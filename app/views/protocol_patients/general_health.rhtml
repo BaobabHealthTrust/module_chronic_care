@@ -1,0 +1,43 @@
+<%= javascript_include_tag 'jquery' %>
+<%= javascript_include_tag "utils" %>
+<script type="text/javascript">
+  tt_cancel_show = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
+  tt_cancel_destination = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
+	
+</script>
+<%	@concept = []
+	@regimen_concepts.each do |reg|
+		@concept << reg.concept.fullname
+	 end %>
+<form method='post' action="/encounters/create">
+<input type='hidden' name='program' value='CHRONIC CARE PROGRAM' />
+	<input type='hidden' name='encounter_type' value='GENERAL HEALTH' />
+	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
+	<input type='hidden' name='user_id' value='<%= @user.id %>' />
+
+<% @treatements_list = ["Heart disease", "Stroke", "TIA", "Diabetes", "Kidney Disease"] %>
+
+<%= select_tag "choice", options_for_select(@treatements_list),
+	{ :field_type => 'text',
+      :helpText => "Patient has any of the following:",
+      :id => "choice",
+	  :name=> "concept[Chronic disease][]",
+      :multiple => true,
+      :tt_pageStyleClass => "MultiSelectList",
+      :optional => true } %>
+
+<%= select_tag "treatment", options_for_select(@concept),
+		{:id => 'regimen_concept_id',
+		:optional => true,
+		:multiple => true,
+		:name => 'concept[treatment][]',
+		:tt_pageStyleClass => "MultiSelectList",
+		:condition => "$('choice').value.length > 0",
+		:helpText => "Treatment Received" } %>
+
+ <%= touch_yes_no_unknown_tag "Drug Allergy", @patient, nil,
+	{	:id => "drug_allergy",
+	:condition => "$('choice').value.length > 0" ,
+	:name => 'concept[Drug Allergy]',
+	:helpText => "An drug allergies" } %>
+</form>

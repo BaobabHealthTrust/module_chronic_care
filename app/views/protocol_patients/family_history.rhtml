@@ -1,0 +1,83 @@
+<style>
+  .summary {
+    font-size: 27px;
+    padding-left: 15px;
+  }
+  
+  .data {
+    color: black;
+    font-size: 25px;
+  }
+</style>
+<script type='text/javascript' language='javascript'>
+<!--
+	tt_cancel_show = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
+	tt_cancel_destination = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
+
+	function showSelectedConditions() {
+      var conditions = [];
+
+      if ($('cardiovascular').value.length > 0)
+        conditions.push("Family History of cardiovascular: " + $('cardiovascular').value);
+
+      if ($('diabetes').value.length > 0)
+        conditions.push("Family History of diabetes: " + $('diabetes').value);
+
+      if ($('hypertension').value.length > 0)
+        conditions.push("Family History of hypertension: " + $('hypertension').value);
+
+      if ($('kidney').value.length > 0)
+        conditions.push("Family History of kidney disease: " + $('kidney').value);
+
+      var html
+      html = "<ul>"
+      for(var i=0;i < conditions.length;i++) {
+        if (conditions[i].length > 0)
+          html += "<li class='data'>" + conditions[i] + "</li>";
+
+      }
+      html += "</ul>"
+	  $('inputFrame'+tstCurrentPage).innerHTML = '<div id="summary">' + html + '</div>' ;
+	  $("clearButton").style.display = "none";
+  }
+</script>
+
+<form method='post' action='/encounters/create'>
+	<input type='hidden' name='program' value='CHRONIC CARE PROGRAM' />
+	<input type='hidden' name='encounter_type' value='FAMILY MEDICAL HISTORY ' />
+	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
+	<input type='hidden' name='user_id' value='<%= @user.id %>' />
+	
+	<select id='cardiovascular' name='concept[Does the family have a history of cardiovascular related diseases?]' helpText='Family History of Premature cardiovascular death? ' pos='0' >
+	<option></option>
+	<option value='No'>No</option>
+	<option value='Yes'>Yes</option>
+	</select>
+
+	<select id='diabetes' name='concept[diabetes family history]' helpText='Family History of Diabetes? ' pos='1' >
+	<option></option>
+	<option value='No'>No</option>
+	<option value='Yes'>Yes</option>
+	</select>
+
+	<select id='hypertension' name='concept[Does the family have a history of hypertension?]' helpText='Does the family have a history of hypertension? ' pos='2' >
+	<option></option>
+	<option value='No'>No</option>
+	<option value='Yes'>Yes</option>
+	</select>
+
+
+	<select id='kidney' name='concept[Kidney disease]' helpText='Family History Kidney disease ' pos='3' >
+	<option></option>
+	<option value='No'>No</option>
+	<option value='Yes'>Yes</option>
+	</select>
+
+<label for='summary'>Summary</label>
+	<%= text_field_tag :summary, nil, {
+	  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';",
+	  :optional => "true",
+	  :tt_pageStyleClass => "NoControls" } %>
+
+
+</form>

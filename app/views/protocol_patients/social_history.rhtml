@@ -1,0 +1,170 @@
+<style>
+  .summary {
+    font-size: 27px;
+    padding-left: 15px;
+  }
+
+  .data {
+    color: black;
+    font-size: 25px;
+  }
+  .warning{
+	color: red;
+	font-weight:bold;
+	font-size: 25px;
+  }
+</style>
+<script type='text/javascript' language='javascript'>
+<!--
+	tt_cancel_show = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
+	tt_cancel_destination = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
+
+	function showSelectedConditions() {
+      var conditions = [];
+
+      if ($('smoking').value.length > 0)
+        conditions.push("Smoke Cigarettes: " + $('smoking').value);
+
+      if ($('number_of_cigarettes').value.length > 0)
+        conditions.push("number of cigarettes per day: " + $('number_of_cigarettes').value + " Cigarettes");
+
+      if ($('current_smoker').value.length > 0)
+        conditions.push("Currently smokes: " + $('current_smoker').value);
+
+      if ($('drink_alcohol').value.length > 0)
+        conditions.push("Drinks alcohol?: " + $('drink_alcohol').value);
+
+	  if ($('drinks_per_day').value.length > 0)
+        conditions.push("Drinks of alcohol per day?: " + $('drinks_per_day').value + " Units");
+
+	  if ($('days_per_week').value.length > 0)
+        conditions.push("Number of Alcohol drinking days per week: " + $('days_per_week').value + " Days");
+
+      var html
+      html = "<ul>"
+      for(var i=0;i < conditions.length;i++) {
+        if (conditions[i].length > 0)
+          html += "<li class='data'>" + conditions[i] + "</li>";
+
+      }
+      html += "</ul>"
+	  if (($('drinks_per_day').value > 6) || ($('days_per_week').value > 3)){
+		html += "<span class='warning'>Patient is a heavy drinker!</span>";
+		 	$('alcoholism').value = "Yes"
+	  }
+
+	  $('inputFrame'+tstCurrentPage).innerHTML = '<div id="summary">' + html + '</div>' ;
+	  $("clearButton").style.display = "none";
+  }
+</script>
+
+<form method='post' action='/encounters/create'>
+	<input type='hidden' name='program' value='CHRONIC CARE PROGRAM' />
+	<input type='hidden' name='encounter_type' value='SOCIAL HISTORY ' />
+	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
+	<input type='hidden' name='user_id' value='<%= @user.id %>' />
+	<input type='hidden' name='concept[Alcoholism]' id="alcoholism">
+	<%#= raise @patient.gender.to_yaml   %>
+	<%#= raise @patient.age.to_yaml   %>
+	<table>
+		<tr>
+			<td>
+				Ever smoked? 
+			</td>
+			<td>
+<select id='smoking' name='concept[Smoking History]' helpText='Ever smoked? ' pos='0' >
+<option></option>
+<option value='No'>No</option>
+ <option value='Yes'>Yes</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Number of cigarettes per day? 
+			</td>
+			<td>
+<input type='text' id='number_of_cigarettes'
+	   name='concept[Number of cigarettes smoked per day]'
+	   helpText='Number of cigarettes per day? '
+	   field_type="number"  pos='1'
+	   condition='__$("smoking").value.toLowerCase() == "yes"'
+	   tt_pageStyleClass = "Numeric NumbersWithUnknown"/>
+			</td>
+		</tr>
+		
+		<tr>
+			<td>
+				Do you currently smoke? 
+			</td>
+			<td>
+<select id='current_smoker' name='concept[current smoker]' helpText='Do you currently smoke? ' pos='3'  condition='__$("smoking").value.toLowerCase() == "yes"' >
+<option></option>
+<option value='No'>No</option>
+ <option value='Yes'>Yes</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Does patient drink alcohol? 
+			</td>
+			<td>
+	<% if (@patient.gender.to_s.upcase == "F" and  @patient.age.to_i >= 4) || (@patient.gender.to_s.upcase == "M" and  @patient.age.to_i >= 5) %>
+
+<select id='drink_alcohol'
+		name='concept[Does the patient drink alcohol?]'
+		helpText='Does patient drink alcohol? '
+		pos='4' >
+<option></option>
+<option value='No'>No</option>
+ <option value='Yes'>Yes</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Alcohol drinks per day? 
+			</td>
+			<td>
+<input type='text' id='drinks_per_day'  
+	   name='concept[Alcoholic drinks per day]'
+	   helpText='Alcohol drinks per day? '
+	   field_type="number"
+	   pos='5'
+	   condition='__$("drink_alcohol").value.toLowerCase() == "yes"'
+	   tt_pageStyleClass = "Numeric NumbersWithUnknown"/>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Number of days per week alcohol is used? 
+			</td>
+			<td>
+<input type='text' id='days_per_week'  
+	   name='concept[Number of days per week alcohol is used]'
+	   helpText='Number of days per week alcohol is used? '
+	   field_type="number"
+	   pos='6'
+	   min = 1
+	   max = 7
+	   condition='__$("drink_alcohol").value.toLowerCase() == "yes"'
+	   tt_pageStyleClass = "Numeric NumbersWithUnknown"/>
+			</td>
+		</tr>
+		<tr>
+	<% else %>
+		  <%= touch_hidden_tag "Does the patient drink alcohol?", @patient, nil, {:id => "drink_alcohol"}%>
+		  <%= touch_hidden_tag "Alcoholic drinks per day", @patient, nil, {:id => "drinks_per_day"}%>
+		  <%= touch_hidden_tag "Number of days per week alcohol is used", @patient, nil, {:id => "days_per_week"}%>
+	<% end %>
+		  <td>
+			<label for='summary'>Summary</label>
+	<%= text_field_tag :summary, nil, {
+	  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';",
+	  :optional => "true",
+	  :tt_pageStyleClass => "NoControls" } %>
+		  </td>
+		</tr>
+	</table>
+</form>

@@ -30,6 +30,20 @@ module MedicationService
 		diabetes_medication_drug_concepts
 	end
 
+	def self.hypertension_dm_drugs
+		hypertension_medication_concept       = ConceptName.find_by_name("HYPERTENSION MEDICATION").concept_id
+		diabetes_medication_concept       = ConceptName.find_by_name("DIABETES MEDICATION").concept_id
+		cardiac_medication_concept       = ConceptName.find_by_name("CARDIAC MEDICATION").concept_id
+		kidney_failure_medication_concept       = ConceptName.find_by_name("KIDNEY FAILURE CARDIAC MEDICATION").concept_id
+		medication_drug_concepts = ConceptName.find_by_sql("SELECT * FROM concept_set WHERE concept_set 
+		IN (#{hypertension_medication_concept}, #{diabetes_medication_concept}, #{cardiac_medication_concept}, #{kidney_failure_medication_concept})")
+
+		medication_drug_concepts
+	end
+
+	def self.hypertension_dm_medication(drug)
+		hypertension_dm_drugs.map(&:concept_id).include?(drug.concept_id)
+	end
   # Generate a given list of Regimen+s for the given +Patient+ <tt>weight</tt>
   # into select options. 
 	def self.regimen_options(weight, program)

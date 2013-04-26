@@ -50,6 +50,9 @@
         "/reset_datetime?user_id=#{ params[:user_id] }&location_id=#{ params[:location_id] }" :
                 "/set_datetime?user_id=#{ params[:user_id] }&location_id=#{ session[:location_id] || params[:location_id] }") %>'
             ttSize="100px"><%= (!session[:datetime].nil? ? "Reset Date" : "Set Date") %></option>
+  
+   <option value='/clinic/programs?user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>'
+            ttSize="200px">Select Program</option>
   </select>
 
   <form id="register" action="<%= @patient_registration %>/search?user_id=<%= params[:user_id] 

@@ -142,10 +142,12 @@ class TaskFlow
       # If user does not have this activity, goto the patient dashboard
 
 			encounters =  [
-                      'VITALS','UPDATE HIV STATUS','LAB RESULTS',
-                      'COMPLICATIONS','ASSESSMENT','LAB RESULTS'
+                      'VITALS','FAMILY HISTORY','SOCIAL HISTORY','GENERAL HEALTH',
+											'UPDATE HIV STATUS','LAB RESULTS','COMPLICATIONS','TREATMENT',
+											'OUTCOME','ASSESSMENT'
                      ]
 			encounters.each do |tsk|
+			found = false
 			case tsk
 
         when "VITALS"
@@ -159,7 +161,58 @@ class TaskFlow
 					self.url = "/protocol_patients/vitals?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					return self
 
+				when "FAMILY HISTORY"
+					self.patient.encounters.each do | enc |
+					 found = true if enc.name.upcase == "FAMILY MEDICAL HISTORY"
+					end
+					next if found == true
+          history = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
+                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
+                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name('FAMILY MEDICAL HISTORY').id])
+
+					next if !history.blank?
+					self.encounter_type = 'FAMILY MEDICAL HISTORY'
+					self.url = "/protocol_patients/family_history?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+					
+					return self
+
+				when "SOCIAL HISTORY"
+
+					self.patient.encounters.each do | enc |
+					 found = true if enc.name.upcase == "SOCIAL HISTORY"
+					end
+					next if found == true
+
+          history = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
+                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
+                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
+
+					next if !history.blank?
+					self.encounter_type = 'SOCIAL HISTORY'
+					self.url = "/protocol_patients/social_history?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+					return self
+
+				when "GENERAL HEALTH"
+
+					self.patient.encounters.each do | enc |
+					 found = true if enc.name.upcase == "GENERAL HEALTH"
+					end
+					next if found == true
+          history = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
+                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
+                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
+
+					next if !history.blank?
+					self.encounter_type = 'GENERAL HEALTH'
+					self.url = "/protocol_patients/general_health?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+					return self
+
         when "UPDATE HIV STATUS"
+					self.patient.encounters.each do | enc |
+					 found = true if enc.name.upcase == "UPDATE HIV STATUS"
+					end
+					next if found == true
+
 					next if @patient.person.observations.to_s.match(/hiv status/i)
           hiv_status = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
                                   :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
@@ -189,9 +242,13 @@ class TaskFlow
                                   self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
 					next if !assessment.blank?
 					self.encounter_type = "COMPLICATIONS"
-					self.url = "/protocol_patients/complicationss?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+					self.url = "/protocol_patients/complications?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					return self
 				when "LAB RESULTS"
+					self.patient.encounters.each do | enc |
+					 found = true if enc.name.upcase == "LAB RESULTS"
+					end
+					next if found == true
 					assessment = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
                                   :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
                                   self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])

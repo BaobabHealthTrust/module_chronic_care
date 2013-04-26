@@ -1,4 +1,24 @@
 <%= javascript_include_tag "date" %>
+
+<style>
+  .summary {
+    font-size: 27px;
+    padding-left: 15px;
+  }
+
+  .data {
+    color: black;
+    font-size: 25px;
+  }
+
+  #tt_page_hiv_test_month  .inputFrameClass {
+  height: 600px;
+}
+
+ #tt_page_hiv_test_month  #viewport {
+  height: 600px;
+}
+</style>
 <script type='text/javascript' language='javascript'>
 <!--
 	tt_cancel_show = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
@@ -8,12 +28,40 @@
 		var testDate = new Date($('hiv_test_year').value, $('hiv_test_month').value - 1, $('hiv_test_day').value);
 		$('hiv_test_date').value = testDate;
 	}
-	
+
+	function showSelectedConditions() {
+      var conditions = [];
+
+      if ($('status').value.length > 0)
+        conditions.push("HIV status: " + $('status').value);
+
+      if ($('hiv_test_date').value.length > 0){
+		var hivDate = new Date($('hiv_test_date').value)
+        conditions.push("HIV Test Date: " + hivDate.getFullYear() + "/" + (hivDate.getMonth()+ 1)  + "/" + $('hiv_test_day').value);
+	  }
+
+      if ($('on_art').value.length > 0)
+        conditions.push("On ART?: " + $('on_art').value);
+
+      if ($('enroll').value.length > 0)
+        conditions.push("Enroll in HIV program: " + $('enroll').value);
+
+      var html
+      html = "<ul>"
+      for(var i=0;i < conditions.length;i++) {
+        if (conditions[i].length > 0)
+          html += "<li class='data'>" + conditions[i] + "</li>";
+
+      }
+      html += "</ul>"
+	  $('inputFrame'+tstCurrentPage).innerHTML = '<div id="summary">' + html + '</div>' ;
+	  $("clearButton").style.display = "none";
+	}
 	</script>
 
 <form method='post' action='/encounters/create'>
 	<input type='hidden' name='program' value='CHRONIC CARE PROGRAM' />
-	<input type='hidden' name='encounter_type' value='HIV STATUS AT ENROLLMENT ' />
+	<input type='hidden' name='encounter_type' value='UPDATE HIV STATUS' />
 	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
 	<input type='hidden' name='user_id' value='<%= @user.id %>' />
 	<table>
@@ -22,7 +70,7 @@
 				HIV Status 
 			</td>
 			<td>
-<select id='1.1.1' name='concept[HIV Status]' helpText='HIV Status ' pos='0' >
+<select id='status' name='concept[HIV Status]' helpText='HIV Status ' pos='0' >
 <option></option>
 <option value='Unknown'>Unknown</option>
  <option value='Positive'>Positive</option>
@@ -42,7 +90,7 @@
 	:min => "1982",
 	:absoluteMax => Date.today.year,
 	:tt_pageStyleClass => "Numeric NumbersOnly",
-	:condition => '$("1.1.1").value != "UNKNOWN"'} %>
+	:condition => '$("status").value.toLowerCase() != "unknown"'} %>
 			</td>
 		</tr>
 		<tr>
@@ -52,7 +100,7 @@
 			<td>
 <%= select_tag "hiv_test_month", month_name_options,
 	{:helpText => 'HIV test month',
-	:condition => '($("hiv_test_year").value.toLowerCase() != "unknown") && ($("1.1.1").value != "UNKNOWN")',
+	:condition => '($("hiv_test_year").value.toLowerCase() != "unknown") && ($("status").value.toLowerCase() != "unknown")',
 	:tt_onLoad => "__$('keyboard').style.display = 'none'"}%>
 			</td>
 		</tr>
@@ -64,7 +112,7 @@
   <%= text_field_tag "hiv_test_day",  nil,
 	{:field_type => 'number',
 	:helpText => 'HIV test day',
-	:condition => '($("hiv_test_year").value != "Unknown") && ($("hiv_test_month").value != "Unknown") && ($("1.1.1").value != "UNKNOWN")',
+	:condition => '($("hiv_test_year").value != "Unknown") && ($("hiv_test_month").value != "Unknown") && ($("status").value.toLowerCase() != "unknown")',
 	:tt_onLoad => "getDayOfMonthPicker($('hiv_test_year').value, $('hiv_test_month').value);",
 	:tt_onUnload=> "updateTestDate();",
 	:tt_pageStyleClass => 'NumbersOnlyWithUnknown'
@@ -78,7 +126,7 @@
 				On ART? 
 			</td>
 			<td>
-<select id='1.1.6' name='concept[on art]' helpText='On ART? ' pos='5' >
+<select id='on_art' name='concept[on art]' helpText='On ART? ' pos='5' >
 <option></option>
 <option value='Yes'>Yes</option>
  <option value='No'>No</option>
@@ -90,12 +138,21 @@
 				On ART? 
 			</td>
 			<td>
-<select id='1.1.7' name='concept[Patient enrolled in HIV program]' helpText='On ART? ' pos='6'  condition='__$("1.1.6").value.toLowerCase() == "no"' >
+<select id='enroll' name='concept[Patient enrolled in HIV program]' helpText='On ART? ' pos='6'  condition='__$("on_art").value.toLowerCase() == "no"' >
 <option></option>
 <option value='No'>No</option>
  <option value='Yes'>Yes</option>
  </select>
 			</td>
+		</tr>
+		<tr>
+		<td>
+			<label for='summary'>Summary</label>
+			<%= text_field_tag :summary, nil, {
+			  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';",
+			  :optional => "true",
+			  :tt_pageStyleClass => "NoControls" } %>
+		  </td>
 		</tr>
 	</table>
 </form>

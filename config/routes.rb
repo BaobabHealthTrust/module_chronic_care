@@ -1,6 +1,6 @@
 ActionController::Routing::Routes.draw do |map|
   
-  map.root :controller => 'clinic', :action => 'programs'
+  map.root :controller => 'clinic', :action => 'index'
   map.create '/create', :controller => 'encounters', :action => 'create'
 
   map.user_login '/user_login/:id', :controller => 'clinic', :action => 'user_login'

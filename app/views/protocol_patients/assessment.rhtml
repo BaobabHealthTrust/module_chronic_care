@@ -1,8 +1,133 @@
+<style>
+th { text-align: center;
+	 vertical-align: middle;
+	 background-color: #9250DE;
+	 color: white;
+	 height: 10%;
+	 border-radius: 20px ;
+}
+  #charttable{
+	border-color:#ff0000 #0000ff;
+	border-radius: 20px ;
+	border-style: outset;
+	height: 590px;
+	
+  }
+
+  #first{
+	width:10% ! important;
+	background-color: #336600;
+  }
+
+   #second{
+	width:10%;
+	background-color: #FFE47A;
+  }
+
+   #third{
+	width:10%;
+	background-color: #FF9933;
+  }
+
+   #forth{
+	width:10%;
+	background-color: #FF3333;
+  }
+
+   #fifth{
+	width:10%;
+	background-color: #B8002E;
+  }
+  #innertable {
+
+  }
+  #summary_container {
+    bottom: 124px;
+    font-size: 20px;
+    left: 25px;
+    position: absolute;
+    z-index: 600;
+    border-radius: 10px 10px 10px 10px;
+    width: 47.2em;
+    border-style: solid;
+    border-width: 1px;
+    background-color: lightgrey;
+    display: none;
+    -moz-user-select: none;
+    height: 18em;
+    overflow: auto;
+  }
+
+  .summary {
+    font-size: 27px;
+    padding-left: 15px;
+  }
+
+  .data {
+    color: black;
+    font-size: 25px;
+  }
+  .menu{
+	border-radius: 20px ;
+	border-style:solid;
+	border-color:#ff0000 #0000ff;
+  }
+  .range{
+	height: 5%;
+	background-color:white;
+	border-radius: 20px ;
+	border-style:solid;
+	border-color:#ff0000 #0000ff;
+	
+  }
+
+</style>
+
 <script type='text/javascript' language='javascript'>
 <!--
 	tt_cancel_show = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
 	tt_cancel_destination = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
-	</script>
+
+   function showSelectedConditions() {
+      var conditions = [];
+
+		conditions.push("Age : " + '<%= @patient.age %>');
+
+        conditions.push("Gender : " + '<%= @patient.gender %>');
+
+		conditions.push("Smoker : " + '<%= @smoking_status %>');
+
+		if ($('diabetic').value.length > 0)
+        conditions.push("Diabetes : " + $('diabetic').value);
+
+		conditions.push("SBP : " + '<%= @systolic_value.to_i  %>' + " mm Hg");
+
+		conditions.push("Cholesterol : " + '<%= @cholesterol_value.to_i / 18  %>' + " mmol/l");
+
+      //var container = $("summary_container");
+      var html
+      html = "<table valign='top' id='maintable' width='100%'><tr valign='top'><td width='20%' class='menu'><ul>"
+      for(var i=0;i < conditions.length;i++) {
+        if (conditions[i].length > 0)
+          html += "<li class='data'>" + conditions[i] + "</li>";
+
+      }
+      html += "</ul></td>"
+
+	  html +="<td valign='top' width='80%' id='innertable'><table id='charttable'  width='100%'><tr ><th colspan='10'>WHO/ISH risk Prediction</th></tr>"
+	  html += "<tr  valign='top' class='range'>"
+	  html += "<td width='10%'><10%  </td><td id='first'>&nbsp;  </td>"
+	  html += "<td width='10%'>>=10% and <20% </td><td id='second'>&nbsp; </td>"
+	  html += "<td width='10%'>>=20% and <30% </td><td id='third'>&nbsp; </td>"
+	  html += "<td width='10%'>>=30% and <40% </td><td id='forth'>&nbsp; </td>"
+	  html += "<td width='10%'>>= 40% </td> <td id='fifth'>&nbsp;</td></tr>"
+	  html += "<tr><td th colspan='10'></td></tr></table></td></tr>"
+	  html += "</table>"
+	  $('inputFrame'+tstCurrentPage).innerHTML = '<div id="summary">' + html + '</div>' ;
+	  $("clearButton").style.display = "none";
+  }
+
+</script>
 
 <form method='post' action='/encounters/create'>
 	<input type='hidden' name='program' value='CHRONIC CARE PROGRAM' />
@@ -15,7 +140,7 @@
 				Is patient Diabetic? 
 			</td>
 			<td>
-<select id='1.1.1' name='concept[Patient has Diabetes]' helpText='Is patient Diabetic? ' pos='1' >
+<select id='diabetic' name='concept[Patient has Diabetes]' helpText='Is patient Diabetic? ' pos='1' >
 <option></option>
 <option value='No'>No</option>
  <option value='Yes'>Yes</option>
@@ -24,11 +149,14 @@
 		</tr>
 		<tr>
 			<td>
-				Patient Summary 
+				Risk Pridiction for: <b><%= @patient.name %></b>
 			</td>
 			<td>
-	<label for='summary'>Patient Summary</label>
-	<%= text_field_tag :summary, nil, { :tt_onLoad => "__$('keyboard').style.display = 'none';", :optional => "true", :tt_pageStyleClass => "NoControls" } %>
+	<label for='summary'>Risk Pridiction for: <b><%= @patient.name %></b> </label>
+	<%= text_field_tag :summary, nil, { 
+	  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';",
+	  :optional => "true",
+	  :tt_pageStyleClass => "NoControls" } %>
 
 			</td>
 		</tr>

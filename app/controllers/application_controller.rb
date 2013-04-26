@@ -53,11 +53,11 @@ class ApplicationController < ActionController::Base
     f.close
 	
     if @user.empty?
-      #redirect_to "/user_login?internal=true" and return
+      redirect_to "/user_login?internal=true" and return
     end
 
     if @user["token"].nil?
-      #redirect_to "/user_login?internal=true" and return
+      redirect_to "/user_login?internal=true" and return
     end
 
   end

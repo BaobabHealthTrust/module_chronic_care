@@ -2,6 +2,351 @@
 <!--
 	tt_cancel_show = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
 	tt_cancel_destination = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
+
+  function getSelected(){
+    var choices = "";
+
+    for(var o = 0; o < __$('choice').options.length; o++){
+      if(__$('choice').options[o].selected == true){
+        choices += __$('choice').options[o].innerHTML + " ";
+      }
+    }
+
+    return choices;
+  }
+
+  function getComplaints(){
+    var complaints = "";
+
+    for(var o = 0; o < $('multiple').options.length; o++){
+      if($('multiple').options[o].selected == true){
+        complaints += $('multiple').options[o].innerHTML + " ";
+      }
+    }
+
+    return complaints;
+  }
+
+  function calculateBP(pos){
+    var bp;
+
+    if(!$('bp')){
+      var div = document.createElement("div");
+      div.id = "bp";
+      div.className = "statusLabel";
+
+      $("inputFrame" + tstCurrentPage).appendChild(div);
+    }
+
+    if(pos == 1){
+      bp = ($("touchscreenInput" + tstCurrentPage).value.trim().length > 0 ? $("touchscreenInput" +
+        tstCurrentPage).value.trim() : "?") +
+        "/" + ($("diastolic_blood_pressure").value.trim().length > 0 ? $("diastolic_blood_pressure").value.trim() : "?");
+    } else if(pos == 2){
+      bp = ($("systolic_blood_pressure").value.trim().length > 0 ? $("systolic_blood_pressure").value.trim() : "?") +
+        "/" + ($("touchscreenInput" + tstCurrentPage).value.trim().length > 0 ? $("touchscreenInput" +
+        tstCurrentPage).value.trim() : "?");
+    }
+
+    $("bp").innerHTML = "Blood Pressure: <i style='font-size: 1.2em; float: right;'>" + bp + "</i>";
+
+    timedEvent = setTimeout('calculateBP(' + pos + ')', 500);
+  }
+
+
+
+  /* starts */
+
+
+   function showSelectedConditions() {
+      var conditions = [];
+
+      if ($('weight').value.length > 0)
+        conditions.push("Weight: " + $('weight').value);
+
+
+      if ($('temperature').value.length > 0)
+        conditions.push("Temperature: " + $('temperature').value);
+
+      if($('systolic_blood_pressure').value.length > 0 && $('diastolic_blood_pressure').value.length > 0){
+        conditions.push("BP: " + $('systolic_blood_pressure').value +"/"+ $('diastolic_blood_pressure').value);
+      }
+
+      if ($('respiratory_rate').value.length > 0)
+        conditions.push("Respiratory rate: " + $('respiratory_rate').value);
+
+      if ($('pulse').value.length > 0)
+        conditions.push("Pulse: " + $('pulse').value);
+
+      if ($('oxygen').value.length > 0)
+        conditions.push("Oxygen: " + $('oxygen').value);
+
+      if ($('waist_circumference').value.length > 0)
+        conditions.push("Waist Circumference: " + $('waist_circumference').value);
+
+
+
+      //var container = $("summary_container");
+      var html
+      html = "<ul>"
+      for(var i=0;i < conditions.length;i++) {
+        if (conditions[i].length > 0)
+          html += "<li class='data'>" + conditions[i] + "</li>";
+
+      }
+      html += "</ul>"
+	  $('inputFrame'+tstCurrentPage).innerHTML = '<div id="summary">' + html + '</div>' ;
+	  $("clearButton").style.display = "none";
+  }
+
+    function selectTriageCategory(category) {
+      var options = document.getElementsByTagName("li");
+      for(var i = 0; i < options.length; i++){
+        if(options[i].innerHTML == category){
+          updateTouchscreenInputForSelect(options[i]);
+          break
+        }
+      }
+    }
+
+
+    function triage() {
+
+      if ($('temperature').value.length > 0) {
+        temp = parseFloat($('temperature').value);
+        if (temp > 40 || temp < 34) {
+          return 'EMERGENCY'
+        }
+      }
+
+      /*if ($('temperature').length > 0) {
+        temp = parseFloat($('temperature').value);
+        if (temp > 40 || temp < 34) {
+          return 'EMERGENCY'
+        }
+      }*/
+
+      if($('systolic_blood_pressure').value.length > 0){
+        sbp = parseFloat($('systolic_blood_pressure').value);
+        if (sbp > 220 || sbp < 80) {
+          return 'EMERGENCY'
+        }
+      }
+
+      if($('diastolic_blood_pressure').value.length > 0){
+        dbp = parseFloat($('diastolic_blood_pressure').value);
+        if (dbp > 130) {
+          return 'EMERGENCY'
+        }
+      }
+
+      if($('respiratory_rate').value.length > 0){
+        respiratory_rate = parseFloat($('respiratory_rate').value);
+        if (respiratory_rate > 30 || respiratory_rate < 8) {
+          return 'EMERGENCY'
+        }
+      }
+
+      if($('pulse').value.length > 0){
+        pulse = parseFloat($('pulse').value);
+        if (pulse > 130 || pulse < 40) {
+          return 'EMERGENCY'
+        }
+      }
+
+      if($('oxygen').value.length > 0){
+        oxygen = parseFloat($('oxygen').value);
+        if (oxygen < 90) {
+          return 'EMERGENCY'
+        }
+      }
+
+      if($('life threatening condition').value.length > 0){
+        ltc = $('life threatening condition').value;
+        if (ltc != 'None' && ltc != 'Other') {
+          return 'EMERGENCY'
+        }
+      }
+
+
+      /*  ..................... */
+
+
+
+      if ($('temperature').value.length > 0) {
+        temp = parseFloat($('temperature').value);
+        if (temp > 38 || temp < 35.5) {
+          return 'PRIORITY'
+        }
+      }
+
+      /*if ($('temperature').length > 0) {
+        temp = parseFloat($('temperature').value);
+        if (temp > 40 || temp < 34) {
+          return 'EMERGENCY'
+        }
+      }*/
+
+      if($('systolic_blood_pressure').value.length > 0){
+        sbp = parseFloat($('systolic_blood_pressure').value);
+        if (sbp > 180 || sbp < 90) {
+          return 'PRIORITY'
+        }
+      }
+
+      if($('diastolic_blood_pressure').value.length > 0){
+        dbp = parseFloat($('diastolic_blood_pressure').value);
+        if (dbp > 110) {
+          return 'PRIORITY'
+        }
+      }
+
+      if($('respiratory_rate').value.length > 0){
+        respiratory_rate = parseFloat($('respiratory_rate').value);
+        if (respiratory_rate > 20 || respiratory_rate < 12) {
+          return 'PRIORITY'
+        }
+      }
+
+      if($('pulse').value.length > 0){
+        pulse = parseFloat($('pulse').value);
+        if (pulse > 110 || pulse < 50) {
+          return 'PRIORITY'
+        }
+      }
+
+      if($('oxygen').value.length > 0){
+        oxygen = parseFloat($('oxygen').value);
+        if (oxygen < 92) {
+          return 'PRIORITY'
+        }
+      }
+
+
+     /* .......................... */
+
+
+
+
+
+
+      for(var i=0;i < selected_complaints.length;i++) {
+        if (selected_complaints[i] == 'Snike bite (Bites)')
+          return 'EMERGENCY'
+
+        if (selected_complaints[i] == 'Major (Burns)')
+          return 'EMERGENCY'
+
+        if (selected_complaints[i] == 'Snake bite (Bites)')
+          return 'EMERGENCY'
+
+        if (selected_complaints[i] == 'PV bleeding (Pregnancy)')
+          return 'EMERGENCY'
+
+        if (selected_complaints[i] == 'Major (Trauma)')
+          return 'EMERGENCY'
+
+        if (selected_complaints[i] == 'Violent behaviour')
+          return 'EMERGENCY'
+
+        if (selected_complaints[i] == 'Severe (Shortness of breath)')
+          return 'EMERGENCY'
+
+      }
+
+      for(var i=0;i < selected_complaints.length;i++) {
+        //alert(selected_complaints[i])
+        if (selected_complaints[i] == 'Active bleeding')
+          return 'PRIORITY'
+
+        if (selected_complaints[i] == 'Chest pain')
+          return 'PRIORITY'
+
+        if (selected_complaints[i] == 'Focal neurologic deficit')
+          return 'PRIORITY'
+
+        if (selected_complaints[i] == 'Lower limb (Fracture)')
+          return 'PRIORITY'
+
+        if (selected_complaints[i] == 'Pelvis limb (Fracture)')
+          return 'PRIORITY'
+
+        if (selected_complaints[i] == 'Rib (Fracture)')
+          return 'PRIORITY'
+
+        if (selected_complaints[i] == 'Skull (Fracture)')
+          return 'PRIORITY'
+
+        if (selected_complaints[i] == 'Spine (Fracture)')
+          return 'PRIORITY'
+
+        if (selected_complaints[i] == 'Upper limb (Fracture)')
+          return 'PRIORITY'
+
+        if (selected_complaints[i] == 'Severe (Head injury)')
+          return 'PRIORITY'
+
+        if (selected_complaints[i] == 'Unconscious (Head injury)')
+          return 'PRIORITY'
+
+        if (selected_complaints[i] == 'Medication history (Convulsions)')
+          return 'PRIORITY'
+
+        if (selected_complaints[i] == 'Minor (Burns)')
+          return 'PRIORITY'
+
+        if (selected_complaints[i] == 'Iron posioning (Poisioning)')
+          return 'PRIORITY'
+
+        if (selected_complaints[i] == 'Organophosphate posioning (Poisioning)')
+          return 'PRIORITY'
+
+        if (selected_complaints[i] == 'Other (Poisioning)')
+          return 'PRIORITY'
+
+        if (selected_complaints[i] == 'Paraffin (Poisioning)')
+          return 'PRIORITY'
+
+        if (selected_complaints[i] == 'Abdominal pain (Pregnancy)')
+          return 'PRIORITY'
+
+        if (selected_complaints[i] == 'Pain')
+          return 'PRIORITY'
+
+        if (selected_complaints[i] == 'Sexual assualt')
+          return 'PRIORITY'
+
+        if (selected_complaints[i] == 'Visual changes')
+          return 'PRIORITY'
+
+        if (selected_complaints[i] == 'Body swelling')
+          return 'PRIORITY'
+
+        if (selected_complaints[i] == 'Weakness')
+          return 'PRIORITY'
+
+      }
+
+
+
+      return 'QUEUE';
+    }
+
+
+    var selected_complaints = [];
+
+    function unLoadSelectedComplaints() {
+      selected_complaints = [];
+    }
+
+    function LoadSelectedComplaints() {
+      complaints = $('touchscreenInput'+tstCurrentPage).value.split(';');
+      for(var i = 0 ; i < complaints.length; i++) {
+        selected_complaints.push(complaints[i]);
+      }
+    }
+
+  /* end */
 	</script>
 
 <form method='post' action='/encounters/create'>
@@ -9,49 +354,59 @@
 	<input type='hidden' name='encounter_type' value='COMPLICATIONS ' />
 	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
 	<input type='hidden' name='user_id' value='<%= @user.id %>' />
-	<table>
-		<tr>
-			<td>
-				Complication Type Type 
-			</td>
-			<td>
-<select id='1.1.1' name='concept[Complications]' helpText='Complication Type Type ' pos='1' >
-<option></option>
-<option value='Amputation'>Amputation</option>
- <option value='Stroke'>Stroke</option>
- <option value='Heart Attack'>Heart Attack</option>
- <option value='CVA'>CVA</option>
- <option value='MI'>MI</option>
- <option value='Creatinine'>Creatinine</option>
- <option value='Funduscopy'>Funduscopy</option>
- <option value='Shortness of breath'>Shortness of breath</option>
- <option value='Oedema'>Oedema</option>
- </select>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				Test year 
-			</td>
-			<td>
-<input type='text' id='1.1.2'  name='concept[Test year ]' helpText='Test year '  pos='2'  field_type='number'  condition='__$("1.1.1").value.toLowerCase() != "heart attack" && __$("1.1.1").value.toLowerCase() != "stroke"  && __$("1.1.1").value.toLowerCase() != "amputation"'  absoluteMin='1982'  tt_pageStyleClass='NumbersOnlyWithUnknown' />
-			</td>
-		</tr>
-		<tr>
-			<td>
-				Test month 
-			</td>
-			<td>
-<input type='text' id='1.1.3'  name='concept[Test month ]' helpText='Test month '  pos='3'  condition='__$("1.1.1").value.toLowerCase() != "heart attack" && __$("1.1.1").value.toLowerCase() != "stroke"  && __$("1.1.1").value.toLowerCase() != "amputation"'  tt_pageStyleClass='NumbersOnlyWithUnknown' />
-			</td>
-		</tr>
-		<tr>
-			<td>
-				Test day 
-			</td>
-			<td>
-<input type='text' id='1.1.4'  name='concept[Test day ]' helpText='Test day '  pos='4'  condition='__$("1.1.1").value.toLowerCase() != "heart attack" && __$("1.1.1").value.toLowerCase() != "stroke"  && __$("1.1.1").value.toLowerCase() != "amputation"'  tt_pageStyleClass='NumbersOnlyWithUnknown' />
-			</td>
-		</tr>
-	</table>
+
+	<% @treatements_list = ["Amputation", "Stroke", "Myocardial injactia(MI)", "Creatinine", "Funduscopy","Shortness of breath","Oedema","CVA"] %>
+
+<%= select_tag "Complication", options_for_select(@treatements_list),
+	{ :field_type => 'text',
+      :helpText => "Patient has any of the following:",
+      :id => "choice",
+	  :name=> "concept[Complications][]",
+      :multiple => true,
+      :tt_pageStyleClass => "MultiSelectList",
+      :optional => true} %>
+
+
+<%= text_field_tag "Oedema", nil, {
+	:helpText => 'Oedema Test Date',
+	:name => 'concept[oedema]',
+	:field_type => 'date',
+	:id => 'oedema',
+	:condition => 'getSelected().match(/oedema/i)'}  %>
+
+<%= text_field_tag "Shortness of breath", nil, {
+	:helpText => 'Shortness of breath Test Date',
+	:name => 'concept[Shortness of breath]',
+	:field_type => 'date',
+	:id => 'shortness_of_breath',
+	:condition => 'getSelected().match(/shortness\sof\sbreath/i)'}  %>
+
+<%= text_field_tag "Funduscopy", nil, {
+	:helpText => 'Funduscopy Test Date',
+	:name => 'concept[Fundus]',
+	:field_type => 'date',
+	:id => 'funduscopy',
+	:condition => 'getSelected().match(/funduscopy/i)'}  %>
+
+<%= text_field_tag "Creatinine", nil, {
+	:helpText => 'Creatinine Test Date',
+	:name => 'concept[Creatinine]',
+	:field_type => 'date',
+	:id => 'creatinine',
+	:condition => 'getSelected().match(/creatinine/i)'}  %>
+
+<%= text_field_tag "MI", nil, {
+	:helpText => 'Myocardial Injactia Test Date',
+	:name => 'concept[myocardial injactia]',
+	:field_type => 'date',
+	:id => 'mi',
+	:condition => 'getSelected().match(/myocardial injactia(mi)/i)'}  %>
+
+<%= text_field_tag "CVA", nil, {
+	:helpText => 'CVA Test Date',
+	:name => 'concept[Cardiac]',
+	:field_type => 'date',
+	:id => 'cva',
+	:condition => 'getSelected().match(/cva/i)'}  %>
+
 </form>

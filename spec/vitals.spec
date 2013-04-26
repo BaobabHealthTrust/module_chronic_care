@@ -1,4 +1,4 @@
-P.1. VITALS [program: CHRONIC CARE MODULE, label: Vitals]
+P.1. VITALS [program: CHRONIC CARE PROGRAM, label: Vitals]
 C.1.1. Capture the following vitals for both men and women 40 years or old
 Q.1.1.1. Weight [pos: 1, concept: Weight, field_type: number]
 Q.1.1.2. Height [pos: 2, concept: Height, field_type: number]

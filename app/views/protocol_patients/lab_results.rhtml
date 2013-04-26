@@ -1,7 +1,8 @@
 <%= javascript_include_tag 'jquery' %>
 <%= javascript_include_tag "utils" %>
 <script type="text/javascript">
-  //var tt_cancel_destination = "/patients/show/<%= @patient.patient_id %>"
+  tt_cancel_show = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
+  tt_cancel_destination = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
 
   function resetPageAttributes(currentPage, attr){
     var attributes = {};
@@ -86,36 +87,36 @@
     $('cnf_test_type_value_coded_or_text').value    = '';
     $('cnf_concept_name').value                     = '';
     $('cnf_parent_concept_name').value              = '';
-	
-    if(values_string.match(/fasting blood sugar/i)){
+
+    if(values_string.contains("FASTING BLOOD SUGAR")){
       $('fbs_test_type_concept_name').value           = 'BLOOD SUGAR TEST TYPE';
       $('fbs_parent_concept_name').value              = 'BLOOD SUGAR TEST TYPE';
       $('fbs_test_type_value_coded_or_text').value    = 'FASTING';
       $('fbs_concept_name').value                     = 'FASTING';
     }
 
-    if(values_string.match(/RANDOM BLOOD SUGAR/g)){
+    if(values_string.contains("RANDOM BLOOD SUGAR")){
       $('rbs_test_type_concept_name').value           = 'BLOOD SUGAR TEST TYPE';
       $('rbs_parent_concept_name').value              = 'BLOOD SUGAR TEST TYPE';
       $('rbs_test_type_value_coded_or_text').value    = 'RANDOM';
       $('rbs_concept_name').value                     = 'RANDOM';
     }
 
-    if(values_string.match(/HbA1c/g)){
+    if(values_string.contains("HbA1c")){
       $('HbA1c_test_type_concept_name').value         = 'BLOOD SUGAR TEST TYPE';
       $('HbA1c_parent_concept_name').value            = 'BLOOD SUGAR TEST TYPE';
       $('HbA1c_test_type_value_coded_or_text').value  = 'HbA1c';
       $('HbA1c_concept_name').value                   = 'HbA1c';
     }
 
-    if(values_string.match(/CHOLESTEROL FASTING/g)){
+    if(values_string.contains("CHOLESTEROL FASTING")){
       $('cf_test_type_concept_name').value            = 'CHOLESTEROL TEST TYPE';
       $('cf_parent_concept_name').value               = 'CHOLESTEROL TEST TYPE';
       $('cf_test_type_value_coded_or_text').value     = 'FASTING';
       $('cf_concept_name').value                      = 'FASTING';
     }
 
-    if(values_string.match(/CHOLESTEROL NOT FASTING/g)){
+    if(values_string.contains("CHOLESTEROL NOT FASTING")){
       $('cnf_test_type_concept_name').value           = 'CHOLESTEROL TEST TYPE';
       $('cnf_parent_concept_name').value              = 'CHOLESTEROL TEST TYPE';
       $('cnf_test_type_value_coded_or_text').value    = 'NOT FASTING';
@@ -124,11 +125,11 @@
   }
 </script>
 
-<form method='post' action="/encounters/create">
   <% default={
     :allowFreeText => 'true',
   } %>
 
+<form method='post' action='/encounters/create'>
 	<input type='hidden' name='program' value='CHRONIC CARE PROGRAM' />
 	<input type='hidden' name='encounter_type' value='LAB RESULTS' />
 	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
@@ -388,6 +389,6 @@
 	<% else %>
 		<%= hidden_field_tag "filter[provider]", nil %>
 	<% end %>
-	
+
     <%= submit_tag "Finish" %>
 </form>
