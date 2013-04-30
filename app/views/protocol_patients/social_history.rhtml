@@ -110,7 +110,7 @@
 				Does patient drink alcohol? 
 			</td>
 			<td>
-	<% if (@patient.gender.to_s.upcase == "F" and  @patient.age.to_i >= 4) || (@patient.gender.to_s.upcase == "M" and  @patient.age.to_i >= 5) %>
+	<% if ((@patient.gender.to_s.upcase == "F" || "FEMALE") and  @patient.age.to_i >= 4) || ((@patient.gender.to_s.upcase == "M" || "MALE") and  @patient.age.to_i >= 5) %>
 
 <select id='drink_alcohol'
 		name='concept[Does the patient drink alcohol?]'

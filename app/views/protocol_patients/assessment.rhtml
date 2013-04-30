@@ -139,6 +139,31 @@ th { text-align: center;
   #classed1 {
 	background-color: #B8002E;
   }
+#no8no60f120, #no7no60f120, #no6no60f120, #no5no60f120, #no4no60f120, #no7no60f140, #no6no60f140, #no5no60f140, #no4no60f140, #no6no60f160, #no5no60f160, #no4no60f160, #no4no70f120, #no5no70f120, #no6no70f120, #no7no70f120, #no8no70f120, #no4no70f140, #no5no70f140, #no6no70f140, #no4no70f160 {
+	width:10% ! important;
+	background-color: #336600;
+  }
+
+#no4no50f180, #no8no60f140, #no8no60f160, #no7no60f160, #no4no60f180, #no7no70f140, #no8no70f140,#no5no70f160, #no6no70f160, #no7no70f160 {
+	width:10%;
+	background-color: #FFE47A;
+  }
+
+#no5no50f180, #no6no50f180, #no5no60f180,#no6no60f180, #no8no70f160, #no4no70f180, #no5no70f180{
+	width:10%;
+	background-color: #FF9933;
+  }
+
+#no7no60f180, #no6no70f180 {
+	width:10%;
+	background-color: #FF3333;
+  }
+
+#no7no50f180, #no8no50f180, #no8no60f180, #no7no70f180, #no8no70f180 {
+	width:10%;
+	background-color: #B8002E;
+  }
+  
   #summary_container {
     bottom: 124px;
     font-size: 20px;
@@ -156,6 +181,32 @@ th { text-align: center;
     overflow: auto;
   }
 
+
+#no8no60f120, #no7no60f120, #no6no60f120, #no5no60f120, #no4no60f120, #no7no60f140, #no6no60f140, #no5no60f140, #no4no60f140, #no6no60f160, #no5no60f160, #no4no60f160, #no4no70f120, #no5no70f120, #no6no70f120, #no7no70f120, #no8no70f120, #no4no70f140, #no5no70f140, #no6no70f140, #no4no70f160 {
+	width:10% ! important;
+	background-color: #336600;
+  }
+
+#no8no60f140, #no8no60f160, #no7no60f160, #no4no60f180, #no7no70f140, #no8no70f140,#no5no70f160, #no6no70f160, #no7no70f160 {
+	width:10%;
+	background-color: #FFE47A;
+  }
+
+#no5no60f180,#no6no60f180, #no8no70f160, #no4no70f180, #no5no70f180{
+	width:10%;
+	background-color: #FF9933;
+  }
+
+#no7no60f180, #no6no70f180 {
+	width:10%;
+	background-color: #FF3333;
+  }
+
+#no8no60f180, #no7no70f180, #no8no70f180 {
+	width:10%;
+	background-color: #B8002E;
+  }
+  
   .summary {
     font-size: 27px;
     padding-left: 15px;
@@ -256,7 +307,7 @@ th { text-align: center;
 	   html += "<tr>"
 		for (var h =0; h < 4; h++){
 
-			html += "<td align='right' colspan='' width = 10%><b>" + min_age + "</b></td><td colspan='' align='left'  width = 15%><table border=0 align='left' id='predictions'>"
+			html += "<td align='right' colspan='' width = 10%><b>" + min_age + "</b></td><td colspan='' align='left'  width = 15%><table id = 'mytable' border=0 align='left'>"
 			var max_sbp = 180;
 			predefinedClass = smoking + cholesterol + diabetic + age +  sex + max_sbp
 			html += "<tr>"
@@ -329,17 +380,20 @@ th { text-align: center;
 	  html += "</table>"
 	  $('inputFrame'+tstCurrentPage).innerHTML = '<div id="summary">' + html + '</div>' ;
 	  $("clearButton").style.display = "none";
-	var td = document.getElementsByTagName('td')
-	var numRows = td.length;
+
+	//tr = document.getElementById("predictions")
+	//alert(tr.width)
+	//var td = document.getElementsByTagName('td')
+	///var numRows = td.length;
 
 	//alert(numRows);
 
-	for (var i = 1; i < numRows; i++) {
+	//for (var i = 1; i < numRows; i++) {
         // alert the table cell contents
         // you probably do not want to do this, but let's just make
         // it SUPER-obvious  that it works :)
-        alert(td[i].width);
-    }
+        //alert(td[i].width);
+    //}
 
   }
 
