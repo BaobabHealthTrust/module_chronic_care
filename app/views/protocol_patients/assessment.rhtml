@@ -225,6 +225,7 @@ th { text-align: center;
   }
   .range{
 	height: 5%;
+	width: 400px;
 	background-color:white;
 	border-radius: 20px ;
 	border-style:solid;
@@ -297,11 +298,11 @@ th { text-align: center;
 
 	  html +="<td valign='top' width='80%' id='innertable'><table id='charttable'  width='100%'><tr ><th colspan='10'>WHO/ISH risk Prediction</th></tr>"
 	  html += "<tr  valign='top' class='range'>"
-	  html += "<td width='10%'><10%  </td><td id='first'>&nbsp;  </td>"
-	  html += "<td width='10%'>>=10% and <20% </td><td id='second'>&nbsp; </td>"
-	  html += "<td width='10%'>>=20% and <30% </td><td id='third'>&nbsp; </td>"
-	  html += "<td width='10%'>>=30% and <40% </td><td id='forth'>&nbsp; </td>"
-	  html += "<td width='10%'>>= 40% </td> <td id='fifth'>&nbsp;</td></tr>"
+	  html += "<td width='%'><10%             </td><td id='first' width='1%'>&nbsp;  </td>"
+	  html += "<td width='5%'>>=10% and <20%   </td><td id='second' width='1%'>&nbsp; </td>"
+	  html += "<td width='5%'>>=20% and <30%   </td><td id='third' width='1%'>&nbsp; </td>"
+	  html += "<td width='5%'>>=30% and <40%   </td><td id='forth' width='1%'>&nbsp; </td>"
+	  html += "<td width='5%'>>= 40% </td>     <td id='fifth' width='1%'>&nbsp;</td></tr>"
 	  html += "<tr><td th colspan='10'></td></tr>"
 	   var min_age = 70;
 	   html += "<tr>"
@@ -404,11 +405,13 @@ th { text-align: center;
 	  html += "<tr><td width =80%>With Age Range : </td><td width =20%>" + age + " Years</td></tr></table>"
 	  $('inputFrame'+tstCurrentPage).innerHTML += html
 
-	  //$('inputFrame'+tstCurrentPage).innerHTML += bg;
-	//var td = document.getElementsByTagName('td')
-	///var numRows = td.length;
+	submitForm = document.getElementById("assessment");
 
-	//alert(numRows);
+    newElement = document.createElement("input");
+    newElement.setAttribute("name","concept[Assessment comments]");
+    newElement.setAttribute("type","hidden");
+    newElement.value = riskValue;
+    submitForm.appendChild(newElement);
 
 	//for (var i = 1; i < numRows; i++) {
         // alert the table cell contents

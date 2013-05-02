@@ -17,6 +17,7 @@
 
 <% @treatements_list = ["Heart disease", "Stroke", "TIA", "Diabetes", "Kidney Disease"] %>
 
+
 <%= select_tag "choice", options_for_select(@treatements_list),
 	{ :field_type => 'text',
       :helpText => "Patient has any of the following:",
@@ -25,6 +26,7 @@
       :multiple => true,
       :tt_pageStyleClass => "MultiSelectList",
       :optional => true } %>
+
 
 <%= select_tag "treatment", options_for_select(@concept),
 		{:id => 'regimen_concept_id',

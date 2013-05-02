@@ -8,6 +8,12 @@ class ProtocolPatientsController < ApplicationController
 
 	@regimen_concepts = MedicationService.hypertension_dm_drugs
 
+	@circumference = Observation.find_by_sql("SELECT * from obs
+									 WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'Head circumference' LIMIT 1) AND voided = 0
+									 AND voided = 0 AND person_id = #{@patient.id} ORDER BY obs_datetime DESC LIMIT 1").first.value_numeric rescue nil
+
+	raise @circumference.to_yaml
+
 	redirect_to '/encounters/no_patient' and return if @patient.nil?
 
 if params[:user_id].nil?

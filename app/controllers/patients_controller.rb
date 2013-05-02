@@ -17,16 +17,14 @@ class PatientsController < ApplicationController
     redirect_to "/encounters/no_user" and return if @user.nil?
 
     @task = TaskFlow.new(params[:user_id], @patient.id)
-		
+		#raise @task.to_yaml
     @links = {}
 		
     @task.tasks.each{|task|
-			
-      next if task.downcase == "update baby outcome" and (@patient.current_babies.length == 0 rescue false)
 
       @links[task.titleize] = "/protocol_patients/#{task.gsub(/\s/, "_")}?patient_id=#{
       @patient.id}&user_id=#{params[:user_id]}" + (task.downcase == "update baby outcome" ?
-          "&baby=1&baby_total=#{(@patient.current_babies.length rescue 0)}" : "")
+        "&baby=1&baby_total=#{(@patient.current_babies.length rescue 0)}" : "")
       
     }
 
