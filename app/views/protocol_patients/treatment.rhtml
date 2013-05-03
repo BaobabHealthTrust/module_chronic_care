@@ -28,11 +28,45 @@
 				recommended treatment 
 			</td>
 			<td>
-<select id='1.1.2' name='concept[recommended treatment]' helpText='recommended treatment ' pos='2' >
-<option></option>
-<option value='Hydrochlorthiazide'>Hydrochlorthiazide</option>
- <option value='Aspirin'>Aspirin</option>
- </select>
+
+<% @moderate_list = ["Hydrochlorothiazide (25mg tablet) + Amlodipine 5 – 10 mg", "Hydrochlorothiazide (25mg tablet) + Nifedipine 10-20 mg"] %>
+
+<% @mild_list = ["Aspirin (75mg tablet)", "Hydrochlorothiazide (25mg tablet)"] %>
+
+<% @severe_list = ["Hydrochlorthiazide + Amlodipine + Lipiniopril + Enalapril", "Hydrochlorthiazide + Amlodipine + Lipiniopril + Captopril",
+				   "Hydrochlorthiazide + Amlodipine + Lipiniopril + Captopril +  Atenolol", "Hydrochlorthiazide + Amlodipine + Lipiniopril + Enalapril + Atenolol",
+					"Hydrochlorthiazide  + Nifedipine + Lipiniopril + Captopril", "Hydrochlorthiazide  + Nifedipine + Lipiniopril + Enalapril "] %>
+
+<%= select_tag "1.1.2", options_for_select(@mild_list),
+	{ :field_type => 'text',
+      :helpText => "Patient has any of the following:",
+      :id => "1.1.2",
+	  :name=> "concept[recommended treatment][]",
+	  :condition => '$("1.1.1").value.toLowerCase() == "mild"',
+      :multiple => true,
+      :tt_pageStyleClass => "MultiSelectList",
+      :optional => true} %>
+
+<%= select_tag "1.1.2", options_for_select(@moderate_list),
+	{ :field_type => 'text',
+      :helpText => "Patient has any of the following:",
+      :id => "1.1.2",
+	  :name=> "concept[recommended treatment][]",
+	  :condition => '$("1.1.1").value.toLowerCase() == "moderate"',
+      :multiple => true,
+      :tt_pageStyleClass => "MultiSelectList",
+      :optional => true} %>
+
+<%= select_tag "1.1.2", options_for_select(@severe_list),
+	{ :field_type => 'text',
+      :helpText => "Patient has any of the following:",
+      :id => "1.1.2",
+	  :name=> "concept[recommended treatment][]",
+	  :condition => '$("1.1.1").value.toLowerCase() == "severe"',
+      :multiple => true,
+      :tt_pageStyleClass => "MultiSelectList",
+      :optional => true} %>
+
 			</td>
 		</tr>
 		<tr>
@@ -80,11 +114,27 @@
 			<td>
 <select id='1.1.6' name='concept[Refer to Tertial Level?]' helpText='Refer to Tertial Level? ' pos='6'  condition='__$("1.1.1").value.toLowerCase() == "severe" &&  __$("1.1.4").value.toLowerCase() == "no"' >
 <option></option>
-<option value='No'>No</option>
- <option value='Yes'>Yes</option>
+<option value='NO'>No</option>
+ <option value='YES'>Yes</option>
  </select>
 			</td>
 		</tr>
+
+		<tr>
+			<td>
+				Select Location
+			</td>
+			<td>
+			  <%= touch_location_tag "location",  @patient, nil,
+			  {	:id => "location_of_art_intiation",
+			  :value_datetime => true,
+			  :location => "concept[]",
+			  :helpText => "Select Location",
+			  :ajaxURL => '/location/locations?search_string=',
+			  :condition => '$("1.1.6").value == "YES"'}%>
+			</td>
+		</tr>
+
 		<tr>
 			<td>
 				Prescribe Drugs? 
@@ -112,11 +162,27 @@
 			<td>
 <select id='1.1.9' name='concept[Refer to Secondary Level?]' helpText='Refer to Secondary Level? ' pos='9'  condition='__$("1.1.1").value.toLowerCase() != "moderate"' >
 <option></option>
-<option value='No'>No</option>
- <option value='Yes'>Yes</option>
+<option value='NO'>No</option>
+ <option value='YES'>Yes</option>
  </select>
 			</td>
 		</tr>
+
+		<tr>
+			<td>
+				Select Location
+			</td>
+			<td>
+			  <%= touch_location_tag "location",  @patient, nil,
+			  {	:id => "location_of_art_intiation",
+			  :value_datetime => true,
+			  :location => "concept[]",
+			  :helpText => "Select Location",
+			  :ajaxURL => '/location/locations?search_string=',
+			  :condition => '$("1.1.9").value == "YES"'}%>
+			</td>
+		</tr>
+
 		<tr>
 			<td>
 				Referal Reason 

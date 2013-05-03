@@ -12,7 +12,7 @@ class ProtocolPatientsController < ApplicationController
 									 WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'Head circumference' LIMIT 1) AND voided = 0
 									 AND voided = 0 AND person_id = #{@patient.id} ORDER BY obs_datetime DESC LIMIT 1").first.value_numeric rescue nil
 
-	raise @circumference.to_yaml
+	#raise @circumference.to_yaml
 
 	redirect_to '/encounters/no_patient' and return if @patient.nil?
 
@@ -85,51 +85,58 @@ if params[:user_id].nil?
 
 	def treatment
 
-	@patient = Patient.find(params[:patient_id]) rescue nil
+				@patient = Patient.find(params[:patient_id]) rescue nil
 
-	redirect_to '/encounters/no_patient' and return if @patient.nil?
+				redirect_to '/encounters/no_patient' and return if @patient.nil?
 
-if params[:user_id].nil?
-	redirect_to '/encounters/no_user' and return
-	end
+					if params[:user_id].nil?
+						redirect_to '/encounters/no_user' and return
+					end
 
-	@user = User.find(params[:user_id]) rescue nil?
+				@user = User.find(params[:user_id]) rescue nil?
 
-	redirect_to '/encounters/no_patient' and return if @user.nil?
-	
+				redirect_to '/encounters/no_patient' and return if @user.nil?
+
 
 	end
 
 	def lab_results
 
-	@patient = Patient.find(params[:patient_id]) rescue nil
+				@patient = Patient.find(params[:patient_id]) rescue nil
 
-	redirect_to '/encounters/no_patient' and return if @patient.nil?
+				redirect_to '/encounters/no_patient' and return if @patient.nil?
 
-if params[:user_id].nil?
-	redirect_to '/encounters/no_user' and return
-	end
+				if params[:user_id].nil?
+					redirect_to '/encounters/no_user' and return
+				end
 
-	@user = User.find(params[:user_id]) rescue nil?
+				@user = User.find(params[:user_id]) rescue nil?
 
-	redirect_to '/encounters/no_patient' and return if @user.nil?
-	
+				redirect_to '/encounters/no_patient' and return if @user.nil?
+
 
 	end
 
 	def vitals
 
-	@patient = Patient.find(params[:patient_id]) rescue nil
+				session_date = session[:datetime] || Time.now
 
-	redirect_to '/encounters/no_patient' and return if @patient.nil?
+				@patient = Patient.find(params[:patient_id]) rescue nil
 
-if params[:user_id].nil?
-	redirect_to '/encounters/no_user' and return
-	end
+				if @patient.age.to_i > 22
+						obs = @patient.person.observations.old(1).question("HEIGHT (CM)").all
+						@current_height = obs.last.answer_string.to_f
+				end
 
-	@user = User.find(params[:user_id]) rescue nil?
+				redirect_to '/encounters/no_patient' and return if @patient.nil?
 
-	redirect_to '/encounters/no_patient' and return if @user.nil?
+				if params[:user_id].nil?
+					redirect_to '/encounters/no_user' and return
+				end
+
+				@user = User.find(params[:user_id]) rescue nil?
+
+				redirect_to '/encounters/no_patient' and return if @user.nil?
 	
 
 	end
