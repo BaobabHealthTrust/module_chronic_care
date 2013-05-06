@@ -84,7 +84,7 @@ class EncountersController < ApplicationController
 			 end
 
         params[:concept].each do |key, value|
-
+					
           if value.blank?
             next
           end
@@ -107,7 +107,7 @@ class EncountersController < ApplicationController
                     :end_date => Time.now
                   }) if !selected_state.nil?
               end
-
+							
               concept_type = nil
               if value.strip.match(/^\d+$/)
 
@@ -164,7 +164,7 @@ class EncountersController < ApplicationController
                 obs.update_attribute("value_coded_name_id", value_coded.concept_name_id)
 
               else
-
+								
                 obs.update_attribute("value_text", value)
 
               end
@@ -347,6 +347,9 @@ class EncountersController < ApplicationController
 
       end
 			
+			if params[:encounter_type] == "TREATMENT "
+				redirect_to "/prescriptions/prescribe?user_id=#{params[@user.id]}&patient_id=#{params[:patient_id]}" and return
+			end
       @task = TaskFlow.new(params[:user_id] || User.first.id, patient.id)
 			
       redirect_to params[:next_url] and return if !params[:next_url].nil?

@@ -125,7 +125,7 @@ if params[:user_id].nil?
 
 				if @patient.age.to_i > 22
 						obs = @patient.person.observations.old(1).question("HEIGHT (CM)").all
-						@current_height = obs.last.answer_string.to_f
+						@current_height = obs.last.answer_string.to_f rescue nil
 				end
 
 				redirect_to '/encounters/no_patient' and return if @patient.nil?
