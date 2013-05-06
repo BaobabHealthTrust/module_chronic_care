@@ -1,0 +1,19 @@
+## YAML Template.
+---
+production:
+  project.name: Early Infant Diagnosis
+  facility.name: Test Centre
+  patient.registration.url: http://localhost:3005
+  user.management.url: http://localhost:3004
+
+development:
+  project.name: Early Infant Diagnosis
+  facility.name: Test Centre
+  patient.registration.url: http://localhost:3005
+  user.management.url: http://localhost:3004
+
+test: &TEST
+  project.name: Early Infant Diagnosis
+  facility.name: Test Centre
+  patient.registration.url: http://localhost:3005
+  user.management.url: http://localhost:3004

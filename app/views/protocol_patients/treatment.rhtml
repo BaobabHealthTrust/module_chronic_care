@@ -1,0 +1,140 @@
+<script type='text/javascript' language='javascript'>
+<!--
+	tt_cancel_show = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
+	tt_cancel_destination = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
+	</script>
+
+<form method='post' action='/encounters/create'>
+	<input type='hidden' name='program' value='CHRONIC CARE MODULE' />
+	<input type='hidden' name='encounter_type' value='TREATMENT ' />
+	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
+	<input type='hidden' name='user_id' value='<%= @user.id %>' />
+	<table>
+		<tr>
+			<td>
+				Hypertension Category 
+			</td>
+			<td>
+<select id='1.1.1' name='concept[Complications]' helpText='Hypertension Category ' pos='1' >
+<option></option>
+<option value='Severe'>Severe</option>
+ <option value='Moderate'>Moderate</option>
+ <option value='Mild'>Mild</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				recommended treatment 
+			</td>
+			<td>
+<select id='1.1.2' name='concept[recommended treatment]' helpText='recommended treatment ' pos='2' >
+<option></option>
+<option value='Hydrochlorthiazide'>Hydrochlorthiazide</option>
+ <option value='Aspirin'>Aspirin</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Advise on Life Changes 
+			</td>
+			<td>
+<select id='1.1.3' name='concept[advice][]' helpText='Advise on Life Changes ' multiple='true'  pos='3'  condition='__$("1.1.1").value.toLowerCase() == "mild"' >
+<option></option>
+<option value='Avoid heavy drinking'>Avoid heavy drinking</option>
+ <option value='Loose weight'>Loose weight</option>
+ <option value='Regular exercises'>Regular exercises</option>
+ <option value='Stop Smoking'>Stop Smoking</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Is current treatment effective? 
+			</td>
+			<td>
+<select id='1.1.4' name='concept[advice]' helpText='Is current treatment effective? ' pos='4'  condition='__$("1.1.1").value.toLowerCase() != "mild"' >
+<option></option>
+<option value='No'>No</option>
+ <option value='Yes'>Yes</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Refer to Secondary Level? 
+			</td>
+			<td>
+<select id='1.1.5' name='concept[Refer to Secondary Level?]' helpText='Refer to Secondary Level? ' pos='5'  condition='__$("1.1.1").value.toLowerCase() == "moderate"  &&  __$("1.1.4").value.toLowerCase() == "no"' >
+<option></option>
+<option value='No'>No</option>
+ <option value='Yes'>Yes</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Refer to Tertial Level? 
+			</td>
+			<td>
+<select id='1.1.6' name='concept[Refer to Tertial Level?]' helpText='Refer to Tertial Level? ' pos='6'  condition='__$("1.1.1").value.toLowerCase() == "severe" &&  __$("1.1.4").value.toLowerCase() == "no"' >
+<option></option>
+<option value='No'>No</option>
+ <option value='Yes'>Yes</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Prescribe Drugs? 
+			</td>
+			<td>
+<select id='1.1.7' name='concept[Prescribe Drugs]' helpText='Prescribe Drugs? ' pos='7' >
+<option></option>
+<option value='No'>No</option>
+ <option value='Yes'>Yes</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Next Appoinment 
+			</td>
+			<td>
+<input type='text' id='1.1.8'  name='concept[Appoinment]' helpText='Next Appoinment '  pos='8' />
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Refer to Secondary Level? 
+			</td>
+			<td>
+<select id='1.1.9' name='concept[Refer to Secondary Level?]' helpText='Refer to Secondary Level? ' pos='9'  condition='__$("1.1.1").value.toLowerCase() != "moderate"' >
+<option></option>
+<option value='No'>No</option>
+ <option value='Yes'>Yes</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Referal Reason 
+			</td>
+			<td>
+<select id='1.1.10' name='concept[Referal Reason][]' helpText='Referal Reason ' multiple='true'  pos='10'  condition='__$("1.1.9").value.toLowerCase() == "yes"' >
+<option></option>
+<option value='Diabetic with ulcers'>Diabetic with ulcers</option>
+ <option value='Hsitory of stroke'>Hsitory of stroke</option>
+ <option value='History of heart attack'>History of heart attack</option>
+ <option value='History of pain in calf'>History of pain in calf</option>
+ <option value='History of chect pain or exertion'>History of chect pain or exertion</option>
+ <option value='Diabetic and BP >= 130 inspite tratment'>Diabetic and BP >= 130 inspite tratment</option>
+ <option value='BP >= 140 despite treatment'>BP >= 140 despite treatment</option>
+ <option value='SBP > 160 or DBP >= 90 mmHg and aged 40 or more'>SBP > 160 or DBP >= 90 mmHg and aged 40 or more</option>
+ <option value='SBP > 140 or DBP >= 90 mmHg and aged below 40 years'>SBP > 140 or DBP >= 90 mmHg and aged below 40 years</option>
+ </select>
+			</td>
+		</tr>
+	</table>
+</form>

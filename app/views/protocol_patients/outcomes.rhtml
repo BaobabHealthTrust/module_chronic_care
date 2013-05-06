@@ -1,0 +1,29 @@
+<script type='text/javascript' language='javascript'>
+<!--
+	tt_cancel_show = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
+	tt_cancel_destination = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
+	</script>
+
+<form method='post' action='/encounters/create'>
+	<input type='hidden' name='program' value='CHRONIC CARE MODULE' />
+	<input type='hidden' name='encounter_type' value='UPDATE OUTCOMES ' />
+	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
+	<input type='hidden' name='user_id' value='<%= @user.id %>' />
+	<table>
+		<tr>
+			<td>
+				New Outcome 
+			</td>
+			<td>
+<select id='1.1.1' name='concept[Outcome]' helpText='New Outcome ' pos='1' >
+<option></option>
+<option value='Transfered Out'>Transfered Out</option>
+ <option value='Defaulted'>Defaulted</option>
+ <option value='Stopped Treatment'>Stopped Treatment</option>
+ <option value='Dead'>Dead</option>
+ <option value='Alive'>Alive</option>
+ </select>
+			</td>
+		</tr>
+	</table>
+</form>

@@ -1,0 +1,6 @@
+P.1. ASSESSMENT [program: CHRONIC CARE MODULE, label: Assessment]
+C.1.1. Values are all already captured and only a clinical decision is required as to whether the patient is diabetic or not
+Q.1.1.1. Is patient Diabetic? [pos: 1, concept: Patient Diabetic]
+O.1.1.1.1. Yes
+O.1.1.1.2. No
+Q.1.1.2. Patient Summary [pos: 2, tt_pageStyleClass: NoControls, tt_onLoad: __$("keyboard").style.display = "none"]

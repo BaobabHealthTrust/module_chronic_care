@@ -1,0 +1,57 @@
+<script type='text/javascript' language='javascript'>
+<!--
+	tt_cancel_show = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
+	tt_cancel_destination = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
+	</script>
+
+<form method='post' action='/encounters/create'>
+	<input type='hidden' name='program' value='CHRONIC CARE MODULE' />
+	<input type='hidden' name='encounter_type' value='COMPLICATIONS ' />
+	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
+	<input type='hidden' name='user_id' value='<%= @user.id %>' />
+	<table>
+		<tr>
+			<td>
+				Complication Type Type 
+			</td>
+			<td>
+<select id='1.1.1' name='concept[Complications]' helpText='Complication Type Type ' pos='1' >
+<option></option>
+<option value='Amputation'>Amputation</option>
+ <option value='Stroke'>Stroke</option>
+ <option value='Heart Attack'>Heart Attack</option>
+ <option value='CVA'>CVA</option>
+ <option value='MI'>MI</option>
+ <option value='Creatinine'>Creatinine</option>
+ <option value='Funduscopy'>Funduscopy</option>
+ <option value='Shortness of breath'>Shortness of breath</option>
+ <option value='Oedema'>Oedema</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Test year 
+			</td>
+			<td>
+<input type='text' id='1.1.2'  name='concept[Test year ]' helpText='Test year '  pos='2'  field_type='number'  condition='__$("1.1.1").value.toLowerCase() != "heart attack" && __$("1.1.1").value.toLowerCase() != "stroke"  && __$("1.1.1").value.toLowerCase() != "amputation"'  absoluteMin='1982'  tt_pageStyleClass='NumbersOnlyWithUnknown' />
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Test month 
+			</td>
+			<td>
+<input type='text' id='1.1.3'  name='concept[Test month ]' helpText='Test month '  pos='3'  condition='__$("1.1.1").value.toLowerCase() != "heart attack" && __$("1.1.1").value.toLowerCase() != "stroke"  && __$("1.1.1").value.toLowerCase() != "amputation"'  tt_pageStyleClass='NumbersOnlyWithUnknown' />
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Test day 
+			</td>
+			<td>
+<input type='text' id='1.1.4'  name='concept[Test day ]' helpText='Test day '  pos='4'  condition='__$("1.1.1").value.toLowerCase() != "heart attack" && __$("1.1.1").value.toLowerCase() != "stroke"  && __$("1.1.1").value.toLowerCase() != "amputation"'  tt_pageStyleClass='NumbersOnlyWithUnknown' />
+			</td>
+		</tr>
+	</table>
+</form>

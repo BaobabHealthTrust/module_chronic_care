@@ -1,0 +1,2 @@
+development:
+    current.path: http://localhost:3012/patients/confirm/ext_patient_id?found_person_id=174&location_id=721&user_id=1

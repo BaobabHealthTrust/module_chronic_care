@@ -1,0 +1,11 @@
+P.1. VITALS [program: CHRONIC CARE MODULE, label: Vitals]
+C.1.1. Capture the following vitals for both men and women 40 years or old
+Q.1.1.1. Weight [pos: 1, concept: Weight, field_type: number]
+Q.1.1.2. Height [pos: 2, concept: Height, field_type: number]
+Q.1.1.3. Waist circumference (in cm) [pos: 3, concept: Waist circumference (in cm), field_type: number]
+Q.1.1.4. Systolic blood pressure [pos: 4, concept: Systolic blood pressure, field_type: number]
+Q.1.1.5. Diastolic blood pressure [pos: 5, concept: Diastolic blood pressure, field_type: number]
+Q.1.1.6. Respiratory rate [pos: 6, concept: Respiratory rate, field_type: number]
+Q.1.1.7. Pulse rate [pos: 7, concept: Pulse rate, field_type: number]
+Q.1.1.8. Oxygen saturation [pos: 8, concept: Oxygen saturation, field_type: number]
+Q.1.1.9. Temperature [pos: 9, concept: Temperature, field_type: number]

@@ -1,0 +1,20 @@
+<script>
+  var tt_cancel_destination = "/clinic/user_logout"; // /properties"
+</script>
+
+<style>
+  #tt_page_select_program .options { height: 300px; }
+  #cancelButton { display: none; }
+</style>
+
+<% programs = ['','ASTHMA PROGRAM','HYPERTENSION PROGRAM','DM PROGRAM'] %>
+
+<form method = 'post' action = "/clinic/programs">
+  <%= select_tag 'program',
+      options_for_select(programs),
+      :helpText => "Select program" ,
+      :multiple =>  false %>
+
+<%= hidden_field_tag("user_id", @user_id) %>
+<%= hidden_field_tag("location_id", @location_id) %>
+</form>
