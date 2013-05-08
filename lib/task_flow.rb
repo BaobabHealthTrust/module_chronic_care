@@ -97,7 +97,7 @@ class TaskFlow
     (0..(normal_flow.length-1)).each{|n|
       flow[normal_flow[n].downcase] = n+1
     }
-
+		
     if self.current_user_activities.blank?
 
       self.encounter_type = "NO TASKS SELECTED"
@@ -133,22 +133,90 @@ class TaskFlow
     }
 
     self.task_list = tasks
-
+		
     sorted_tasks = sorted_tasks.sort
 
-    sorted_tasks.each do |pos, tsk|
+    
 
       # next if tasks[tsk][8] == false
       # If user does not have this activity, goto the patient dashboard
+
+			encounters =  [
+                      'VITALS','UPDATE HIV STATUS','LAB RESULTS',
+                      'COMPLICATIONS','ASSESSMENT','LAB RESULTS'
+                     ]
+			encounters.each do |tsk|
+			case tsk
+
+        when "VITALS"
+					
+          vitals = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
+                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
+                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
+
+					next if !vitals.blank?
+					self.encounter_type = 'VITALS'
+					self.url = "/protocol_patients/vitals?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+					return self
+
+        when "UPDATE HIV STATUS"
+					next if @patient.person.observations.to_s.match(/hiv status/i)
+          hiv_status = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
+                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
+                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
+					
+					
+
+					if hiv_status.observations.map{|s|s.to_s.split(':').last.strip}.include?('Positive')
+            next
+          end if not hiv_status.blank?
+
+					self.encounter_type = "HIV STATUS"
+					self.url = "/protocol_patients/hiv_status?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+					return self
+				when "ASSESSMENT"
+					assessment = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
+                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
+                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
+					
+					next if !assessment.blank?
+					self.encounter_type = "ASSESSMENT"
+					self.url = "/protocol_patients/assessment?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+					return self
+				when "COMPLICATIONS"
+					assessment = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
+                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
+                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
+					next if !assessment.blank?
+					self.encounter_type = "COMPLICATIONS"
+					self.url = "/protocol_patients/complicationss?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+					return self
+				when "LAB RESULTS"
+					assessment = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
+                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
+                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
+					next if !assessment.blank?
+					self.encounter_type = "LAB RESULTS"
+					self.url = "/protocol_patients/lab_results?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+					return self
+			end
+					
+		end
+
+		self.encounter_type = 'NONE'
+		self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}"
+		return self
+
+=begin
       if tasks[tsk][8] == false        
         self.encounter_type = tsk
         self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}"
         return self
       end
-
-      case tasks[tsk][5]
-      when "TODAY"
-
+			
+      case tasks[tsk][2]
+      when "VITALS"
+				
         checked_already = false
 
         if !tasks[tsk][3].blank? && checked_already == false    # Check for presence of specific concept_id
@@ -363,7 +431,7 @@ class TaskFlow
     self.encounter_type = 'NONE'
     self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}"
     return self
-
+=end
   end
 
 end
