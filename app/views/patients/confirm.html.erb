@@ -65,6 +65,10 @@
 
   function cancel(){ document.location = "/clinic?user_id=<%=@user['user_id']%>&location_id=<%=@current_location%>" }
 
+  <%
+   backlink = "/patients/show/#{@person.id}?user_id=#{@user['user_id']}"
+  %>
+
   function changeAttributes(){
     buttonsdiv = document.getElementById('buttons')
     buttonsdiv.innerHTML+="<button onmousedown='cancel();' id='cancelhButton' class='button red left'><span>Cancel</span></button>";
@@ -78,7 +82,7 @@
   }
 
   function go() {
-	document.location = "<%= @task.next_task.url %>"
+	document.location = "<%= @task.next_task.url rescue backlink %>"
   }
 
   function weightGraph(){
@@ -152,7 +156,7 @@
   <div>
     <table>
       <tr style = "font-size:20px;">
-        <th>Next task : </th><td><%= @next_task.titleize %></td>
+        <th>Next task : </th><td><%= @next_task.titleize rescue "None"%></td>
       </tr>
     </table>
   </div>

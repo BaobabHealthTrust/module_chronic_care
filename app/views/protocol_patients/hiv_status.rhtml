@@ -1,17 +1,18 @@
+<%= javascript_include_tag "date" %>
 <script type='text/javascript' language='javascript'>
 <!--
 	tt_cancel_show = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
 	tt_cancel_destination = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
 
 	function updateTestDate(){
-		var testDate = new Date($('1.1.3').value, $('hiv_test_month').value - 1, $('hiv_test_day').value);
+		var testDate = new Date($('hiv_test_year').value, $('hiv_test_month').value - 1, $('hiv_test_day').value);
 		$('hiv_test_date').value = testDate;
 	}
 	
 	</script>
 
 <form method='post' action='/encounters/create'>
-	<input type='hidden' name='program' value='CHRONIC CARE MODULE' />
+	<input type='hidden' name='program' value='CHRONIC CARE PROGRAM' />
 	<input type='hidden' name='encounter_type' value='HIV STATUS AT ENROLLMENT ' />
 	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
 	<input type='hidden' name='user_id' value='<%= @user.id %>' />
@@ -34,7 +35,14 @@
 				HIV test year 
 			</td>
 			<td>
-<input type='text' id='1.1.3'  name='concept[HIV test year ]' helpText='HIV test year '  pos='2'  field_type='number'  condition='__$("1.1.1").value.toLowerCase() != "unknown"'  absoluteMin='1982'  tt_pageStyleClass='NumbersOnlyWithUnknown' />
+<%= text_field_tag "hiv_test_year", nil,
+	{:helpText => 'HIV test year',
+	:field_type => 'number',
+	:absoluteMin => "1982",
+	:min => "1982",
+	:absoluteMax => Date.today.year,
+	:tt_pageStyleClass => "Numeric NumbersOnly",
+	:condition => '$("1.1.1").value != "UNKNOWN"'} %>
 			</td>
 		</tr>
 		<tr>
@@ -44,7 +52,7 @@
 			<td>
 <%= select_tag "hiv_test_month", month_name_options,
 	{:helpText => 'HIV test month',
-	:condition => '($("1.1.3").value.toLowerCase() != "unknown") && ($("1.1.1").value != "UNKNOWN")',
+	:condition => '($("hiv_test_year").value.toLowerCase() != "unknown") && ($("1.1.1").value != "UNKNOWN")',
 	:tt_onLoad => "__$('keyboard').style.display = 'none'"}%>
 			</td>
 		</tr>
@@ -56,7 +64,8 @@
   <%= text_field_tag "hiv_test_day",  nil,
 	{:field_type => 'number',
 	:helpText => 'HIV test day',
-	:condition => '($("1.1.3").value != "Unknown") && ($("hiv_test_month").value != "Unknown") && ($("1.1.1").value != "UNKNOWN")',
+	:condition => '($("hiv_test_year").value != "Unknown") && ($("hiv_test_month").value != "Unknown") && ($("1.1.1").value != "UNKNOWN")',
+	:tt_onLoad => "getDayOfMonthPicker($('hiv_test_year').value, $('hiv_test_month').value);",
 	:tt_onUnload=> "updateTestDate();",
 	:tt_pageStyleClass => 'NumbersOnlyWithUnknown'
   } %>

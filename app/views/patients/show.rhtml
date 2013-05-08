@@ -28,7 +28,7 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
       __$("patient-dashboard-application").appendChild(nextTask);
     }
 
-    __$("nextTask").innerHTML = "<b>Next Task:</b><br /><i><%= next_task.titleize %></i>";
+    __$("nextTask").innerHTML = "<b>Next Task:</b><br /><i><%= next_task.titleize rescue "None"%></i>";
   }
 
 <% if !next_task.nil? %>

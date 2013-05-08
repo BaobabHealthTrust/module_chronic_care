@@ -39,7 +39,6 @@ class ClinicController < ApplicationController
   end
 
 	def programs
-		#raise params.to_yaml
 		if request.post?
 			session[:selected_program] = params[:program]
 			redirect_to(:action => "index",
