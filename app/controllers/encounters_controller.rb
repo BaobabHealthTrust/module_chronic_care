@@ -346,10 +346,14 @@ class EncountersController < ApplicationController
         ) if !baby_id.nil?
 
       end
-			
+			#raise params["concept"]["Patient enrolled in HIV program"].upcase.to_yaml
 			if params[:encounter_type] == "TREATMENT "
-				redirect_to "/prescriptions/prescribe?user_id=#{params[@user.id]}&patient_id=#{params[:patient_id]}" and return
+				redirect_to "/prescriptions/prescribe?user_id=#{@user["user_id"]}&patient_id=#{params[:patient_id]}" and return
 			end
+			#if params[:encounter_type] == "UPDATE HIV STATUS" and params["concept"]["Patient enrolled in HIV program"].upcase == "YES"
+				#redirect_to "http://0.0.0.0:3000/encounters/new/hiv_clinic_consultation?patient_id=#{params[:patient_id]}&user_id=#{@user["user_id"]}" and return
+			#end
+
       @task = TaskFlow.new(params[:user_id] || User.first.id, patient.id)
 			
       redirect_to params[:next_url] and return if !params[:next_url].nil?

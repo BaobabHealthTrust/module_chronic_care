@@ -41,7 +41,7 @@
 	  }
 
       if ($('on_art').value.length > 0)
-        conditions.push("On ART?: " + $('on_art').value);
+        conditions.push("On ART: " + $('on_art').value);
 
       if ($('enroll').value.length > 0)
         conditions.push("Enroll in HIV program: " + $('enroll').value);
@@ -135,7 +135,7 @@
 		</tr>
 		<tr>
 			<td>
-				On ART? 
+				Enroll in HIV program?
 			</td>
 			<td>
 <select id='enroll' name='concept[Patient enrolled in HIV program]' helpText='On ART? ' pos='6'  condition='__$("on_art").value.toLowerCase() == "no"' >

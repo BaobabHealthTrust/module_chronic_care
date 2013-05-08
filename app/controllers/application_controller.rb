@@ -27,6 +27,14 @@ class ApplicationController < ActionController::Base
     render :template => 'print/print', :layout => nil
   end
 
+	def is_first_hypertension_clinic_visit(patient_id)
+		session_date = session[:datetime].to_date rescue Date.today
+		hyp_encounter = Encounter.find(:first,:conditions =>["voided = 0 AND patient_id = ? AND encounter_type = ? AND DATE(encounter_datetime) < ?",
+				patient_id, EncounterType.find_by_name('DIABETES HYPERTENSION INITIAL VISIT').id, session_date ]) rescue nil
+		return true if hyp_encounter.nil?
+		return false
+	end
+
   protected
 
   def check_user

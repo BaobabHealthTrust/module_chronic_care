@@ -79,13 +79,17 @@
 				Advise on Life Changes 
 			</td>
 			<td>
-<select id='1.1.3' name='concept[You receive helpful advice on important things in your life][]' helpText='Advise on Life Changes ' multiple='true'  pos='3'  condition='__$("1.1.1").value.toLowerCase() == "mild"' >
-<option></option>
-<option value='Avoid heavy drinking'>Avoid heavy drinking</option>
- <option value='Loose weight'>Loose weight</option>
- <option value='Regular exercises'>Regular exercises</option>
- <option value='Stop Smoking'>Stop Smoking</option>
- </select>
+	<% @changes_list = ["Avoid heavy drinking", "Loose weight", "Regular exercises", "Stop Smoking"] %>
+	<%= select_tag "You receive helpful advice on important things in your life", options_for_select(@changes_list),
+	{ :field_type => 'text',
+      :helpText => "Advise on Life Changes",
+      :id => "1.1.3",
+	  :name=> "concept[You receive helpful advice on important things in your life][]",
+      :multiple => true,
+      :tt_pageStyleClass => "MultiSelectList",
+	  :condition => '__$("1.1.1").value.toLowerCase() == "mild"',
+      :optional => true} %>
+
 			</td>
 		</tr>
 		<tr>

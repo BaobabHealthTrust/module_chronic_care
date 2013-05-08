@@ -101,6 +101,8 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
       <select id="tabs">
         <option value='/patients/current_visit/<%= @patient.id %>?user_id=<%= @user.id %>'>Current Visit</option>
         <option value='/patients/visit_history/<%= @patient.id %>?user_id=<%= @user.id %>'>Visit History</option>
+		<option value='/patients/patient_report/<%= @patient.id %>?user_id=<%= @user.id %>'>Report</option>
+		<option value='/patients/visit_history/<%= @patient.id %>?user_id=<%= @user.id %>'>HIV Status</option>
       </select>
       <select id="links">
 
@@ -219,5 +221,5 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
 
       <input type='submit' value='Finish' />
     </form>
-    <</div>
+    </div>
 </div>

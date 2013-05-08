@@ -105,12 +105,12 @@ class DrugOrder < ActiveRecord::Base
     #    instructions += " (prn)" if prn == 1
     #  end
     # end
-
+		
     ActiveRecord::Base.transaction do
       order = encounter.orders.create(
         :order_type_id => OrderType.find_by_name("Drug Order").id,
         :concept_id => drug.concept_id, 
-        :orderer => User.current.user_id, 
+        :orderer => user_person_id,
         :patient_id => patient.id,
         :start_date => start_date,
         :auto_expire_date => auto_expire_date,

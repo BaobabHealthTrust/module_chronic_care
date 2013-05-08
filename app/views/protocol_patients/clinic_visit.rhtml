@@ -1,0 +1,101 @@
+<script type='text/javascript' language='javascript'>
+<!--
+	tt_cancel_show = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
+	tt_cancel_destination = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
+	</script>
+
+<form method='post' action='/encounters/create'>
+  <%
+		@select_init_diagnosis_year = ["", "Unknown"]
+		this_year = Date.today.year
+		begin @select_init_diagnosis_year << Array.new(1){this_year.to_s}; this_year = this_year - 1; end while (this_year != 1949)
+	%>
+	<input type='hidden' name='program' value='CHRONIC CARE PROGRAM' />
+	<input type='hidden' name='encounter_type' value='DIABETES HYPERTENSION INITIAL VISIT' />
+	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
+	<input type='hidden' name='user_id' value='<%= @user.id %>' />
+	<table>
+		<tr>
+			<td>
+				Have you been diagnosed with TB since your LAST clinic visit? 
+			</td>
+			<td>
+<select id='1.1.1' name='concept[HAVE YOU EVER HAD TB?]' helpText='Have you been diagnosed with TB since your LAST clinic visit? ' pos='1' >
+<option></option>
+<option value='No'>No</option>
+ <option value='Yes'>Yes</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Year(s) of TB Diagnosis 
+			</td>
+			<td>
+<%= select_tag "TB DIAGNOSIS DATE",  options_for_select(@select_init_diagnosis_year, ""),
+			{	:id => "year_of_tb_diagnosis",
+				:multiple => true,
+				:name => "concept[TB DIAGNOSIS DATE][]",
+          		:condition => "$('1.1.1').value.match(/^yes$/i);",
+          		:tt_pageStyleClass => "longSelectList",
+          		:absoluteMin => "1950", :min => "1940", :absoluteMax => Date.today.year,
+				:helpText => "Year(s) of TB Diagnosis" } %>
+			</td>
+		</tr>
+			<tr>
+			<td>
+				Is patient diabetic?
+			</td>
+			<td>
+<% if @first_visit == true || !@diabetic.blank? %>
+<select id='1.1.3' name='concept[Patient has Diabetes]' helpText='Is patient diabetic? ' pos='3' >
+<option></option>
+<option value='No'>No</option>
+ <option value='Yes'>Yes</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Year(s) of Diabetes Diagnosis
+			</td>
+			<td>
+
+<%= select_tag "DIABETES DIAGNOSIS DATE",  options_for_select(@select_init_diagnosis_year, ""),
+			{	:id => "year_of_tb_diagnosis",
+				:multiple => true,
+				:name => "concept[DIABETES DIAGNOSIS DATE][]",
+          		:condition => "$('1.1.3').value.match(/^yes$/i);",
+          		:tt_pageStyleClass => "longSelectList",
+          		:absoluteMin => "1950", :min => "1940", :absoluteMax => Date.today.year,
+				:helpText => "Year(s) of Diabetes Diagnosis" } %>
+<% end %>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Is Patient Pregnant
+			</td>
+			<td>
+<% if @patient.gender.upcase == ("F" || "FEMALE")  %>
+<select id='1.1.5' name='concept[Is patient pregnant?]' helpText='Is Patient Pregnant' pos='5' >
+<option></option>
+<option value='No'>No</option>
+ <option value='Yes'>Yes</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Is Patient breastfeeding
+			</td>
+			<td>
+<select id='1.1.6' name='concept[Is patient breast feeding?]' helpText='Is Patient breastfeeding' pos='6' >
+<option></option>
+<option value='No'>No</option>
+ <option value='Yes'>Yes</option>
+ </select>
+	<%  end %>		</td>
+		</tr>
+	</table>
+</form>

@@ -5,12 +5,14 @@ production:
   facility.name: Baobab Test Centre
   patient.registration.url: http://localhost:3005
   user.management.url: http://localhost:3004
+  use_drug_barcodes_only: true
 
 development:
   project.name: Chronic Care Clinic
   facility.name: Baobab Test Centre
   patient.registration.url: http://localhost:3005
   user.management.url: http://localhost:3004
+  use_drug_barcodes_only: false
 
 test: &TEST
   project.name: Chronic Care Clinic

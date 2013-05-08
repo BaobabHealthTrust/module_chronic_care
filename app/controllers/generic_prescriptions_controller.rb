@@ -1,21 +1,23 @@
 class GenericPrescriptionsController < ApplicationController
   # Is this used?
   def index
+		@user = User.find(params[:user_id]) rescue nil
     @patient = Patient.find(params[:patient_id] || session[:patient_id]) rescue nil
     @orders = @patient.orders.prescriptions.current.all rescue []
     @history = @patient.orders.prescriptions.historical.all rescue []
-    redirect_to "/prescriptions/new?patient_id=#{params[:patient_id] || session[:patient_id]}" and return if @orders.blank?
+    redirect_to "/prescriptions/new?patient_id=#{params[:patient_id] || session[:patient_id]}&user_id=#{@user.id}" and return if @orders.blank?
     render :template => 'prescriptions/index', :layout => 'menu'
   end
   
-  def void	
+  def void
+		@user = User.find(params[:user_id]) rescue nil
     @order = Order.find(params[:order_id])
     @order.void
     flash.now[:notice] = "Order was successfully voided"
     if !params[:source].blank? && params[:source].to_s == 'advanced'
-		redirect_to "/prescriptions/advanced_prescription?patient_id=#{params[:patient_id]}" and return
+		redirect_to "/prescriptions/advanced_prescription?patient_id=#{params[:patient_id]}&user_id=#{@user.id}" and return
     else
-    	index and return
+    	redirect_to :action => "index", :patient_id => params[:patient_id], :user_id => @user.id and return
    	end
   end
   
@@ -35,10 +37,10 @@ class GenericPrescriptionsController < ApplicationController
     elsif params[:location] # migration
       user_person_id = params[:provider_id]
     else
-      user_person_id = User.find_by_user_id(current_user.user_id).person_id
+      user_person_id = User.find_by_user_id(params[:user_id]).person_id
     end
 
-    @encounter = PatientService.current_treatment_encounter( @patient, session_date, user_person_id)
+    @encounter = Vitals.current_treatment_encounter( @patient, session_date, user_person_id)
     @diagnosis = Observation.find(params[:diagnosis]) rescue nil
     @suggestions.each do |suggestion|
       unless (suggestion.blank? || suggestion == '0' || suggestion == 'New Prescription')
@@ -65,7 +67,7 @@ class GenericPrescriptionsController < ApplicationController
     end
 
     if params[:location].blank?
-      redirect_to (params[:auto] == '1' ? "/prescriptions/auto?patient_id=#{@patient.id}" : "/patients/treatment_dashboard/#{@patient.id}")
+      redirect_to (params[:auto] == '1' ? "/prescriptions/auto?user_id=#{@user["user_id"]}&patient_id=#{@patient.id}" : "/patients/treatment_dashboard/#{@patient.id}?user_id=#{@user["user_id"]}")
     else
       render :text => 'import success' and return
     end

@@ -23,7 +23,7 @@
     display:none;
   }
 
-  #tt_page_generic_drug #viewport {
+  #tt_page_select_drug #viewport {
     height:307px;
   }
 
@@ -59,14 +59,14 @@
     display: none;
   }
 
-  .tt_controls_generic_drug #qwerty {
+  .tt_controls_select_drug #qwerty {
     display: inline;
   }
 
 
 </style>
 <script>
-  var tt_cancel_destination = "/patients/treatment_dashboard/<%= @patient.patient_id %>"
+  var tt_cancel_destination = "/patients/treatment_dashboard/<%= @patient.patient_id %>?user_id=<%=  @user.id %>"
   
   function changeNextButtonText(text){
     $('nextButton').innerHTML = "<span>" + text + "</span>";  
@@ -82,7 +82,7 @@
     changeNextButtonText('Select Prescription');
     var diagnosis = $('diagnosis').value; 
     $('infoBar'+tstCurrentPage).innerHTML = "Current Weight: <%= @current_weight -%>KG; Current Height: <%= @current_height -%>CM"
-    $('touchscreenInput'+tstCurrentPage).setAttribute('ajaxURL', "/prescriptions/suggested?patient_id=<%= @patient.patient_id %>&diagnosis=" + diagnosis + "&search_string=");
+    $('touchscreenInput'+tstCurrentPage).setAttribute('ajaxURL', "/prescriptions/suggested?user_id=<%=  @user.id %>&patient_id=<%= @patient.patient_id %>&diagnosis=" + diagnosis + "&search_string=");
     
     var text = "Common prescriptions"
     var helpText = $('helpText'+tstCurrentPage);
@@ -94,7 +94,7 @@
 
   function set_generic_drug_for_formulation() {
     var generic = encodeURIComponent($('generic').value); 
-    $('touchscreenInput'+tstCurrentPage).setAttribute('ajaxURL', "/prescriptions/formulations?generic=" + generic + "&search_string=");
+    $('touchscreenInput'+tstCurrentPage).setAttribute('ajaxURL', "/prescriptions/formulations?user_id=<%=  @user.id %>&generic=" + generic + "&search_string=");
     $('infoBar'+tstCurrentPage).innerHTML = $('generic').value;
     listSuggestions(tstCurrentPage); 
   }
@@ -106,7 +106,7 @@
   function set_generic_drug_and_formulation_for_duration() {
     var generic = encodeURIComponent($('generic').value); 
     var formulation = encodeURIComponent($('formulation').value); 
-    $('touchscreenInput'+tstCurrentPage).setAttribute('ajaxURL', "/prescriptions/durations?generic=" + generic + "&formulation=" + formulation + "&search_string=");
+    $('touchscreenInput'+tstCurrentPage).setAttribute('ajaxURL', "/prescriptions/durations?user_id=<%=  @user.id %>&generic=" + generic + "&formulation=" + formulation + "&search_string=");
     if (selectedValue('type_of_prescription') == 'Standard Dose')
       $('infoBar'+tstCurrentPage).innerHTML = $('formulation').value + ': ' + $('dose_strength').value + ' ' + units + ' ' + selectedValue('frequency');        
     else
@@ -119,7 +119,7 @@
     frequency = encodeURIComponent(frequency); 
     var generic = encodeURIComponent($('generic').value); 
     var formulation = encodeURIComponent($('formulation').value); 
-    $('touchscreenInput'+tstCurrentPage).setAttribute('ajaxURL', "/prescriptions/dosages?generic=" + generic + "&formulation=" + formulation + "&frequency=" + frequency + "&search_string=");
+    $('touchscreenInput'+tstCurrentPage).setAttribute('ajaxURL', "/prescriptions/dosages?user_id=<%=  @user.id %>&generic=" + generic + "&formulation=" + formulation + "&frequency=" + frequency + "&search_string=");
     $('infoBar'+tstCurrentPage).innerHTML = $('formulation').value;  
     listSuggestions(tstCurrentPage); 
   }
@@ -162,11 +162,12 @@
       el.innerHTML += (" in " + units);
     }
   }
-  
 </script>
 <form id='prescription' action="/prescriptions/create" method='post'>
   <%= hidden_field_tag :auto, params[:auto] %>
   <%= hidden_field_tag :patient_id, @patient.id %>
+  <input type='hidden' name='user_id' value='<%= @user.id %>' />
+  <input type='hidden' name='programs[][states][][state]' value='on treatment' />
 
   <% @options = [['NO DIAGNOSIS', 'NO DIAGNOSIS']]
      @patient_diagnoses.each do |diag|
@@ -191,10 +192,10 @@
     :tt_pageStyleClass => "NoKeyboard NoInput small" } %>
   
   <%= text_field_tag :generic, nil, {
-    :ajaxURL => "/prescriptions/generics?search_string=", 
+    :ajaxURL => "/prescriptions/generics?user_id=#{@user.id}&search_string=",
     :textCase => "upper", 
     :condition => "isGeneric()",    
-    :helpText => "Generic Drug"}%>
+    :helpText => "Select Drug"}%>
 
   <% # Set ajaxURL in the script, but need to start it blank %>
   <%= text_field_tag :formulation, nil, {
@@ -232,7 +233,7 @@
      options << ['', '']
   %>
   <%= select_tag :frequency, options_for_select(options, ''), 
-    {:tt_onLoad => "set_info_for_frequency();",     
+    {:tt_onLoad => "set_info_for_frequency();__$('keyboard').style.display = 'none';",
      :helpText => "Frequency",
      :condition => "isGeneric() && selectedValue('type_of_prescription') == 'Standard Dose'"} %> 
 

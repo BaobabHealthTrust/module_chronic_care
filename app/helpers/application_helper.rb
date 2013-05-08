@@ -96,4 +96,13 @@ module ApplicationHelper
     options_for_select(options_array, selected_months)
   end
   
+	def advanced_prescription_interface
+		get_global_property_value("advanced.prescription.interface").to_s == "true" rescue false
+	end
+
+  def fancy_or_high_contrast_touch
+    fancy = get_global_property_value("interface") == "fancy" rescue false
+    fancy ? "touch-fancy.css" : "touch.css"
+  end
+	
 end

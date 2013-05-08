@@ -276,6 +276,7 @@ th { text-align: center;
 		smoking = '<%= @smoking_status.downcase %>'
 		diabetic = $('diabetic').value.toLowerCase();
 		sex = '<%= @patient.gender.downcase %>'
+		bp = '<%= @systolic_value.to_i  %>'
 		if (sex == "female")
 		  sex = "f"
 
@@ -310,7 +311,19 @@ th { text-align: center;
 
 			html += "<td align='right' colspan='' width = 10%><b>" + min_age + "</b></td><td colspan='' align='left'  width = 15%><table id = 'mytable' border=0 align='left'>"
 			var max_sbp = 180;
-			predefinedClass = smoking + cholesterol + diabetic + age +  sex + '<%= @systolic_value.to_i  %>'
+			if (bp <= 130) {
+			  set_age = 120
+			}
+			else if (bp > 130 && bp <= 150){
+			  set_age = 140
+			}
+			else if (bp > 150 && bp <= 170){
+			  set_age = 160
+			}
+			else {
+			  set_age = 180
+			}
+			predefinedClass = smoking + cholesterol + diabetic + age +  sex + set_age
 			html += "<tr>"
 				for (i =0; i< 4; i++){
 					  classed = smoking + "4" + diabetic + min_age +  sex + max_sbp 
@@ -381,8 +394,9 @@ th { text-align: center;
 	  html += "</table>"
 	  $('inputFrame'+tstCurrentPage).innerHTML = '<div id="summary">' + html + '</div>' ;
 	  $("clearButton").style.display = "none";
-
+	  
 	  elem1 = document.getElementById(predefinedClass);
+
 	  bg = window.getComputedStyle(elem1, null).backgroundColor;
 	  if (bg == "rgb(51, 102, 0)")
 		riskValue = "< 10 %"

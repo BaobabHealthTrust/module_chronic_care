@@ -146,4 +146,139 @@ class PatientsController < ApplicationController
 		render :layout => 'menu'
 	end
 
+  def treatment_dashboard
+		@user = User.find(params[:user_id]) rescue nil
+		@patient = Patient.find(params[:id]) rescue nil
+		@dispense = CoreService.get_global_property_value('use_drug_barcodes_only')
+	  #@patient_bean = PatientService.get_patient(@patient.person)
+    @amount_needed = 0
+    @amounts_required = 0
+
+    type = EncounterType.find_by_name('TREATMENT')
+    session_date = session[:datetime].to_date rescue Date.today
+    Order.find(:all,
+      :joins => "INNER JOIN encounter e USING (encounter_id)",
+      :conditions => ["encounter_type = ? AND e.patient_id = ? AND DATE(encounter_datetime) = ?",
+        type.id,@patient.id,session_date]).each{|order|
+
+      @amount_needed = @amount_needed + (order.drug_order.amount_needed.to_i rescue 0)
+
+      @amounts_required = @amounts_required + (order.drug_order.total_required rescue 0)
+
+    }
+
+    @dispensed_order_id = params[:dispensed_order_id]
+    #@reason_for_art_eligibility = PatientService.reason_for_art_eligibility(@patient) rescue nil
+    #@arv_number = PatientService.get_patient_identifier(@patient, 'ARV Number') rescue nil
+
+		@project = get_global_property_value("project.name") rescue "Unknown"
+		
+    render :template => 'dashboards/treatment_dashboard', :layout => false
+  end
+
+	 def treatment
+		@user = User.find(params[:user_id]) rescue nil
+		@patient = Patient.find(params[:patient_id] || params[:id]) rescue nil
+    type = EncounterType.find_by_name('TREATMENT')
+    session_date = session[:datetime].to_date rescue Date.today
+    @prescriptions = Order.find(:all,
+      :joins => "INNER JOIN encounter e USING (encounter_id)",
+      :conditions => ["encounter_type = ? AND e.patient_id = ? AND DATE(encounter_datetime) = ?",
+        type.id,@patient.id,session_date])
+		
+    @restricted = ProgramLocationRestriction.all(:conditions => {:location_id => Location.current_health_center.id })
+		
+    @restricted.each do |restriction|
+      @prescriptions = restriction.filter_orders(@prescriptions)
+    end
+
+    @encounters = @patient.encounters.find_by_date(session_date)
+
+    @transfer_out_site = nil
+
+    @encounters.each do |enc|
+      enc.observations.map do |obs|
+				@transfer_out_site = obs.to_s if obs.to_s.include?('Transfer out to')
+			end
+    end
+    #@reason_for_art_eligibility = PatientService.reason_for_art_eligibility(@patient)
+    #@arv_number = PatientService.get_patient_identifier(@patient, 'ARV Number')
+
+    render :template => 'dashboards/dispension_tab', :layout => false
+  end
+
+  def history_treatment
+    @user = User.find(params[:user_id]) rescue nil
+    @patient = Patient.find(params[:patient_id] || params[:id])
+    type = EncounterType.find_by_name('TREATMENT')
+    session_date = session[:datetime].to_date rescue Date.today
+    @prescriptions = Order.find(:all,
+      :joins => "INNER JOIN encounter e USING (encounter_id)",
+      :conditions => ["encounter_type = ? AND e.patient_id = ?",type.id,@patient.id])
+
+    @historical = @patient.orders.historical.prescriptions.all
+    @restricted = ProgramLocationRestriction.all(:conditions => {:location_id => Location.current_health_center.id })
+    @restricted.each do |restriction|
+      @historical = restriction.filter_orders(@historical)
+    end
+
+    render :template => 'dashboards/treatment_tab', :layout => false
+  end
+	
+	def patient_report
+		@user = User.find(params[:user_id]) rescue nil
+		@patient = Patient.find(params[:patient_id] || params[:id]) rescue nil
+    type = EncounterType.find_by_name('TREATMENT')
+    session_date = session[:datetime].to_date rescue Date.today
+    @prescriptions = Order.find(:all,
+      :joins => "INNER JOIN encounter e USING (encounter_id)",
+      :conditions => ["encounter_type = ? AND e.patient_id = ? AND DATE(encounter_datetime) = ?",
+        type.id,@patient.id,session_date])
+
+    @restricted = ProgramLocationRestriction.all(:conditions => {:location_id => Location.current_health_center.id })
+
+    @restricted.each do |restriction|
+      @prescriptions = restriction.filter_orders(@prescriptions)
+    end
+
+    @encounters = @patient.encounters.find_by_date(session_date)
+
+    @transfer_out_site = nil
+
+    @encounters.each do |enc|
+      enc.observations.map do |obs|
+				@transfer_out_site = obs.to_s if obs.to_s.include?('Transfer out to')
+			end
+    end
+		@sbp = Vitals.get_patient_attribute_value(@patient, "systolic blood pressure")
+		@dbp = Vitals.get_patient_attribute_value(@patient, "diastolic blood pressure")
+
+		@complications = Vitals.current_encounter(@patient, "complications", "complications") rescue []
+								
+		@diabetic = ConceptName.find_by_concept_id(Vitals.get_patient_attribute_value(@patient, "Patient has Diabetes")).name rescue []
+
+		@risk = Vitals.current_encounter(@patient, "assessment", "assessment comments") rescue []
+
+		#raise @prescriptions.to_yaml
+		@programs = @patient.program_encounters.current.collect{|p|
+
+      [
+        p.id,
+        p.to_s,
+        p.program_encounter_types.collect{|e|
+          [
+            e.encounter_id, e.encounter.type.name,
+            e.encounter.encounter_datetime.strftime("%H:%M"),
+            e.encounter.creator
+          ]
+        },
+        p.date_time.strftime("%d-%b-%Y")
+      ]
+    } if !@patient.nil?
+    #@reason_for_art_eligibility = PatientService.reason_for_art_eligibility(@patient)
+    #@arv_number = PatientService.get_patient_identifier(@patient, 'ARV Number')
+
+    render :layout => false
+  end
+
 end

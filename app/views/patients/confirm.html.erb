@@ -75,10 +75,7 @@
     conntinue = document.getElementById('finishButton')
     conntinue.innerHTML = '<span>Continue</span>';
 	conntinue.setAttribute('onmousedown','go();')
-	<%#= raise @location.to_yaml %>
-    <%if @location.match(/HIV|ART/i) and not @location.match(/Reception/i)%>
-      weightGraph();
-    <%end%>
+	
   }
 
   function go() {
@@ -86,9 +83,6 @@
   }
 
   function weightGraph(){
-    <% if @location.match(/HIV|ART/i) and @location.match(/Reception/i) %>
-      return
-    <% end %>
      var patient_data = [
       <% @min = Time.now
          @max = Time.now
@@ -163,13 +157,5 @@
 </div>
 
 <hr />
-
-<% if @location.match(/HIV|ART/i) and not @location.match(/Reception/i) %>
-  <div class = 'charts'>
-    <h3>Weight graph - History</h3>
-    <div id="charts" class="panel" style="width:700px;height:330px;"></div>
-    <div id="placeholder_details" style="height:50px;padding-top:15px;"></div>
-  </div>
-<% end %>
 
 </body>

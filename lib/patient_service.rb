@@ -548,14 +548,20 @@ module PatientService
     return status
   end
 
+	def graph
+    @currentWeight = params[:currentWeight]
+    render :template => "graphs/#{params[:data]}", :layout => false
+  end
+
   def self.patient_is_child?(patient)
     return self.get_patient_attribute_value(patient, "age") <= 14 unless self.get_patient_attribute_value(patient, "age").nil?
     return false
   end
 
   def self.get_patient_attribute_value(patient, attribute_name, session_date = Date.today)
-
+		
     patient_bean = get_patient(patient.person)
+		
     if patient_bean.sex.upcase == 'MALE'
    		sex = 'M'
     elsif patient_bean.sex.upcase == 'FEMALE'
@@ -836,7 +842,7 @@ EOF
 		patient.person_id = person.id
 		patient.patient_id = person.patient.id
 		patient.arv_number = get_patient_identifier(person.patient, 'ARV Number')
-		patient.address = person.addresses.first.city_village
+		patient.address = person.addresses.first.city_village rescue nil
 		patient.national_id = get_patient_identifier(person.patient, 'National id')    
 		patient.national_id_with_dashes = get_national_id_with_dashes(person.patient)
 		patient.name = person.names.first.given_name + ' ' + person.names.first.family_name rescue nil
