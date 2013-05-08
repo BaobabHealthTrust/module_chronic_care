@@ -54,7 +54,7 @@
 
 <%
   task = @task
-  next_task = task.encounter_type.gsub('_',' ') rescue nil
+  #next_task = task.encounter_type.gsub('_',' ') rescue nil
 
 %>
 
@@ -63,24 +63,22 @@
 <%= javascript_include_tag "prototype" %>
 <script>
 
-  function cancel(){ document.location = "/clinic" }
+  function cancel(){ document.location = "/clinic?user_id=<%=@user['user_id']%>&location_id=<%=@current_location%>" }
 
   function changeAttributes(){
     buttonsdiv = document.getElementById('buttons')
     buttonsdiv.innerHTML+="<button onmousedown='cancel();' id='cancelhButton' class='button red left'><span>Cancel</span></button>";
     conntinue = document.getElementById('finishButton')
-    conntinue.innerHTML = '<span>Continue</span>'
-    conntinue.setAttribute('onmousedown','go();')
-
+    conntinue.innerHTML = '<span>Continue</span>';
+	conntinue.setAttribute('onmousedown','go();')
+	<%#= raise @location.to_yaml %>
     <%if @location.match(/HIV|ART/i) and not @location.match(/Reception/i)%>
       weightGraph();
     <%end%>
   }
 
   function go() {
-    submit_form = $('confirm');
-    submit_form.action = "<%#= task.url %>"
-    submit_form.submit();
+	document.location = "<%= @task.next_task.url %>"
   }
 
   function weightGraph(){
@@ -134,12 +132,9 @@
 
 </script>
 
-<body onload = "setTimeout('changeAttributes()',500);">
+<body onload = "changeAttributes();">
 
-<form method='post' action="/people/confirm" id = "confirm">
-  <%= hidden_field_tag(:found_person_id, @found_person_id) %>
-  <%= hidden_field_tag(:relation, @relation) %>
-</form>
+
 
 <div id ='header'>
   <h1><%= @person.patient.name %>&nbsp;(<%= @person.patient.gender %>)</h1>
@@ -157,7 +152,7 @@
   <div>
     <table>
       <tr style = "font-size:20px;">
-        <th>Next task</th><td><%= next_task %></td>
+        <th>Next task : </th><td><%= @next_task.titleize %></td>
       </tr>
     </table>
   </div>

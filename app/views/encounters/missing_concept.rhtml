@@ -1,5 +1,5 @@
 <div style="width: 100%; padding-top: 120px; text-align: center;">
-  <h1>Sorry, concept "<i style="color: blue;"><%= params[:concept].upcase rescue "" %></i>" is missing!</h1>
+  <h1>Sorry, concept "<i style="color: blue;"><%= params[:concept].gsub("_", " ").upcase rescue "" %></i>" is missing!</h1>
   <br />
   <br />
   <br />

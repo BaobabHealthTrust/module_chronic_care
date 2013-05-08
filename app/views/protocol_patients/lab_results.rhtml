@@ -124,15 +124,15 @@
   }
 </script>
 
-<form action="/encounters/create/lab_results">
+<form method='post' action="/encounters/create">
   <% default={
     :allowFreeText => 'true',
   } %>
 
-  <%= hidden_field_tag "encounter[encounter_type_name]", "LAB RESULTS" %>
-  <%#= hidden_field_tag "encounter[patient_id]", @patient.id %>
-  <%= hidden_field_tag "encounter[encounter_datetime]", DateTime.now() %>
-  <%#= hidden_field_tag "encounter[provider_id]", session[:user_id] %>
+	<input type='hidden' name='program' value='CHRONIC CARE PROGRAM' />
+	<input type='hidden' name='encounter_type' value='LAB RESULTS' />
+	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
+	<input type='hidden' name='user_id' value='<%= @user.id %>' />
 
   <% options=default.merge({
       :field_type => 'text',
@@ -180,7 +180,7 @@
     <!-- set the test type concept name and value -->
     <%= hidden_field_tag("observations[][concept_name]",        "", {:id => 'fbs_test_type_concept_name'}) %>
     <%= hidden_field_tag("observations[][value_coded_or_text]", "", {:id => 'fbs_test_type_value_coded_or_text'}) %>
-    <%#= hidden_field_tag("observations[][patient_id]",          @patient.id) %>
+    <%= hidden_field_tag("observations[][patient_id]",          @patient.id) %>
     <%= hidden_field_tag("observations[][obs_datetime]",        DateTime.now()) %>
 
     <!-- set the test concept and value -->
@@ -188,8 +188,8 @@
     <%= hidden_field_tag("observations[][value_numeric]",       "", {:id => 'fbs_value_numeric'} ) %>
     <%= hidden_field_tag("observations[][measurement_unit]",    nil,{:id => 'fbs_measurement_unit'}) %>
     <%= hidden_field_tag("observations[][parent_concept_name]", "", {:id => 'fbs_parent_concept_name'}) %>
-    <%#= hidden_field_tag("observations[][patient_id]", @patient.id) %>
-    <%#= hidden_field_tag("observations[][obs_datetime]", DateTime.now()) %>
+    <%= hidden_field_tag("observations[][patient_id]", @patient.id) %>
+    <%= hidden_field_tag("observations[][obs_datetime]", DateTime.now()) %>
 
     <% options = default.merge({
           :id           => "rbs_unit",
@@ -224,15 +224,15 @@
     <!-- set the test type concept name and value -->
     <%= hidden_field_tag("observations[][concept_name]",        "", {:id => 'rbs_test_type_concept_name'}) %>
     <%= hidden_field_tag("observations[][value_coded_or_text]", "", {:id => 'rbs_test_type_value_coded_or_text'}) %>
-    <%#= hidden_field_tag("observations[][patient_id]",          @patient.id) %>
-    <%#= hidden_field_tag("observations[][obs_datetime]",        DateTime.now()) %>
+    <%= hidden_field_tag("observations[][patient_id]",          @patient.id) %>
+    <%= hidden_field_tag("observations[][obs_datetime]",        DateTime.now()) %>
 
     <!-- set the test concept and value -->
     <%= hidden_field_tag("observations[][concept_name]",        "", {:id => 'rbs_concept_name'}) %>
     <%= hidden_field_tag("observations[][value_numeric]",       "", {:id => 'rbs_value_numeric'} ) %>
     <%= hidden_field_tag("observations[][measurement_unit]",    nil,{:id => 'rbs_measurement_unit'}) %>
     <%= hidden_field_tag("observations[][parent_concept_name]", "", {:id => 'rbs_parent_concept_name'}) %>
-    <%#= hidden_field_tag("observations[][patient_id]", @patient.id) %>
+    <%= hidden_field_tag("observations[][patient_id]", @patient.id) %>
     <%= hidden_field_tag("observations[][obs_datetime]", DateTime.now()) %>
 
     <% options = default.merge({
@@ -255,7 +255,7 @@
     <!-- set the test type concept name and value -->
     <%= hidden_field_tag("observations[][concept_name]",        "", {:id => 'HbA1c_test_type_concept_name'}) %>
     <%= hidden_field_tag("observations[][value_coded_or_text]", "", {:id => 'HbA1c_test_type_value_coded_or_text'}) %>
-    <%#= hidden_field_tag("observations[][patient_id]",          @patient.id) %>
+    <%= hidden_field_tag("observations[][patient_id]",          @patient.id) %>
     <%= hidden_field_tag("observations[][obs_datetime]",        DateTime.now()) %>
 
     <!-- set the test concept and value -->
@@ -263,7 +263,7 @@
     <%= hidden_field_tag("observations[][value_numeric]",       "", {:id => 'HbA1c_value_numeric'} ) %>
     <%= hidden_field_tag("observations[][measurement_unit]",    nil,{:id => 'HbA1c_measurement_unit'}) %>
     <%= hidden_field_tag("observations[][parent_concept_name]", "", {:id => 'HbA1c_parent_concept_name'}) %>
-    <%#= hidden_field_tag("observations[][patient_id]", @patient.id) %>
+    <%= hidden_field_tag("observations[][patient_id]", @patient.id) %>
     <%= hidden_field_tag("observations[][obs_datetime]", DateTime.now()) %>
 
     <% options = default.merge({
@@ -321,7 +321,7 @@
     <%= hidden_field_tag("observations[][value_numeric]",       "", {:id => 'cf_value_numeric'} ) %>
     <%= hidden_field_tag("observations[][measurement_unit]",    nil,{:id => 'cf_measurement_unit'}) %>
     <%= hidden_field_tag("observations[][parent_concept_name]", "", {:id => 'cf_parent_concept_name'}) %>
-    <%#= hidden_field_tag("observations[][patient_id]", @patient.id) %>
+    <%= hidden_field_tag("observations[][patient_id]", @patient.id) %>
     <%= hidden_field_tag("observations[][obs_datetime]", DateTime.now()) %>
 
     <% options = default.merge({
@@ -370,7 +370,7 @@
     <!-- set the test type concept name and value -->
     <%= hidden_field_tag("observations[][concept_name]",        "", {:id => 'cnf_test_type_concept_name'}) %>
     <%= hidden_field_tag("observations[][value_coded_or_text]", "", {:id => 'cnf_test_type_value_coded_or_text'}) %>
-    <%#= hidden_field_tag("observations[][patient_id]",          @patient.id) %>
+    <%= hidden_field_tag("observations[][patient_id]",          @patient.id) %>
     <%= hidden_field_tag("observations[][obs_datetime]",        DateTime.now()) %>
 
     <!-- set the test concept and value -->
@@ -379,7 +379,7 @@
     <%= hidden_field_tag("observations[][value_numeric]",       "", {:id => 'cnf_value_numeric'} ) %>
     <%= hidden_field_tag("observations[][measurement_unit]",    nil,{:id => 'cnf_measurement_unit'}) %>
     <%= hidden_field_tag("observations[][parent_concept_name]", "", {:id => 'cnf_parent_concept_name'}) %>
-    <%#= hidden_field_tag("observations[][patient_id]", @patient.id) %>
+    <%= hidden_field_tag("observations[][patient_id]", @patient.id) %>
     <%= hidden_field_tag("observations[][obs_datetime]", DateTime.now()) %>
 
 	<% if @retrospective %>

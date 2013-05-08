@@ -2,7 +2,7 @@
 class EncountersController < ApplicationController
 
   def create
-
+		
     User.current = User.find(@user["user_id"]) rescue nil
 
     Location.current = Location.find(params[:location_id] || session[:location_id]) rescue nil
@@ -28,7 +28,7 @@ class EncountersController < ApplicationController
         if !params[:program].blank?
 
           @program = Program.find_by_concept_id(ConceptName.find_by_name(params[:program]).concept_id) rescue nil
-
+					
           if !@program.nil?
 
             @program_encounter = ProgramEncounter.find_by_program_id(@program.id,
@@ -50,7 +50,7 @@ class EncountersController < ApplicationController
               :program_encounter_id => @program_encounter.id,
               :program_id => @program.id
             )
-
+						
             @current = PatientProgram.find_by_program_id(@program.id,
               :conditions => ["patient_id = ? AND COALESCE(date_completed, '') = ''", patient.id])
 
@@ -157,9 +157,10 @@ class EncountersController < ApplicationController
                 obs.update_attribute("value_text", value)
 
               end
-
+							
             else
-
+							
+							key = key.gsub(" ", "_")
               redirect_to "/encounters/missing_concept?concept=#{key}" and return if !value.blank?
 
             end
@@ -254,7 +255,7 @@ class EncountersController < ApplicationController
             end
 
           end
-
+					
         end if !params[:concept].nil?
 
 
@@ -302,7 +303,7 @@ class EncountersController < ApplicationController
           end
 
         end
-
+				
       else
 
         redirect_to "/encounters/missing_encounter_type?encounter_type=#{params[:encounter_type]}" and return
@@ -334,9 +335,9 @@ class EncountersController < ApplicationController
         ) if !baby_id.nil?
 
       end
-
+			
       @task = TaskFlow.new(params[:user_id] || User.first.id, patient.id)
-
+			
       redirect_to params[:next_url] and return if !params[:next_url].nil?
 
       redirect_to @task.next_task.url and return

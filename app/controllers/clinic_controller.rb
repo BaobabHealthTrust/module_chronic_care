@@ -9,13 +9,15 @@ class ClinicController < ApplicationController
 
     @location = Location.find(params[:location_id] || session[:location_id]) rescue nil
 
+		lock = params[:location_id] || session[:location_id]
+
     session[:location_id] = @location.id if !@location.nil?
     
     #redirect_to "/patients/show/#{params[:ext_patient_id]}?user_id=#{params[:user_id]}&location_id=#{
     #params[:location_id]}" if !params[:ext_patient_id].nil?
 
-		redirect_to "/patients/confirm/#{:ext_patient_id}?found_person_id=#{params[:ext_patient_id]}&location_id=#{
-    params[:location_id]}&user_id=#{params[:user_id]}" if !params[:ext_patient_id].nil?
+		redirect_to "/patients/confirm/#{params[:ext_patient_id]}?found_person_id=#{params[:ext_patient_id]}&location_id=#{
+    lock}&user_id=#{params[:user_id]}" and return if !params[:ext_patient_id].nil?
 
     @project = get_global_property_value("project.name") rescue "Unknown"
 

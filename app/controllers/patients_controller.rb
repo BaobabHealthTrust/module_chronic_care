@@ -17,11 +17,11 @@ class PatientsController < ApplicationController
     redirect_to "/encounters/no_user" and return if @user.nil?
 
     @task = TaskFlow.new(params[:user_id], @patient.id)
-
+		
     @links = {}
-
+		
     @task.tasks.each{|task|
-
+			
       next if task.downcase == "update baby outcome" and (@patient.current_babies.length == 0 rescue false)
 
       @links[task.titleize] = "/protocol_patients/#{task.gsub(/\s/, "_")}?patient_id=#{
@@ -39,7 +39,7 @@ class PatientsController < ApplicationController
     end
 		@demographics_url = "http://" + @demographics_url if !@demographics_url.match(/http:/)
     @task.next_task
-
+		
     @babies = @patient.current_babies rescue []
 
   end
@@ -131,16 +131,17 @@ class PatientsController < ApplicationController
 
 		session_date = session[:datetime] || Date.today
 
-		if request.post?
-			redirect_to search_complete_url(params[:found_person_id], params[:relation]) and return
-		end
-		
+		#if request.post?
+			#redirect_to search_complete_url(params[:found_person_id], params[:relation]) and return
+		#end
+		@current_location = params[:location_id]
 		@current_user = User.find(@user["user_id"])
 		
-		@found_person_id = params[:found_person_id]
+		@found_person_id = params[:found_person_id] || session[:location_id]
 		@relation = params[:relation] rescue nil
 		@person = Person.find(@found_person_id) rescue nil
-		@task = main_next_task(Location.current_location, @person.patient, session_date.to_date) rescue nil
+		@task = TaskFlow.new(params[:user_id], @person.id) rescue nil
+		@next_task = @task.next_task.encounter_type.gsub('_',' ') rescue nil
 		@arv_number = PatientService.get_patient_identifier(@person, 'ARV Number') rescue ""		
 		@patient_bean = PatientService.get_patient(@person) rescue ""
 		@location = Location.find(params[:location_id] || session[:location_id]).name rescue nil

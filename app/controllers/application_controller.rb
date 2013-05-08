@@ -30,7 +30,7 @@ class ApplicationController < ActionController::Base
   protected
 
   def check_user
-
+		#raise get_global_property_value("user.management.url").to_s.to_yaml
     link = get_global_property_value("user.management.url").to_s rescue nil
 
     if link.nil?
@@ -41,7 +41,7 @@ class ApplicationController < ActionController::Base
 
     @user = JSON.parse(RestClient.get("#{link}/verify/#{(params[:user_id])}")) # rescue {}
 
-    # raise @user.to_yaml
+     
 
     # Track final destination
     file = "#{File.expand_path("#{Rails.root}/tmp", __FILE__)}/current.path.yml"
@@ -51,13 +51,13 @@ class ApplicationController < ActionController::Base
     f.write("#{Rails.env}:\n    current.path: #{request.referrer}")
 
     f.close
-
+	
     if @user.empty?
-      redirect_to "/user_login?internal=true" and return
+      #redirect_to "/user_login?internal=true" and return
     end
 
     if @user["token"].nil?
-      redirect_to "/user_login?internal=true" and return
+      #redirect_to "/user_login?internal=true" and return
     end
 
   end

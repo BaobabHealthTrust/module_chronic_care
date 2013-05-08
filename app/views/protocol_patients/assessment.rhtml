@@ -5,7 +5,7 @@
 	</script>
 
 <form method='post' action='/encounters/create'>
-	<input type='hidden' name='program' value='CHRONIC CARE MODULE' />
+	<input type='hidden' name='program' value='CHRONIC CARE PROGRAM' />
 	<input type='hidden' name='encounter_type' value='ASSESSMENT ' />
 	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
 	<input type='hidden' name='user_id' value='<%= @user.id %>' />
@@ -15,7 +15,7 @@
 				Is patient Diabetic? 
 			</td>
 			<td>
-<select id='1.1.1' name='concept[Patient Diabetic]' helpText='Is patient Diabetic? ' pos='1' >
+<select id='1.1.1' name='concept[Patient has Diabetes]' helpText='Is patient Diabetic? ' pos='1' >
 <option></option>
 <option value='No'>No</option>
  <option value='Yes'>Yes</option>
@@ -27,56 +27,11 @@
 				Patient Summary 
 			</td>
 			<td>
-<input type='text' id='1.1.2'  name='concept[Patient Summary ]' helpText='Patient Summary '  pos='2'  tt_onLoad='__$("keyboard").style.display = "none"'  tt_pageStyleClass='NoControls' />
+	<label for='summary'>Patient Summary</label>
+	<%= text_field_tag :summary, nil, { :tt_onLoad => "__$('keyboard').style.display = 'none';", :optional => "true", :tt_pageStyleClass => "NoControls" } %>
+
 			</td>
 		</tr>
-		<tr>
-			<td>
-				Systolic blood pressure 
-			</td>
-			<td>
-<input type='text' id='1.1.4'  name='concept[Systolic blood pressure]' helpText='Systolic blood pressure '  field_type='number'  pos='4' />
-			</td>
-		</tr>
-		<tr>
-			<td>
-				Diastolic blood pressure 
-			</td>
-			<td>
-<input type='text' id='1.1.5'  name='concept[Diastolic blood pressure]' helpText='Diastolic blood pressure '  field_type='number'  pos='5' />
-			</td>
-		</tr>
-		<tr>
-			<td>
-				Respiratory rate 
-			</td>
-			<td>
-<input type='text' id='1.1.6'  name='concept[Respiratory rate]' helpText='Respiratory rate '  field_type='number'  pos='6' />
-			</td>
-		</tr>
-		<tr>
-			<td>
-				Pulse rate 
-			</td>
-			<td>
-<input type='text' id='1.1.7'  name='concept[Pulse rate]' helpText='Pulse rate '  field_type='number'  pos='7' />
-			</td>
-		</tr>
-		<tr>
-			<td>
-				Oxygen saturation 
-			</td>
-			<td>
-<input type='text' id='1.1.8'  name='concept[Oxygen saturation]' helpText='Oxygen saturation '  field_type='number'  pos='8' />
-			</td>
-		</tr>
-		<tr>
-			<td>
-				Temperature 
-			</td>
-			<td>
-<input type='text' id='1.1.9'  name='concept[Temperature]' helpText='Temperature '  field_type='number'  pos='9' />
-			</td>
-		</tr>
+		
 	</table>
 </form>
