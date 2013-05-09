@@ -273,10 +273,10 @@ th { text-align: center;
 		  age = 0;
 		}
 
-		smoking = '<%= @smoking_status.downcase %>'
+		smoking = '<%= @smoking_status.downcase rescue "" %>'
 		diabetic = $('diabetic').value.toLowerCase();
-		sex = '<%= @patient.gender.downcase %>'
-		bp = '<%= @systolic_value.to_i  %>'
+		sex = '<%= @patient.gender.downcase  rescue "" %>'
+		bp = '<%= @systolic_value.to_i   rescue ""%>'
 		if (sex == "female")
 		  sex = "f"
 
@@ -451,11 +451,15 @@ th { text-align: center;
 				Is patient Diabetic? 
 			</td>
 			<td>
+<% if @diabetic.upcase != "YES" %>
 <select id='diabetic' name='concept[Patient has Diabetes]' helpText='Is patient Diabetic? ' pos='1' >
 <option></option>
 <option value='No'>No</option>
  <option value='Yes'>Yes</option>
  </select>
+<% else %>
+ <input type='hidden' id='diabetic' value='YES' />
+<%  end %>
 			</td>
 		</tr>
 		<tr>

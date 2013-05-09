@@ -212,10 +212,12 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
             Demographics
           </option>
         <% end %>
-
-        <% if @task.url != "/patients/show/#{@patient.id}?user_id=#{@user.id}" %>
-          <option link="<%= @task.url  %>" ttSize = "160px">Continue</option>
-        <% end %>
+		  
+		<% if @disable.to_s != "true" %>
+		  <% if @task.url != "/patients/show/#{@patient.id}?user_id=#{@user.id}" %>
+			<option link="<%= @task.url  %>" ttSize = "160px">Continue</option>
+		  <% end %>
+		<% end %>
 
       </select>
 

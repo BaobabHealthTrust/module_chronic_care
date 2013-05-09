@@ -1,9 +1,20 @@
 <%= javascript_include_tag 'jquery' %>
 <%= javascript_include_tag "utils" %>
+<style>
+    #tt_page_treatment_received #viewport {
+    height: 500px;
+  }
+  #tt_page_any_drug_allergies #viewport {
+    height: 200px;
+  }
+</style>
+
 <script type="text/javascript">
   tt_cancel_show = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
   tt_cancel_destination = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
-	
+
+  <% @side_effects = MedicationService.concept_set('MALAWI ART DRUG INDUCED SYMPTOM SET') %>
+
 </script>
 <%	@concept = []
 	@regimen_concepts.each do |reg|
@@ -14,9 +25,9 @@
 	<input type='hidden' name='encounter_type' value='GENERAL HEALTH' />
 	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
 	<input type='hidden' name='user_id' value='<%= @user.id %>' />
-
-<% @treatements_list = ["Heart disease", "Stroke", "TIA", "Diabetes", "Kidney Disease"] %>
-
+<% if @diabetic.upcase == "YES" %>
+	<input type='hidden' name='concept[Chronic disease][]' value='Diabetes' />
+<% end %>
 
 <%= select_tag "choice", options_for_select(@treatements_list),
 	{ :field_type => 'text',
@@ -25,7 +36,7 @@
 	  :name=> "concept[Chronic disease][]",
       :multiple => true,
       :tt_pageStyleClass => "MultiSelectList",
-      :optional => true } %>
+      :optional => true} %>
 
 
 <%= select_tag "treatment", options_for_select(@concept),
@@ -41,5 +52,5 @@
 	{	:id => "drug_allergy",
 	:condition => "$('choice').value.length > 0" ,
 	:name => 'concept[Drug Allergy]',
-	:helpText => "An drug allergies" } %>
+	:helpText => "Any drug allergies" } %>
 </form>

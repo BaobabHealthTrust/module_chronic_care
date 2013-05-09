@@ -36,9 +36,9 @@
       }
 
     </script>
-    <%= stylesheet_link_tag "mateme" %>
-    <%= stylesheet_link_tag fancy_or_high_contrast_touch %>
-    <%= javascript_include_tag "preload" %>
+     <script language="javascript" type="text/javascript" src="/touchscreentoolkit/lib/javascripts/touchScreenToolkit.js" defer="true"></script>
+
+    <%= javascript_include_tag "custom" %>
   </head>
   <body id="mateme">
     <div id="container">
@@ -63,7 +63,7 @@
         </div>
         <%= yield %>
         <div id="footer">
-          <div id="buttons" class="buttonsDiv" style="top:0px">
+          <div id="buttons" class="buttonsDiv" style="width: 100%;">
             <button id="finishButton" class="button navButton green" onclick="if (tt_cancel_destination) window.location = tt_cancel_destination;"><span>Finish</span></button>
                   <% if 'mastercard' == params[:action].to_s %>
                     <% if session[:mastercard_ids].length.to_i != 0 %>

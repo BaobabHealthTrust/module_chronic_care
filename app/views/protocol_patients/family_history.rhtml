@@ -16,18 +16,49 @@
 
 	function showSelectedConditions() {
       var conditions = [];
+	  var riskValue = 0;
 
-      if ($('cardiovascular').value.length > 0)
-        conditions.push("Family History of cardiovascular: " + $('cardiovascular').value);
+      if ($('cardiovascular').value.length > 0){
+		if ($('cardiovascular').value == "Yes")
+		  riskValue += 1
 
-      if ($('diabetes').value.length > 0)
-        conditions.push("Family History of diabetes: " + $('diabetes').value);
+		conditions.push("Family history of premature cardiovascular death: " + $('cardiovascular').value);
+	  }
+        
 
-      if ($('hypertension').value.length > 0)
-        conditions.push("Family History of hypertension: " + $('hypertension').value);
+      if ($('diabetes').value.length > 0){
+		if ($('diabetes').value == "Yes")
+		  riskValue += 1
 
-      if ($('kidney').value.length > 0)
-        conditions.push("Family History of kidney disease: " + $('kidney').value);
+		conditions.push("Family history of diabetes: " + $('diabetes').value);
+	  }
+        
+
+      if ($('hypertension').value.length > 0){
+		if ($('hypertension').value == "Yes")
+		  riskValue += 1
+
+		conditions.push("Family history of hypertension: " + $('hypertension').value);
+	  }
+        
+      if ($('kidney').value.length > 0){
+		if ($('kidney').value == "Yes")
+		  riskValue += 1
+		
+		conditions.push("Family history of kidney disease: " + $('kidney').value);
+	  }
+	  
+      if (riskValue > 0) {
+		riskValue = (riskValue / 4) * 99;
+		conditions.push("<i style='color: red'>Patient's hypertension risk is almost: " + riskValue + "% </i>");
+
+		submitForm = document.getElementById("family_history");
+		newElement = document.createElement("input");
+		newElement.setAttribute("name","concept[Hypertension]");
+		newElement.setAttribute("type","hidden");
+		newElement.value = riskValue + "%";
+		submitForm.appendChild(newElement);
+	  }
 
       var html
       html = "<ul>"
@@ -42,7 +73,7 @@
   }
 </script>
 
-<form method='post' action='/encounters/create'>
+<form method='post' action='/encounters/create' id="family_history">
 	<input type='hidden' name='program' value='CHRONIC CARE PROGRAM' />
 	<input type='hidden' name='encounter_type' value='FAMILY MEDICAL HISTORY ' />
 	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />

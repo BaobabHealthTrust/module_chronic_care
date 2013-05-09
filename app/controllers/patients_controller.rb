@@ -22,9 +22,7 @@ class PatientsController < ApplicationController
 		
     @task.tasks.each{|task|
 
-      @links[task.titleize] = "/protocol_patients/#{task.gsub(/\s/, "_")}?patient_id=#{
-      @patient.id}&user_id=#{params[:user_id]}" + (task.downcase == "update baby outcome" ?
-        "&baby=1&baby_total=#{(@patient.current_babies.length rescue 0)}" : "")
+      @links[task.titleize] = "/protocol_patients/#{task.gsub(/\s/, "_")}?patient_id=#{@patient.id}&user_id=#{params[:user_id]}"
       
     }
 
@@ -36,9 +34,8 @@ class PatientsController < ApplicationController
       @demographics_url = @demographics_url + "/demographics/#{@patient.id}?user_id=#{@user.id}&ext=true"
     end
 		@demographics_url = "http://" + @demographics_url if !@demographics_url.match(/http:/)
-    @task.next_task
-		
-    @babies = @patient.current_babies rescue []
+    @task.next_task rescue ""
+		@disable = params[:disable] rescue ""
 
   end
 

@@ -45,12 +45,12 @@
       for(var i=0;i < conditions.length;i++) {
         if (conditions[i].length > 0)
           html += "<li class='data'>" + conditions[i] + "</li>";
-
       }
       html += "</ul>"
 	  if (($('drinks_per_day').value > 6) || ($('days_per_week').value > 3)){
-		html += "<span class='warning'>Patient is a heavy drinker!</span>";
+		html += "<span class='warning'>Patient is a heavy drinker! <br>Please refer patient for advice on life changes</span>";
 		 	$('alcoholism').value = "Yes"
+			$('refer_to_clinician').value = "Yes"
 	  }
 
 	  $('inputFrame'+tstCurrentPage).innerHTML = '<div id="summary">' + html + '</div>' ;
@@ -64,6 +64,7 @@
 	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
 	<input type='hidden' name='user_id' value='<%= @user.id %>' />
 	<input type='hidden' name='concept[Alcoholism]' id="alcoholism">
+	<input type='hidden' name='concept[refer to clinician]' id="refer_to_clinician">
 	<%#= raise @patient.gender.to_yaml   %>
 	<%#= raise @patient.age.to_yaml   %>
 	<table>
