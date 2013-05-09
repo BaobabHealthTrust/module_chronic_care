@@ -2,7 +2,7 @@
 class TaskFlow
 
   attr_accessor :patient, :person, :user, :current_date, :tasks, :current_user_activities,
-    :encounter_type, :url, :task_scopes, :task_list, :labels
+    :encounter_type, :url, :task_scopes, :task_list, :labels, :redirect_to
     
   def initialize(user_id, patient_id, session_date = Date.today)
     self.patient = Patient.find(patient_id)
@@ -159,7 +159,7 @@ class TaskFlow
                                   self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name("DIABETES HYPERTENSION INITIAL VISIT").id])
 
 					next if !visit.blank?
-					#next if ! my_activities.include?(tsk)
+					
 					self.encounter_type = 'CLINIC VISIT'
 					self.url = "/protocol_patients/clinic_visit?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					return self
@@ -171,10 +171,13 @@ class TaskFlow
                                   self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
 
 					next if !vitals.blank?
-					next if ! my_activities.include?(tsk)
 					self.encounter_type = 'VITALS'
 					self.url = "/protocol_patients/vitals?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
-					return self
+					if ! my_activities.include?(tsk)
+						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
+					else
+						return self
+					end
 
 				when "FAMILY HISTORY"
 					self.patient.encounters.each do | enc |
@@ -186,11 +189,14 @@ class TaskFlow
                                   self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name('FAMILY MEDICAL HISTORY').id])
 
 					next if !history.blank?
-					next if ! my_activities.include?(tsk)
 					self.encounter_type = 'FAMILY MEDICAL HISTORY'
 					self.url = "/protocol_patients/family_history?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					
-					return self
+					if ! my_activities.include?(tsk)
+						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
+					else
+						return self
+					end
 
 				when "SOCIAL HISTORY"
 
@@ -204,10 +210,13 @@ class TaskFlow
                                   self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
 
 					next if !history.blank?
-					next if ! my_activities.include?(tsk)
 					self.encounter_type = 'SOCIAL HISTORY'
 					self.url = "/protocol_patients/social_history?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
-					return self
+					if ! my_activities.include?(tsk)
+						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
+					else
+						return self
+					end
 
 				when "GENERAL HEALTH"
 
@@ -220,10 +229,13 @@ class TaskFlow
                                   self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
 
 					next if !history.blank?
-					next if ! my_activities.include?(tsk)
 					self.encounter_type = 'GENERAL HEALTH'
 					self.url = "/protocol_patients/general_health?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
-					return self
+				  if ! my_activities.include?(tsk)
+						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
+					else
+						return self
+					end
 
         when "UPDATE HIV STATUS"
 					self.patient.encounters.each do | enc |
@@ -241,52 +253,71 @@ class TaskFlow
 					if hiv_status.observations.map{|s|s.to_s.split(':').last.strip}.include?('Positive')
             next
           end if not hiv_status.blank?
-					next if ! my_activities.include?("HIV STATUS")
 					self.encounter_type = "HIV STATUS"
 					self.url = "/protocol_patients/hiv_status?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
-					return self
+					if ! my_activities.include?("HIV STATUS")
+						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
+					else
+						return self
+					end
+
 				when "ASSESSMENT"
 					assessment = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
                                   :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
                                   self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
 					
 					next if !assessment.blank?
-					next if ! my_activities.include?(tsk)
 					self.encounter_type = "ASSESSMENT"
 					self.url = "/protocol_patients/assessment?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
-					return self
+					if ! my_activities.include?(tsk)
+						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
+					else
+						return self
+					end
+
 				when "COMPLICATIONS"
 					assessment = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
                                   :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
                                   self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
 					next if !assessment.blank?
-					next if ! my_activities.include?(tsk)
 					self.encounter_type = "COMPLICATIONS"
 					self.url = "/protocol_patients/complications?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
-					return self
+					if ! my_activities.include?(tsk)
+						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
+					else
+						return self
+					end
+
 				when "TREATMENT"
 					assessment = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
                                   :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
                                   self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
 
 					next if !assessment.blank?
-					next if ! my_activities.include?(tsk)
 					self.encounter_type = "TREATMENT"
 					self.url = "/protocol_patients/treatment?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
-					return self
+					if ! my_activities.include?(tsk)
+						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
+					else
+						return self
+					end
+
 				when "LAB RESULTS"
 					self.patient.encounters.each do | enc |
 					 found = true if enc.name.upcase == "LAB RESULTS"
 					end
 					next if found == true
-					next if ! my_activities.include?(tsk)
 					assessment = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
                                   :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
                                   self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
 					next if !assessment.blank?
 					self.encounter_type = "LAB RESULTS"
 					self.url = "/protocol_patients/lab_results?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
-					return self
+					if ! my_activities.include?(tsk)
+						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
+					else
+						return self
+					end
 			end
 					
 		end
