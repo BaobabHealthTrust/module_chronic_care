@@ -88,6 +88,9 @@
   var currentWeightPercentile;
   var displayText;
   var medianWeightHeight;
+  var systolicColor = "";
+  var diastolicColor = "";
+
 
   function getSelected(){
     var choices = "";
@@ -115,7 +118,7 @@
 
   function calculateBP(pos){
     var bp;
-
+	
     if(!$('bp')){
       var div = document.createElement("div");
       div.id = "bp";
@@ -125,16 +128,80 @@
     }
 
     if(pos == 1){
-      bp = ($("touchscreenInput" + tstCurrentPage).value.trim().length > 0 ? $("touchscreenInput" +
-        tstCurrentPage).value.trim() : "?") +
-        "/" + ($("diastolic_blood_pressure").value.trim().length > 0 ? $("diastolic_blood_pressure").value.trim() : "?");
-    } else if(pos == 2){
-      bp = ($("systolic_blood_pressure").value.trim().length > 0 ? $("systolic_blood_pressure").value.trim() : "?") +
-        "/" + ($("touchscreenInput" + tstCurrentPage).value.trim().length > 0 ? $("touchscreenInput" +
-        tstCurrentPage).value.trim() : "?");
-    }
+	  if (parseInt($("touchscreenInput" + tstCurrentPage).value) >= 120 && parseInt($("touchscreenInput" + tstCurrentPage).value) < 140){
+		 systolicColor = ": #FFE47A"
+	   }
+	  if (parseInt($("touchscreenInput" + tstCurrentPage).value) >= 140 && parseInt($("touchscreenInput" + tstCurrentPage).value) < 160){
+		 systolicColor = ": #FF9933"
+	   }
+
+	  if (parseInt($("touchscreenInput" + tstCurrentPage).value) >= 160 && parseInt($("touchscreenInput" + tstCurrentPage).value) <= 180){
+		 systolicColor = ": #FF3333"
+	   }
+
+	  if ( parseInt($("touchscreenInput" + tstCurrentPage).value) < 120)
+		systolicColor = ": #336600"
+
+	  if ( parseInt($("touchscreenInput" + tstCurrentPage).value) > 180)
+		systolicColor = ": #B8002E"
+
+	  bp = ($("touchscreenInput" + tstCurrentPage).value.trim().length > 0 ? "<i style='color" + systolicColor + "'>" + $("touchscreenInput" +
+        tstCurrentPage).value.trim() + "</i>" : "?") +
+        "/" + ($("diastolic_blood_pressure").value.trim().length > 0 ? "<i style='color" + diastolicColor + "'>" + $("diastolic_blood_pressure").value.trim() + "</i>" : "?");
+	    $("bp").innerHTML = "Blood Pressure: <i style='font-size: 1.2em; float: right;'>" + bp + "</i>";
+   } else if(pos == 2){
+
+	  if (parseInt($("touchscreenInput" + tstCurrentPage).value) >= 80 && parseInt($("touchscreenInput" + tstCurrentPage).value) < 90){
+		 diastolicColor = ": #FFE47A"
+	   }
+	  if (parseInt($("touchscreenInput" + tstCurrentPage).value) >= 90 && parseInt($("touchscreenInput" + tstCurrentPage).value) < 100){
+		 diastolicColor = ": #FF9933"
+	   }
+
+	  if (parseInt($("touchscreenInput" + tstCurrentPage).value) >= 100 && parseInt($("touchscreenInput" + tstCurrentPage).value) <= 110){
+		 diastolicColor = ": #FF3333"
+	   }
+
+	  if ( parseInt($("touchscreenInput" + tstCurrentPage).value) < 80)
+		{
+		  diastolicColor = ": #336600"
+		}
+		
+
+	  if ( parseInt($("touchscreenInput" + tstCurrentPage).value) > 110){
+		diastolicColor = ": #B8002E"
+	  }
+		
+
+	  bp = ($("systolic_blood_pressure").value.trim().length > 0 ? "<i style='color" + systolicColor + "'>" + $("systolic_blood_pressure").value.trim() + "</i>" : "?") +
+        "/" + ($("touchscreenInput" + tstCurrentPage).value.trim().length > 0 ? "<i style='color" + diastolicColor + "'>" + $("touchscreenInput" +
+        tstCurrentPage).value.trim() + "</i>" : "?");
+	   $("bp").innerHTML = "Blood Pressure: <i style='font-size: 1.2em; float: right;'>" + bp + "</i>";
+    }else if(pos == 3){
+	   if ($("touchscreenInput" + tstCurrentPage).value.trim().length > 0)
+			 if (parseInt($("touchscreenInput" + tstCurrentPage).value) > 130 || parseInt($("touchscreenInput" + tstCurrentPage).value) < 40){
+			   $("bp").innerHTML = "Pulse Rate: <i style='font-size: 1.2em; float: right;'>" + $("touchscreenInput" + tstCurrentPage).value + " : Emergency</i>";
+			 }
+			 else{
+			   $("bp").innerHTML = "Pulse Rate: <i style='font-size: 1.2em; float: right;'>" + $("touchscreenInput" + tstCurrentPage).value + ": Normal</i>";
+			 }
+		else{
+				$("bp").innerHTML = "Pulse Rate: <i style='font-size: 1.2em; float: right;'> Specify</i>";
+		}
+	}else if(pos == 4){
+	   if ($("touchscreenInput" + tstCurrentPage).value.trim().length > 0)
+			 if (parseInt($("touchscreenInput" + tstCurrentPage).value) < 90){
+			   $("bp").innerHTML = "Oxygen Saturation: <i style='font-size: 1.2em; float: right;'>" + $("touchscreenInput" + tstCurrentPage).value + " : Emergency</i>";
+			 }
+			 else{
+			   $("bp").innerHTML = "Oxygen Saturation: <i style='font-size: 1.2em; float: right;'>" + $("touchscreenInput" + tstCurrentPage).value + ": Normal</i>";
+			 }
+		else{
+				$("bp").innerHTML = "Oxygen Saturation: <i style='font-size: 1.2em; float: right;'> Specify</i>";
+		}
+	}
 	
-    $("bp").innerHTML = "Blood Pressure: <i style='font-size: 1.2em; float: right;'>" + bp + "</i>";
+   
     timedEvent = setTimeout('calculateBP(' + pos + ')', 500);
   }
 
@@ -166,7 +233,6 @@
 	  conditions.push("BMI : " + currentBmi);
 	  $('bmi').value = currentBmi;
 	  var col = "<i>"
-	  var col1 = "<i>"
 
       if ($('temperature').value.length > 0)
         conditions.push("Temperature: " + $('temperature').value);
@@ -174,11 +240,24 @@
       if ($('respiratory_rate').value.length > 0)
         conditions.push("Respiratory rate: " + $('respiratory_rate').value);
 
-      if ($('pulse').value.length > 0)
-        conditions.push("Pulse: " + $('pulse').value);
+      if ($('pulse').value.length > 0){
+		pulse = parseFloat($('pulse').value);
+        if (pulse > 130 || pulse < 40) {
+          conditions.push("Pulse Rate: " + $('pulse').value + ' : EMERGENCY');
+        }
+		else {
+		  conditions.push("Pulse Rate: " + $('pulse').value);
+		}
+	  }
 
       if ($('oxygen').value.length > 0)
-        conditions.push("Oxygen: " + $('oxygen').value);
+        oxygen = parseFloat($('oxygen').value);
+        if (oxygen < 90) {
+          conditions.push("Oxygen Saturation: " + $('oxygen').value + ' : EMERGENCY');
+        }
+		else {
+		  conditions.push("Oxygen Saturation: " + $('oxygen').value);
+		}
 
       if ($('waist_circumference').value.length > 0)
         conditions.push("Waist Circumference: " + $('waist_circumference').value);
@@ -186,31 +265,38 @@
 	   var alert = ""
 	   var form = $('vitals');
 	  if($('systolic_blood_pressure').value.length > 0 && $('diastolic_blood_pressure').value.length > 0){
-		if ($('systolic_blood_pressure').value > 180 || $('systolic_blood_pressure').value < 90){
-		  newElement = document.createElement("input")
-		  newElement.setAttribute("name",'concept[any need to see a clinician]')
-		  newElement.setAttribute("type","hidden");
-		  newElement.value = 'Yes'
-		  form.appendChild(newElement)
-		  alert = "Message: <i style='color: red'> Patient needs to be referred to clinician</i>"
-		  col = "<i style='color: red'>"
+		if ($('systolic_blood_pressure').value < 120 && $('diastolic_blood_pressure').value < 80){
+		  $("cva").value = "Normal"
+		  alert = "  : <i style='color: #336600'> Normal</i>"
+		  col = "<i style='color: #336600'>"
 		}
 
-		if ($('diastolic_blood_pressure').value > 110){
-		  if (alert == ""){
-			newElement = document.createElement("input")
-			newElement.setAttribute("name",'concept[any need to see clinitian]')
-			newElement.setAttribute("type","hidden");
-			newElement.value = 'Yes'
-			form.appendChild(newElement)
-		  }
-		  alert = "Message: <i style='color: red'> Patient needs to be referred to clinician</i>"
-		  col1 = "<i style='color: red'>"
+		if (($('systolic_blood_pressure').value >= 120 && $('systolic_blood_pressure').value < 140) || ($('diastolic_blood_pressure').value >= 80 && $('diastolic_blood_pressure').value < 90)){
+		  $("cva").value = "Uncoplicated hypertension"
+		  alert = "  : <i style='color: #FFE47A'> Prehypertension</i>"
+		  col = "<i style='color: #FFE47A'>"
 		}
 
+		if (($('systolic_blood_pressure').value >= 140 && $('systolic_blood_pressure').value < 160) || ($('diastolic_blood_pressure').value >= 90 && $('diastolic_blood_pressure').value < 100)){
+		   $("cva").value = "Hypertension Stage 1"
+		  alert = "  : <i style='color: #FF9933'> Hypertension Stage 1</i>"
+		  col = "<i style='color: #FF9933'>"
+		}
 
-        conditions.push("BP: "+ col + $('systolic_blood_pressure').value +"</i>/"+ col1 +$('diastolic_blood_pressure').value + "</i>");
-		conditions.push(alert)
+		if (($('systolic_blood_pressure').value >= 160 && $('systolic_blood_pressure').value < 180) || ($('diastolic_blood_pressure').value >= 100 && $('diastolic_blood_pressure').value < 110)){
+		  $("cva").value = "Hypertension Stage 2"
+		  alert = "  : <i style='color: #FF3333'> Hypertension Stage 2</i>"
+		  col = "<i style='color: #FF3333'>"
+		}
+
+		if (($('systolic_blood_pressure').value >= 180) || ($('diastolic_blood_pressure').value >= 110)){
+		  $("cva").value = "Hypertensive crisis"
+		  alert = "  : <i style='color: #B8002E'> Hypertension Crisis. Emergency care needed </i>"
+		  col = "<i style='color: #B8002E'>"
+		}
+
+        conditions.push("BP: "+ col + $('systolic_blood_pressure').value +"</i>/"+ col +$('diastolic_blood_pressure').value + "</i>" + alert);
+		
       }
 
       //var container = $("summary_container");
@@ -484,6 +570,7 @@
 	<input type='hidden' name='user_id' value='<%= @user.id %>' />
 	
 	<input type='hidden' name="concept[bmi]" id="bmi" />
+	<input type='hidden' name="concept[cardiovascular system diagnosis]" id="cva" />
 
   <%
     vital_signs = ["","Temperature","Respiratory Rate","Blood Pressure",
@@ -560,6 +647,8 @@
 	 name='concept[Pulse]'
 	 helpText='Pulse rate '
 	 field_type='number'
+	 tt_onLoad = "timedEvent = setTimeout('calculateBP(3)', 100);"
+	 tt_onUnLoad = "clearTimeout(timedEvent);"
 	 pos='7'
 	 condition = "getSelected().match(/PULSE\sRATE/i)"
 	 min = 50
@@ -568,15 +657,20 @@
 	 units = 'bpm'
 	 tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"/>
 
-	<input type='text' id='weight'
-	name='concept[Weight]'
-	helpText='Weight '
-	field_type='number'  
-	pos='1'
-	tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"
-	absoluteMin = 0
-	absoluteMax = 250
-	units = 'kg'/>
+<%= touch_numeric_tag "WEIGHT (KG)", @patient, nil,
+			{	:id => "weight",
+				:name => "concept[weight (kg)]",
+				:field_type => "number",
+				:tt_onLoad => "$('clearButton').style.display = 'inline';",
+				:min => number_with_precision(@min_weight, :precision => 1),
+				:max => number_with_precision(@max_weight, :precision => 1),
+				:absoluteMin => 0,
+				:absoluteMax => 250,
+				:units => 'kg',
+				:validationRule => "([0-9]+\\.[0-9])|Unknown$",
+				:validationMessage => "You must enter a decimal between 0 and 9 (for example: 54<b>.6</b>)",
+		       	:tt_pageStyleClass => "Numeric NumbersOnlyWithDecimal",
+				:helpText => "Weight (Kg)" } %>
 
 <% if @current_height.blank? || @patient.age <= 14 %>
 	<input type='text' id='height'
@@ -593,6 +687,8 @@
    name='concept[Blood Oxygen saturation]'
    helpText='Oxygen saturation '
    field_type='number'
+   tt_onLoad = "timedEvent = setTimeout('calculateBP(4)', 100);"
+   tt_onUnLoad = "clearTimeout(timedEvent);"
    pos='8'
    min = 85
    max = 100

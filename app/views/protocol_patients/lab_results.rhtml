@@ -142,7 +142,8 @@
       :tt_onUnLoad => "setConceptNamesAndValues()",
       :multiple => true,
       :tt_pageStyleClass => "MultiSelectList",
-      :optional => true
+      :optional => true,
+	  :tt_onLoad => "showCategory('Lab Results')"
     }) %>
 
   <% @treatements_list = ["FASTING BLOOD SUGAR", "RANDOM BLOOD SUGAR", "CHOLESTEROL FASTING", "CHOLESTEROL NOT FASTING", "HbA1c"] %>
@@ -151,7 +152,7 @@
   <% options = default.merge({
           :id           => "fbs_unit",
           :field_type   => "text",
-          :tt_onload    => "$('infoBar'+tstCurrentPage).innerHTML = ' Fasting Blood Sugar'",
+          :tt_onload    => "$('infoBar'+tstCurrentPage).innerHTML = ' Fasting Blood Sugar';showCategory('Lab Results')",
           :condition    => "$('fbs_test_type_value_coded_or_text').value == 'FASTING'",
           :tt_onUnLoad  => "$('fbs_measurement_unit').value = $('fbs_unit').value",
           :tt_requireNextClick => false,
@@ -174,7 +175,7 @@
         :validationMessage => "You must enter a decimal between 0 and 9 (for example: 36<b>.6</b>)",
         :tt_pageStyleClass => "Numeric NumbersOnlyWithDecimal",
         :tt_onUnLoad  => "$('fbs_value_numeric').value = $('fbs_value').value",
-        :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'fbs');"
+        :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'fbs');showCategory('Lab Results')"
       }) %>
 
     <%= text_field_tag "fbs_value_numeric", nil, options%>
@@ -195,7 +196,7 @@
     <% options = default.merge({
           :id           => "rbs_unit",
           :field_type   => "text",
-          :tt_onload    => "$('infoBar'+tstCurrentPage).innerHTML = ' Random Blood Sugar'",
+          :tt_onload    => "$('infoBar'+tstCurrentPage).innerHTML = ' Random Blood Sugar';showCategory('Lab Results')",
           :condition      => "$('rbs_test_type_value_coded_or_text').value == 'RANDOM'",
           :tt_onUnLoad  => "$('rbs_measurement_unit').value = $('rbs_unit').value",
           :tt_requireNextClick => false,
@@ -218,7 +219,7 @@
         :validationMessage => "You must enter a decimal between 0 and 9 (for example: 36<b>.6</b>)",
         :tt_pageStyleClass => "Numeric NumbersOnlyWithDecimal",
         :tt_onUnLoad  => "$('rbs_value_numeric').value = $('rbs_value').value",
-        :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'rbs');"
+        :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'rbs');showCategory('Lab Results')"
       }) %>
 
     <%= text_field_tag "rbs_value_numeric", nil, options%>
@@ -249,7 +250,7 @@
         :validationMessage => "You must enter a decimal between 0 and 9 (for example: 36<b>.6</b>)",
         :tt_pageStyleClass => "Numeric NumbersOnlyWithDecimal",
         :tt_onUnLoad  => "$('HbA1c_value_numeric').value = $('HbA1c_value').value",
-        :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'hba1c');"
+        :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'hba1c');showCategory('Lab Results')"
       }) %>
 
     <%= text_field_tag "HbA1c_value_numeric", nil, options%>
@@ -270,7 +271,7 @@
     <% options = default.merge({
           :id           => "cf_unit",
           :field_type   => "text",
-          :tt_onload    => "$('infoBar'+tstCurrentPage).innerHTML = ' Cholesterol Fasting'",
+          :tt_onload    => "$('infoBar'+tstCurrentPage).innerHTML = ' Cholesterol Fasting';showCategory('Lab Results')",
           :condition    => "$('cf_test_type_value_coded_or_text').value == 'FASTING'",
           :tt_onUnLoad  => "$('cf_measurement_unit').value = $('cf_unit').value",
           :tt_requireNextClick => false,
@@ -294,7 +295,7 @@
         :validationMessage => "You must enter a decimal between 0 and 9 (for example: 36<b>.6</b>)",
         :tt_pageStyleClass => "Numeric NumbersOnlyWithDecimal",
         :tt_onUnLoad  => "$('cf_value_numeric').value = $('cf_value').value",
-        :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'cf');"
+        :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'cf');showCategory('Lab Results')"
       }) %>
 
     <%= text_field_tag "cf_value_numeric", nil, options%>
@@ -305,7 +306,7 @@
       :tt_onUnLoad  => "$('cf_value_text').value = $('cf_lo_or_hi').value",
       :condition    => "($('cf_test_type_value_coded_or_text').value == 'FASTING') && ($('cf_unit').value == 'Lo/Hi')",
       :helpText     =>"Cholesterol Fasting Value",
-      :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'cf');",
+      :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'cf');showCategory('Lab Results')",
       :tt_requireNextClick => false
     }) %>
     <%= select_tag("cf_value_lo_or_hi", options_for_select(["","Lo","Hi"]), options ) %>
@@ -328,7 +329,7 @@
     <% options = default.merge({
           :id           => "cnf_unit",
           :field_type   => "text",
-          :tt_onload    => "$('infoBar'+tstCurrentPage).innerHTML = ' Cholesterol Not Fasting'",
+          :tt_onload    => "$('infoBar'+tstCurrentPage).innerHTML = ' Cholesterol Not Fasting';showCategory('Lab Results')",
           :condition    => "$('cnf_test_type_value_coded_or_text').value == 'NOT FASTING'",
           :tt_onUnLoad  => "$('cnf_measurement_unit').value = $('cnf_unit').value",
           :tt_requireNextClick => false,
@@ -352,7 +353,7 @@
         :validationMessage => "You must enter a decimal between 0 and 9 (for example: 36<b>.6</b>)",
         :tt_pageStyleClass => "Numeric NumbersOnlyWithDecimal",
         :tt_onUnLoad  => "$('cnf_value_numeric').value = $('cnf_value').value",
-        :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'cnf');"
+        :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'cnf');showCategory('Lab Results')"
       }) %>
 
     <%= text_field_tag "cnf_value_numeric", nil, options%>
@@ -363,7 +364,7 @@
       :tt_onUnLoad  => "$('cnf_value_text').value = $('cnf_lo_or_hi').value",
       :condition    => "($('cnf_test_type_value_coded_or_text').value == 'NOT FASTING')  && ($('cnf_unit').value == 'Lo/Hi')",
       :helpText     =>"Cholesterol Not Fasting Value",
-      :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'cnf');",
+      :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'cnf');showCategory('Lab Results')",
       :tt_requireNextClick => false
     }) %>
     <%= select_tag("cnf_value_lo_or_hi", options_for_select(["","Lo","Hi"]), options ) %>

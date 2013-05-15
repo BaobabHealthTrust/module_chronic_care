@@ -364,7 +364,8 @@
 	  :name=> "concept[Complications][]",
       :multiple => true,
       :tt_pageStyleClass => "MultiSelectList",
-      :optional => true} %>
+      :optional => true,
+	  :tt_onLoad => "showCategory('Complications')"} %>
 
 
 <%= text_field_tag "Oedema", nil, {
@@ -372,41 +373,47 @@
 	:name => 'concept[oedema]',
 	:field_type => 'date',
 	:id => 'oedema',
-	:condition => 'getSelected().match(/oedema/i)'}  %>
+	:condition => 'getSelected().match(/oedema/i)',
+	:tt_onLoad => "showCategory('Complications')"}  %>
 
 <%= text_field_tag "Shortness of breath", nil, {
 	:helpText => 'Shortness of breath Test Date',
 	:name => 'concept[Shortness of breath]',
 	:field_type => 'date',
 	:id => 'shortness_of_breath',
-	:condition => 'getSelected().match(/shortness\sof\sbreath/i)'}  %>
+	:condition => 'getSelected().match(/shortness\sof\sbreath/i)',
+	:tt_onLoad => "showCategory('Complications')"}  %>
 
 <%= text_field_tag "Funduscopy", nil, {
 	:helpText => 'Funduscopy Test Date',
 	:name => 'concept[Fundus]',
 	:field_type => 'date',
 	:id => 'funduscopy',
-	:condition => 'getSelected().match(/funduscopy/i)'}  %>
+	:condition => 'getSelected().match(/funduscopy/i)',
+	:tt_onLoad => "showCategory('Complications')"}  %>
 
 <%= text_field_tag "Creatinine", nil, {
 	:helpText => 'Creatinine Test Date',
 	:name => 'concept[Creatinine]',
 	:field_type => 'date',
 	:id => 'creatinine',
-	:condition => 'getSelected().match(/creatinine/i)'}  %>
+	:condition => 'getSelected().match(/creatinine/i)',
+	:tt_onLoad => "showCategory('Complications')"}  %>
 
 <%= text_field_tag "MI", nil, {
 	:helpText => 'Myocardial Injactia Test Date',
 	:name => 'concept[myocardial injactia]',
 	:field_type => 'date',
 	:id => 'mi',
-	:condition => 'getSelected().match(/myocardial injactia(mi)/i)'}  %>
+	:condition => 'getSelected().match(/myocardial injactia(mi)/i)',
+	:tt_onLoad => "showCategory('Complications')"}  %>
 
 <%= text_field_tag "CVA", nil, {
 	:helpText => 'CVA Test Date',
 	:name => 'concept[Cardiac]',
 	:field_type => 'date',
 	:id => 'cva',
-	:condition => 'getSelected().match(/cva/i)'}  %>
+	:condition => 'getSelected().match(/cva/i)',
+	:tt_onLoad => "showCategory('Complications')"}  %>
 
 </form>

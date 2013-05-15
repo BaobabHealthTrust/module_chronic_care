@@ -1,5 +1,6 @@
 
 class PatientsController < ApplicationController
+ before_filter :find_patient
 
   def show
     @patient = Patient.find(params[:id] || params[:patient_id]) rescue nil
@@ -278,4 +279,79 @@ class PatientsController < ApplicationController
     render :layout => false
   end
 
+	def hiv_status
+		@user = User.find(params[:user_id]) rescue nil
+		@patient = Patient.find(params[:patient_id] || params[:id]) rescue nil
+    type = EncounterType.find_by_name('TREATMENT')
+    session_date = session[:datetime].to_date rescue Date.today
+
+		@status = ConceptName.find_by_concept_id(Vitals.get_patient_attribute_value(@patient, "hiv")).name rescue []
+  end
+
+	def number_of_booked_patients
+		@user = User.find(params[:user_id]) rescue nil
+		@patient = Patient.find(params[:patient_id] || params[:id]) rescue nil
+		
+    date = params[:date].to_date
+    encounter_type = EncounterType.find_by_name('APPOINTMENT')
+    concept_id = ConceptName.find_by_name('APPOINTMENT DATE').concept_id
+
+    start_date = date.strftime('%Y-%m-%d 00:00:00')
+    end_date = date.strftime('%Y-%m-%d 23:59:59')
+
+    appointments = Observation.find_by_sql("SELECT count(*) AS count FROM obs
+      INNER JOIN encounter e USING(encounter_id) WHERE concept_id = #{concept_id}
+      AND encounter_type = #{encounter_type.id} AND value_datetime >= '#{start_date}'
+      AND value_datetime <= '#{end_date}' AND obs.voided = 0 GROUP BY value_datetime")
+    count = appointments.first.count unless appointments.blank?
+    count = '0' if count.blank?
+
+    render :text => (count.to_i >= 0 ? {params[:date] => count}.to_json : 0)
+  end
+
+  def dashboard_print_visit
+    print_and_redirect("/patients/visit_label/?patient_id=#{params[:id]}&user_id=#{params[:user_id]}", "/patients/show/#{params[:id]}&user_id=#{params[:user_id]}")
+  end
+
+	def visit_label
+		session_date = session[:datetime].to_date rescue Date.today
+		@patient = Patient.find(params[:patient_id])
+		#raise @patient.to_yaml
+    print_string = patient_visit_label(@patient, session_date) #rescue (raise "Unable to find patient (#{params[:patient_id]}) or generate a visit label for that patient")
+    send_data(print_string,:type=>"application/label; charset=utf-8", :stream=> false, :filename=>"#{params[:patient_id]}#{rand(10000)}.lbl", :disposition => "inline")
+  end
+
+	def patient_visit_label(patient, date = Date.today)
+    result = Location.find(session[:location_id]).name.match(/outpatient/i)
+
+    #unless result
+     # return mastercard_visit_label(patient,date)
+   # else
+      label = ZebraPrinter::StandardLabel.new
+      label.font_size = 3
+      label.font_horizontal_multiplier = 1
+      label.font_vertical_multiplier = 1
+      label.left_margin = 50
+      encs = patient.encounters.find(:all,:conditions =>["DATE(encounter_datetime) = ?",date])
+      return nil if encs.blank?
+
+      label.draw_multi_text("Visit: #{encs.first.encounter_datetime.strftime("%d/%b/%Y %H:%M")}", :font_reverse => true)
+      encs.each {|encounter|
+        next if encounter.name.upcase == "REGISTRATION"
+        next if encounter.name.upcase == "HIV REGISTRATION"
+        next if encounter.name.upcase == "HIV STAGING"
+        next if encounter.name.upcase == "HIV CLINIC CONSULTATION"
+        next if encounter.name.upcase == "VITALS"
+        next if encounter.name.upcase == "ART ADHERENCE"
+        encounter.to_s.split("<b>").each do |string|
+          concept_name = string.split("</b>:")[0].strip rescue nil
+          obs_value = string.split("</b>:")[1].strip rescue nil
+          next if string.match(/Workstation location/i)
+          next if obs_value.blank?
+          label.draw_multi_text("#{encounter.name.humanize} - #{concept_name}: #{obs_value}", :font_reverse => false)
+        end
+      }
+      label.print(1)
+    #end
+  end
 end

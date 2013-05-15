@@ -37,6 +37,10 @@ class ApplicationController < ActionController::Base
 
   protected
 
+	def find_patient
+    @patient = Patient.find(params[:patient_id] || session[:patient_id] || params[:id]) rescue nil
+  end
+
   def check_user
 		#raise get_global_property_value("user.management.url").to_s.to_yaml
     link = get_global_property_value("user.management.url").to_s rescue nil

@@ -43,7 +43,7 @@ class DispensationsController < ApplicationController
     else
       user_person_id = User.find_by_user_id(params[:user_id]).person_id
     end
-		raise user_person_id.to_yaml
+		
     @encounter = current_dispensation_encounter(@patient, session_date, user_person_id)
 
     @order = PatientService.current_treatment_encounter( @patient, session_date, user_person_id).drug_orders.find(:first,:conditions => ['drug_order.drug_inventory_id = ?',

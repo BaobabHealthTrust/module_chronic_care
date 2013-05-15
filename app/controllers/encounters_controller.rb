@@ -79,8 +79,11 @@ class EncountersController < ApplicationController
 				@task = TaskFlow.new(params[:user_id] || User.first.id, patient.id)
 
 				redirect_to params[:next_url] and return if !params[:next_url].nil?
-
-				redirect_to @task.next_task.url and return
+					begin
+						redirect_to @task.next_task.url and return
+					rescue
+						redirect_to "/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}&disable=true" and return
+					end
 			 end
 
         params[:concept].each do |key, value|
@@ -96,7 +99,6 @@ class EncountersController < ApplicationController
             if !concept.nil? and !value.blank?
 
               if !@program.nil? and !@current.nil?
-
                 selected_state = @program.program_workflows.map(&:program_workflow_states).flatten.select{|pws|
                   pws.concept.fullname.upcase() == value.upcase()
                 }.first rescue nil
@@ -350,13 +352,23 @@ class EncountersController < ApplicationController
 			if params[:encounter_type] == "TREATMENT "
 				redirect_to "/prescriptions/prescribe?user_id=#{@user["user_id"]}&patient_id=#{params[:patient_id]}" and return
 			end
-			#if params[:encounter_type] == "UPDATE HIV STATUS" and params["concept"]["Patient enrolled in HIV program"].upcase == "YES"
-				#redirect_to "http://0.0.0.0:3000/encounters/new/hiv_clinic_consultation?patient_id=#{params[:patient_id]}&user_id=#{@user["user_id"]}" and return
-			#end
-			
+
+			if params[:encounter_type].to_s.upcase == "DIABETES HYPERTENSION INITIAL VISIT"
+				#raise @current.to_yaml
+				@current.transition({
+                    :state => "currently in treatment",
+                    :start_date => Time.now,
+                    :end_date => Time.now
+                  })
+			end
       @task = TaskFlow.new(params[:user_id] || User.first.id, patient.id)
 			
       redirect_to params[:next_url] and return if !params[:next_url].nil?
+
+			if params[:encounter_type].to_s.upcase == "APPOINTMENT"
+						print_and_redirect("/patients/dashboard_print_visit/#{params[:patient_id]}?user_id=#{params[:user_id]}","/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}")
+						return
+			end
 			begin
 				redirect_to @task.next_task.url and return
 			rescue
@@ -571,4 +583,275 @@ class EncountersController < ApplicationController
 		return observation
 	end
 
+	def new
+		#raise params.to_yaml
+		@patient = Patient.find(params[:patient_id] || session[:patient_id])
+		#@patient_bean = PatientService.get_patient(@patient.person)
+		session_date = session[:datetime].to_date rescue Date.today
+		
+		if session[:datetime]
+			@retrospective = true
+		else
+			@retrospective = false
+		end
+
+		@current_height = Vitals.get_patient_attribute_value(@patient, "current_height")
+		@min_weight = Vitals.get_patient_attribute_value(@patient, "min_weight")
+        @max_weight = Vitals.get_patient_attribute_value(@patient, "max_weight")
+        @min_height = Vitals.get_patient_attribute_value(@patient, "min_height")
+        @max_height = Vitals.get_patient_attribute_value(@patient, "max_height")
+        #@given_arvs_before = given_arvs_before(@patient)
+        @current_encounters = @patient.encounters.find_by_date(session_date)
+        #@previous_tb_visit = previous_tb_visit(@patient.id)
+        @is_patient_pregnant_value = nil
+        @is_patient_breast_feeding_value = nil
+
+				if (params[:encounter_type].upcase rescue '') == 'APPOINTMENT'
+					@todays_date = session_date
+					logger.info('========================== Suggesting appointment date =================================== @ '  + Time.now.to_s)
+					@suggested_appointment_date = suggest_appointment_date
+					logger.info('========================== Completed suggesting appointment date =================================== @ '  + Time.now.to_s)
+				end
+
+		#@number_of_days_to_add_to_next_appointment_date = number_of_days_to_add_to_next_appointment_date(@patient, session[:datetime] || Date.today)
+
+		@location_transferred_to = []
+		if (params[:encounter_type].upcase rescue '') == 'APPOINTMENT'
+		  @old_appointment = nil
+		  @report_url = nil
+		  @report_url =  params[:report_url]  and @old_appointment = params[:old_appointment] if !params[:report_url].nil?
+		  @current_encounters.reverse.each do |enc|
+		     enc.observations.each do |o|
+		       @location_transferred_to << o.to_s_location_name.strip if o.to_s.include?("Transfer out to") rescue nil
+		     end
+		   end
+		end
+
+		if (params[:encounter_type].upcase rescue '') == "DIABETES_INITIAL_QUESTIONS"
+			encounter_available = Encounter.find(:first,:conditions =>["patient_id = ? AND encounter_type = ?",
+				                             @patient.id, EncounterType.find_by_name("DIABETES INITIAL QUESTIONS").id],
+				                             :order =>'encounter_datetime DESC',:limit => 1)
+
+			if encounter_available.blank?
+				@has_initial_questions = false
+			else
+				@has_initial_questions = true
+			end
+		end
+
+		if ['GENERAL_HEALTH', 'DIABETES_HISTORY', 'PAST_DIABETES_MEDICAL_HISTORY'].include?((params[:encounter_type].upcase rescue ''))
+
+			encounter = params[:encounter_type].upcase
+			encounter_available = Encounter.find(:first,:conditions =>["patient_id = ? AND encounter_type = ?",
+				                             @patient.id, EncounterType.find_by_name(encounter.humanize.upcase).id],
+				                             :order =>'encounter_datetime DESC',:limit => 1)
+			@has_diabetes_history = false
+			@has_general_health = false
+			@past_diabetes_medical_history = false
+
+			if encounter == 'GENERAL_HEALTH' && !encounter_available.blank?
+				@has_general_health = true
+			elsif encounter == 'DIABETES_HISTORY' && !encounter_available.blank?
+				@has_diabetes_history = true
+			elsif encounter == 'PAST_DIABETES_MEDICAL_HISTORY' && !encounter_available.blank?
+				@past_diabetes_medical_history = true
+			end
+
+		end
+
+
+		redirect_to "/" and return unless @patient
+
+		redirect_to next_task(@patient) and return unless params[:encounter_type]
+
+		redirect_to :action => :create, 'encounter[encounter_type_name]' => params[:encounter_type].upcase, 'encounter[patient_id]' => @patient.id and return if ['registration'].include?(params[:encounter_type])
+
+		
+		render :action => params[:encounter_type].downcase if params[:encounter_type]
+	end
+
+	def suggest_appointment_date
+		#for now we disable this because we are already checking for this
+		#in the browser - the method is suggested_return_date
+		#@number_of_days_to_add_to_next_appointment_date = number_of_days_to_add_to_next_appointment_date(@patient, session[:datetime] || Date.today)
+
+		dispensed_date = session[:datetime].to_date rescue Date.today
+		expiry_date = prescription_expiry_date(@patient, dispensed_date)
+		
+		#if the patient is a child (age 14 or less) and the peads clinic days are set - we
+		#use the peads clinic days to set the next appointment date
+		peads_clinic_days = CoreService.get_global_property_value('peads.clinic.days')
+
+		if (@patient.age <= 14 && !peads_clinic_days.blank?)
+			clinic_days = peads_clinic_days
+		else
+			clinic_days = CoreService.get_global_property_value('clinic.days') || 'Monday,Tuesday,Wednesday,Thursday,Friday'
+		end
+		clinic_days = clinic_days.split(',')
+
+		bookings = bookings_within_range(expiry_date)
+
+		clinic_holidays = CoreService.get_global_property_value('clinic.holidays')
+		clinic_holidays = clinic_holidays.split(',').map{|day|day.to_date}.join(',').split(',') rescue []
+
+		return suggested_date(expiry_date ,clinic_holidays, bookings, clinic_days)
+	end
+
+	def prescription_expiry_date(patient, dispensed_date)
+    session_date = dispensed_date.to_date
+
+    arvs_given = false
+
+    #get all drug dispensed on set clinic day
+		drugs_given_on = Vitals.drugs_given_on(patient, session_date)
+
+		orders_made = drugs_given_on.reject do |o|
+      !MedicationService.tb_medication(o.drug_order.drug)
+    end
+
+		auto_expire_date = Date.today + 2.days
+
+		if orders_made.blank?
+			orders_made = drugs_given_on
+			auto_expire_date = orders_made.sort_by(&:auto_expire_date).first.auto_expire_date.to_date unless orders_made.blank?
+
+      regimen_type_concept = nil
+      (orders_made || []).each do |o|
+        next unless MedicationService.arv(o.drug_order.drug)
+        regimen_type_concept = ConceptName.find_by_name("ARV regimens received abstracted construct").concept_id
+        arvs_given = true
+        break
+      end
+		else
+			auto_expire_date = orders_made.sort_by(&:auto_expire_date).first.auto_expire_date.to_date
+      regimen_type_concept = ConceptName.find_by_name("TB REGIMEN TYPE").concept_id
+		end
+
+		treatment_encounter = orders_made.first
+
+		treatment_encounter = treatment_encounter.encounter.id rescue treatment_encounter.encounter_id
+		#raise treatment_encounter.to_yaml
+    arv_regimen_obs = Observation.find_by_sql("SELECT * FROM obs
+      WHERE concept_id = #{regimen_type_concept}
+      AND encounter_id = #{treatment_encounter} LIMIT 1") rescue []
+
+		arv_regimen_type = ""
+		unless arv_regimen_obs.blank?
+			arv_regimen_type = arv_regimen_obs.to_s
+		end
+
+		starter_pack = false
+		if arv_regimen_type.match(/STARTER PACK/i)
+			starter_pack = true
+		end
+
+    #==========================================================================================
+    calculated_expire_date = auto_expire_date
+
+    order = orders_made.sort_by(&:auto_expire_date).first
+
+    #............................................................................................
+    amounts_brought_to_clinic = Observation.find_by_sql("SELECT * FROM obs
+      INNER JOIN drug_order USING (order_id)
+      WHERE obs.concept_id = #{ConceptName.find_by_name('AMOUNT OF DRUG BROUGHT TO CLINIC').concept_id}
+      AND drug_order.drug_inventory_id = #{order.drug_order.drug_inventory_id}
+      AND obs.obs_datetime >= '#{session_date.to_date}'
+      AND obs.obs_datetime <= '#{session_date.to_date.strftime('%Y-%m-%d 23:59:59')}'
+      AND person_id = #{patient.id}")
+
+    total_brought_to_clinic = amounts_brought_to_clinic.sum{|amount| amount.value_numeric}
+
+    total_brought_to_clinic = total_brought_to_clinic + amounts_brought_to_clinic.sum{|amount| (amount.value_text.to_f rescue 0)}
+
+    hanging_pills_duration = ((total_brought_to_clinic)/order.drug_order.equivalent_daily_dose).to_i
+
+    expire_date = order.auto_expire_date + hanging_pills_duration.days
+
+    calculated_expire_date = expire_date.to_date if expire_date.to_date > calculated_expire_date
+
+    #............................................................................................
+
+
+    auto_expire_date = calculated_expire_date
+
+		buffer = 0
+		if starter_pack
+			buffer = 1
+		else
+			buffer = 2
+		end
+
+		buffer = 0 if !arvs_given
+		return auto_expire_date - buffer.days
+	end
+
+  def bookings_within_range(end_date = nil)
+    clinic_days = GlobalProperty.find_by_property("clinic.days")
+    clinic_days = clinic_days.property_value.split(',') rescue 'Monday,Tuesday,Wednesday,Thursday,Friday'.split(',')
+
+    start_date = (end_date - 4.days)
+    booked_dates = [end_date]
+
+    (1.upto(4)).each do |num|
+      booked_dates << (end_date - num.day)
+    end
+
+    clinic_holidays = CoreService.get_global_property_value('clinic.holidays')
+    clinic_holidays = clinic_holidays.split(',').map{|day|day.to_date}.join(',').split(',') rescue []
+    return_booked_dates = []
+
+    unless clinic_holidays.blank?
+      (booked_dates || []).each do |date|
+        next if is_holiday(date,clinic_holidays)
+        return_booked_dates << date
+      end
+    else
+      return_booked_dates = booked_dates
+    end
+
+    return return_booked_dates
+  end
+
+	def suggested_date(expiry_date, holidays, bookings, clinic_days)
+    bookings.delete_if{|bd| holidays.collect{|h|h.to_date.to_s[5..-1]}.include?(bd.to_s[5..-1])}
+    recommended_date = nil
+    clinic_appointment_limit = CoreService.get_global_property_value('clinic.appointment.limit').to_i rescue 0
+
+    @encounter_type = EncounterType.find_by_name('APPOINTMENT')
+    @concept_id = ConceptName.find_by_name('APPOINTMENT DATE').concept_id
+
+    number_of_bookings = {}
+
+    (bookings || []).sort.reverse.each do |date|
+      next if not clinic_days.collect{|c|c.upcase}.include?(date.strftime('%A').upcase)
+      limit = number_of_booked_patients(date.to_date).to_i rescue 0
+      if limit < clinic_appointment_limit
+        recommended_date = date
+        break
+      else
+        number_of_bookings[date] = limit
+      end
+    end
+
+    (number_of_bookings || {}).sort_by { |dates,num| num }.each do |dates , num|
+      next if not clinic_days.collect{|c|c.upcase}.include?(dates.strftime('%A').upcase)
+      recommended_date = dates
+      break
+    end if recommended_date.blank?
+
+    recommended_date = expiry_date if recommended_date.blank?
+    return recommended_date
+	end
+
+  def assign_close_to_expire_date(set_date,auto_expire_date)
+    if (set_date < auto_expire_date)
+      while (set_date < auto_expire_date)
+        set_date = set_date + 1.day
+      end
+      #Give the patient a 2 day buffer*/
+      set_date = set_date - 1.day
+    end
+    return set_date
+  end
+	
 end

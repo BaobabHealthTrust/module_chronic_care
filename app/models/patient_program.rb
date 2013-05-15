@@ -47,7 +47,7 @@ class PatientProgram < ActiveRecord::Base
   end
   
   def transition(params)
-    # raise params.to_yaml
+     
     ActiveRecord::Base.transaction do
       # Find the state by name
       # Used upcase below as we were having problems matching the concept fullname with the state
@@ -56,7 +56,7 @@ class PatientProgram < ActiveRecord::Base
         pws.concept.fullname.upcase() == params[:state].upcase()}.first rescue nil
 
       state = self.patient_states.last rescue []
-
+			
       if (state && selected_state == state.program_workflow_state)
         # do nothing as we are already there
       else

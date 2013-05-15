@@ -15,7 +15,7 @@
 				Hypertension Category 
 			</td>
 			<td>
-<select id='1.1.1' name='concept[Complications]' helpText='Hypertension Category ' pos='1' >
+<select id='1.1.1' name='concept[Complications]' helpText='Hypertension Category ' pos='1' tt_onload="showCategory('Treatment')" >
 <option></option>
 <option value='Severe'>Severe</option>
  <option value='Moderate'>Moderate</option>
@@ -37,7 +37,7 @@
 				   "Hydrochlorthiazide + Amlodipine + Lipiniopril + Captopril +  Atenolol", "Hydrochlorthiazide + Amlodipine + Lipiniopril + Enalapril + Atenolol",
 					"Hydrochlorthiazide  + Nifedipine + Lipiniopril + Captopril", "Hydrochlorthiazide  + Nifedipine + Lipiniopril + Enalapril "] %>
 
-<select id="1.1.2" name="concept[recommended treatment][]" condition='__$("1.1.1").value.toLowerCase() == "mild"'  multiple='true' >
+<select id="1.1.2" name="concept[recommended treatment][]" condition='__$("1.1.1").value.toLowerCase() == "mild"'  multiple='true'  tt_onload="showCategory('Treatment')">
   <option value="Aspirin">Aspirin (75mg tablet)</option>
   <option value="Hydrochlorothiazide">Hydrochlorothiazide (25mg tablet)</option>
 
@@ -88,7 +88,8 @@
       :multiple => true,
       :tt_pageStyleClass => "MultiSelectList",
 	  :condition => '__$("1.1.1").value.toLowerCase() == "mild"',
-      :optional => true} %>
+      :optional => true,
+	  :tt_onload=> "showCategory('Treatment')"} %>
 
 			</td>
 		</tr>
@@ -97,7 +98,7 @@
 				Is current treatment effective? 
 			</td>
 			<td>
-<select id='1.1.4' name='concept[continue treatment]' helpText='Is current treatment effective? ' pos='4'  condition='__$("1.1.1").value.toLowerCase() != "mild"' >
+<select id='1.1.4' name='concept[continue treatment]' helpText='Is current treatment effective? ' pos='4'  condition='__$("1.1.1").value.toLowerCase() != "mild"' tt_onload="showCategory('Treatment')" >
 <option></option>
 <option value='No'>No</option>
  <option value='Yes'>Yes</option>
@@ -109,7 +110,7 @@
 				Refer to another Level?
 			</td>
 			<td>
-<select id='1.1.5' name='concept[Refer to other hospital]' helpText='Refer to Secondary Level? ' pos='5'  condition='(__$("1.1.1").value.toLowerCase() == "moderate" || __$("1.1.1").value.toLowerCase() == "severe") &&  __$("1.1.4").value.toLowerCase() == "no"' >
+<select id='1.1.5' name='concept[Refer to other hospital]' helpText='Refer to Secondary Level? ' pos='5'  condition='(__$("1.1.1").value.toLowerCase() == "moderate" || __$("1.1.1").value.toLowerCase() == "severe") &&  __$("1.1.4").value.toLowerCase() == "no"' tt_onload="showCategory('Treatment')">
 <option></option>
 <option value='Refer to Tertial Level'>Refer to Tertial Level</option>
 <option value='Refer to Secondary Level'>Refer to Secondary Level</option>
@@ -129,7 +130,8 @@
 			  :location => "concept[]",
 			  :helpText => "Select Location",
 			  :ajaxURL => '/location/locations?search_string=',
-			  :condition => '$("1.1.5").value != "UNKNOWN" && $("1.1.4").value.toLowerCase() == "no"'}%>
+			  :condition => '$("1.1.5").value != "UNKNOWN" && $("1.1.4").value.toLowerCase() == "no"',
+			  :tt_onload=> "showCategory('Treatment')"}%>
 			</td>
 		</tr>
 
@@ -138,7 +140,7 @@
 				Prescribe Drugs? 
 			</td>
 			<td>
-<select id='1.1.7' name='concept[Prescribe Drugs]' helpText='Prescribe Drugs? ' pos='7' >
+<select id='1.1.7' name='concept[Prescribe Drugs]' helpText='Prescribe Drugs? ' pos='7' tt_onload="showCategory('Treatment')">
 <option></option>
 <option value='No'>No</option>
  <option value='Yes'>Yes</option>
