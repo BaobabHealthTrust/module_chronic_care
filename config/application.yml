@@ -3,7 +3,7 @@
 production:
   project.name: Chronic Care Clinic
   facility.name: Baobab Test Centre
-  patient.registration.url: http://localhost:3005
+  patient.registration.url: http://192.168.100.110:3005
   user.management.url: http://localhost:3004
   use_drug_barcodes_only: true
 
