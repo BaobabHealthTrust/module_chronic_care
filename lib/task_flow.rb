@@ -185,7 +185,7 @@ class TaskFlow
 					end
 					next if found == true
           history = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
+                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
                                   self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name('FAMILY MEDICAL HISTORY').id])
 
 					next if !history.blank?
@@ -206,7 +206,7 @@ class TaskFlow
 					next if found == true
 
           history = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
+                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
                                   self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
 
 					next if !history.blank?
@@ -225,7 +225,7 @@ class TaskFlow
 					end
 					next if found == true
           history = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
+                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
                                   self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
 
 					next if !history.blank?
@@ -263,7 +263,7 @@ class TaskFlow
 
 				when "ASSESSMENT"
 					assessment = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
+                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
                                   self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
 					
 					next if !assessment.blank?
@@ -277,7 +277,7 @@ class TaskFlow
 
 				when "COMPLICATIONS"
 					assessment = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
+                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
                                   self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
 					next if !assessment.blank?
 					self.encounter_type = "COMPLICATIONS"
@@ -308,7 +308,7 @@ class TaskFlow
 					end
 					next if found == true
 					assessment = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
+                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
                                   self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
 					next if !assessment.blank?
 					self.encounter_type = "LAB RESULTS"
