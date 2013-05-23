@@ -35,6 +35,11 @@ class ApplicationController < ActionController::Base
 		return false
 	end
 
+	def current_program
+		raise session[:selected_program].to_yaml
+		return session[:selected_program] rescue "HYPERTENSION PROGRAM"
+	end
+
   protected
 
 	def find_patient

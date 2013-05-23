@@ -348,6 +348,7 @@ class EncountersController < ApplicationController
         ) if !baby_id.nil?
 
       end
+			
 			#raise params["concept"]["Patient enrolled in HIV program"].upcase.to_yaml
 			if params[:encounter_type] == "TREATMENT "
 				if params[:concept]["Prescribe Drugs"].to_s.upcase == "NO"

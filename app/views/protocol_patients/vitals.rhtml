@@ -213,6 +213,12 @@
    function showSelectedConditions() {
       var conditions = [];
 	  currentHeight = '<%= @current_height %>'
+	  sex = '<%= @patient.gender.downcase  rescue "" %>'
+	  if (sex == "female")
+		  sex = "f"
+
+	  if (sex == "male")
+		  sex = "m"
 
       if ($('weight').value.length > 0){
 
@@ -250,14 +256,34 @@
 		}
 	  }
 
-      if ($('oxygen').value.length > 0)
-        oxygen = parseFloat($('oxygen').value);
+      if ($('oxygen').value.length > 0){
+		oxygen = parseFloat($('oxygen').value);
         if (oxygen < 90) {
           conditions.push("Oxygen Saturation: " + $('oxygen').value + ' : EMERGENCY');
         }
 		else {
 		  conditions.push("Oxygen Saturation: " + $('oxygen').value);
 		}
+	  }
+
+	  if ($('expiratory_flow_rate').value.length > 0){
+		var age = '<%= @patient.age %>';
+		if (age < 18)
+		  pefr = ((currentHeight - 100) * 5) + 100;
+
+		if ((age >= 18) && (sex == "m")){
+		  currentHeight /= 100;
+		   pefr = (((currentHeight * 5.48) + 1.58) - (age * 0.041)) * 60;
+		}
+
+		if ((age >= 18) && (sex == "f")){
+		   currentHeight /= 100;
+		   pefr = (((currentHeight * 3.72) + 2.24) - (age * 0.03)) * 60;
+		}
+		$("estimated").value = pefr;
+		conditions.push("Estimated expiratory Flow Rate (L/m): " + $('expiratory_flow_rate').value);
+		conditions.push("Expected expiratory Flow Rate (L/m): " + parseInt(pefr));
+	  }
 
       if ($('waist_circumference').value.length > 0)
         conditions.push("Waist Circumference: " + $('waist_circumference').value);
@@ -571,10 +597,11 @@
 	
 	<input type='hidden' name="concept[bmi]" id="bmi" />
 	<input type='hidden' name="concept[cardiovascular system diagnosis]" id="cva" />
+	<input type='hidden' name="concept[peak flow predicted]" id="estimated" />
 
   <%
     vital_signs = ["","Temperature","Respiratory Rate","Blood Pressure",
-    "Pulse Rate","Oxygen Saturation","Waist circumference"]
+    "Pulse Rate","Oxygen Saturation","Waist circumference","Expiratory flow rate"]
   %>
 
 	<%= select_tag "choice", options_for_select(vital_signs),
@@ -619,6 +646,18 @@
 	 absoluteMax = 250
 	 tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"/>
 
+	 <input type='text' id='expiratory_flow_rate'
+	 name='concept[Peak flow]'
+	 helpText='Expiratory flow rate (Litres per minute) '
+	 field_type='number'
+	 pos='6'
+	 min = 50
+	 max = 800
+	 condition = "getSelected().match(/EXPIRATORY\sFLOW\sRATE/i)"
+	 absoluteMin = 0
+	 absoluteMax = 1000
+	 tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"/>
+
 	 <input type='text' id='systolic_blood_pressure'
 	 name='concept[Systolic blood pressure]'
 	 helpText='Systolic blood pressure '
@@ -629,7 +668,7 @@
 	 tt_onUnLoad = "clearTimeout(timedEvent);"
 	 condition = "getSelected().match(/BLOOD\sPRESSURE/i)"
 	 absoluteMin = 0
-	 max => 250/>
+	 max = 250/>
 
 	 <input type='text' id='diastolic_blood_pressure'
 	  name='concept[Diastolic blood pressure]'

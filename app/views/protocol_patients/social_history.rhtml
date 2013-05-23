@@ -51,11 +51,34 @@
       if ($('smoking').value.length > 0)
         conditions.push("Smoke Cigarettes: " + $('smoking').value);
 
-      if ($('number_of_cigarettes').value.length > 0)
-        conditions.push("Number of cigarettes per day: " + $('number_of_cigarettes').value + " Cigarettes : 1 per every " + parseInt(cigaretesPerminute) + "Minutes");
+      if ($('number_of_cigarettes').value.length > 0){
+		if ($('smoking').value.toLowerCase() == "yes")
+		  conditions.push("Number of cigarettes per day: " + $('number_of_cigarettes').value + " Cigarettes : 1 per every " + parseInt(cigaretesPerminute) + "Minutes");
+	  }
+        
 
       if ($('current_smoker').value.length > 0)
         conditions.push("Currently smokes: " + $('current_smoker').value);
+
+	  if ($('duration').value.length > 0){
+		conditions.push("Duration on smoking: " + $('duration').value);
+	  }
+	  else {
+		$('duration').value = "Passive Smoker"
+		conditions.push("Duration on smoking: Passive Smoker");
+	  }
+
+	   if ($('smoke_history').value.length > 0)
+        conditions.push("Patient with family member who smoke: " + $('smoke_history').value);
+
+	  if ($('patient_home').value.length > 0)
+        conditions.push("Patient lives or works near: " + $('patient_home').value);
+
+	  if ($('exposed').value.length > 0)
+        conditions.push("Patient exposed to pollution: " + $('exposed').value);
+
+	  if ($('cooking').value.length > 0)
+        conditions.push("Patient mode of cooking: " + $('cooking').value);
 
       if ($('drink_alcohol').value.length > 0)
         conditions.push("Drinks alcohol: " + $('drink_alcohol').value);
@@ -92,6 +115,8 @@
 	<input type='hidden' name='concept[Alcoholism]' id="alcoholism">
 	<input type='hidden' name='concept[refer to clinician]' id="refer_to_clinician">
 	<input type='hidden' name='concept[current smoker]' id="current_smoker" value="NO">
+	<input type='hidden' name='concept[smoking duration]' id="duration" value="Passive Smoker">
+	<input type='hidden' name='concept[Family health seeking behavior construct]' id="smoke_history" value="No">
 	<%#= raise @patient.gender.to_yaml   %>
 	<%#= raise @patient.age.to_yaml   %>
 	<table>
@@ -125,7 +150,20 @@
 	   tt_onLoad ="showCategory('Social History')"/>
 			</td>
 		</tr>
-		
+
+		<tr>
+			<td>
+				How long Have been smoking?
+			</td>
+			<td>
+ <select id='duration' name='concept[smoking duration]' helpText='How long Have been smoking? ' tt_onLoad ="showCategory('Social History')"  condition='__$("smoking").value.toLowerCase() == "yes"'>
+		<option></option>
+		<option value='Less than five years'>Less than five years</option>
+		<option value='Five years or more'>Five years or more</option>
+ </select>
+			</td>
+		</tr>
+
 		<tr>
 			<td>
 				Do you currently smoke? 
@@ -138,6 +176,15 @@
  <option value='Yes'>Yes</option>
  </select>
 			</td>
+		</tr>
+		<tr>
+		  <td>
+<select id='smoke_history' name='concept[Family health seeking behavior construct]' helpText='Do you have a family member who smokes? ' pos='3'  condition='__$("smoking").value.toLowerCase() == "yes" && __$("current_smoker").value.toLowerCase() == "no"'  tt_onLoad ="showCategory('Social History')">
+	 <option></option>
+	 <option value='No'>No</option>
+	<option value='Smoking'>Yes</option>
+ </select>
+		  </td>
 		</tr>
 		<tr>
 			<td>
@@ -195,6 +242,33 @@
 		  <%= touch_hidden_tag "Alcoholic drinks per day", @patient, nil, {:id => "drinks_per_day"}%>
 		  <%= touch_hidden_tag "Number of days per week alcohol is used", @patient, nil, {:id => "days_per_week"}%>
 	<% end %>
+	<td>
+	<select id='patient_home' name='concept[home ownership]' helpText='Patient lives or works near? ' pos='3' tt_onLoad ="showCategory('Social History')" >
+	 <option></option>
+	 <option value='Near factory'>Near factory</option>
+	 <option value='Near hospital'>Near hospital</option>
+	 <option value='None'>None</option>
+	</select>
+	</td>
+
+	<td>
+	<select id='exposed' name='concept[Danger sign]' helpText='Patient exposed to pollution? ' pos='3' tt_onLoad ="showCategory('Social History')" >
+	 <option></option>
+	 <option value='Exposed to pollution'>Yes</option>
+	 <option value='No'>No</option>
+   </select>
+	</td>
+
+	<td>
+	<select id='cooking' name='concept[method]' helpText='Patient mode of coking? ' pos='3' tt_onLoad ="showCategory('Social History')" >
+	 <option></option>
+	 <option value='Gas'>Gas</option>
+	 <option value='Electricity'>Electricity</option>
+	 <option value='Firewood'>Firewood</option>
+	 <option value='Charcoal'>Charcoal</option>
+	 <option value='None'>None</option>
+   </select>
+	</td>
 		  <td>
 			<label for='summary'>Summary</label>
 	<%= text_field_tag :summary, nil, {

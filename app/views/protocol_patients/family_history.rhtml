@@ -17,14 +17,28 @@
 	function showSelectedConditions() {
       var conditions = [];
 	  var riskValue = 0;
+	  var asthmaRisk = 0;
 
       if ($('cardiovascular').value.length > 0){
 		if ($('cardiovascular').value == "Yes")
 		  riskValue += 1
-
+		  asthmaRisk += 1
 		conditions.push("Family history of premature cardiovascular death: " + $('cardiovascular').value);
 	  }
         
+	  if ($('asthma').value.length > 0){
+		if ($('asthma').value == "Yes")
+		  asthmaRisk += 1
+
+		conditions.push("Family history of asthma: " + $('asthma').value);
+	  }
+
+	   if ($('tb').value.length > 0){
+		if ($('tb').value == "Yes")
+		  asthmaRisk += 1
+
+		conditions.push("Family history of TB: " + $('tb').value);
+	  }
 
       if ($('diabetes').value.length > 0){
 		if ($('diabetes').value == "Yes")
@@ -47,12 +61,12 @@
 		
 		conditions.push("Family history of kidney disease: " + $('kidney').value);
 	  }
-	  
+
+	  submitForm = document.getElementById("family_history");
       if (riskValue > 0) {
 		riskValue = (riskValue / 4) * 99;
 		conditions.push("<i style='color: red'>Patient's hypertension risk is almost: " + riskValue + "% </i>");
 
-		submitForm = document.getElementById("family_history");
 		newElement = document.createElement("input");
 		newElement.setAttribute("name","concept[Hypertension]");
 		newElement.setAttribute("type","hidden");
@@ -60,6 +74,16 @@
 		submitForm.appendChild(newElement);
 	  }
 
+	   if (asthmaRisk > 0) {
+		asthmaRisk = (asthmaRisk / 3) * 99;
+		conditions.push("<i style='color: red'>Patient's asthma risk is almost: " + asthmaRisk + "% </i>");
+
+		newElement = document.createElement("input");
+		newElement.setAttribute("name","concept[asthma]");
+		newElement.setAttribute("type","hidden");
+		newElement.value = asthmaRisk + "%";
+		submitForm.appendChild(newElement);
+	  }
       var html
       html = "<ul>"
       for(var i=0;i < conditions.length;i++) {
@@ -79,34 +103,46 @@
 	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
 	<input type='hidden' name='user_id' value='<%= @user.id %>' />
 	
-	<select id='cardiovascular' name='concept[Does the family have a history of cardiovascular related diseases?]' helpText='Family History of Premature cardiovascular death? ' pos='0' >
+	<select id='cardiovascular' name='concept[Does the family have a history of cardiovascular related diseases?]' helpText='Family History of Premature cardiovascular death? ' pos='0'  tt_onLoad ="showCategory('Family History')">
 	<option></option>
 	<option value='No'>No</option>
 	<option value='Yes'>Yes</option>
 	</select>
 
-	<select id='diabetes' name='concept[diabetes family history]' helpText='Family History of Diabetes? ' pos='1' >
+	<select id='diabetes' name='concept[diabetes family history]' helpText='Family History of Diabetes? ' pos='1'  tt_onLoad ="showCategory('Family History')" >
 	<option></option>
 	<option value='No'>No</option>
 	<option value='Yes'>Yes</option>
 	</select>
 
-	<select id='hypertension' name='concept[Does the family have a history of hypertension?]' helpText='Does the family have a history of hypertension? ' pos='2' >
+	<select id='hypertension' name='concept[Does the family have a history of hypertension?]' helpText='Does the family have a history of hypertension? ' pos='2'   tt_onLoad ="showCategory('Family History')" >
 	<option></option>
 	<option value='No'>No</option>
 	<option value='Yes'>Yes</option>
 	</select>
 
 
-	<select id='kidney' name='concept[Kidney disease]' helpText='Family History Kidney disease ' pos='3' >
+	<select id='kidney' name='concept[Kidney disease]' helpText='Family History Kidney disease? ' pos='3'   tt_onLoad ="showCategory('Family History')">
 	<option></option>
 	<option value='No'>No</option>
 	<option value='Yes'>Yes</option>
 	</select>
 
+	<select id='asthma' name='concept[Has the family a history of asthma?]' helpText='Family History Asthma? ' pos='3'   tt_onLoad ="showCategory('Family History')">
+	<option></option>
+	<option value='No'>No</option>
+	<option value='Yes'>Yes</option>
+	</select>
+
+	<select id='tb' name='concept[tuberculosis smear history]' helpText='Family History TB? ' pos='3'   tt_onLoad ="showCategory('Family History')">
+	<option></option>
+	<option value='No'>No</option>
+	<option value='Yes'>Yes</option>
+	</select>
+ 
 <label for='summary'>Summary</label>
 	<%= text_field_tag :summary, nil, {
-	  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';",
+	  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';showCategory('Family History')",
 	  :optional => "true",
 	  :tt_pageStyleClass => "NoControls" } %>
 
