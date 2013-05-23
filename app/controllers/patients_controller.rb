@@ -22,9 +22,8 @@ class PatientsController < ApplicationController
     @links = {}
 		
     @task.tasks.each{|task|
-
       @links[task.titleize] = "/protocol_patients/#{task.gsub(/\s/, "_")}?patient_id=#{@patient.id}&user_id=#{params[:user_id]}"
-      
+			@links[task.titleize] = "/patients/treatment_dashboard/#{@patient.id}?user_id=#{params[:user_id]}" if task.downcase == "treatment"
     }
 
     @project = get_global_property_value("project.name") rescue "Unknown"

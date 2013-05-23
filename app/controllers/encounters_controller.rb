@@ -350,7 +350,11 @@ class EncountersController < ApplicationController
       end
 			#raise params["concept"]["Patient enrolled in HIV program"].upcase.to_yaml
 			if params[:encounter_type] == "TREATMENT "
+				if params[:concept]["Prescribe Drugs"].to_s.upcase == "NO"
+				 redirect_to "/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}&disable=true" and return
+				else
 				redirect_to "/prescriptions/prescribe?user_id=#{@user["user_id"]}&patient_id=#{params[:patient_id]}" and return
+				end
 			end
 
 			if params[:encounter_type].to_s.upcase == "DIABETES HYPERTENSION INITIAL VISIT"
