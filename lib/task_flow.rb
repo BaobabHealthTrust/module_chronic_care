@@ -2,12 +2,13 @@
 class TaskFlow
 
   attr_accessor :patient, :person, :user, :current_date, :tasks, :current_user_activities,
-    :encounter_type, :url, :task_scopes, :task_list, :labels, :redirect_to
+    :encounter_type, :url, :task_scopes, :task_list, :labels, :redirect_to, :current_program
     
   def initialize(user_id, patient_id, session_date = Date.today)
     self.patient = Patient.find(patient_id)
     self.user = User.find(user_id)
     self.current_date = session_date
+		
 
     if File.exists?("#{Rails.root}/config/protocol_task_flow.yml")
       settings = YAML.load_file("#{Rails.root}/config/protocol_task_flow.yml")["#{Rails.env
@@ -140,12 +141,21 @@ class TaskFlow
 
       # next if tasks[tsk][8] == false
       # If user does not have this activity, goto the patient dashboard
-
+			
 			encounters =  [
                       'CLINIC VISIT','VITALS','FAMILY HISTORY','SOCIAL HISTORY','GENERAL HEALTH',
 											'UPDATE HIV STATUS','LAB RESULTS','COMPLICATIONS','TREATMENT',
 											'OUTCOME','ASSESSMENT'
                      ]
+			#program = current_program
+			#if program.upcase == "ASTHMA PROGRAM"
+			#	encounters =  [
+      #                'CLINIC VISIT','VITALS','FAMILY HISTORY','SOCIAL HISTORY',
+			#								'UPDATE HIV STATUS','TREATMENT',
+			#								'OUTCOME'
+     #                ]
+		#	end
+			
 			my_activities = self.current_user_activities.map(&:upcase)
 			
 			encounters.each do |tsk|
