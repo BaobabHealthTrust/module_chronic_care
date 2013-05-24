@@ -53,9 +53,9 @@
 
       if ($('number_of_cigarettes').value.length > 0){
 		if ($('smoking').value.toLowerCase() == "yes")
-		  conditions.push("Number of cigarettes per day: " + $('number_of_cigarettes').value + " Cigarettes : 1 per every " + parseInt(cigaretesPerminute) + "Minutes");
+		  conditions.push("Number of cigarettes per day: " + $('number_of_cigarettes').value + " Cigarettes : 1 per every " + parseInt(cigaretesPerminute) + " Minutes");
 	  }
-        
+
 
       if ($('current_smoker').value.length > 0)
         conditions.push("Currently smokes: " + $('current_smoker').value);
@@ -122,7 +122,7 @@
 	<table>
 		<tr>
 			<td>
-				Ever smoked? 
+				Ever smoked?
 			</td>
 			<td>
 <select id='smoking' name='concept[Smoking History]' helpText='Ever smoked? ' pos='0' tt_onLoad ="showCategory('Social History')">
@@ -134,7 +134,7 @@
 		</tr>
 		<tr>
 			<td>
-				Number of cigarettes per day? 
+				Number of cigarettes per day?
 			</td>
 			<td>
 <input type='text' id='number_of_cigarettes'
@@ -166,7 +166,7 @@
 
 		<tr>
 			<td>
-				Do you currently smoke? 
+				Do you currently smoke?
 			</td>
 			<td>
 
@@ -179,7 +179,7 @@
 		</tr>
 		<tr>
 		  <td>
-<select id='smoke_history' name='concept[Family health seeking behavior construct]' helpText='Do you have a family member who smokes? ' pos='3'  condition='__$("smoking").value.toLowerCase() == "yes" && __$("current_smoker").value.toLowerCase() == "no"'  tt_onLoad ="showCategory('Social History')">
+<select id='smoke_history' name='concept[Family health seeking behavior construct]' helpText='Do you have a family member who smokes? ' pos='3'  condition='(__$("smoking").value.toLowerCase() == "yes") && (__$("current_smoker").value.toLowerCase() == "no")'  tt_onLoad ="showCategory('Social History')">
 	 <option></option>
 	 <option value='No'>No</option>
 	<option value='Smoking'>Yes</option>
@@ -188,7 +188,7 @@
 		</tr>
 		<tr>
 			<td>
-				Does patient drink alcohol? 
+				Does patient drink alcohol?
 			</td>
 			<td>
 	<% if ((@patient.gender.to_s.upcase == "F" || "FEMALE") and  @patient.age.to_i >= 4) || ((@patient.gender.to_s.upcase == "M" || "MALE") and  @patient.age.to_i >= 5) %>
@@ -206,10 +206,10 @@
 		</tr>
 		<tr>
 			<td>
-				Alcohol drinks per day? 
+				Alcohol drinks per day?
 			</td>
 			<td>
-<input type='text' id='drinks_per_day'  
+<input type='text' id='drinks_per_day'
 	   name='concept[Alcoholic drinks per day]'
 	   helpText='Alcohol drinks per day? '
 	   field_type="number"
@@ -221,10 +221,10 @@
 		</tr>
 		<tr>
 			<td>
-				Number of days per week alcohol is used? 
+				Number of days per week alcohol is used?
 			</td>
 			<td>
-<input type='text' id='days_per_week'  
+<input type='text' id='days_per_week'
 	   name='concept[Number of days per week alcohol is used]'
 	   helpText='Number of days per week alcohol is used? '
 	   field_type="number"
@@ -278,4 +278,4 @@
 		  </td>
 		</tr>
 	</table>
-</form> 
+</form>

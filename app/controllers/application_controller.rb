@@ -36,7 +36,6 @@ class ApplicationController < ActionController::Base
 	end
 
 	def current_program
-		raise session[:selected_program].to_yaml
 		return session[:selected_program] rescue "HYPERTENSION PROGRAM"
 	end
 

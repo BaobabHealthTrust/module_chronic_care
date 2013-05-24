@@ -11,6 +11,7 @@
 	<input type='hidden' name='user_id' value='<%= @user.id %>' />
 	<table>
 		<tr>
+ <% if @current_program != "ASTHMA PROGRAM" %>
 			<td>
 				Hypertension Category 
 			</td>
@@ -133,6 +134,18 @@
 			  :condition => '$("1.1.5").value != "UNKNOWN" && $("1.1.4").value.toLowerCase() == "no"',
 			  :tt_onload=> "showCategory('Treatment')"}%>
 			</td>
+ <% else %>
+	<% @changes_list = ["Cigarette or smoke free environment", "Correct use of in-haler", "Loose weight", "Breathing control exercise", "Allergen avoidance", "Acid reflux"] %>
+	<%= select_tag "You receive helpful advice on important things in your life", options_for_select(@changes_list),
+	{ :field_type => 'text',
+      :helpText => "Advise on Life Changes",
+      :id => "1.1.3",
+	  :name=> "concept[You receive helpful advice on important things in your life][]",
+      :multiple => true,
+      :tt_pageStyleClass => "MultiSelectList",
+      :optional => true,
+	  :tt_onload=> "showCategory('Treatment')"} %>
+ <% end %>
 		</tr>
 
 		<tr>

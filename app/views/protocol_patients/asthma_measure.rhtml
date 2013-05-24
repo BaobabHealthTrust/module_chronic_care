@@ -1,0 +1,174 @@
+<script type='text/javascript' language='javascript'>
+<!--
+	tt_cancel_show = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
+	tt_cancel_destination = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
+
+var conditions = [];
+function selectedOptions(selected){
+	 var x = 1
+      for (i = 0; i < selected.options.length; i++) {
+        if (selected.options[i].selected) {
+            conditions.push( x + " : " + selected.options[i].value);
+			x += 1
+        }
+    }
+
+}
+
+function showSelectedConditions() {
+      conditions = []
+      if ($('attack').value.length > 0)
+        conditions.push("Patient currently having attack: " + $('attack').value);
+
+
+      if ($('attacks').value.length > 0){
+		conditions.push("Attack Triggered by: ");
+		 selectedOptions($('attacks'))
+	  }
+	  
+      if ($('symptoms')){
+		conditions.push("Symptoms: ");
+		selectedOptions($('symptoms'))
+	  }
+        
+
+      if ($('asthmatic').value.length > 0){
+		 conditions.push("Patient Asthmatic: " + $('asthmatic').value);
+	  }
+
+
+      if ($('prevention').value.length > 0)
+        conditions.push("Type of asthma control: " + $('prevention').value);
+
+      if ($('vascular').value.length > 0){
+		conditions.push("Patient has cardiovascular related disease: " + $('vascular').value);
+	  }
+
+      var html
+      html = "<ul>"
+      for(var i=0;i < conditions.length;i++) {
+        if (conditions[i].length > 0)
+          html += "<li class='data'>" + conditions[i] + "</li>";
+
+      }
+      html += "</ul>"
+	  $('inputFrame'+tstCurrentPage).innerHTML = '<div id="summary">' + html + '</div>' ;
+	  $("clearButton").style.display = "none";
+  }
+
+
+	</script>
+
+<form method='post' action='/encounters/create'>
+	<input type='hidden' name='program' value='CHRONIC CARE PROGRAM' />
+	<input type='hidden' name='encounter_type' value='ASTHMA MEASURE ' />
+	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
+	<input type='hidden' name='user_id' value='<%= @user.id %>' />
+	<table>
+		<tr>
+			<td>
+				 Patient is currently having an attack 
+			</td>
+			<td>
+<select id='attack' name='concept[attack][]' helpText=' Patient is currently having an attack ' pos='1' ttOnLoad ="showCategory('Asthma Measure')">
+<option></option>
+<option value='No'>No</option>
+ <option value='Yes'>Yes</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Attack triggered by 
+			</td>
+			<td>
+<select id='attacks'
+		name='concept[attack][]'
+		helpText='Attack triggered by '
+		condition="__$('attack').value.toLowerCase() == 'yes'"
+		multiple="multiple"
+		ttOnLoad ="showCategory('Asthma Measure')"
+		>
+<option></option>
+<option value='Other'>Other</option>
+ <option value='Exposure to allergens'>Exposure to allergens</option>
+ <option value='Exercise'>Exercise</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Symptoms 
+			</td>
+			<td>
+<select id='symptoms'
+		name='concept[Symptom present][]'
+		helpText='Symptoms'
+		multiple="multiple"
+		nested ="true"
+		field_type="text"
+		ttOnLoad ="showCategory('Asthma Measure')">
+  
+<option> </option>
+<option value='chest tightiness'>Chest tightiness</option>
+ <option value='chronic conditions'>Chronic cough</option>
+ <option value ="finger clubbing">Finger clubbing</option>
+ <option value ="stridor">Stridor</option>
+ <option value ="prolonged expiration" >Prolonged expiration</option>
+ <option value ="central_carinatus">Central carinatus</option>
+ <option value='wheezing'>wheezing</option>
+ <optgroup id='shortness_of_breath' label="Shortness of breath">
+   <option value='Shortness of breath : Mild'>Mild</option>
+   <option value='Shortness of breath : Moderate'>Moderate</option>
+   <option value='Shortness of breath : Severe'>Severe</option>
+ </optgroup>
+
+ <option value='Coughing'>Coughing</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Patient asthmatic? 
+			</td>
+			<td>
+<select id='asthmatic' name='concept[asthma]' helpText='Patient asthmatic? ' pos='4' ttOnLoad ="showCategory('Asthma Measure')">
+<option></option>
+<option value='No'>No</option>
+ <option value='Yes'>Yes</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Is asthma being controlled? 
+			</td>
+			<td>
+<select id='prevention' name='concept[prevention]' helpText='Is asthma being controlled? ' pos='5' ttOnLoad ="showCategory('Asthma Measure')" >
+<option></option>
+<option value='Poor control'>Poor control</option>
+ <option value='Inadequate control'>Inadequate control</option>
+ <option value='Adequate control'>Adequate control</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Patient has cardiovascular related diseases 
+			</td>
+			<td>
+<select id='vascular' name='concept[cardiovascular disease]' helpText='Patient has cardiovascular related diseases ' pos='6' ttOnLoad ="showCategory('Asthma Measure')" >
+<option></option>
+<option value='No'>No</option>
+ <option value='Yes'>Yes</option>
+ </select>
+
+			  <label for='summary'>Summary</label>
+	<%= text_field_tag :summary, nil, {
+	  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';showCategory('Asthma Measure')",
+	  :optional => "true",
+	  :tt_pageStyleClass => "NoControls" } %>
+			</td>
+		</tr>
+	</table>
+</form>

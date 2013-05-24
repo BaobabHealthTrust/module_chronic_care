@@ -212,7 +212,7 @@
 
    function showSelectedConditions() {
       var conditions = [];
-	  currentHeight = '<%= @current_height %>'
+	  currentHeight = '<%= @current_hieght %>'
 	  sex = '<%= @patient.gender.downcase  rescue "" %>'
 	  if (sex == "female")
 		  sex = "f"
@@ -711,7 +711,8 @@
 		       	:tt_pageStyleClass => "Numeric NumbersOnlyWithDecimal",
 				:helpText => "Weight (Kg)" } %>
 
-<% if @current_height.blank? || @patient.age <= 14 %>
+	 <%#= raise @current_hieght.to_yaml %>
+<% if @current_height.blank? %> <% # || @patient.age <= 14 %>
 	<input type='text' id='height'
 	name='concept[Height (cm)]'
 	helpText='Height (cm)'

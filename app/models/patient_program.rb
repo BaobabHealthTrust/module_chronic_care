@@ -52,16 +52,23 @@ class PatientProgram < ActiveRecord::Base
       # Find the state by name
       # Used upcase below as we were having problems matching the concept fullname with the state
       # I hope this will sort the problem and doesnt break anything
-      selected_state = self.program.program_workflows.map(&:program_workflow_states).flatten.select{|pws| 
-        pws.concept.fullname.upcase() == params[:state].upcase()}.first rescue nil
-
+			#raise self.program.program_workflows.map(&:program_workflow_states).flatten.to_yaml
+      #selected_state = self.program.program_workflows.map(&:program_workflow_states).flatten.select{|pws|
+				selected_state = ""
+				#raise params[:state]["state"].to_yaml
+       # pws.concept.fullname.upcase() == params[:state].upcase()}.first rescue nil
+			 self.program.program_workflows.map(&:program_workflow_states).flatten.select{|pws|
+				selected_state = pws if pws.concept.fullname.upcase == params[:state]["state"].upcase
+				} 
+				
       state = self.patient_states.last rescue []
 			
       if (state && selected_state == state.program_workflow_state)
         # do nothing as we are already there
       else
-
+				
         if !selected_state.blank?
+					
           # Check if there is an open state and close it
           if (state && state.end_date.blank?)
             state.end_date = params[:start_date]
@@ -74,7 +81,7 @@ class PatientProgram < ActiveRecord::Base
               :end_date => params[:end_date]
             })
           state.save!
-
+					
           if selected_state.terminal == 1
             complete(params[:start_date])
           else

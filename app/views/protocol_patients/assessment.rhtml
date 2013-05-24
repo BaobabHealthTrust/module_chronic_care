@@ -13,6 +13,9 @@ th { text-align: center;
 	height: 390px;
 	overflow: scroll;
   }
+  .statusLabel {
+	top: 549px ! important;
+  }
   #yes4yes70m180{
 	background-color: #B8002E;
   }
@@ -241,6 +244,20 @@ th { text-align: center;
 	var age;
 	var riskValue = "";
 
+
+  function calculateBP(pos){
+    var bp;
+
+    if(!$('bp')){
+      var div = document.createElement("div");
+      div.id = "bp";
+      div.className = "statusLabel";
+
+      $("inputFrame" + tstCurrentPage).appendChild(div);
+     }
+	 $("bp").innerHTML = "Oxygen Saturation: <i style='font-size: 1.2em; float: right;'>" + riskValue + "</i>";
+	timedEvent = setTimeout('calculateBP(' + pos + ')', 500);
+  }
    function showSelectedConditions() {
       var conditions = [];
 	  var cholesterol = '<%= @cholesterol_value.to_i / 18  %>'
@@ -257,16 +274,16 @@ th { text-align: center;
 
 		age = '<%= @patient.age.to_i %>'
 
-		if (age <= 50){
+		if (age < 50){
 		  age = 40;
 		}
-		else if(age > 50 && age <=60){
+		else if(age >= 50 && age <60){
 		  age = 50;
 		}
-		else if (age > 60 && age <= 70){
+		else if (age >= 60 && age < 70){
 		  age = 60
 		}
-		else if (age > 70){
+		else if (age >= 70){
 		  age = 70
 		}
 		else {
@@ -476,7 +493,7 @@ th { text-align: center;
 			<td>
 	<label for='summary'>Risk Pridiction for: <b><%= @patient.name %></b> </label>
 	<%= text_field_tag :summary, nil, { 
-	  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';",
+	  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';timedEvent = setTimeout('calculateBP(1)', 100);",
 	  :optional => "true",
 	  :tt_pageStyleClass => "NoControls" } %>
 

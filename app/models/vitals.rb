@@ -21,6 +21,8 @@
 					return self.current_vitals(patient, attribute_name).value_numeric
 				when "PATIENT HAS DIABETES"
 					return self.current_vitals(patient, attribute_name).value_coded
+				when "APPOINTMENT DATE"
+					return self.current_vitals(patient, attribute_name).value_datetime
 				when "CURRENT_HEIGHT"
 					obs = patient.person.observations.before((session_date + 1.days).to_date).question("HEIGHT (CM)").all
 					return obs.first.answer_string.to_f rescue 0
@@ -46,6 +48,26 @@
 					return WeightHeight.max_height(sex, patient.age_in_months).to_f
 				end
 
+			end
+
+			def self.expectect_flow_rate(patient)
+				age = patient.age
+				sex = patient.gender.downcase
+				sex = 'm' if patient.gender.upcase == 'male'
+				sex = 'f' if patient.gender.upcase == 'female'
+				current_height = self.get_patient_attribute_value(patient, "current_height")
+				if (age < 18)
+					pefr = ((current_height - 100) * 5) + 100;
+				end
+				if age >= 18 and sex == "m"
+					current_height /= 100;
+					pefr = (((current_height * 5.48) + 1.58) - (age * 0.041)) * 60;
+				end
+				if ((age >= 18) && (sex == "f"))
+						current_height /= 100;
+						pefr = (((current_height * 3.72) + 2.24) - (age * 0.03)) * 60;
+				end
+				return pefr
 			end
 
 			def self.current_treatment_encounter(patient, date = Time.now(), provider = user_person_id)

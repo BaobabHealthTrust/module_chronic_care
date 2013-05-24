@@ -13,6 +13,14 @@
     -moz-user-select:none;
   }
 
+  #inform{
+	width: 80%;
+	background-color:white;
+	border-radius: 20px ;
+	border-style:solid;
+	border-color:#ff0000 #0000ff;
+	margin:0 auto;
+  }
   th {
     text-align:left;
     -moz-user-select:none;
@@ -64,7 +72,7 @@
 <script>
 
   function cancel(){ document.location = "/clinic?user_id=<%=@user['user_id']%>&location_id=<%=@current_location%>" }
-
+  var conditions = []
   <%
    backlink = "/patients/show/#{@person.id}?user_id=#{@user['user_id']}"
   %>
@@ -157,5 +165,23 @@
 </div>
 
 <hr />
+<div id="inform">
+<table width="100%">
+	<tr style = "font-size:20px;">
+	  <th>
+		Visit Overview
+	  </th>
+	</tr>
+	<tr style = "font-size:20px;">
 
+	  <th width="50%">
+		<ul>
+		<% @conditions.each do |condition| %>
+			<li class="<%= cycle('even', 'odd') %>"><%= condition %></li>
+		<%  end %>
+		</ul>
+		</th>
+	</tr>
+  </table>
+</div>
 </body>

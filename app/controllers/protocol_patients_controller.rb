@@ -18,8 +18,43 @@ if params[:user_id].nil?
 
 	end
 
-	def treatment
+	def asthma_measure
 
+	@patient = Patient.find(params[:patient_id]) rescue nil
+
+	redirect_to '/encounters/no_patient' and return if @patient.nil?
+
+if params[:user_id].nil?
+	redirect_to '/encounters/no_user' and return
+	end
+
+	@user = User.find(params[:user_id]) rescue nil?
+
+	redirect_to '/encounters/no_patient' and return if @user.nil?
+
+
+	end
+
+	def medical_history
+
+	@patient = Patient.find(params[:patient_id]) rescue nil
+
+	redirect_to '/encounters/no_patient' and return if @patient.nil?
+
+if params[:user_id].nil?
+	redirect_to '/encounters/no_user' and return
+	end
+
+	@user = User.find(params[:user_id]) rescue nil?
+	@regimen_concepts = MedicationService.hypertension_dm_drugs
+
+	redirect_to '/encounters/no_patient' and return if @user.nil?
+	
+
+	end
+
+	def treatment
+	 @current_program = current_program
 	@patient = Patient.find(params[:patient_id]) rescue nil
 
 	redirect_to '/encounters/no_patient' and return if @patient.nil?
@@ -65,7 +100,24 @@ if params[:user_id].nil?
 	@user = User.find(params[:user_id]) rescue nil?
 
 	redirect_to '/encounters/no_patient' and return if @user.nil?
-	
+	@current_hieght = Vitals.get_patient_attribute_value(@patient, "current_height")
+
+	end
+
+	def update_outcome
+
+	@patient = Patient.find(params[:patient_id]) rescue nil
+
+	redirect_to '/encounters/no_patient' and return if @patient.nil?
+
+if params[:user_id].nil?
+	redirect_to '/encounters/no_user' and return
+	end
+
+	@user = User.find(params[:user_id]) rescue nil?
+
+	redirect_to '/encounters/no_patient' and return if @user.nil?
+
 
 	end
 
@@ -174,6 +226,8 @@ if params[:user_id].nil?
 		flash[:notice] = "No Systolic Blood Pressure status, please vitals."
 		redirect_to "/protocol_patients/vitals?patient_id=#{@patient.id}&user_id=#{@user["user_id"]}" and return
 	end
+	
+  @first_vist = is_first_hypertension_clinic_visit(@person.id)
 
 	if @cholesterol_value == 0
 		flash[:notice] = "No Cholesterol Value, please capture vitals."

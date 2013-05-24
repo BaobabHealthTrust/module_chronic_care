@@ -2,7 +2,6 @@
 class EncountersController < ApplicationController
 
   def create
-		
     User.current = User.find(@user["user_id"]) rescue nil
 
     Location.current = Location.find(params[:location_id] || session[:location_id]) rescue nil
@@ -80,6 +79,7 @@ class EncountersController < ApplicationController
 
 				redirect_to params[:next_url] and return if !params[:next_url].nil?
 					begin
+						redirect_to @task.asthma_next_task.url and return if current_program == "ASTHMA PROGRAM"
 						redirect_to @task.next_task.url and return
 					rescue
 						redirect_to "/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}&disable=true" and return
@@ -87,7 +87,6 @@ class EncountersController < ApplicationController
 			 end
 
         params[:concept].each do |key, value|
-					
           if value.blank?
             next
           end
@@ -146,8 +145,8 @@ class EncountersController < ApplicationController
                 :obs_datetime => @encounter.encounter_datetime,
                 :encounter_id => @encounter.id
               )
-
               case concept_type
+								
               when "date"
 
                 obs.update_attribute("value_datetime", value)
@@ -181,7 +180,7 @@ class EncountersController < ApplicationController
           else
 
             value.each do |item|
-
+							
               concept = ConceptName.find_by_name(key.strip).concept_id rescue nil
 
               if !concept.nil? and !item.blank?
@@ -352,20 +351,27 @@ class EncountersController < ApplicationController
 			#raise params["concept"]["Patient enrolled in HIV program"].upcase.to_yaml
 			if params[:encounter_type] == "TREATMENT "
 				if params[:concept]["Prescribe Drugs"].to_s.upcase == "NO"
-				 redirect_to "/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}&disable=true" and return
+						redirect_to "/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}&disable=true" and return
 				else
-				redirect_to "/prescriptions/prescribe?user_id=#{@user["user_id"]}&patient_id=#{params[:patient_id]}" and return
-				end
-			end
-
-			if params[:encounter_type].to_s.upcase == "DIABETES HYPERTENSION INITIAL VISIT"
-				#raise @current.to_yaml
-				@current.transition({
-                    :state => "currently in treatment",
+						@current.transition({
+                    :state => "On treatment",
                     :start_date => Time.now,
                     :end_date => Time.now
                   })
+						redirect_to "/prescriptions/prescribe?user_id=#{@user["user_id"]}&patient_id=#{params[:patient_id]}" and return
+				end
 			end
+
+			#if params[:encounter_type].to_s.upcase == "DIABETES HYPERTENSION INITIAL VISIT" || "UPDATE OUTCOME"
+				(params[:programs] || []).each do |program|
+						(program[:states] || []).each {|state| @current.transition({
+                    :state => state,
+                    :start_date => Time.now,
+                    :end_date => Time.now
+                  }) }
+				#end
+			end
+			
       @task = TaskFlow.new(params[:user_id] || User.first.id, patient.id)
 			
       redirect_to params[:next_url] and return if !params[:next_url].nil?
@@ -375,6 +381,7 @@ class EncountersController < ApplicationController
 						return
 			end
 			begin
+				redirect_to @task.asthma_next_task.url and return if current_program == "ASTHMA PROGRAM"
 				redirect_to @task.next_task.url and return
 			rescue
 				redirect_to "/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}&disable=true" and return

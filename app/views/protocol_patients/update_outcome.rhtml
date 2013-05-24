@@ -6,21 +6,20 @@
 
 <form method='post' action='/encounters/create'>
 	<input type='hidden' name='program' value='CHRONIC CARE PROGRAM' />
-	<input type='hidden' name='encounter_type' value='UPDATE OUTCOME' />
+	<input type='hidden' name='encounter_type' value='OUTCOME ' />
 	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
 	<input type='hidden' name='user_id' value='<%= @user.id %>' />
 	<table>
 		<tr>
 			<td>
-				New Outcome 
+				Weight 
 			</td>
 			<td>
-<select id='1.1.1' name='programs[][states][][state]'  helpText='New Outcome ' pos='1' >
+<select id='1.1.1' name='concept[asthma[][outcome]]' helpText='Weight ' field_type='number'  pos='1' >
 <option></option>
-<option value='Patient transferred out'>Patient Transfered Out</option>
- <option value='Patient died'>Patient Died</option>
- <option value='Discharged'>Discharged</option>
- <option value ="on treatment">On treatment</option>
+<option value='Defaulted'>Defaulted</option>
+ <option value='Stop treatment'>Stop treatment</option>
+ <option value='Died'>Died</option>
  <option value='Alive'>Alive</option>
  </select>
 			</td>

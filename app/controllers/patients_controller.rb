@@ -34,7 +34,12 @@ class PatientsController < ApplicationController
       @demographics_url = @demographics_url + "/demographics/#{@patient.id}?user_id=#{@user.id}&ext=true"
     end
 		@demographics_url = "http://" + @demographics_url if !@demographics_url.match(/http:/)
-    @task.next_task rescue ""
+		if current_program == "ASTHMA PROGRAM"
+			@task.asthma_next_task rescue ""
+		else
+			@task.next_task rescue ""
+		end
+
 		@disable = params[:disable] rescue ""
 
   end
@@ -123,12 +128,8 @@ class PatientsController < ApplicationController
   end
 
 	def confirm
-
 		session_date = session[:datetime] || Date.today
 
-		#if request.post?
-			#redirect_to search_complete_url(params[:found_person_id], params[:relation]) and return
-		#end
 		@current_location = params[:location_id]
 		@current_user = User.find(@user["user_id"])
 		
@@ -140,6 +141,13 @@ class PatientsController < ApplicationController
 		@arv_number = PatientService.get_patient_identifier(@person, 'ARV Number') rescue ""		
 		@patient_bean = PatientService.get_patient(@person) rescue ""
 		@location = Location.find(params[:location_id] || session[:location_id]).name rescue nil
+		@conditions = []
+		@conditions.push("Visit Type											:  First Vist") if  is_first_hypertension_clinic_visit(@person.id) == true
+		@conditions.push("Visit Type											:  Follow up visit") if  is_first_hypertension_clinic_visit(@person.id) != true
+		risk = Vitals.current_encounter(@person.patient, "assessment", "assessment comments") rescue "Previous Hypetension Assessment : Not Available"
+		@conditions.push("Expected Appointment date: #{Vitals.get_patient_attribute_value(@person.patient, 'appointment date').to_date.strftime('%d/%m/%Y')}") if  is_first_hypertension_clinic_visit(@person.id) != true
+		@conditions.push("#{risk} ")
+		@conditions.push("Asthma Expected Peak Flow Rate  : #{Vitals.expectect_flow_rate(@person.patient)} Litres/Minute") if  is_first_hypertension_clinic_visit(@person.id) != true
 		render :layout => 'menu'
 	end
 
