@@ -1,13 +1,110 @@
+<style>
+  th { text-align: center;
+	 vertical-align: middle;
+	 background-color: #9250DE;
+	 color: white;
+	 height: 10%;
+	 border-radius: 20px ;
+}
+  #charttable{
+	border-color:#ff0000 #0000ff;
+	border-radius: 20px ;
+	border-style: outset;
+	height: 600px;
+	overflow: scroll;
+  }
+
+  .data {
+    color: black;
+    font-size: 25px;
+  }
+
+  .create_button {
+	background-color: #7784AE;
+	border-bottom: 1px outset black;
+	border-radius: 7px 7px 7px 7px;
+	border-style: outset;
+	border-top: 1px outset black;
+	color: #E8EAF1;
+	display: block;
+	padding: 10px 16px 10px 10px;
+	text-align: center;
+	text-decoration: none !important;
+	font-size:27px;
+	width: 327%;
+	height: 70px;
+  }
+  
+  .menu{
+	border-radius: 20px ;
+	border-style:solid;
+	border-color:#ff0000 #0000ff;
+  }
+
+  .range{
+	height: 5%;
+	width: 400px;
+	background-color:white;
+	border-radius: 20px ;
+	border-style:solid;
+	border-color:#ff0000 #0000ff;
+  }
+  #summary_container {
+    bottom: 124px;
+    font-size: 20px;
+    left: 25px;
+    position: absolute;
+    z-index: 600;
+    border-radius: 10px 10px 10px 10px;
+    width: 47.2em;
+    border-style: solid;
+    border-width: 1px;
+    background-color: lightgrey;
+    display: none;
+    -moz-user-select: none;
+    height: 18em;
+    overflow: auto;
+  }
+
+  .summary {
+    font-size: 27px;
+    padding-left: 15px;
+  }
+
+  .header {
+    font-size: 27px;
+    color: white;
+    padding-left: 30px;
+    border-style: solid;
+    border-width: 0px 0px 1px 0px;
+  }
+</style>
 <script type='text/javascript' language='javascript'>
 <!--
 	tt_cancel_show = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
 	tt_cancel_destination = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
 
 var conditions = [];
+var riskValue;
+var familyvalue = '<%= @familyvalue %>'
+var asthmatic = '<%= @sthmatic %>'
+  function getSelected(){
+    var choices = "";
+
+    for(var o = 0; o < __$('symptoms').options.length; o++){
+      if(__$('symptoms').options[o].selected == true){
+        choices += __$('symptoms').options[o].innerHTML + " ";
+      }
+    }
+
+    return choices;
+  }
+
 function selectedOptions(selected){
 	 var x = 1
       for (i = 0; i < selected.options.length; i++) {
         if (selected.options[i].selected) {
+			riskValue += 1
             conditions.push( x + " : " + selected.options[i].value);
 			x += 1
         }
@@ -17,34 +114,68 @@ function selectedOptions(selected){
 
 function showSelectedConditions() {
       conditions = []
-      if ($('attack').value.length > 0)
-        conditions.push("Patient currently having attack: " + $('attack').value);
-
-
+	  riskValue = 0
+      if ($('attack').value.length > 0){
+		if ($('attack').value.toLowerCase() == "yes"){
+		  riskValue += 1 
+		}
+		conditions.push("Patient currently having attack: " + $('attack').value);
+	  }
+        
       if ($('attacks').value.length > 0){
 		conditions.push("Attack Triggered by: ");
 		 selectedOptions($('attacks'))
 	  }
 	  
-      if ($('symptoms')){
+      if ($('symptoms').value.length > 0){
 		conditions.push("Symptoms: ");
 		selectedOptions($('symptoms'))
 	  }
         
 
       if ($('asthmatic').value.length > 0){
+		  if ($('asthmatic').value.toLowerCase() == "yes"){
+			riskValue += 1
+		  }
 		 conditions.push("Patient Asthmatic: " + $('asthmatic').value);
 	  }
 
-
-      if ($('prevention').value.length > 0)
-        conditions.push("Type of asthma control: " + $('prevention').value);
-
-      if ($('vascular').value.length > 0){
-		conditions.push("Patient has cardiovascular related disease: " + $('vascular').value);
+      if ($('prevention').value.length > 0){
+		conditions.push("Type of asthma control: " + $('prevention').value);
 	  }
 
+	  if ($('shortness_of_breath').value.length > 0){
+		conditions.push("Shortness of breath category: " + $('shortness_of_breath').value);
+	  }
+
+      if ($('vascular').value.length > 0){
+		if ($('vascular').value.toLowerCase() == "yes"){
+		  riskValue += 1
+		}
+		conditions.push("Patient has cardiovascular related disease: " + $('vascular').value);
+	  }
+	  riskValue = parseInt((riskValue/15) * 100)
+	  totalRisk = parseInt(((riskValue + parseInt(familyvalue)) / 200) * 100)
+	  if (totalRisk > 50){
+		comment = "Patient is asthmatic";
+		$('asthmatic').value = "yes";
+		if (asthmatic == "yes"){
+		  comment += ",  Asthma tests also shows patient may be asthmatic!<br>Asthma treatment is recommended";
+		}
+	  }
+	  else if (asthmatic == "yes"){
+		$('asthmatic').value = "yes";
+		comment = "Asthma tests also shows patient may be asthmatic!<br>Asthma treatment is recommended";
+	  }
+	  else{
+		$('asthmatic').value = "no";
+		comment = "Patient looks like not asthmatic, clinical judgement is advised";
+	  }
+	  conditions.push("Asthma risk in percentage: <i style='color: #B8002E'>" + riskValue + "</li>");
       var html
+	  var tabledAnalysis
+	  var vitals = "<ul>"
+	  var family = "<ul>"
       html = "<ul>"
       for(var i=0;i < conditions.length;i++) {
         if (conditions[i].length > 0)
@@ -52,7 +183,22 @@ function showSelectedConditions() {
 
       }
       html += "</ul>"
-	  $('inputFrame'+tstCurrentPage).innerHTML = '<div id="summary">' + html + '</div>' ;
+	  <% @condition.each do |condition|  %>
+		  vitals += "<li class='data'>" + '<%= condition %>' + "</li>";
+	  <% end %>
+	  vitals += "</ul>"
+
+	  <% @familyhistory.each do |condition|  %>
+		   family += "<li class='data'>" + '<%= condition %>' + "</li>";
+	  <% end %>
+
+	  family += "</ul>"
+
+	  tabledAnalysis = "<table  id='charttable'  width='100%' valign='top'><tr><th>Medical History</th><th>Family History</th><th>Asthma Test</th></tr>";
+	  tabledAnalysis += "<tr><td valign='top' width= '30%'>" + html + "</td><td valign='top' width= '30%'>" + family + "</td><td valign='top' width= '40%'>" + vitals + "</td></tr>";
+	  tabledAnalysis += "<tr><td colspan='3' valign ='top'><hr></td></tr>";
+	  tabledAnalysis += "<tr class = 'create_button'  valign='top'><td width= '50%' valign='top'>Patient risk value is at <blink><i style='color: #B8002E'>" + totalRisk + " %</i></blink> </td><td colspan='2' valign='top'><blink>" + comment + "</blink></td></tr></table>"
+	  $('inputFrame'+tstCurrentPage).innerHTML = '<div id="summary">' + tabledAnalysis + '</div>' ;
 	  $("clearButton").style.display = "none";
   }
 
@@ -70,7 +216,11 @@ function showSelectedConditions() {
 				 Patient is currently having an attack 
 			</td>
 			<td>
-<select id='attack' name='concept[attack][]' helpText=' Patient is currently having an attack ' pos='1' ttOnLoad ="showCategory('Asthma Measure')">
+<select id='attack'
+		name='concept[attack][]'
+		helpText=' Patient is currently having an attack '
+		pos='1'
+		tt_OnLoad ="showCategory('Asthma Measure')">
 <option></option>
 <option value='No'>No</option>
  <option value='Yes'>Yes</option>
@@ -82,12 +232,13 @@ function showSelectedConditions() {
 				Attack triggered by 
 			</td>
 			<td>
+<%= touch_hidden_tag "attacks", @patient, nil, {:id => 'attacks', :name => 'concept[attack][]'} %>
 <select id='attacks'
 		name='concept[attack][]'
 		helpText='Attack triggered by '
 		condition="__$('attack').value.toLowerCase() == 'yes'"
 		multiple="multiple"
-		ttOnLoad ="showCategory('Asthma Measure')"
+		tt_OnLoad ="showCategory('Asthma Measure')"
 		>
 <option></option>
 <option value='Other'>Other</option>
@@ -105,9 +256,9 @@ function showSelectedConditions() {
 		name='concept[Symptom present][]'
 		helpText='Symptoms'
 		multiple="multiple"
-		nested ="true"
+		optional="true"
 		field_type="text"
-		ttOnLoad ="showCategory('Asthma Measure')">
+		tt_OnLoad ="showCategory('Asthma Measure')">
   
 <option> </option>
 <option value='chest tightiness'>Chest tightiness</option>
@@ -115,16 +266,25 @@ function showSelectedConditions() {
  <option value ="finger clubbing">Finger clubbing</option>
  <option value ="stridor">Stridor</option>
  <option value ="prolonged expiration" >Prolonged expiration</option>
- <option value ="central_carinatus">Central carinatus</option>
+ <option value ="central carinatus">Central carinatus</option>
  <option value='wheezing'>wheezing</option>
- <optgroup id='shortness_of_breath' label="Shortness of breath">
-   <option value='Shortness of breath : Mild'>Mild</option>
-   <option value='Shortness of breath : Moderate'>Moderate</option>
-   <option value='Shortness of breath : Severe'>Severe</option>
- </optgroup>
-
+ <option value='shortness of breath'>Shortness of breath</option>
  <option value='Coughing'>Coughing</option>
  </select>
+
+<%= touch_hidden_tag "shortness_of_breath", @patient, nil, {:id => 'shortness_of_breath', :name => 'concept[Shortness of breath][]'} %>
+
+<select id='shortness_of_breath'
+		name='concept[Shortness of breath][]'
+		helpText='Shortness of breath'
+		field_type="text"
+		tt_OnLoad ="showCategory('Asthma Measure')"
+		condition = "getSelected().match(/SHORTNESS\sOF\sBREATH/i)">
+
+     <option value='Mild'>Mild</option>
+	 <option value='Moderate'>Moderate</option>
+	 <option value='Severe'>Severe</option>
+</select>
 			</td>
 		</tr>
 		<tr>
@@ -132,11 +292,16 @@ function showSelectedConditions() {
 				Patient asthmatic? 
 			</td>
 			<td>
-<select id='asthmatic' name='concept[asthma]' helpText='Patient asthmatic? ' pos='4' ttOnLoad ="showCategory('Asthma Measure')">
+<select id='vascular' 
+		name='concept[cardiovascular disease]'
+		helpText='Patient has cardiovascular related diseases '
+		pos='6'
+		tt_OnLoad ="showCategory('Asthma Measure')" >
 <option></option>
 <option value='No'>No</option>
  <option value='Yes'>Yes</option>
  </select>
+
 			</td>
 		</tr>
 		<tr>
@@ -144,12 +309,6 @@ function showSelectedConditions() {
 				Is asthma being controlled? 
 			</td>
 			<td>
-<select id='prevention' name='concept[prevention]' helpText='Is asthma being controlled? ' pos='5' ttOnLoad ="showCategory('Asthma Measure')" >
-<option></option>
-<option value='Poor control'>Poor control</option>
- <option value='Inadequate control'>Inadequate control</option>
- <option value='Adequate control'>Adequate control</option>
- </select>
 			</td>
 		</tr>
 		<tr>
@@ -157,17 +316,27 @@ function showSelectedConditions() {
 				Patient has cardiovascular related diseases 
 			</td>
 			<td>
-<select id='vascular' name='concept[cardiovascular disease]' helpText='Patient has cardiovascular related diseases ' pos='6' ttOnLoad ="showCategory('Asthma Measure')" >
-<option></option>
-<option value='No'>No</option>
- <option value='Yes'>Yes</option>
- </select>
 
-			  <label for='summary'>Summary</label>
+
+			  <label for='summary'>Asthma Measurement Summary</label>
 	<%= text_field_tag :summary, nil, {
-	  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';showCategory('Asthma Measure')",
+	  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';",
 	  :optional => "true",
 	  :tt_pageStyleClass => "NoControls" } %>
+
+<%= touch_hidden_tag "asthma", @patient, nil, {:id => 'asthmatic', :name => 'concept[asthma]'} %>
+
+	<select id='prevention' 
+			name='concept[prevention]'
+			helpText='Is asthma being controlled? '
+			pos='5'
+			tt_OnLoad ="showCategory('Asthma Measure')"
+			condition ="__$('asthmatic').value.toLowerCase() == 'yes'">
+<option></option>
+<option value='Poor control'>Poor control</option>
+ <option value='Inadequate control'>Inadequate control</option>
+ <option value='Adequate control'>Adequate control</option>
+ </select>
 			</td>
 		</tr>
 	</table>

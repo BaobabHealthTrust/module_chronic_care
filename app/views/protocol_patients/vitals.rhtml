@@ -283,6 +283,9 @@
 		$("estimated").value = pefr;
 		conditions.push("Estimated expiratory Flow Rate (L/m): " + $('expiratory_flow_rate').value);
 		conditions.push("Expected expiratory Flow Rate (L/m): " + parseInt(pefr));
+		if (parseInt(pefr) > parseInt($('expiratory_flow_rate').value)){
+		  conditions.push("<i style='color: #B8002E'> Measurements for expiratory below normal: Possibly indicate obstructed airways </i>");
+		}
 	  }
 
       if ($('waist_circumference').value.length > 0)
@@ -600,15 +603,15 @@
 	<input type='hidden' name="concept[peak flow predicted]" id="estimated" />
 
   <%
-    vital_signs = ["","Temperature","Respiratory Rate","Blood Pressure",
-    "Pulse Rate","Oxygen Saturation","Waist circumference","Expiratory flow rate"]
+    vital_signs = @treatements_list
   %>
 
 	<%= select_tag "choice", options_for_select(vital_signs),
 		{	:helpText => 'Select vital signs',
 			:id => "choice",
 			:multiple => true ,
-			:optional => true } %>
+			:optional => true,
+			:tt_onLoad =>"showCategory('Vitals')"} %>
 
 	  <input type='text' id='waist_circumference'
 	  name='concept[Head circumference]'
@@ -620,7 +623,8 @@
 	 min = 10
 	 max = 300
 	 units = 'cm'
-	 tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"/>/>
+	 tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"
+	 tt_onLoad ="showCategory('Vitals')" />
 
 	 <input type='text' id='temperature'
 	 name='concept[Temperature]'
@@ -632,7 +636,8 @@
 	 min = 35
 	 max = 41
 	 units = 'Degrees Celcius'
-	 tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"/>
+	 tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"
+	 tt_onLoad ="showCategory('Vitals')"/>
 
 	 <input type='text' id='respiratory_rate'
 	 name='concept[Respiratory rate]'
@@ -644,7 +649,8 @@
 	 condition = "getSelected().match(/RESPIRATORY\sRATE/i)"
 	 absoluteMin = 0
 	 absoluteMax = 250
-	 tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"/>
+	 tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"
+	 tt_onLoad ="showCategory('Vitals')"/>
 
 	 <input type='text' id='expiratory_flow_rate'
 	 name='concept[Peak flow]'
@@ -656,7 +662,8 @@
 	 condition = "getSelected().match(/EXPIRATORY\sFLOW\sRATE/i)"
 	 absoluteMin = 0
 	 absoluteMax = 1000
-	 tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"/>
+	 tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"
+	 tt_onLoad ="showCategory('Vitals')"/>
 
 	 <input type='text' id='systolic_blood_pressure'
 	 name='concept[Systolic blood pressure]'
@@ -668,7 +675,8 @@
 	 tt_onUnLoad = "clearTimeout(timedEvent);"
 	 condition = "getSelected().match(/BLOOD\sPRESSURE/i)"
 	 absoluteMin = 0
-	 max = 250/>
+	 max = 250
+	 tt_onLoad ="showCategory('Vitals')"/>
 
 	 <input type='text' id='diastolic_blood_pressure'
 	  name='concept[Diastolic blood pressure]'
@@ -680,7 +688,8 @@
 	  tt_onUnLoad = "clearTimeout(timedEvent);"
 	  condition = "getSelected().match(/BLOOD\sPRESSURE/i)"
 	  absoluteMin = 0
-	  max = 180 />
+	  max = 180
+	  tt_onLoad ="showCategory('Vitals')"/>
 
 	 <input type='text' id='pulse'
 	 name='concept[Pulse]'
@@ -694,13 +703,14 @@
 	 max = 120
 	 condition = "getSelected().match(/PULSE\sRATE/i)"
 	 units = 'bpm'
-	 tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"/>
+	 tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"
+	 tt_onLoad ="showCategory('Vitals')"/>
 
 <%= touch_numeric_tag "WEIGHT (KG)", @patient, nil,
 			{	:id => "weight",
 				:name => "concept[weight (kg)]",
 				:field_type => "number",
-				:tt_onLoad => "$('clearButton').style.display = 'inline';",
+				:tt_onLoad => "$('clearButton').style.display = 'inline';showCategory('Vitals')",
 				:min => number_with_precision(@min_weight, :precision => 1),
 				:max => number_with_precision(@max_weight, :precision => 1),
 				:absoluteMin => 0,
@@ -719,7 +729,8 @@
 	field_type='number'
 	tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"
 	min = 50
-	max = 180/>
+	max = 180
+	tt_onLoad ="showCategory('Vitals')"/>
 <% end %>
 
    <input type='text'
@@ -735,11 +746,12 @@
    condition = "getSelected().match(/OXYGEN\sSATURATION/i)"
    absoluteMin = 0
    absoluteMax = 250
-   tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"/>
+   tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"
+   tt_onLoad ="showCategory('Vitals')"/>
    
   <label for='summary'>Summary</label>
 	<%= text_field_tag :summary, nil, {
-	  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';",
+	  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';showCategory('Vitals')",
 	  :optional => "true",
 	  :tt_pageStyleClass => "NoControls" } %>
 

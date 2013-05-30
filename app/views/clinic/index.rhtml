@@ -1,9 +1,188 @@
+<style>
+
+#popup {
+ 	top: 50px;
+	height:80% ! important;
+  }
+
+  #reason_for_tb_treatment_change {
+	height:80%;
+	width:100%;
+	background:none repeat scroll 0 0 light-grey;
+	border-color: -moz-use-text-color -moz-use-text-color silver;
+	border-style: none none solid;
+	border-width: medium medium 1px;
+	font-family: "Nimbus Sans L","Arial Narrow",sans-serif;
+	font-size: 2.2em;
+	padding-left: 5px;
+
+  }
+
+  #main_head{
+	float: left;
+	width: 100%;
+	font-size: 23px;
+	font-weight:bold;
+  }
+
+  #reason_for_change{
+	height:379px;
+	width:100%;
+	border-style: none none solid;
+	border-width: medium medium 1px;
+	font-family: "Nimbus Sans L","Arial Narrow",sans-serif;
+	font-size: 2.2em;
+	padding-left: 5px;
+	color: black;
+	background-color:white;
+	border-radius: 20px ;
+	border-style:solid;
+	border-color:#ff0000 #0000ff;
+
+  }
+
+  .create_button {
+	background-color: #7784AE;
+	border-bottom: 1px outset black;
+	border-radius: 7px 7px 7px 7px;
+	border-style: outset;
+	border-top: 1px outset black;
+	color: #E8EAF1;
+	display: block;
+	padding: 10px 16px 10px 10px;
+	text-align: center;
+	text-decoration: none !important;
+	font-size:27px;
+	width: 149%
+  }
+
+  #ok {
+	float:right ! important;
+	width: 150px;
+  }
+
+  #cancel {
+	float:left ! important;
+	width: 150px;
+  }
+
+  #cover {
+	position: absolute;
+	background-color: black;
+	width: 100%;
+	height: 100%;
+	left: 0%;
+	top: 0%;
+	z-index: 500;
+	opacity: 0.5;
+	align: center;
+	display:none;
+  }
+
+  #newText{
+	top: 40%;
+    	left: 40%;
+	margin-top: -200px;
+    	margin-left: -250px;
+	position: absolute;
+	margin-right:auto;
+	width: 800px;
+	height: 38px;
+	padding-bottom: 10px;
+	font-size: 2em;
+	text-align: left;
+	background-color: white;
+	padding: 10px;
+	z-index: 999;
+	border: 5px outset blue;
+	border-radius: 15px;
+	z-index: 900;
+	display:none;
+  }
+
+  #alertPage{
+	top: 50%;
+    left: 40%;
+	margin-top: -200px;
+ 	margin-left: -250px;
+	position: absolute;
+	margin-right:auto;
+	width: 800px;
+	height: 400px;
+	padding-bottom: 10px;
+	font-size: 1em;
+	text-align: center;
+	background-color: #7784AE;
+	padding: 10px;
+	z-index: 999;
+	border: 5px outset blue;
+	border-radius: 15px;
+	z-index: 900;
+  }
+</style>
 <script language="javascript">
   tstUsername = "";
   tt_cancel_destination = '/user_logout/<%= params[:user_id] %>?location_id=<%= session[:location_id] || params[:location_id] %>';
   tt_cancel_show = '<%= @patient_registration %>/scan?user_id=<%= params[:user_id]
 %>&ext=true&location_id=<%= session[:location_id] || params[:location_id] %>';
+ function setValue(td){
+   window.location ='/clinic/programs?user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>&program=' + td.value;
+   //alert(td.value)
+ }
+ function selectProgram(){
+
+	var ele = document.getElementById('cover')
+	ele.style.display = "inline";
+	document.body.appendChild(ele);
+
+	var newDiv = document.createElement('div');
+	newDiv.id = "alertPage";
+	newDiv.style.left = "32%";
+	newDiv.style.top = "30%";
+	newDiv.style.width = "840px";
+	newDiv.style.height = "500px";
+
+	var display = "<div id='main_head'><span>Chronic Care Program</span></div>";
+	display += "<div height='800'>"//<div id = 'reason_for_change'>"
+	//display +=	'<input type="checkbox" id="reason_for_change" class="create_button" name="Asthma program" value="ASTHMA PROGRAM" onmousedown="setValue(this)">'
+	//display +=	'<label for="reason_for_change">Asthma program</label>'
+
+	display += '<div id = "reason_for_change">'
+    display += '<fieldset data-role="controlgroup">'
+    	display += '<legend>Choose a program:</legend>'
+         	display += '<table cellspacing="10"><tr class="create_button"><td  width="5%"><input type="checkbox" name="Asthma program" id="asthma" value="Asthma program" /></td>'
+         	display += '<td align="left">Asthma program</td></tr>'
+
+         	display += '<tr class="create_button" ><td width="5%"><input type="checkbox" name="HYPERTENSION PROGRAM" id="hypertension" value="HYPERTENSION PROGRAM"  /></td>'
+         	display += '<td align="left">Hypertension and Diabetes Program</td></tr>'
+
+         	display += '<tr class="create_button" ><td width="5%"><input type="checkbox" name="EPILEPSY PROGRAM" id="epilepsy" value="EPILEPSY PROGRAM"  /></td>'
+         	display += '<td align="left">Epilepsy program</td></tr></table>'
+
+    display += '</fieldset>'
+	display += '</div>'
+
+	//display += "<select id='reason_for_change' size='6'>";
+	///display += "<option value=''></option>"
+	///display += "<option value='ASTHMA PROGRAM' onmousedown='setValue(this)' class='create_button'>Asthma program</option>"
+	///display += "<option value='HYPERTENSION PROGRAM' onmousedown='setValue(this)' class='create_button'>Hypertension and Diabetes Program</option>"
+	//display += "<option value='EPILEPSY PROGRAM' onmousedown='setValue(this)' class='create_button'>Epilepsy program</option>"
+	//for (x=0; x < reasons.length; x++){
+	 // display += "<option value='" + reasons[x] + "' onmousedown='removeObs(this)' class='reasons'>" + reasons[x] + "</option>";
+	//}
+	display += "</div>";
+	newDiv.innerHTML = '<div id="popup">' + display + '</div>' ;
+	document.body.appendChild(newDiv);
+
+  }
+  
+  function resetRegimen(){
+	element = document.getElementById('nextButton')
+	element.setAttribute("onmousedown", "gotoNextPage()")
+  }
 </script>
+  <div id="cover" align="center">
+  </div>
 <div id="home">
   <div id="project_name">
     <div style="margin-top: 0px; color: #6281A7; font-size: 0.4em;">
@@ -31,6 +210,10 @@
 
     <% end %>
 
+	   <option value="/clinic/site_properties?user_id=<%= params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>">
+        Properties
+      </option>
+
   </select>
 
   <div id="facility"><%= @facility rescue "&nbsp;" %></div>
@@ -51,8 +234,7 @@
                 "/set_datetime?user_id=#{ params[:user_id] }&location_id=#{ session[:location_id] || params[:location_id] }") %>'
             ttSize="100px"><%= (!session[:datetime].nil? ? "Reset Date" : "Set Date") %></option>
   
-   <option value='/clinic/programs?user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>'
-            ttSize="200px">Select Program</option>
+   <option ttSize="200px" value="javascript:selectProgram()">Select Program</option>
   </select>
 
   <form id="register" action="<%= @patient_registration %>/search?user_id=<%= params[:user_id] 

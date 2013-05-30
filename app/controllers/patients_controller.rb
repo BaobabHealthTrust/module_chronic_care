@@ -20,13 +20,16 @@ class PatientsController < ApplicationController
     @task = TaskFlow.new(params[:user_id], @patient.id)
 		#raise @task.to_yaml
     @links = {}
-		
+
+		@project = get_global_property_value("project.name") rescue "Unknown"
+		current_user_activities = UserProperty.find_by_user_id_and_property(params[:user_id],
+      "#{@project.downcase.gsub(/\s/, ".")}.activities").property_value.split(",").collect{|a| a.downcase} rescue []
+
     @task.tasks.each{|task|
+			next if ! current_user_activities.include?(task.downcase)
       @links[task.titleize] = "/protocol_patients/#{task.gsub(/\s/, "_")}?patient_id=#{@patient.id}&user_id=#{params[:user_id]}"
 			@links[task.titleize] = "/patients/treatment_dashboard/#{@patient.id}?user_id=#{params[:user_id]}" if task.downcase == "treatment"
     }
-
-    @project = get_global_property_value("project.name") rescue "Unknown"
 
     @demographics_url = get_global_property_value("patient.registration.url") rescue nil
 

@@ -19,7 +19,11 @@ if params[:user_id].nil?
 	end
 
 	def asthma_measure
-
+	@condition = []
+	@familyhistory = []
+	expected = ""
+	predicted = ""
+	current_date = (!session[:datetime].nil? ? session[:datetime].to_date : Date.today)
 	@patient = Patient.find(params[:patient_id]) rescue nil
 
 	redirect_to '/encounters/no_patient' and return if @patient.nil?
@@ -32,7 +36,51 @@ if params[:user_id].nil?
 
 	redirect_to '/encounters/no_patient' and return if @user.nil?
 
+	observation = Observation.find(:all,
+		:conditions => ["encounter_id = ?", Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
+                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
+                                  current_date, @patient.id,EncounterType.find_by_name("Vitals").id]).encounter_id])
+	#raise observation.to_s.to_yaml
+	observation.each {|obs|
+		value = ConceptName.find_by_concept_id(obs.value_coded).name if !obs.value_coded.blank?
+		value = obs.value_numeric.to_i if !obs.value_numeric.blank?
+		value = obs.value_text if !obs.value_text.blank?
+		value = obs.value_datetime if !obs.value_datetime.blank?
+		if obs.concept.fullname == "PEAK FLOW PREDICTED"
+			value = value.to_i 
+			predicted = value
+		end
+		expected = value.to_i if obs.concept.fullname.upcase == "PEAK FLOW"
 
+		asthma_values = ["PEAK FLOW PREDICTED","PEAK FLOW", "BODY MASS INDEX, MEASURED","RESPIRATORY RATE", "CARDIOVASCULAR SYSTEM DIAGNOSIS"]
+		next if !asthma_values.include?(obs.concept.fullname.upcase)
+	 @condition.push("#{obs.concept.fullname.humanize} : #{value}")
+	}
+	@sthmatic = ""
+	if expected < predicted
+		@sthmatic = "yes"
+		@condition.push('<i style="color: #B8002E">Expiratory measurement below normal : Possibly indicate obstructed airways</i>')
+	end
+	observation = Observation.find(:all,
+		:conditions => ["encounter_id = ?", Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
+                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
+                                  current_date, @patient.id,EncounterType.find_by_name("FAMILY MEDICAL HISTORY").id]).encounter_id])
+	
+	@estimatedvalue = []
+	observation.each {|obs|
+		value = ConceptName.find_by_concept_id(obs.value_coded).name if !obs.value_coded.blank?
+		value = obs.value_numeric.to_i if !obs.value_numeric.blank?
+		value = obs.value_text if !obs.value_text.blank?
+		value = obs.value_datetime if !obs.value_datetime.blank?
+		asthma_values = ["HYPERTENSION", "ASTHMA"]
+		if asthma_values.include?(obs.concept.fullname.upcase)
+			@familyvalue = value.to_i if obs.concept.fullname.upcase == "ASTHMA"
+			@estimatedvalue.push("#{obs.concept.fullname.humanize}" + 'in percentage : <i style="color: #B8002E">' + "#{value.to_i}" + '</i>')
+			next
+		end
+	 @familyhistory.push("#{obs.concept.fullname.humanize} : #{value}")
+	}
+	@familyhistory +=  @estimatedvalue
 	end
 
 	def medical_history
@@ -83,8 +131,8 @@ if params[:user_id].nil?
 	@user = User.find(params[:user_id]) rescue nil?
 
 	redirect_to '/encounters/no_patient' and return if @user.nil?
+	@treatements_list = get_global_property_value("lab_results").split(";") rescue ""
 	
-
 	end
 
 	def vitals
@@ -101,7 +149,7 @@ if params[:user_id].nil?
 
 	redirect_to '/encounters/no_patient' and return if @user.nil?
 	@current_hieght = Vitals.get_patient_attribute_value(@patient, "current_height")
-
+	@treatements_list = get_global_property_value("vitals").split(";") rescue ""
 	end
 
 	def update_outcome

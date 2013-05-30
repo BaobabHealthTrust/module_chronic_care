@@ -146,7 +146,6 @@
 	  :tt_onLoad => "showCategory('Lab Results')"
     }) %>
 
-  <% @treatements_list = ["FASTING BLOOD SUGAR", "RANDOM BLOOD SUGAR", "CHOLESTEROL FASTING", "CHOLESTEROL NOT FASTING", "CREATININE", "HbA1c"] %>
   <%= select_tag("test_type_values",options_for_select(@treatements_list),options)%>
 
   <% options = default.merge({

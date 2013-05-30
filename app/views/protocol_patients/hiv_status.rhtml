@@ -71,7 +71,7 @@
 				HIV Status 
 			</td>
 			<td>
-<select id='status' name='concept[HIV Status]' helpText='HIV Status ' pos='0' >
+<select id='status' name='concept[HIV Status]' helpText='HIV Status ' pos='0' tt_onLoad ="showCategory('Update HIV Status')" >
 <option></option>
 <option value='Unknown'>Unknown</option>
  <option value='Positive'>Positive</option>
@@ -91,7 +91,8 @@
 	:min => "1982",
 	:absoluteMax => Date.today.year,
 	:tt_pageStyleClass => "Numeric NumbersOnly",
-	:condition => '$("status").value.toLowerCase() != "unknown"'} %>
+	:condition => '$("status").value.toLowerCase() != "unknown"',
+	:tt_onLoad => "showCategory('Update HIV status')"} %>
 			</td>
 		</tr>
 		<tr>
@@ -102,7 +103,7 @@
 <%= select_tag "hiv_test_month", month_name_options,
 	{:helpText => 'HIV test month',
 	:condition => '($("hiv_test_year").value.toLowerCase() != "unknown") && ($("status").value.toLowerCase() != "unknown")',
-	:tt_onLoad => "__$('keyboard').style.display = 'none'"}%>
+	:tt_onLoad => "__$('keyboard').style.display = 'none';showCategory('Update HIV status')"}%>
 			</td>
 		</tr>
 		<tr>

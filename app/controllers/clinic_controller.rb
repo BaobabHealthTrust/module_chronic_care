@@ -39,14 +39,10 @@ class ClinicController < ApplicationController
   end
 
 	def programs
-		if request.post?
 			session[:selected_program] = params[:program]
-			redirect_to(:action => "index",
-        :user_id => params[:user_id], :location_id => params[:location_id])
-		else
 			@user_id = params[:user_id]
 			@location_id = params[:location_id]
-		end
+			redirect_to "/clinic/index?user_id=#{params[:user_id]}&location_id=#{params[:location_id]}"
 	end
 
   def user_login
@@ -119,6 +115,54 @@ class ClinicController < ApplicationController
 
     render :layout => false
   end
+
+	def vitals
+	  if request.post?
+			 lab_results = get_global_property_value("vitals") rescue nil
+			 if lab_results.blank?
+						lab_results = GlobalProperty.new
+						lab_results.property = "vitals"
+						lab_results.property_value = params[:vitals].join(";")
+						lab_results.save
+			 else
+				 lab_results = GlobalProperty.find_by_property("vitals")
+				 lab_results.property_value = params[:vitals].join(";")
+				 lab_results.save
+			 end
+			redirect_to "/clinic?user_id=#{params[:user_id]}&location_id=#{session[:location_id] || params[:location_id]}"
+		end
+	end
+
+	def lab_results
+	  if request.post?
+			 lab_results = get_global_property_value("lab_results") rescue nil
+			 if lab_results.blank?
+						lab_results = GlobalProperty.new
+						lab_results.property = "lab_results"
+						lab_results.property_value = params[:test_type_values].join(";")
+						lab_results.save
+			 else
+				 lab_results = GlobalProperty.find_by_property("lab_results")
+				 lab_results.property_value = params[:test_type_values].join(";")
+				 lab_results.save
+			 end
+			redirect_to "/clinic?user_id=#{params[:user_id]}&location_id=#{session[:location_id] || params[:location_id]}"
+		end	
+	end
+	
+	def site_properties
+    @link = get_global_property_value("user.management.url").to_s rescue nil
+
+    if @link.nil?
+      flash[:error] = "Missing configuration for <br/>user management connection!"
+
+      redirect_to "/no_user" and return
+    end
+
+    @host = request.host_with_port rescue ""
+
+    render :layout => false
+	end
 
   def my_account
 
