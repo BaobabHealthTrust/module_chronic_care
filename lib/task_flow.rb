@@ -141,19 +141,19 @@ class TaskFlow
       # If user does not have this activity, goto the patient dashboard
 
 			encounters =  [
-                      'CLINIC VISIT','VITALS','MEDICAL HISTORY','FAMILY HISTORY','SOCIAL HISTORY',
+                      'CLINIC VISIT','VITALS','FAMILY HISTORY','MEDICAL HISTORY','SOCIAL HISTORY',
 											'UPDATE HIV STATUS','ASTHMA MEASURE','COMPLICATIONS','TREATMENT',
 											'OUTCOME'
                      ]
 
 			my_activities = self.current_user_activities.map(&:upcase)
-
+			
 			encounters.each do |tsk|
 
 			found = false
 			case tsk
 				when "CLINIC VISIT"
-
+					next if ! self.current_user_activities.include?(tsk.downcase)
           visit = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
                                   :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
                                   self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name("DIABETES HYPERTENSION INITIAL VISIT").id])
@@ -165,7 +165,7 @@ class TaskFlow
 					return self
 
         when "VITALS"
-
+					next if ! self.current_user_activities.include?(tsk.downcase)
           vitals = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
                                   :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
                                   self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
@@ -180,6 +180,7 @@ class TaskFlow
 					end
 
 				when "FAMILY HISTORY"
+					next if ! self.current_user_activities.include?('medical history')
 					self.patient.encounters.each do | enc |
 					 found = true if enc.name.upcase == "FAMILY MEDICAL HISTORY"
 					end
@@ -199,7 +200,7 @@ class TaskFlow
 					end
 
 				when "SOCIAL HISTORY"
-
+					next if ! self.current_user_activities.include?(tsk.downcase)
 					self.patient.encounters.each do | enc |
 					 found = true if enc.name.upcase == "SOCIAL HISTORY"
 					end
@@ -219,7 +220,7 @@ class TaskFlow
 					end
 
 				when "MEDICAL HISTORY"
-
+					next if ! self.current_user_activities.include?(tsk.downcase)
 					self.patient.encounters.each do | enc |
 					 found = true if enc.name.upcase == "MEDICAL HISTORY"
 					end
@@ -238,6 +239,7 @@ class TaskFlow
 					end
 
         when "UPDATE HIV STATUS"
+					next if ! self.current_user_activities.include?("hiv status")
 					self.patient.encounters.each do | enc |
 					 found = true if enc.name.upcase == "UPDATE HIV STATUS"
 					end
@@ -262,6 +264,7 @@ class TaskFlow
 					end
 
 				when "ASTHMA MEASURE"
+					next if ! self.current_user_activities.include?(tsk.downcase)
 					assessment = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
                                   :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
                                   self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
@@ -276,6 +279,7 @@ class TaskFlow
 					end
 
 				when "COMPLICATIONS"
+					next if ! self.current_user_activities.include?(tsk.downcase)
 					assessment = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
                                   :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
                                   self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
@@ -289,6 +293,7 @@ class TaskFlow
 					end
 
 				when "TREATMENT"
+					next if ! self.current_user_activities.include?(tsk.downcase)
 					assessment = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
                                   :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
                                   self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
@@ -386,7 +391,7 @@ class TaskFlow
 			found = false
 			case tsk
 				when "CLINIC VISIT"
-
+					next if ! self.current_user_activities.include?(tsk.downcase)
           visit = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
                                   :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
                                   self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name("DIABETES HYPERTENSION INITIAL VISIT").id])
@@ -398,7 +403,7 @@ class TaskFlow
 					return self
 
         when "VITALS"
-					
+					next if ! self.current_user_activities.include?(tsk.downcase)
           vitals = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
                                   :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
                                   self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
@@ -413,6 +418,7 @@ class TaskFlow
 					end
 
 				when "FAMILY HISTORY"
+					next if ! self.current_user_activities.include?('medical history')
 					self.patient.encounters.each do | enc |
 					 found = true if enc.name.upcase == "FAMILY MEDICAL HISTORY"
 					end
@@ -432,7 +438,7 @@ class TaskFlow
 					end
 
 				when "SOCIAL HISTORY"
-
+					next if ! self.current_user_activities.include?(tsk.downcase)
 					self.patient.encounters.each do | enc |
 					 found = true if enc.name.upcase == "SOCIAL HISTORY"
 					end
@@ -452,7 +458,7 @@ class TaskFlow
 					end
 
 				when "GENERAL HEALTH"
-
+					next if ! self.current_user_activities.include?(tsk.downcase)
 					self.patient.encounters.each do | enc |
 					 found = true if enc.name.upcase == "GENERAL HEALTH"
 					end
@@ -471,6 +477,7 @@ class TaskFlow
 					end
 
         when "UPDATE HIV STATUS"
+					next if ! self.current_user_activities.include?('hiv status')
 					self.patient.encounters.each do | enc |
 					 found = true if enc.name.upcase == "UPDATE HIV STATUS"
 					end
@@ -495,6 +502,7 @@ class TaskFlow
 					end
 
 				when "ASSESSMENT"
+					next if ! self.current_user_activities.include?(tsk.downcase)
 					assessment = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
                                   :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
                                   self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
@@ -509,6 +517,7 @@ class TaskFlow
 					end
 
 				when "COMPLICATIONS"
+					next if ! self.current_user_activities.include?(tsk.downcase)
 					assessment = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
                                   :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
                                   self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
@@ -522,6 +531,7 @@ class TaskFlow
 					end
 
 				when "TREATMENT"
+					next if ! self.current_user_activities.include?(tsk.downcase)
 					assessment = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
                                   :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
                                   self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
