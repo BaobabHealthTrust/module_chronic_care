@@ -103,38 +103,67 @@
 	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
 	<input type='hidden' name='user_id' value='<%= @user.id %>' />
 	
-	<select id='cardiovascular' name='concept[Does the family have a history of cardiovascular related diseases?]' helpText='Family History of Premature cardiovascular death? ' pos='0'  tt_onLoad ="showCategory('Family History')">
+	<select id='cardiovascular' 
+			name='concept[Does the family have a history of cardiovascular related diseases?]'
+			helpText='Family History of Premature cardiovascular death? '
+			tt_onLoad ="showCategory('Family History')"
+			tt_requireNextClick = false />
 	<option></option>
 	<option value='No'>No</option>
 	<option value='Yes'>Yes</option>
 	</select>
 
-	<select id='diabetes' name='concept[diabetes family history]' helpText='Family History of Diabetes? ' pos='1'  tt_onLoad ="showCategory('Family History')" >
+	<select id='diabetes'
+			name='concept[diabetes family history]'
+			helpText='Family History of Diabetes? '
+			pos='1'
+			tt_onLoad ="showCategory('Family History')"
+			tt_requireNextClick = false >
 	<option></option>
 	<option value='No'>No</option>
 	<option value='Yes'>Yes</option>
 	</select>
 
-	<select id='hypertension' name='concept[Does the family have a history of hypertension?]' helpText='Does the family have a history of hypertension? ' pos='2'   tt_onLoad ="showCategory('Family History')" >
+	<select id='hypertension'
+			name='concept[Does the family have a history of hypertension?]'
+			helpText='Does the family have a history of hypertension? '
+			pos='2'
+			tt_onLoad ="showCategory('Family History')"
+			tt_requireNextClick = false >
 	<option></option>
 	<option value='No'>No</option>
 	<option value='Yes'>Yes</option>
 	</select>
 
 
-	<select id='kidney' name='concept[Kidney disease]' helpText='Family History Kidney disease? ' pos='3'   tt_onLoad ="showCategory('Family History')">
+	<select id='kidney'
+			name='concept[Kidney disease]'
+			helpText='Family History Kidney disease? '
+			pos='3'
+			tt_onLoad ="showCategory('Family History')"
+			tt_requireNextClick = false >
 	<option></option>
 	<option value='No'>No</option>
 	<option value='Yes'>Yes</option>
 	</select>
 
-	<select id='asthma' name='concept[Has the family a history of asthma?]' helpText='Family History Asthma? ' pos='3'   tt_onLoad ="showCategory('Family History')">
+	<select id='asthma'
+			name='concept[Has the family a history of asthma?]'
+			helpText='Family History Asthma? '
+			pos='3'
+			tt_onLoad ="showCategory('Family History')"
+			tt_requireNextClick = false >
 	<option></option>
 	<option value='No'>No</option>
 	<option value='Yes'>Yes</option>
 	</select>
 
-	<select id='tb' name='concept[tuberculosis smear history]' helpText='Family History TB? ' pos='3'   tt_onLoad ="showCategory('Family History')">
+	<select id='tb'
+			name='concept[tuberculosis smear history]'
+			helpText='Family History TB? '
+			pos='3'
+			tt_onLoad ="showCategory('Family History')"
+			tt_requireNextClick = false >
 	<option></option>
 	<option value='No'>No</option>
 	<option value='Yes'>Yes</option>

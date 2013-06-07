@@ -2,6 +2,7 @@
 class EncountersController < ApplicationController
 
   def create
+
     User.current = User.find(@user["user_id"]) rescue nil
 
     Location.current = Location.find(params[:location_id] || session[:location_id]) rescue nil
@@ -349,18 +350,7 @@ class EncountersController < ApplicationController
       end
 			
 			#raise params["concept"]["Patient enrolled in HIV program"].upcase.to_yaml
-			if params[:encounter_type] == "TREATMENT "
-				if params[:concept]["Prescribe Drugs"].to_s.upcase == "NO"
-						redirect_to "/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}&disable=true" and return
-				else
-						@current.transition({
-                    :state => "On treatment",
-                    :start_date => Time.now,
-                    :end_date => Time.now
-                  })
-						redirect_to "/prescriptions/prescribe?user_id=#{@user["user_id"]}&patient_id=#{params[:patient_id]}" and return
-				end
-			end
+		
 
 			#if params[:encounter_type].to_s.upcase == "DIABETES HYPERTENSION INITIAL VISIT" || "UPDATE OUTCOME"
 				(params[:programs] || []).each do |program|
@@ -371,7 +361,14 @@ class EncountersController < ApplicationController
                   }) }
 				#end
 			end
-			
+
+			if params[:encounter_type] == "TREATMENT "
+				if params[:concept]["Prescribe Drugs"].to_s.upcase == "NO"
+						redirect_to "/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}&disable=true" and return
+				else
+						redirect_to "/prescriptions/prescribe?user_id=#{@user["user_id"]}&patient_id=#{params[:patient_id]}" and return
+				end
+			end
       @task = TaskFlow.new(params[:user_id] || User.first.id, patient.id)
 			
       redirect_to params[:next_url] and return if !params[:next_url].nil?
@@ -480,6 +477,7 @@ class EncountersController < ApplicationController
 		# Observation handling
 		 #raise params['provider'].to_yaml
 		(params[:observations] || []).each do |observation|
+			next if observation[:concept_name] == ""
 			# Check to see if any values are part of this observation
 			# This keeps us from saving empty observations
 			values = ['coded_or_text', 'coded_or_text_multiple', 'group_id', 'boolean', 'coded', 'drug', 'datetime', 'numeric', 'modifier', 'text'].map { |value_name|

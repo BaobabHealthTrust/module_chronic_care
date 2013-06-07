@@ -15,6 +15,13 @@
           attributes = {'min':[50],'max':[500]};
       break;
 
+	  case 'ctn':
+        if ($('ctn_unit').value == 'mmol/l')
+          attributes = {'min':[2.7],'max':[27.8]};
+        else
+          attributes = {'min':[50],'max':[500]};
+      break;
+
       case 'rbs':
         if ($('rbs_unit').value == 'mmol/l')
           attributes = {'min':[2.7],'max':[27.8]};
@@ -63,31 +70,6 @@
 
     var values_string = selectedValue('test_types');
 
-    $('fbs_test_type_concept_name').value           = '';
-    $('fbs_test_type_value_coded_or_text').value    = '';
-    $('fbs_concept_name').value                     = '';
-    $('fbs_parent_concept_name').value              = '';
-
-    $('rbs_test_type_concept_name').value           = '';
-    $('rbs_test_type_value_coded_or_text').value    = '';
-    $('rbs_concept_name').value                     = '';
-    $('rbs_parent_concept_name').value              = '';
-
-    $('HbA1c_test_type_concept_name').value         = '';
-    $('HbA1c_test_type_value_coded_or_text').value  = '';
-    $('HbA1c_concept_name').value                   = '';
-    $('HbA1c_parent_concept_name').value            = '';
-
-    $('cf_test_type_concept_name').value            = '';
-    $('cf_test_type_value_coded_or_text').value     = '';
-    $('cf_concept_name').value                      = '';
-    $('cf_parent_concept_name').value               = '';
-
-    $('cnf_test_type_concept_name').value           = '';
-    $('cnf_test_type_value_coded_or_text').value    = '';
-    $('cnf_concept_name').value                     = '';
-    $('cnf_parent_concept_name').value              = '';
-
     if(values_string.contains("FASTING BLOOD SUGAR")){
       $('fbs_test_type_concept_name').value           = 'BLOOD SUGAR TEST TYPE';
       $('fbs_parent_concept_name').value              = 'BLOOD SUGAR TEST TYPE';
@@ -108,6 +90,23 @@
       $('HbA1c_test_type_value_coded_or_text').value  = 'HbA1c';
       $('HbA1c_concept_name').value                   = 'HbA1c';
     }
+  }
+
+  function getSelected(){
+    var choices = "";
+
+    for(var o = 0; o < __$('test_types').options.length; o++){
+      if(__$('test_types').options[o].selected == true){
+        choices += __$('test_types').options[o].innerHTML + " ";
+      }
+    }
+
+    return choices;
+  }
+
+    function setConceptNamesAndValues1(){
+
+    var values_string = selectedValue('test_types1');
 
     if(values_string.contains("CHOLESTEROL FASTING")){
       $('cf_test_type_concept_name').value            = 'CHOLESTEROL TEST TYPE';
@@ -122,6 +121,42 @@
       $('cnf_test_type_value_coded_or_text').value    = 'NOT FASTING';
       $('cnf_concept_name').value                     = 'NOT FASTING';
     }
+  }
+
+  function getSelected1(){
+    var choices = "";
+
+    for(var o = 0; o < __$('test_types1').options.length; o++){
+      if(__$('test_types1').options[o].selected == true){
+        choices += __$('test_types1').options[o].innerHTML + " ";
+      }
+    }
+
+    return choices;
+  }
+
+  function setConceptNamesAndValues2(){
+
+    var values_string = selectedValue('test_types2');
+
+	  if(values_string.contains("CREATININE")){
+      $('ctn_test_type_concept_name').value           = 'CREATININE';
+      $('ctn_parent_concept_name').value              = 'CREATININE';
+      $('ctn_test_type_value_coded_or_text').value    = 'CREATININE';
+      $('ctn_concept_name').value                     = 'CREATININE';
+    }
+  }
+
+  function getSelected2(){
+    var choices = "";
+
+    for(var o = 0; o < __$('test_types2').options.length; o++){
+      if(__$('test_types2').options[o].selected == true){
+        choices += __$('test_types2').options[o].innerHTML + " ";
+      }
+    }
+
+    return choices;
   }
 </script>
 
@@ -140,19 +175,18 @@
       :helpText => "Select the type of test taken:",
       :id => "test_types",
       :tt_onUnLoad => "setConceptNamesAndValues()",
-      :multiple => true,
       :tt_pageStyleClass => "MultiSelectList",
       :optional => true,
 	  :tt_onLoad => "showCategory('Lab Results')"
     }) %>
 
-  <%= select_tag("test_type_values",options_for_select(@treatements_list),options)%>
+  <%= select_tag("test_type_values",options_for_select(@sugar),options)%>
 
   <% options = default.merge({
           :id           => "fbs_unit",
           :field_type   => "text",
           :tt_onload    => "$('infoBar'+tstCurrentPage).innerHTML = ' Fasting Blood Sugar';showCategory('Lab Results')",
-          :condition    => "$('fbs_test_type_value_coded_or_text').value == 'FASTING'",
+          :condition    => "getSelected().match(/FASTING\sBLOOD\sSUGAR/i)",
           :tt_onUnLoad  => "$('fbs_measurement_unit').value = $('fbs_unit').value",
           :tt_requireNextClick => false,
           :helpText   =>"Select blood sugar units of measure"
@@ -167,7 +201,7 @@
         :id             => "fbs_value",
         :field_type     => 'number',
         :helpText       =>"Fasting Blood Sugar Value",
-        :condition      => "$('fbs_test_type_value_coded_or_text').value == 'FASTING'",
+        :condition      => "getSelected().match(/FASTING\sBLOOD\sSUGAR/i)",
         :min            => 50,
         :max            => 500,
         :validationRule    => "([0-9]+(\\.)*[0-9]*)|Unknown$",
@@ -196,7 +230,7 @@
           :id           => "rbs_unit",
           :field_type   => "text",
           :tt_onload    => "$('infoBar'+tstCurrentPage).innerHTML = ' Random Blood Sugar';showCategory('Lab Results')",
-          :condition      => "$('rbs_test_type_value_coded_or_text').value == 'RANDOM'",
+          :condition      => "getSelected().match(/RANDOM\sBLOOD\sSUGAR/i)",
           :tt_onUnLoad  => "$('rbs_measurement_unit').value = $('rbs_unit').value",
           :tt_requireNextClick => false,
           :helpText   =>"Select blood sugar units of measure"
@@ -211,7 +245,7 @@
         :id             => "rbs_value",
         :field_type     => 'number',
         :helpText       =>"Random Blood Sugar Value",
-        :condition      => "$('rbs_test_type_value_coded_or_text').value == 'RANDOM'",
+        :condition      => "getSelected().match(/RANDOM\sBLOOD\sSUGAR/i)",
         :min            => 50,
         :max            => 500,
         :validationRule    => "([0-9]+(\\.)*[0-9]*)|Unknown$",
@@ -240,7 +274,7 @@
         :id             => "HbA1c_value",
         :field_type     => 'number',
         :helpText       =>"Enter HbA1c Value",
-        :condition      => "$('HbA1c_test_type_value_coded_or_text').value == 'HbA1c'",
+        :condition      => "getSelected().match(/HbA1c/i)",
         :min            => 0,
         :max            => 30,
         :absoluteMin    => 0,
@@ -267,11 +301,24 @@
     <%= hidden_field_tag("observations[][patient_id]", @patient.id) %>
     <%= hidden_field_tag("observations[][obs_datetime]", DateTime.now()) %>
 
+
+	  <% options=default.merge({
+      :field_type => 'text',
+      :helpText => "Select the type of test taken:",
+      :id => "test_types1",
+      :tt_onUnLoad => "setConceptNamesAndValues1()",
+      :tt_pageStyleClass => "MultiSelectList",
+      :optional => true,
+	  :tt_onLoad => "showCategory('Lab Results')"
+    }) %>
+
+  <%= select_tag("test_type_values",options_for_select(@cholesterol),options)%>
+
     <% options = default.merge({
           :id           => "cf_unit",
           :field_type   => "text",
           :tt_onload    => "$('infoBar'+tstCurrentPage).innerHTML = ' Cholesterol Fasting';showCategory('Lab Results')",
-          :condition    => "$('cf_test_type_value_coded_or_text').value == 'FASTING'",
+          :condition    => "getSelected1().match(/CHOLESTEROL\sFASTING/i)",
           :tt_onUnLoad  => "$('cf_measurement_unit').value = $('cf_unit').value",
           :tt_requireNextClick => false,
           :helpText   =>"Select cholesterol units of measure"
@@ -287,7 +334,7 @@
         :id             => "cf_value",
         :field_type     => 'number',
         :helpText       =>"Cholesterol Fasting Value",
-        :condition      => "($('cf_test_type_value_coded_or_text').value == 'FASTING') && ($('cf_unit').value != 'Lo/Hi')",
+        :condition      => "(getSelected1().match(/CHOLESTEROL\sFASTING/i)) && ($('cf_unit').value != 'Lo/Hi')",
         :min            => 50,
         :max            => 500,
         :validationRule    => "([0-9]+(\\.)*[0-9]*)|Unknown$",
@@ -303,7 +350,7 @@
       :field_type   => 'text',
       :id           => "cf_lo_or_hi",
       :tt_onUnLoad  => "$('cf_value_text').value = $('cf_lo_or_hi').value",
-      :condition    => "($('cf_test_type_value_coded_or_text').value == 'FASTING') && ($('cf_unit').value == 'Lo/Hi')",
+      :condition    => "(getSelected1().match(/CHOLESTEROL\sFASTING/i)) && ($('cf_unit').value == 'Lo/Hi')",
       :helpText     =>"Cholesterol Fasting Value",
       :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'cf');showCategory('Lab Results')",
       :tt_requireNextClick => false
@@ -329,7 +376,7 @@
           :id           => "cnf_unit",
           :field_type   => "text",
           :tt_onload    => "$('infoBar'+tstCurrentPage).innerHTML = ' Cholesterol Not Fasting';showCategory('Lab Results')",
-          :condition    => "$('cnf_test_type_value_coded_or_text').value == 'NOT FASTING'",
+          :condition    => "getSelected1().match(/CHOLESTEROL\sNOT\sFASTING/i)",
           :tt_onUnLoad  => "$('cnf_measurement_unit').value = $('cnf_unit').value",
           :tt_requireNextClick => false,
           :helpText   =>"Select cholesterol units of measure"
@@ -345,7 +392,7 @@
         :id             => "cnf_value",
         :field_type     => 'number',
         :helpText       =>"Cholesterol Not Fasting Value",
-        :condition      => "($('cnf_test_type_value_coded_or_text').value == 'NOT FASTING')  && ($('cnf_unit').value != 'Lo/Hi')",
+        :condition      => "(getSelected1().match(/CHOLESTEROL\sNOT\sFASTING/i))  && ($('cnf_unit').value != 'Lo/Hi')",
         :min            => 50,
         :max            => 500,
         :validationRule    => "([0-9]+(\\.)*[0-9]*)|Unknown$",
@@ -361,7 +408,7 @@
       :field_type   => 'text',
       :id           => "cnf_lo_or_hi",
       :tt_onUnLoad  => "$('cnf_value_text').value = $('cnf_lo_or_hi').value",
-      :condition    => "($('cnf_test_type_value_coded_or_text').value == 'NOT FASTING')  && ($('cnf_unit').value == 'Lo/Hi')",
+      :condition    => "(getSelected1().match(/CHOLESTEROL\sNOT\sFASTING/i))  && ($('cnf_unit').value == 'Lo/Hi')",
       :helpText     =>"Cholesterol Not Fasting Value",
       :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'cnf');showCategory('Lab Results')",
       :tt_requireNextClick => false
@@ -382,6 +429,78 @@
     <%= hidden_field_tag("observations[][parent_concept_name]", "", {:id => 'cnf_parent_concept_name'}) %>
     <%= hidden_field_tag("observations[][patient_id]", @patient.id) %>
     <%= hidden_field_tag("observations[][obs_datetime]", DateTime.now()) %>
+
+	 <% options=default.merge({
+      :field_type => 'text',
+      :helpText => "Select the type of test taken:",
+      :id => "test_types2",
+      :tt_onUnLoad => "setConceptNamesAndValues2()",
+      :tt_pageStyleClass => "MultiSelectList",
+      :optional => true,
+	  :tt_onLoad => "showCategory('Lab Results')"
+    }) %>
+
+  <%= select_tag("test_type_values",options_for_select(@generic),options)%>
+
+ <% options = default.merge({
+          :id           => "ctn_unit",
+          :field_type   => "text",
+          :tt_onload    => "$('infoBar'+tstCurrentPage).innerHTML = 'Creatinine';showCategory('Lab Results')",
+          :condition    => "getSelected2().match(/CREATININE/i)",
+          :tt_onUnLoad  => "$('ctn_measurement_unit').value = $('ctn_unit').value",
+          :tt_requireNextClick => false,
+          :helpText   =>"Select creatinine units of measure"
+      }) %>
+    <%= select_tag("ctn_unit", options_for_select([
+      "",
+      "mmol/l",
+      "mg/dl",
+      "Lo/Hi"
+      ]), options ) %>
+
+  <% options = default.merge({
+        :id             => "ctn_value",
+        :field_type     => 'number',
+        :helpText       =>"Creatinine",
+        :condition      => "(getSelected2().match(/CREATININE/i)) && ($('ctn_unit').value != 'Lo/Hi')",
+        :min            => 50,
+        :max            => 500,
+        :validationRule    => "([0-9]+(\\.)*[0-9]*)|Unknown$",
+        :validationMessage => "You must enter a decimal between 0 and 9 (for example: 36<b>.6</b>)",
+        :tt_pageStyleClass => "Numeric NumbersOnlyWithDecimal",
+        :tt_onUnLoad  => "$('ctn_value_numeric').value = $('ctn_value').value",
+        :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'ctn');showCategory('Lab Results')"
+      }) %>
+
+    <%= text_field_tag "ctn_value_numeric", nil, options%>
+
+    <% options = default.merge({
+      :field_type   => 'text',
+      :id           => "ctn_lo_or_hi",
+      :tt_onUnLoad  => "$('ctn_value_text').value = $('ctn_lo_or_hi').value",
+      :condition    => "(getSelected2().match(/CREATININE/i)) && ($('ctn_unit').value == 'Lo/Hi')",
+      :helpText     =>"Creatinine",
+      :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'cf');showCategory('Lab Results')",
+      :tt_requireNextClick => false
+    }) %>
+    <%= select_tag("ctn_value_lo_or_hi", options_for_select(["","Lo","Hi"]), options ) %>
+
+    <!-- set the test type concept name and value -->
+    <%= hidden_field_tag("observations[][concept_name]",        "", {:id => 'ctn_test_type_concept_name'}) %>
+    <%= hidden_field_tag("observations[][value_coded_or_text]", "", {:id => 'ctn_test_type_value_coded_or_text'}) %>
+    <%= hidden_field_tag("observations[][patient_id]",          @patient.id) %>
+    <%= hidden_field_tag("observations[][obs_datetime]",        DateTime.now()) %>
+
+    <!-- set the test concept and value -->
+    <%= hidden_field_tag("observations[][concept_name]",        "", {:id => 'ctn_concept_name'}) %>
+    <%= hidden_field_tag("observations[][value_text]",          "", {:id => 'ctn_value_text'} ) %>
+    <%= hidden_field_tag("observations[][value_numeric]",       "", {:id => 'ctn_value_numeric'} ) %>
+    <%= hidden_field_tag("observations[][measurement_unit]",    nil,{:id => 'ctn_measurement_unit'}) %>
+    <%= hidden_field_tag("observations[][parent_concept_name]", "", {:id => 'ctn_parent_concept_name'}) %>
+    <%= hidden_field_tag("observations[][patient_id]", @patient.id) %>
+    <%= hidden_field_tag("observations[][obs_datetime]", DateTime.now()) %>
+
+
 
 	<% if @retrospective %>
 		<p><label for="filter_provider">Staff who provided the information (Provider)</label></br>

@@ -62,7 +62,6 @@ class PatientProgram < ActiveRecord::Base
 				} 
 				
       state = self.patient_states.last rescue []
-			
       if (state && selected_state == state.program_workflow_state)
         # do nothing as we are already there
       else

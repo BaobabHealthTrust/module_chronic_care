@@ -21,7 +21,7 @@
   #main_head{
 	float: left;
 	width: 100%;
-	font-size: 23px;
+	font-size: 32px;
 	font-weight:bold;
   }
 
@@ -41,7 +41,7 @@
 
   }
 
-  .create_button {
+  .create_button, a {
 	background-color: #7784AE;
 	border-bottom: 1px outset black;
 	border-radius: 7px 7px 7px 7px;
@@ -53,7 +53,7 @@
 	text-align: center;
 	text-decoration: none !important;
 	font-size:27px;
-	width: 149%
+	width: 138%
   }
 
   #ok {
@@ -108,7 +108,7 @@
 	position: absolute;
 	margin-right:auto;
 	width: 800px;
-	height: 400px;
+	height: 390px ! important;
 	padding-bottom: 10px;
 	font-size: 1em;
 	text-align: center;
@@ -143,21 +143,22 @@
 	newDiv.style.height = "500px";
 
 	var display = "<div id='main_head'><span>Chronic Care Program</span></div>";
-	display += "<div height='800'>"//<div id = 'reason_for_change'>"
+	display += "<div height='80%'>"//<div id = 'reason_for_change'>"
 	//display +=	'<input type="checkbox" id="reason_for_change" class="create_button" name="Asthma program" value="ASTHMA PROGRAM" onmousedown="setValue(this)">'
 	//display +=	'<label for="reason_for_change">Asthma program</label>'
 
 	display += '<div id = "reason_for_change">'
     display += '<fieldset data-role="controlgroup">'
     	display += '<legend>Choose a program:</legend>'
-         	display += '<table cellspacing="10"><tr class="create_button"><td  width="5%"><input type="checkbox" name="Asthma program" id="asthma" value="Asthma program" /></td>'
-         	display += '<td align="left">Asthma program</td></tr>'
+         	display += '<table cellspacing="10"><tr>'
 
-         	display += '<tr class="create_button" ><td width="5%"><input type="checkbox" name="HYPERTENSION PROGRAM" id="hypertension" value="HYPERTENSION PROGRAM"  /></td>'
-         	display += '<td align="left">Hypertension and Diabetes Program</td></tr>'
+         	display += '<td align="left"><a href="/clinic/programs?user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>&program=ASTHMA">Asthma program</a></td></tr>'
 
-         	display += '<tr class="create_button" ><td width="5%"><input type="checkbox" name="EPILEPSY PROGRAM" id="epilepsy" value="EPILEPSY PROGRAM"  /></td>'
-         	display += '<td align="left">Epilepsy program</td></tr></table>'
+         	display += '<tr>'
+         	display += '<td align="left"><a href="/clinic/programs?user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>&program=HYPERTENSION">Hypertension and Diabetes Program</a></td></tr>'
+
+         	display += '<tr>'
+         	display += '<td align="left"><a href="/clinic/programs?user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>&program=EPILEPSY">Epilepsy program</a></td></tr></table>'
 
     display += '</fieldset>'
 	display += '</div>'

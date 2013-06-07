@@ -39,7 +39,7 @@ class ClinicController < ApplicationController
   end
 
 	def programs
-			session[:selected_program] = params[:program]
+			session[:selected_program] = params[:program] + " PROGRAM"
 			@user_id = params[:user_id]
 			@location_id = params[:location_id]
 			redirect_to "/clinic/index?user_id=#{params[:user_id]}&location_id=#{params[:location_id]}"
@@ -119,7 +119,7 @@ class ClinicController < ApplicationController
 	def vitals
 	  if request.post?
 			 lab_results = get_global_property_value("vitals") rescue nil
-			 if lab_results.blank?
+			 if lab_results.nil?
 						lab_results = GlobalProperty.new
 						lab_results.property = "vitals"
 						lab_results.property_value = params[:vitals].join(";")
@@ -136,7 +136,7 @@ class ClinicController < ApplicationController
 	def lab_results
 	  if request.post?
 			 lab_results = get_global_property_value("lab_results") rescue nil
-			 if lab_results.blank?
+			 if lab_results.nil?
 						lab_results = GlobalProperty.new
 						lab_results.property = "lab_results"
 						lab_results.property_value = params[:test_type_values].join(";")
@@ -180,6 +180,15 @@ class ClinicController < ApplicationController
   end
 
   def overview
+    @project = get_global_property_value("project.name").downcase.gsub(/\s/, ".") rescue nil
+
+    @encounter_activities = UserProperty.find(:first, :conditions => ["property = '#{@project}.activities' AND user_id = ?", @user['user_id']]).property_value.split(",") rescue nil
+		@encounter_activities.push("APPOINTMENT")
+		@to_date = Clinic.overview(@encounter_activities)
+		@current_year = Clinic.overview_thiy_year(@encounter_activities)
+		@today = Clinic.overview_today(@encounter_activities)
+		@me = Clinic.overview_me(@encounter_activities, @user['user_id'])
+
     render :layout => false
   end
 

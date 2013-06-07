@@ -22,7 +22,7 @@
 				when "PATIENT HAS DIABETES"
 					return self.current_vitals(patient, attribute_name).value_coded
 				when "APPOINTMENT DATE"
-					return self.current_vitals(patient, attribute_name).value_datetime
+					return self.current_vitals(patient, attribute_name).value_datetime rescue ""
 				when "CURRENT_HEIGHT"
 					obs = patient.person.observations.before((session_date + 1.days).to_date).question("HEIGHT (CM)").all
 					return obs.first.answer_string.to_f rescue 0

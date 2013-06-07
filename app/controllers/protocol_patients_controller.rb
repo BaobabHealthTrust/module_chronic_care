@@ -131,8 +131,18 @@ if params[:user_id].nil?
 	@user = User.find(params[:user_id]) rescue nil?
 
 	redirect_to '/encounters/no_patient' and return if @user.nil?
-	@treatements_list = get_global_property_value("lab_results").split(";") rescue ""
+	treatments_list = get_global_property_value("lab_results").split(";") rescue ""
+
+	@cholesterol = ["FASTING BLOOD SUGAR", "RANDOM BLOOD SUGAR", "CREATININE", "HbA1c"]
 	
+	@sugar = ["CHOLESTEROL FASTING", "CHOLESTEROL NOT FASTING", "CREATININE"]
+	
+	@cholesterol = treatments_list - @cholesterol
+
+  @sugar = treatments_list - @sugar
+
+	@generic = treatments_list - (@sugar + @cholesterol)
+
 	end
 
 	def vitals
@@ -150,6 +160,7 @@ if params[:user_id].nil?
 	redirect_to '/encounters/no_patient' and return if @user.nil?
 	@current_hieght = Vitals.get_patient_attribute_value(@patient, "current_height")
 	@treatements_list = get_global_property_value("vitals").split(";") rescue ""
+
 	end
 
 	def update_outcome
@@ -300,6 +311,8 @@ if params[:user_id].nil?
 	@diabetic = Vitals.current_encounter(@patient, "assessment", "Patient has Diabetes") rescue []
 	
 	@first_visit = is_first_hypertension_clinic_visit(@patient.id)
+	
+	@current_program = current_program
 
 	end
 
@@ -338,5 +351,8 @@ if params[:user_id].nil?
 			@diabetic = Vitals.current_encounter(@patient, "assessment", "Patient has Diabetes") rescue []
 
 			@first_visit = is_first_hypertension_clinic_visit(@patient.id)
+			
+			@current_program = current_program
+			#raise @current_program.to_yaml
 	end
 end

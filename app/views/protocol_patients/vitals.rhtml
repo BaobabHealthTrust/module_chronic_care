@@ -209,7 +209,6 @@
 
   /* starts */
 
-
    function showSelectedConditions() {
       var conditions = [];
 	  currentHeight = '<%= @current_hieght %>'
@@ -269,21 +268,21 @@
 	  if ($('expiratory_flow_rate').value.length > 0){
 		var age = '<%= @patient.age %>';
 		if (age < 18)
-		  pefr = ((currentHeight - 100) * 5) + 100;
+		  pefr = parseInt(((currentHeight - 100) * 5) + 100);
 
 		if ((age >= 18) && (sex == "m")){
 		  currentHeight /= 100;
-		   pefr = (((currentHeight * 5.48) + 1.58) - (age * 0.041)) * 60;
+		   pefr = parseInt((((currentHeight * 5.48) + 1.58) - (age * 0.041)) * 60);
 		}
 
 		if ((age >= 18) && (sex == "f")){
 		   currentHeight /= 100;
-		   pefr = (((currentHeight * 3.72) + 2.24) - (age * 0.03)) * 60;
+		   pefr = parseInt((((currentHeight * 3.72) + 2.24) - (age * 0.03)) * 60);
 		}
 		$("estimated").value = pefr;
 		conditions.push("Estimated expiratory Flow Rate (L/m): " + $('expiratory_flow_rate').value);
-		conditions.push("Expected expiratory Flow Rate (L/m): " + parseInt(pefr));
-		if (parseInt(pefr) > parseInt($('expiratory_flow_rate').value)){
+		conditions.push("Expected expiratory Flow Rate (L/m): " + pefr);
+		if (pefr > parseInt($('expiratory_flow_rate').value)){
 		  conditions.push("<i style='color: #B8002E'> Measurements for expiratory below normal: Possibly indicate obstructed airways </i>");
 		}
 	  }
@@ -614,7 +613,7 @@
 			:tt_onLoad =>"showCategory('Vitals')"} %>
 
 	  <input type='text' id='waist_circumference'
-	  name='concept[Head circumference]'
+	  name='concept[waist circumference]'
 	  helpText='Waist circumference (in cm) '
 	  field_type='number'
 	  pos='3'
@@ -706,6 +705,18 @@
 	 tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"
 	 tt_onLoad ="showCategory('Vitals')"/>
 
+<% if @current_height.to_i == 0 %>
+	<input type='text' id='height'
+	name='concept[Height (cm)]'
+	helpText='Height (cm)'
+	field_type='number'
+	tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"
+	min = 50
+	max = 180
+	tt_onLoad ="showCategory('Vitals')"/>
+<% end %>
+
+
 <%= touch_numeric_tag "WEIGHT (KG)", @patient, nil,
 			{	:id => "weight",
 				:name => "concept[weight (kg)]",
@@ -722,16 +733,9 @@
 				:helpText => "Weight (Kg)" } %>
 
 	 <%#= raise @current_hieght.to_yaml %>
-<% if @current_height.blank? %> <% # || @patient.age <= 14 %>
-	<input type='text' id='height'
-	name='concept[Height (cm)]'
-	helpText='Height (cm)'
-	field_type='number'
-	tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"
-	min = 50
-	max = 180
-	tt_onLoad ="showCategory('Vitals')"/>
-<% end %>
+<%# if @current_height.to_i == 0 %> <% # || @patient.age <= 14 %>
+
+<%# end %>
 
    <input type='text'
    id='oxygen'

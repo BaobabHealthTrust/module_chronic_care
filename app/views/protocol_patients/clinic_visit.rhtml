@@ -15,7 +15,29 @@
 	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
 	<input type='hidden' name='user_id' value='<%= @user.id %>' />
 	<table>
-		<tr>
+	  <tr> <td>
+		 <% if @first_visit == true %>
+		   <%
+				ajax_url = "/location/locations?patient_id=#{@patient.id}&user_id=#{@user['user_id']}&search_string="
+			%>
+		  <% type_list = ["NEW PATIENT", "TRANSFER IN", "TEMPORARY PATIENT"] %>
+		  <%= touch_select_tag "TYPE OF PATIENT", @patient, options_for_select(type_list),
+			{	:id => "patient_type",
+				:name => "concept[TYPE OF PATIENT]",
+				:multiple => false,
+				:helpText => "Is the patient a:" } %>
+
+		   <%= touch_location_tag "location",  @patient, nil,
+			  {	:id => "location",
+			  :value_datetime => true,
+			  :name => "concept[Patient referred to another site]",
+			  :helpText => "Transferred from",
+			  :ajaxURL => "#{ajax_url}",
+			  :condition => '$("patient_type").value == "TRANSFER IN"',
+			  :tt_onload=> "showCategory('Clinic Visit')"
+			  }%>
+		  <% end %>
+		</td>
 			<td>
 				Have you been diagnosed with TB since your LAST clinic visit? 
 			</td>
@@ -33,7 +55,7 @@
 				Year(s) of TB Diagnosis 
 			</td>
 			<td>
-<%= select_tag "TB DIAGNOSIS DATE",  options_for_select(@select_init_diagnosis_year, ""),
+			<%= select_tag "TB DIAGNOSIS DATE",  options_for_select(@select_init_diagnosis_year, ""),
 			{	:id => "year_of_tb_diagnosis",
 				:multiple => true,
 				:name => "concept[TB DIAGNOSIS DATE][]",

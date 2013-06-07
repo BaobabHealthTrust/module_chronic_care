@@ -8,7 +8,8 @@
     <title><%= @title = "#{controller.controller_name.humanize} #{controller.action_name.humanize}" rescue ""  %></title>
 
     <script language="javascript">
-      tstUsername = "<%= current_user.username unless current_user.nil? %>";
+	  <%#= raise @user['name'].to_yaml %>
+      tstUsername = "<%= @user['name'] unless @user.nil? %>";
       tstCurrentDate = "<%= Time.now.strftime("%Y-%m-%d") %>";
       var tt_cancel_destination = null;
     </script>
@@ -19,12 +20,7 @@
     <script type="text/javascript">
       jQuery(document).ready(function($) {
         $('#logout').click(function() {
-
-            <% if @report_url.to_s.blank? %>
-                window.location = '/clinic'; /* /reports'*/
-            <% else %>
-                window.location = '<%= "#{@report_url}" -%>';
-            <% end %>
+                window.location = '/clinic/index?user_id=<%=params[:user_id]%>&location_id=<%params[:location_id]%>'
             })
         $('#find').click(function() {
 
@@ -34,7 +30,7 @@
           }
           else
           {
-              window.location = '/clinic'; // /report/data_cleaning';
+              window.location = '/clinic/index?user_id=<%=params[:user_id]%>&location_id=<%params[:location_id]%>'
           }
 
           })
@@ -112,17 +108,10 @@
 
         <%= yield %>
 
-      <% if session[:mastercard_ids].length.to_i != 0 %>
-         <% session[:mastercard_ids] = session[:mastercard_ids].uniq.sort! rescue ""%>
-        <form action="/patients/mastercard?source=data_cleaning&show_mastercard_counter=true&current=1"  method="post" id="myform">
-        </form>
-      <% end rescue "" %>
-
         <div id="footer" class="dark">
           <div id="buttons" class="buttons" style="top:0px">
             <button id="logout" class="blue left" style="position :relative; float:right;"><span>Finish</span></button>
-            <button id="find" class="green" style="width:200px;" style="position :relative; float:right;"><span>Mastercards</span></button>
-            <% if current_user.admin? %>
+            <% if @user['name'].upcase == "SUPER USER" %>
             <!--button id="staging" class="yellow"><span>Staging</span></button-->
             <% end %>
           </div>

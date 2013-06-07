@@ -2,11 +2,92 @@
   #tt_page_patient_has_any_of_the_following #viewport {
     height: 500px;
   }
+
+    th { text-align: center;
+	 vertical-align: middle;
+	 background-color: #9250DE;
+	 color: white;
+	 height: 10%;
+	 border-radius: 20px ;
+}
+  #charttable{
+	border-color:#ff0000 #0000ff;
+	border-radius: 20px ;
+	border-style: outset;
+	height: 600px;
+	overflow: scroll;
+  }
+
+  .data {
+    color: black;
+    font-size: 25px;
+  }
+
+  .create_button {
+	background-color: #7784AE;
+	border-bottom: 1px outset black;
+	border-radius: 7px 7px 7px 7px;
+	border-style: outset;
+	border-top: 1px outset black;
+	color: #E8EAF1;
+	display: block;
+	padding: 10px 16px 10px 10px;
+	text-align: center;
+	text-decoration: none !important;
+	font-size:27px;
+	width: 327%;
+	height: 70px;
+  }
+
+  .menu{
+	border-radius: 20px ;
+	border-style:solid;
+	border-color:#ff0000 #0000ff;
+  }
+
+  .range{
+	height: 5%;
+	width: 400px;
+	background-color:white;
+	border-radius: 20px ;
+	border-style:solid;
+	border-color:#ff0000 #0000ff;
+  }
+  #summary_container {
+    bottom: 124px;
+    font-size: 20px;
+    left: 25px;
+    position: absolute;
+    z-index: 600;
+    border-radius: 10px 10px 10px 10px;
+    width: 47.2em;
+    border-style: solid;
+    border-width: 1px;
+    background-color: lightgrey;
+    display: none;
+    -moz-user-select: none;
+    height: 18em;
+    overflow: auto;
+  }
+
+  .summary {
+    font-size: 27px;
+    padding-left: 15px;
+  }
+
+  .header {
+    font-size: 27px;
+    color: white;
+    padding-left: 30px;
+    border-style: solid;
+    border-width: 0px 0px 1px 0px;
+  }
 </style>
 <script type='text/javascript' language='javascript'>
 <!--
 	tt_cancel_show = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
 	tt_cancel_destination = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
+	var conditions = [];
 
   function getSelected(){
     var choices = "";
@@ -59,37 +140,47 @@
   }
 
 
+function selectedOptions(selected){
+	 var x = 1
+      for (i = 0; i < selected.options.length; i++) {
 
+        if (selected.options[i].selected) {
+            conditions.push( x + " : " + selected.options[i].value);
+			x += 1
+        }
+    }
+
+}
   /* starts */
 
 
    function showSelectedConditions() {
       var conditions = [];
 
-      if ($('weight').value.length > 0)
-        conditions.push("Weight: " + $('weight').value);
+	   if ($('choice').value.length > 0){
+		conditions.push("Complications: ");
+		selectedOptions($('choice'))
+	  }
+
+      if ($('cva').value.length > 0)
+        conditions.push("CVA: " + $('cva').value);
 
 
-      if ($('temperature').value.length > 0)
-        conditions.push("Temperature: " + $('temperature').value);
+      if ($('mi').value.length > 0)
+        conditions.push("MI: " + $('mi').value);
 
-      if($('systolic_blood_pressure').value.length > 0 && $('diastolic_blood_pressure').value.length > 0){
-        conditions.push("BP: " + $('systolic_blood_pressure').value +"/"+ $('diastolic_blood_pressure').value);
+      if($('creatinine').value.length > 0){
+        conditions.push("Creatinine: " + $('creatinine').value);
       }
 
-      if ($('respiratory_rate').value.length > 0)
-        conditions.push("Respiratory rate: " + $('respiratory_rate').value);
+      if ($('funduscopy').value.length > 0)
+        conditions.push("Funduscopy: " + $('funduscopy').value);
 
-      if ($('pulse').value.length > 0)
-        conditions.push("Pulse: " + $('pulse').value);
+      if ($('shortness_of_breath').value.length > 0)
+        conditions.push("Shortness of breath: " + $('shortness_of_breath').value);
 
-      if ($('oxygen').value.length > 0)
-        conditions.push("Oxygen: " + $('oxygen').value);
-
-      if ($('waist_circumference').value.length > 0)
-        conditions.push("Waist Circumference: " + $('waist_circumference').value);
-
-
+      if ($('oedema').value.length > 0)
+        conditions.push("Oedema: " + $('oedema').value);
 
       //var container = $("summary_container");
       var html
@@ -104,252 +195,6 @@
 	  $("clearButton").style.display = "none";
   }
 
-    function selectTriageCategory(category) {
-      var options = document.getElementsByTagName("li");
-      for(var i = 0; i < options.length; i++){
-        if(options[i].innerHTML == category){
-          updateTouchscreenInputForSelect(options[i]);
-          break
-        }
-      }
-    }
-
-
-    function triage() {
-
-      if ($('temperature').value.length > 0) {
-        temp = parseFloat($('temperature').value);
-        if (temp > 40 || temp < 34) {
-          return 'EMERGENCY'
-        }
-      }
-
-      /*if ($('temperature').length > 0) {
-        temp = parseFloat($('temperature').value);
-        if (temp > 40 || temp < 34) {
-          return 'EMERGENCY'
-        }
-      }*/
-
-      if($('systolic_blood_pressure').value.length > 0){
-        sbp = parseFloat($('systolic_blood_pressure').value);
-        if (sbp > 220 || sbp < 80) {
-          return 'EMERGENCY'
-        }
-      }
-
-      if($('diastolic_blood_pressure').value.length > 0){
-        dbp = parseFloat($('diastolic_blood_pressure').value);
-        if (dbp > 130) {
-          return 'EMERGENCY'
-        }
-      }
-
-      if($('respiratory_rate').value.length > 0){
-        respiratory_rate = parseFloat($('respiratory_rate').value);
-        if (respiratory_rate > 30 || respiratory_rate < 8) {
-          return 'EMERGENCY'
-        }
-      }
-
-      if($('pulse').value.length > 0){
-        pulse = parseFloat($('pulse').value);
-        if (pulse > 130 || pulse < 40) {
-          return 'EMERGENCY'
-        }
-      }
-
-      if($('oxygen').value.length > 0){
-        oxygen = parseFloat($('oxygen').value);
-        if (oxygen < 90) {
-          return 'EMERGENCY'
-        }
-      }
-
-      if($('life threatening condition').value.length > 0){
-        ltc = $('life threatening condition').value;
-        if (ltc != 'None' && ltc != 'Other') {
-          return 'EMERGENCY'
-        }
-      }
-
-
-      /*  ..................... */
-
-
-
-      if ($('temperature').value.length > 0) {
-        temp = parseFloat($('temperature').value);
-        if (temp > 38 || temp < 35.5) {
-          return 'PRIORITY'
-        }
-      }
-
-      /*if ($('temperature').length > 0) {
-        temp = parseFloat($('temperature').value);
-        if (temp > 40 || temp < 34) {
-          return 'EMERGENCY'
-        }
-      }*/
-
-      if($('systolic_blood_pressure').value.length > 0){
-        sbp = parseFloat($('systolic_blood_pressure').value);
-        if (sbp > 180 || sbp < 90) {
-          return 'PRIORITY'
-        }
-      }
-
-      if($('diastolic_blood_pressure').value.length > 0){
-        dbp = parseFloat($('diastolic_blood_pressure').value);
-        if (dbp > 110) {
-          return 'PRIORITY'
-        }
-      }
-
-      if($('respiratory_rate').value.length > 0){
-        respiratory_rate = parseFloat($('respiratory_rate').value);
-        if (respiratory_rate > 20 || respiratory_rate < 12) {
-          return 'PRIORITY'
-        }
-      }
-
-      if($('pulse').value.length > 0){
-        pulse = parseFloat($('pulse').value);
-        if (pulse > 110 || pulse < 50) {
-          return 'PRIORITY'
-        }
-      }
-
-      if($('oxygen').value.length > 0){
-        oxygen = parseFloat($('oxygen').value);
-        if (oxygen < 92) {
-          return 'PRIORITY'
-        }
-      }
-
-
-     /* .......................... */
-
-
-
-
-
-
-      for(var i=0;i < selected_complaints.length;i++) {
-        if (selected_complaints[i] == 'Snike bite (Bites)')
-          return 'EMERGENCY'
-
-        if (selected_complaints[i] == 'Major (Burns)')
-          return 'EMERGENCY'
-
-        if (selected_complaints[i] == 'Snake bite (Bites)')
-          return 'EMERGENCY'
-
-        if (selected_complaints[i] == 'PV bleeding (Pregnancy)')
-          return 'EMERGENCY'
-
-        if (selected_complaints[i] == 'Major (Trauma)')
-          return 'EMERGENCY'
-
-        if (selected_complaints[i] == 'Violent behaviour')
-          return 'EMERGENCY'
-
-        if (selected_complaints[i] == 'Severe (Shortness of breath)')
-          return 'EMERGENCY'
-
-      }
-
-      for(var i=0;i < selected_complaints.length;i++) {
-        //alert(selected_complaints[i])
-        if (selected_complaints[i] == 'Active bleeding')
-          return 'PRIORITY'
-
-        if (selected_complaints[i] == 'Chest pain')
-          return 'PRIORITY'
-
-        if (selected_complaints[i] == 'Focal neurologic deficit')
-          return 'PRIORITY'
-
-        if (selected_complaints[i] == 'Lower limb (Fracture)')
-          return 'PRIORITY'
-
-        if (selected_complaints[i] == 'Pelvis limb (Fracture)')
-          return 'PRIORITY'
-
-        if (selected_complaints[i] == 'Rib (Fracture)')
-          return 'PRIORITY'
-
-        if (selected_complaints[i] == 'Skull (Fracture)')
-          return 'PRIORITY'
-
-        if (selected_complaints[i] == 'Spine (Fracture)')
-          return 'PRIORITY'
-
-        if (selected_complaints[i] == 'Upper limb (Fracture)')
-          return 'PRIORITY'
-
-        if (selected_complaints[i] == 'Severe (Head injury)')
-          return 'PRIORITY'
-
-        if (selected_complaints[i] == 'Unconscious (Head injury)')
-          return 'PRIORITY'
-
-        if (selected_complaints[i] == 'Medication history (Convulsions)')
-          return 'PRIORITY'
-
-        if (selected_complaints[i] == 'Minor (Burns)')
-          return 'PRIORITY'
-
-        if (selected_complaints[i] == 'Iron posioning (Poisioning)')
-          return 'PRIORITY'
-
-        if (selected_complaints[i] == 'Organophosphate posioning (Poisioning)')
-          return 'PRIORITY'
-
-        if (selected_complaints[i] == 'Other (Poisioning)')
-          return 'PRIORITY'
-
-        if (selected_complaints[i] == 'Paraffin (Poisioning)')
-          return 'PRIORITY'
-
-        if (selected_complaints[i] == 'Abdominal pain (Pregnancy)')
-          return 'PRIORITY'
-
-        if (selected_complaints[i] == 'Pain')
-          return 'PRIORITY'
-
-        if (selected_complaints[i] == 'Sexual assualt')
-          return 'PRIORITY'
-
-        if (selected_complaints[i] == 'Visual changes')
-          return 'PRIORITY'
-
-        if (selected_complaints[i] == 'Body swelling')
-          return 'PRIORITY'
-
-        if (selected_complaints[i] == 'Weakness')
-          return 'PRIORITY'
-
-      }
-
-
-
-      return 'QUEUE';
-    }
-
-
-    var selected_complaints = [];
-
-    function unLoadSelectedComplaints() {
-      selected_complaints = [];
-    }
-
-    function LoadSelectedComplaints() {
-      complaints = $('touchscreenInput'+tstCurrentPage).value.split(';');
-      for(var i = 0 ; i < complaints.length; i++) {
-        selected_complaints.push(complaints[i]);
-      }
-    }
 
   /* end */
 	</script>
@@ -420,5 +265,11 @@
 	:id => 'cva',
 	:condition => 'getSelected().match(/cva/i)',
 	:tt_onLoad => "showCategory('Complications')"}  %>
+
+			<label for='summary'>Summary</label>
+	<%= text_field_tag :summary, nil, {
+	  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';showCategory('Complications')",
+	  :optional => "true",
+	  :tt_pageStyleClass => "NoControls" } %>
 
 </form>

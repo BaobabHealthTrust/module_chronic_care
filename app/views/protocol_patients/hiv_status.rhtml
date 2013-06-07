@@ -22,6 +22,12 @@
 
 <script type='text/javascript' language='javascript'>
 <!--
+	<% @session_date = "#{session[:datetime].to_date rescue Date.today}" %>
+	<% @alert_date = @session_date.to_date - 90.days %>
+	var alertDate = createDate("<%= @alert_date.year %>","<%= @alert_date.month %>","<%= @alert_date.day %>");
+	var testDate = null;
+  
+
 	tt_cancel_show = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
 	tt_cancel_destination = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
 
@@ -37,8 +43,10 @@
         conditions.push("HIV status: " + $('status').value);
 
       if ($('hiv_test_date').value.length > 0){
-		var hivDate = new Date($('hiv_test_date').value)
-        conditions.push("HIV Test Date: " + hivDate.getFullYear() + "/" + (hivDate.getMonth()+ 1)  + "/" + $('hiv_test_day').value);
+		if ($('hiv_test_date').value != "Invalid Date"){
+		  var hivDate = new Date($('hiv_test_date').value)
+		  conditions.push("HIV Test Date: " + hivDate.getFullYear() + "/" + (hivDate.getMonth()+ 1)  + "/" + $('hiv_test_day').value);
+		}
 	  }
 
       if ($('on_art').value.length > 0)
@@ -58,6 +66,53 @@
 	  $('inputFrame'+tstCurrentPage).innerHTML = '<div id="summary">' + html + '</div>' ;
 	  $("clearButton").style.display = "none";
 	}
+
+  function checkTestDate(){
+    testDate = createDate($('hiv_test_year').value, $('hiv_test_month').value , $('hiv_test_day').value);
+    $('hiv_test_date').value = testDate;
+	 if (testDate == 'Invalid Date'){
+	  return "true"
+	}
+	else {
+	  return isTestOverDue(testDate,alertDate);
+	}
+  }
+
+  function isTestOverDue(testDate,alertDate) {
+    if (testDate <= alertDate){
+      return "true";
+    }else {
+      return "false";
+    }
+  }
+
+  function createDate(year,month,day) {
+    date_str = year
+
+    if(month.length == 1)
+      month = '0' + month
+
+    date_str+='-' + month
+
+    if(day.length == 1)
+      day = '0' + day
+
+    date_str+='-' + day
+
+    intyear = 0 ; intmonth = 0 ; intday = 0;
+    intyear = parseInt(date_str.substring(0,4))
+    intmonth = (parseInt(date_str.substring(5,7)) - 1)
+    intday = (parseInt(date_str.substring(8,10)))
+
+    if (intmonth == -1)
+      intmonth = (parseInt(date_str.substring(5,7).substring(1,2)) - 1)
+
+    if (intday == 0)
+      intday = parseInt(date_str.substring(8,10).substring(1,2))
+
+    return new Date(intyear,intmonth,intday);
+  }
+
 	</script>
 
 <form method='post' action='/encounters/create'>
@@ -65,6 +120,7 @@
 	<input type='hidden' name='encounter_type' value='UPDATE HIV STATUS' />
 	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
 	<input type='hidden' name='user_id' value='<%= @user.id %>' />
+	<input type ="hidden" id="hiv_test_date" name="concept[HIV TEST DATE]" />
 	<table>
 		<tr>
 			<td>
@@ -120,7 +176,21 @@
 	:tt_pageStyleClass => 'NumbersOnlyWithUnknown'
   } %>
 
-<%= touch_hidden_tag "HIV TEST DATE", @patient, nil, {:id => "hiv_test_date", :value_datetime => true}%>
+			</td>
+			<td>
+    <%= touch_yes_no_unknown_tag "Refer to HTC", @patient, nil,
+      {:id => "refer_to_htc",
+	  :name => "name[Refer to HTC]",
+      :condition => '(checkTestDate() == "true") && ($("status").value.toLowerCase() == "negative")',
+      :tt_pageStyleClass => "NoKeyboard",
+      :helpText => "Patient has been -ve for more than 3 months. Refer patient to HTC?" } %>
+
+	<%= touch_yes_no_unknown_tag "Refer to HTC", @patient, nil,
+      {:id => "refer_to_htc",
+      :name => "name[Refer to HTC]",
+	  :condition => '$("status").value.toLowerCase() == "unknown"',
+      :tt_pageStyleClass => "NoKeyboard",
+      :helpText => "Refer patient to HTC?" } %>
 			</td>
 		</tr>
 		<tr>
@@ -128,7 +198,8 @@
 				On ART? 
 			</td>
 			<td>
-<select id='on_art' name='concept[on art]' helpText='On ART? ' pos='5' >
+<select id='on_art' name='concept[on art]' helpText='On ART? ' pos='5'
+		condition = '$("status").value.toLowerCase() == "positive"'>
 <option></option>
 <option value='Yes'>Yes</option>
  <option value='No'>No</option>
@@ -140,7 +211,8 @@
 				Enroll in HIV program?
 			</td>
 			<td>
-<select id='enroll' name='concept[Patient enrolled in HIV program]' helpText='On ART? ' pos='6'  condition='__$("on_art").value.toLowerCase() == "no"' >
+<select id='enroll' name='concept[Patient enrolled in HIV program]' helpText='On ART? ' pos='6'  condition='__$("on_art").value.toLowerCase() == "no"'
+		condition = '$("status").value.toLowerCase() == "positive"' >
 <option></option>
 <option value='No'>No</option>
  <option value='Yes'>Yes</option>

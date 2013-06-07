@@ -36,7 +36,8 @@
 	  :name=> "concept[Chronic disease][]",
       :multiple => true,
       :tt_pageStyleClass => "MultiSelectList",
-      :optional => true} %>
+      :optional => true,
+	  :tt_onLoad => "showCategory('General Health')"} %>
 
 
 <%= select_tag "treatment", options_for_select(@concept),
@@ -46,11 +47,13 @@
 		:name => 'concept[treatment][]',
 		:tt_pageStyleClass => "MultiSelectList",
 		:condition => "$('choice').value.length > 0",
-		:helpText => "Treatment Received" } %>
+		:helpText => "Treatment Received",
+		:tt_onLoad => "showCategory('General Health')"} %>
 
  <%= touch_yes_no_unknown_tag "Drug Allergy", @patient, nil,
 	{	:id => "drug_allergy",
 	:condition => "$('choice').value.length > 0" ,
 	:name => 'concept[Drug Allergy]',
-	:helpText => "Any drug allergies" } %>
+	:helpText => "Any drug allergies",
+	:tt_onLoad => "showCategory('General Health')"} %>
 </form>

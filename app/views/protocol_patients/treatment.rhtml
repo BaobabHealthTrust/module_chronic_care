@@ -2,6 +2,11 @@
 <!--
 	tt_cancel_show = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
 	tt_cancel_destination = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
+
+	function changeProgram(){
+	  $('program_state').value = "Patient Transferred Out"
+	}
+
 	</script>
 
 <form method='post' action='/encounters/create'>
@@ -111,7 +116,11 @@
 				Refer to another Level?
 			</td>
 			<td>
-<select id='1.1.5' name='concept[Refer to other hospital]' helpText='Refer to Secondary Level? ' pos='5'  condition='(__$("1.1.1").value.toLowerCase() == "moderate" || __$("1.1.1").value.toLowerCase() == "severe") &&  __$("1.1.4").value.toLowerCase() == "no"' tt_onload="showCategory('Treatment')">
+<select id='1.1.5'
+		name='concept[Refer to other hospital]'
+		helpText='Refer to Secondary Level? ' pos='5'
+		condition='(__$("1.1.1").value.toLowerCase() == "moderate" || __$("1.1.1").value.toLowerCase() == "severe") &&  __$("1.1.4").value.toLowerCase() == "no"'
+		tt_onload="showCategory('Treatment')">
 <option></option>
 <option value='Refer to Tertial Level'>Refer to Tertial Level</option>
 <option value='Refer to Secondary Level'>Refer to Secondary Level</option>
@@ -119,20 +128,59 @@
  </select>
 			</td>
 		</tr>
-
+<%= touch_hidden_tag "programs[][states][][state]", @patient, nil, {
+  :id => "program_state",
+  :name => 'programs[][states][][state]'
+}%>
 		<tr>
 			<td>
 				Select Location
 			</td>
+			  <%
+				ajax_url = "/location/secondary_locations?patient_id=#{@patient.id}&user_id=#{@user['user_id']}&search_string="
+				ajax_url1 = "/location/tertialy_locations?patient_id=#{@patient.id}&user_id=#{@user['user_id']}&search_string="
+			  %>
 			<td>
 			  <%= touch_location_tag "location",  @patient, nil,
-			  {	:id => "location_of_art_intiation",
+			  {	:id => "location",
 			  :value_datetime => true,
-			  :location => "concept[]",
+			  :name => "concept[Patient referred to another site]",
 			  :helpText => "Select Location",
-			  :ajaxURL => '/location/locations?search_string=',
-			  :condition => '$("1.1.5").value != "UNKNOWN" && $("1.1.4").value.toLowerCase() == "no"',
-			  :tt_onload=> "showCategory('Treatment')"}%>
+			  :ajaxURL => "#{ajax_url}",
+			  :condition => '$("1.1.5").value != "UNKNOWN" && $("1.1.4").value.toLowerCase() == "no" && $("1.1.5").value == "Refer to Secondary Level"',
+			  :tt_onload=> "showCategory('Treatment')",
+			  :tt_onUnload => "changeProgram()"}%>
+			</td>
+
+			<td>
+			  <%= touch_location_tag "location",  @patient, nil,
+			  {	:id => "location",
+			  :value_datetime => true,
+			  :name => "concept[Patient referred to another site]",
+			  :helpText => "Select Tertiary Location",
+			  :ajaxURL => "#{ajax_url1}",
+			  :condition => '$("1.1.5").value != "UNKNOWN" && $("1.1.4").value.toLowerCase() == "no" && $("1.1.5").value == "Refer to Tertial Level"',
+			  :tt_onload=> "showCategory('Treatment')",
+			  :tt_onUnload => "changeProgram()"}%>
+			</td>
+
+			<td>
+		  <select id='1.1.10'
+			name='concept[Reason for referral][]'
+			helpText='Referal Reason' 
+			multiple='multiple'
+			condition='$("1.1.5").value != "UNKNOWN" && $("1.1.4").value.toLowerCase() == "no"' >
+			<option></option>
+			<option value='Diabetic with ulcers'>Diabetic with ulcers</option>
+			 <option value='History of stroke'>History of stroke</option>
+			 <option value='History of heart attack'>History of heart attack</option>
+			 <option value='History of pain in calf'>History of pain in calf</option>
+			 <option value='History of chect pain or exertion'>History of chect pain or exertion</option>
+			 <option value="Diabetic and BP >= 130 inspite tratment">Diabetic and BP >= 130 inspite tratment</option>
+			 <option value="BP >= 140 despite treatment">BP >= 140 despite treatment</option>
+			 <option value="SBP > 160 or DBP >= 90 mmHg and aged 40 or more">SBP > 160 or DBP >= 90 mmHg and aged 40 or more</option>
+			 <option value="SBP > 140 or DBP >= 90 mmHg and aged below 40 years">SBP > 140 or DBP >= 90 mmHg and aged below 40 years</option>
+		  </select>
 			</td>
  <% else %>
 	<% @changes_list = ["Cigarette or smoke free environment", "Correct use of in-haler", "Loose weight", "Breathing control exercise", "Allergen avoidance", "Acid reflux"] %>
@@ -204,7 +252,10 @@
 				Referal Reason 
 			</td>
 			<td>
-<select id='1.1.10' name='concept[Referal Reason][]' helpText='Referal Reason ' multiple='true'  pos='10'  condition='__$("1.1.9").value.toLowerCase() == "yes"' >
+<select id='1.1.10'
+  name='concept[Referal Reason][]'
+  helpText='Referal Reason ' multiple='true'  pos='10'
+  condition='__$("1.1.9").value.toLowerCase() == "yes"' >
 <option></option>
 <option value='Diabetic with ulcers'>Diabetic with ulcers</option>
  <option value='Hsitory of stroke'>Hsitory of stroke</option>

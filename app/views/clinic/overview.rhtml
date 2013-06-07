@@ -73,22 +73,22 @@
       <th>Total to Date</th>
     </tr>
 
-    <% (0..9).each do |i| %>
-      <tr>
-        <td>
-          &nbsp;
+    <% @encounter_activities.each do |enc| %>
+      <tr class="<%= cycle('even', 'odd') %>">
+        <td align="left">
+          <%=  enc %>
         </td>
         <td>
-          &nbsp;
+          <%= @me[enc] %>
         </td>
         <td>
-          &nbsp;
+         <%= @today[enc] %>
         </td>
         <td>
-          &nbsp;
+          <%= @current_year[enc] %>
         </td>
         <td>
-          &nbsp;
+          <%=  @to_date[enc] %>
         </td>
       </tr>
     <% end %>

@@ -156,11 +156,13 @@
 				How long Have been smoking?
 			</td>
 			<td>
- <select id='duration' name='concept[smoking duration]' helpText='How long Have been smoking? ' tt_onLoad ="showCategory('Social History')"  condition='__$("smoking").value.toLowerCase() == "yes"'>
-		<option></option>
-		<option value='Less than five years'>Less than five years</option>
-		<option value='Five years or more'>Five years or more</option>
- </select>
+<% if @current_program == "ASTHMA PROGRAM"  %>
+	   <select id='duration' name='concept[smoking duration]' helpText='How long Have been smoking? ' tt_onLoad ="showCategory('Social History')"  condition='__$("smoking").value.toLowerCase() == "yes"'>
+			  <option></option>
+			  <option value='Less than five years'>Less than five years</option>
+			  <option value='Five years or more'>Five years or more</option>
+	   </select>
+<% end %>
 			</td>
 		</tr>
 
@@ -179,11 +181,13 @@
 		</tr>
 		<tr>
 		  <td>
+<% if @current_program == "ASTHMA PROGRAM"  %>
 <select id='smoke_history' name='concept[Family health seeking behavior construct]' helpText='Do you have a family member who smokes? ' pos='3'  condition='(__$("smoking").value.toLowerCase() == "yes") && (__$("current_smoker").value.toLowerCase() == "no")'  tt_onLoad ="showCategory('Social History')">
 	 <option></option>
 	 <option value='No'>No</option>
 	<option value='Smoking'>Yes</option>
  </select>
+<% end %>
 		  </td>
 		</tr>
 		<tr>
@@ -243,7 +247,7 @@
 		  <%= touch_hidden_tag "Number of days per week alcohol is used", @patient, nil, {:id => "days_per_week"}%>
 	<% end %>
 	<td>
-	<select id='patient_home' name='concept[home ownership]' helpText='Patient lives or works near? ' pos='3' tt_onLoad ="showCategory('Social History')" >
+	<select id='patient_home' name='concept[Patient lives or works near?]' helpText='Patient lives or works near? ' pos='3' tt_onLoad ="showCategory('Social History')" >
 	 <option></option>
 	 <option value='Near factory'>Near factory</option>
 	 <option value='Near hospital'>Near hospital</option>
@@ -252,15 +256,15 @@
 	</td>
 
 	<td>
-	<select id='exposed' name='concept[Danger sign]' helpText='Patient exposed to pollution? ' pos='3' tt_onLoad ="showCategory('Social History')" >
+	<select id='exposed' name='concept[patient has been exposed to pollution?]' helpText='Patient exposed to pollution? ' pos='3' tt_onLoad ="showCategory('Social History')" >
 	 <option></option>
-	 <option value='Exposed to pollution'>Yes</option>
+	 <option value='Yes'>Yes</option>
 	 <option value='No'>No</option>
    </select>
 	</td>
 
 	<td>
-	<select id='cooking' name='concept[method]' helpText='Patient mode of coking? ' pos='3' tt_onLoad ="showCategory('Social History')" >
+	<select id='cooking' name='concept[patient mode of cooking]' helpText='Patient mode of coking? ' pos='3' tt_onLoad ="showCategory('Social History')" >
 	 <option></option>
 	 <option value='Gas'>Gas</option>
 	 <option value='Electricity'>Electricity</option>

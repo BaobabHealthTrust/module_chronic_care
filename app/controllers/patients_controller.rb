@@ -148,7 +148,7 @@ class PatientsController < ApplicationController
 		@conditions.push("Visit Type											:  First Vist") if  is_first_hypertension_clinic_visit(@person.id) == true
 		@conditions.push("Visit Type											:  Follow up visit") if  is_first_hypertension_clinic_visit(@person.id) != true
 		risk = Vitals.current_encounter(@person.patient, "assessment", "assessment comments") rescue "Previous Hypetension Assessment : Not Available"
-		@conditions.push("Expected Appointment date: #{Vitals.get_patient_attribute_value(@person.patient, 'appointment date').to_date.strftime('%d/%m/%Y')}") if  is_first_hypertension_clinic_visit(@person.id) != true
+		@conditions.push("Expected Appointment date: #{Vitals.get_patient_attribute_value(@person.patient, 'appointment date').to_date.strftime('%d/%m/%Y') rescue 'None'}") if  is_first_hypertension_clinic_visit(@person.id) != true
 		@conditions.push("#{risk} ")
 		@conditions.push("Asthma Expected Peak Flow Rate  : #{Vitals.expectect_flow_rate(@person.patient)} Litres/Minute") if  is_first_hypertension_clinic_visit(@person.id) != true
 		render :layout => 'menu'
@@ -334,34 +334,48 @@ class PatientsController < ApplicationController
 	def patient_visit_label(patient, date = Date.today)
     result = Location.find(session[:location_id]).name.match(/outpatient/i)
 
-    #unless result
-     # return mastercard_visit_label(patient,date)
-   # else
-      label = ZebraPrinter::StandardLabel.new
-      label.font_size = 3
-      label.font_horizontal_multiplier = 1
-      label.font_vertical_multiplier = 1
-      label.left_margin = 50
-      encs = patient.encounters.find(:all,:conditions =>["DATE(encounter_datetime) = ?",date])
-      return nil if encs.blank?
+    label = ZebraPrinter::StandardLabel.new
+    label.draw_text("Printed: #{Date.today.strftime('%b %d %Y')}",597,280,0,1,1,1,false)
+    label.draw_text("#{seen_by(patient,date)}",597,250,0,1,1,1,false)
+    label.draw_text("#{date.strftime("%B %d %Y").upcase}",25,30,0,3,1,1,false)
+    label.draw_text("#{arv_number}",565,30,0,3,1,1,true)
+    label.draw_text("#{patient.name}(#{patient.gender})",25,60,0,3,1,1,false)
+    label.draw_text("#{'(' + visit.visit_by + ')' unless visit.visit_by.blank?}",255,30,0,2,1,1,false)
+    label.draw_text("#{visit.height.to_s + 'cm' if !visit.height.blank?}  #{visit.weight.to_s + 'kg' if !visit.weight.blank?}  #{'BMI:' + visit.bmi.to_s if !visit.bmi.blank?} #{'(PC:' + pill_count[0..24] + ')' unless pill_count.blank?}",25,95,0,2,1,1,false)
+    label.draw_text("SE",25,130,0,3,1,1,false)
+    label.draw_text("TB",110,130,0,3,1,1,false)
+    label.draw_text("Adh",185,130,0,3,1,1,false)
+    label.draw_text("DRUG(S) GIVEN",255,130,0,3,1,1,false)
+    label.draw_text("OUTC",577,130,0,3,1,1,false)
+    label.draw_line(25,150,800,5)
+    label.draw_text("#{visit.tb_status}",110,160,0,2,1,1,false)
+    label.draw_text("#{adherence_to_show(visit.adherence).gsub('%', '\\\\%') rescue nil}",185,160,0,2,1,1,false)
+    label.draw_text("#{visit_data['outcome']}",577,160,0,2,1,1,false)
+    label.draw_text("#{visit_data['outcome_date']}",655,130,0,2,1,1,false)
+    label.draw_text("#{visit_data['next_appointment']}",577,190,0,2,1,1,false) if visit_data['next_appointment']
+    starting_index = 25
+    start_line = 160
 
-      label.draw_multi_text("Visit: #{encs.first.encounter_datetime.strftime("%d/%b/%Y %H:%M")}", :font_reverse => true)
-      encs.each {|encounter|
-        next if encounter.name.upcase == "REGISTRATION"
-        next if encounter.name.upcase == "HIV REGISTRATION"
-        next if encounter.name.upcase == "HIV STAGING"
-        next if encounter.name.upcase == "HIV CLINIC CONSULTATION"
-        next if encounter.name.upcase == "VITALS"
-        next if encounter.name.upcase == "ART ADHERENCE"
-        encounter.to_s.split("<b>").each do |string|
-          concept_name = string.split("</b>:")[0].strip rescue nil
-          obs_value = string.split("</b>:")[1].strip rescue nil
-          next if string.match(/Workstation location/i)
-          next if obs_value.blank?
-          label.draw_multi_text("#{encounter.name.humanize} - #{concept_name}: #{obs_value}", :font_reverse => false)
-        end
-      }
-      label.print(1)
+    visit_data.each{|key,values|
+      data = values.last rescue nil
+      next if data.blank?
+      bold = false
+      #bold = true if key.include?("side_eff") and data !="None"
+      #bold = true if key.include?("arv_given")
+      starting_index = values.first.to_i
+      starting_line = start_line
+      starting_line = start_line + 30 if key.include?("2")
+      starting_line = start_line + 60 if key.include?("3")
+      starting_line = start_line + 90 if key.include?("4")
+      starting_line = start_line + 120 if key.include?("5")
+      starting_line = start_line + 150 if key.include?("6")
+      starting_line = start_line + 180 if key.include?("7")
+      starting_line = start_line + 210 if key.include?("8")
+      starting_line = start_line + 240 if key.include?("9")
+      next if starting_index == 0
+      label.draw_text("#{data}",starting_index,starting_line,0,2,1,1,bold)
+    } rescue []
+    label.print(2)
     #end
   end
 end
