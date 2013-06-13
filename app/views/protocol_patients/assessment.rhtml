@@ -14,7 +14,8 @@ th { text-align: center;
 	overflow: scroll;
   }
   .statusLabel {
-	top: 549px ! important;
+	top: 542px ! important;
+	font-size: 15px ! important;
   }
   #yes4yes70m180{
 	background-color: #B8002E;
@@ -233,6 +234,28 @@ th { text-align: center;
 	border-color:#ff0000 #0000ff;
   }
 
+  .create_button:hover{
+		color:black;
+	  }
+	  
+  a:hover {
+		color:black;
+	  }
+
+ .create_button {
+		background-color: #7784AE;
+		border-bottom: 1px outset black;
+		border-radius: 7px 7px 7px 7px;
+		border-style: outset;
+		border-top: 1px outset black;
+		color: #E8EAF1;
+		display: block;
+		padding: 10px 16px 10px 10px;
+		text-align: center;
+		text-decoration: none !important;
+		font-size:15px;
+		width: 50%;
+	  }
 </style>
 
 <script type='text/javascript' language='javascript'>
@@ -244,7 +267,7 @@ th { text-align: center;
 	var age;
 	var riskValue = "";
 
-
+ 
   function calculateBP(pos){
     var bp;
 
@@ -255,7 +278,35 @@ th { text-align: center;
 
       $("inputFrame" + tstCurrentPage).appendChild(div);
      }
-	 $("bp").innerHTML = "Oxygen Saturation: <i style='font-size: 1.2em; float: right;'>" + riskValue + "</i>";
+	<% if @first_vist == false %>
+		if (riskValue == "< 10 %"){
+		  $("bp").innerHTML = "Reassess cardiovascular risk in 12 months<br>";
+		}
+		else if (riskValue == ">= 10% and < 20%"){
+		  $("bp").innerHTML = "Reassess cardiovascular risk in 6 months<br>";
+		}
+		else{
+		  <% if Location.current_health_center.description.match(/district hospital/i) %>
+			$("bp").innerHTML = "Follow-up monthly<br>Reassess cardiovascular risk in 3 months<br>";
+		 <% end %>
+		 <% if Location.current_health_center.description.match(/health center/i) %>
+			$("bp").innerHTML = "<a class='create_button' href='/protocol_patients/treatment?ext=1&patient_id=<%= @patient.id %>&user_id=<%= @user.id %>'>Refer to next level</a><br>";
+		  <% end %>
+		}
+	<% else %>
+		if ((riskValue == "< 10 %") || (riskValue == ">= 10% and < 20%")){
+		  $("bp").innerHTML = "Counsel on diet, physical activity, smoking cessation<br>";
+		}
+		else{
+		  <% if Location.current_health_center.description.match(/district hospital/i) %>
+			$("bp").innerHTML = "Treat accordingly & follow-up<br>";
+		 <% end %>
+		 <% if Location.current_health_center.description.match(/health center/i) %>
+			$("bp").innerHTML = "<a class='create_button' href='/protocol_patients/treatment?ext=1&patient_id=<%= @patient.id %>&user_id=<%= @user.id %>'>Refer to next level</a><br>";
+		  <% end %>
+		}
+	<% end %>
+	 $("bp").innerHTML += "Risk Value: <i style='font-size: 1.2em; float: right;'>" + riskValue + "</i>";
 	timedEvent = setTimeout('calculateBP(' + pos + ')', 500);
   }
    function showSelectedConditions() {
@@ -270,7 +321,7 @@ th { text-align: center;
 		conditions.push("Smoker : " + '<%= @smoking_status %>');
 
 		if ($('diabetic').value.length > 0)
-        conditions.push("Diabetes : " + $('diabetic').value);
+        conditions.push("Diabetes : " + $('diabetic').value.humanize);
 
 		age = '<%= @patient.age.to_i %>'
 
@@ -421,19 +472,29 @@ th { text-align: center;
 
 	  bg = window.getComputedStyle(elem1, null).backgroundColor;
 	  if (bg == "rgb(51, 102, 0)")
-		riskValue = "< 10 %"
+		{
+		  riskValue = "< 10 %"
+		}
 
 	  if (bg == "rgb(184, 0, 46)")
-		riskValue = ">= 40%"
+		{
+		  riskValue = ">= 40%"
+		}
 
 	  if (bg == "rgb(255, 228, 122)")
-		riskValue = ">= 10% and < 20%"
+		{
+		  riskValue = ">= 10% and < 20%"
+		}
 
 	  if (bg == "rgb(255, 153, 51)")
-		riskValue = ">= 20% and < 30%"
+		{
+		  riskValue = ">= 20% and < 30%"
+		}
 
 	  if (bg == "rgb(255, 51, 51)")
-		riskValue = ">= 30% and < 40%"
+		{
+		  riskValue = ">= 30% and < 40%"
+		}
 
 
 

@@ -1,5 +1,14 @@
 class ReportController < ApplicationController
 
+	def cohort
+		 @quarter = params[:quarter]
+		 @logo = CoreService.get_global_property_value('logo').to_s
+	end
+
+	def cohort_menu
+		render :layout => "application"
+	end
+	
 	def ccc_register
 		@logo = CoreService.get_global_property_value('logo').to_s
 		@report_name = "Chronic Care Clinic Register"

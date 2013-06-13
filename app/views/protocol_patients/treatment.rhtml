@@ -1,3 +1,6 @@
+<style>
+  
+</style>
 <script type='text/javascript' language='javascript'>
 <!--
 	tt_cancel_show = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
@@ -14,6 +17,10 @@
 	<input type='hidden' name='encounter_type' value='TREATMENT ' />
 	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
 	<input type='hidden' name='user_id' value='<%= @user.id %>' />
+	<% if params[:ext].to_i == 1 %>
+	<input type='hidden' id='1.1.1' value="moderate" />
+	<input type='hidden' id='1.1.4' value="no" />
+	<% end %>
 	<table>
 		<tr>
  <% if @current_program != "ASTHMA PROGRAM" %>
@@ -21,12 +28,14 @@
 				Hypertension Category 
 			</td>
 			<td>
+<% if params[:ext].to_i != 1 %>
 <select id='1.1.1' name='concept[Complications]' helpText='Hypertension Category ' pos='1' tt_onload="showCategory('Treatment')" >
 <option></option>
 <option value='Severe'>Severe</option>
  <option value='Moderate'>Moderate</option>
  <option value='Mild'>Mild</option>
  </select>
+<% end %>
 			</td>
 		</tr>
 		<tr>
@@ -104,11 +113,13 @@
 				Is current treatment effective? 
 			</td>
 			<td>
+<% if params[:ext].to_i != 1 %>
 <select id='1.1.4' name='concept[continue treatment]' helpText='Is current treatment effective? ' pos='4'  condition='__$("1.1.1").value.toLowerCase() != "mild"' tt_onload="showCategory('Treatment')" >
 <option></option>
 <option value='No'>No</option>
  <option value='Yes'>Yes</option>
  </select>
+<% end %>
 			</td>
 		</tr>
 		<tr>
@@ -141,7 +152,7 @@
 				ajax_url1 = "/location/tertialy_locations?patient_id=#{@patient.id}&user_id=#{@user['user_id']}&search_string="
 			  %>
 			<td>
-			  <%= touch_location_tag "location",  @patient, nil,
+			  <%= touch_select_tag "location",  @patient, nil,
 			  {	:id => "location",
 			  :value_datetime => true,
 			  :name => "concept[Patient referred to another site]",
@@ -153,7 +164,7 @@
 			</td>
 
 			<td>
-			  <%= touch_location_tag "location",  @patient, nil,
+			  <%= touch_select_tag "location",  @patient, nil,
 			  {	:id => "location",
 			  :value_datetime => true,
 			  :name => "concept[Patient referred to another site]",
@@ -165,6 +176,7 @@
 			</td>
 
 			<td>
+		 
 		  <select id='1.1.10'
 			name='concept[Reason for referral][]'
 			helpText='Referal Reason' 
@@ -201,11 +213,13 @@
 				Prescribe Drugs? 
 			</td>
 			<td>
+<% if params[:ext].to_i != 1 %>
 <select id='1.1.7' name='concept[Prescribe Drugs]' helpText='Prescribe Drugs? ' pos='7' tt_onload="showCategory('Treatment')">
 <option></option>
 <option value='No'>No</option>
  <option value='Yes'>Yes</option>
  </select>
+<% end %>
 			</td>
 		</tr>
 		<!---

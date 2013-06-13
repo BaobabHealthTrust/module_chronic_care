@@ -1,0 +1,82 @@
+<script type='text/javascript' language='javascript'>
+<!--
+	tt_cancel_show = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
+	tt_cancel_destination = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
+	var firstvisit = '<%= @first_visit.to_s %>'
+	</script>
+
+<form method='post' action='/encounters/create'>
+	<input type='hidden' name='program' value='CHRONIC CARE PROGRAM' />
+	<input type='hidden' name='encounter_type' value='CLINIC VISIT ' />
+	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
+	<input type='hidden' name='user_id' value='<%= @user.id %>' />
+	<table>
+		<tr>
+			<td>
+				Is the patient in active seizure? 
+			</td>
+			<td>
+<select id='1.1.1' 
+		name='concept[seizures focal]'
+		helpText='Is the patient in active seizure? '
+		pos='1'
+		tt_requireNextClick = false >
+<option></option>
+<option value='No'>No</option>
+ <option value='Yes'>Yes</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				blood sugar Value 
+			</td>
+			<td>
+<input type='text' id='1.1.2'  
+	   name='concept[blood sugar Value]'
+	   helpText='blood sugar Value '
+	   tt_pageStyleClass='NumbersOnlyWithUnknown'
+	   field_type ="number"
+	   condition='__$("1.1.1").value.toLowerCase() == "yes"'
+	   pos='2' />
+			</td>
+		</tr>
+		<tr>
+			<td>
+				MRDT 
+			</td>
+			<td>
+<input type='text' id='1.1.3'  
+	   name='concept[blood sugar Value]'
+	   helpText='MRDT '
+	   tt_pageStyleClass='NumbersOnlyWithUnknown'
+	   condition='__$("1.1.1").value.toLowerCase() == "yes"'  pos='3' />
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Administer Treatment 
+			</td>
+			<td>
+<% if @first_visit == true and @patient.age > 14 %>
+<select type='text' id='1.1.4'
+	   name='concept[Diazepam]'
+	   helpText='Administer Diazepam '
+	   pos='4' >
+  <option></option>
+  <option value="No">No</option>
+  <option value="Yes">Yes</option>
+</select>
+<% end %>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				time of Seizure
+			</td>
+			<td>
+<input type='text' id='1.1.6'  name='concept[time of Seizure]' helpText='time of Seizure'  fieldtype='time'  pos='6' />
+			</td>
+		</tr>
+	</table>
+</form>

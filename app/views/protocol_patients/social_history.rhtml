@@ -19,6 +19,7 @@
 	tt_cancel_show = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
 	tt_cancel_destination = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
 	var cigaretesPerminute
+	var program = '<%= @current_program %>'
 
   function calculateBP(pos){
     var bp;
@@ -48,7 +49,16 @@
 	function showSelectedConditions() {
       var conditions = [];
 
-      if ($('smoking').value.length > 0)
+      if ($('education').value.length > 0)
+        conditions.push("Highest Education: " + $('education').value);
+	  
+	  if ($('substance_use').value.length > 0)
+        conditions.push("Substance Use: " + $('substance_use').value);
+	  
+	  if ($('pork').value.length > 0)
+        conditions.push("Eats pork: " + $('pork').value);
+
+	  if ($('smoking').value.length > 0)
         conditions.push("Smoke Cigarettes: " + $('smoking').value);
 
       if ($('number_of_cigarettes').value.length > 0){
@@ -121,11 +131,53 @@
 	<%#= raise @patient.age.to_yaml   %>
 	<table>
 		<tr>
+	<select id='education' 
+			name='concept[Education level completed]'
+			helpText='How long Have been smoking? '
+			tt_onLoad ="showCategory('Social History')"
+			condition='program == "EPILEPSY PROGRAM"'
+			tt_requireNextClick = false >
+			  <option></option>
+			  <option value='Tertiary education'>Tertiary education</option>
+			  <option value=' Secondary education '>Secondary education</option>
+			  <option value='Primary education'>Primary education</option>
+			  <option value='None'>None</option>
+	</select>
+
+	<select id='substance_use'
+			name='concept[Substance use]'
+			helpText='Use of substance? '
+			pos='3'
+			condition='program == "EPILEPSY PROGRAM"'
+			tt_onLoad ="showCategory('Social History')"
+			tt_requireNextClick = false >
+			  <option></option>
+			  <option value='No'>No</option>
+			  <option value='Yes'>Yes</option>
+ </select>
+
+ <select id='pork'
+			name='concept[Food package provided]'
+			helpText='Eats pork? '
+			pos='3'
+			condition='program == "EPILEPSY PROGRAM"'
+			tt_onLoad ="showCategory('Social History')"
+			tt_requireNextClick = false >
+			  <option></option>
+			  <option value='Do not eat pork'>No</option>
+			  <option value='Eats pork'>Yes</option>
+ </select>
+
 			<td>
 				Ever smoked?
 			</td>
 			<td>
-<select id='smoking' name='concept[Smoking History]' helpText='Ever smoked? ' pos='0' tt_onLoad ="showCategory('Social History')">
+<select id='smoking'
+		name='concept[Smoking History]'
+		helpText='Ever smoked? '
+		pos='0'
+		tt_onLoad ="showCategory('Social History')"
+		tt_requireNextClick = false >
 <option></option>
 <option value='No'>No</option>
  <option value='Yes'>Yes</option>
@@ -157,7 +209,12 @@
 			</td>
 			<td>
 <% if @current_program == "ASTHMA PROGRAM"  %>
-	   <select id='duration' name='concept[smoking duration]' helpText='How long Have been smoking? ' tt_onLoad ="showCategory('Social History')"  condition='__$("smoking").value.toLowerCase() == "yes"'>
+	   <select id='duration'
+			   name='concept[smoking duration]'
+			   helpText='How long Have been smoking? '
+			   tt_onLoad ="showCategory('Social History')"
+			   condition='__$("smoking").value.toLowerCase() == "yes"'
+			   tt_requireNextClick = false >
 			  <option></option>
 			  <option value='Less than five years'>Less than five years</option>
 			  <option value='Five years or more'>Five years or more</option>
@@ -172,7 +229,13 @@
 			</td>
 			<td>
 
-<select id='current_smoker' name='concept[current smoker]' helpText='Do you currently smoke? ' pos='3'  condition='__$("smoking").value.toLowerCase() == "yes"'  tt_onLoad ="showCategory('Social History')">
+<select id='current_smoker' 
+		name='concept[current smoker]'
+		helpText='Do you currently smoke? '
+		pos='3'
+		condition='__$("smoking").value.toLowerCase() == "yes"'
+		tt_onLoad ="showCategory('Social History')"
+		tt_requireNextClick = false >
 <option></option>
 <option value='No'>No</option>
  <option value='Yes'>Yes</option>
@@ -182,7 +245,13 @@
 		<tr>
 		  <td>
 <% if @current_program == "ASTHMA PROGRAM"  %>
-<select id='smoke_history' name='concept[Family health seeking behavior construct]' helpText='Do you have a family member who smokes? ' pos='3'  condition='(__$("smoking").value.toLowerCase() == "yes") && (__$("current_smoker").value.toLowerCase() == "no")'  tt_onLoad ="showCategory('Social History')">
+<select id='smoke_history' 
+		name='concept[Family health seeking behavior construct]'
+		helpText='Do you have a family member who smokes? '
+		pos='3'
+		condition='(__$("smoking").value.toLowerCase() == "yes") && (__$("current_smoker").value.toLowerCase() == "no")'
+		tt_onLoad ="showCategory('Social History')"
+		tt_requireNextClick = false >
 	 <option></option>
 	 <option value='No'>No</option>
 	<option value='Smoking'>Yes</option>
@@ -201,7 +270,8 @@
 		name='concept[Does the patient drink alcohol?]'
 		helpText='Does patient drink alcohol? '
 		pos='4'
-		 tt_onLoad ="showCategory('Social History')">
+		 tt_onLoad ="showCategory('Social History')"
+		 tt_requireNextClick = false >
 <option></option>
 <option value='No'>No</option>
  <option value='Yes'>Yes</option>
@@ -246,8 +316,14 @@
 		  <%= touch_hidden_tag "Alcoholic drinks per day", @patient, nil, {:id => "drinks_per_day"}%>
 		  <%= touch_hidden_tag "Number of days per week alcohol is used", @patient, nil, {:id => "days_per_week"}%>
 	<% end %>
+    
 	<td>
-	<select id='patient_home' name='concept[Patient lives or works near?]' helpText='Patient lives or works near? ' pos='3' tt_onLoad ="showCategory('Social History')" >
+	<select id='patient_home' 
+			condition='program == "ASTHMA PROGRAM"'
+			name='concept[Patient lives or works near?]'
+			helpText='Patient lives or works near? ' pos='3'
+			tt_onLoad ="showCategory('Social History')"
+			tt_requireNextClick = false >
 	 <option></option>
 	 <option value='Near factory'>Near factory</option>
 	 <option value='Near hospital'>Near hospital</option>
@@ -256,7 +332,13 @@
 	</td>
 
 	<td>
-	<select id='exposed' name='concept[patient has been exposed to pollution?]' helpText='Patient exposed to pollution? ' pos='3' tt_onLoad ="showCategory('Social History')" >
+	<select id='exposed'
+			name='concept[patient has been exposed to pollution?]'
+			helpText='Patient exposed to pollution? '
+			pos='3'
+			condition='program == "ASTHMA PROGRAM"'
+			tt_onLoad ="showCategory('Social History')"
+			tt_requireNextClick = false >
 	 <option></option>
 	 <option value='Yes'>Yes</option>
 	 <option value='No'>No</option>
@@ -264,7 +346,13 @@
 	</td>
 
 	<td>
-	<select id='cooking' name='concept[patient mode of cooking]' helpText='Patient mode of coking? ' pos='3' tt_onLoad ="showCategory('Social History')" >
+	<select id='cooking'
+			name='concept[patient mode of cooking]'
+			helpText='Patient mode of coking? '
+			pos='3'
+			condition='program == "ASTHMA PROGRAM"'
+			tt_onLoad ="showCategory('Social History')"
+			tt_requireNextClick = false >
 	 <option></option>
 	 <option value='Gas'>Gas</option>
 	 <option value='Electricity'>Electricity</option>

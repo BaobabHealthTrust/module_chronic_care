@@ -3,7 +3,7 @@
     font-size: 27px;
     padding-left: 15px;
   }
-  
+
   .data {
     color: black;
     font-size: 25px;
@@ -13,11 +13,50 @@
 <!--
 	tt_cancel_show = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
 	tt_cancel_destination = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
+	var program = '<%= @current_program %>'
+	var maximum = 1;
 
 	function showSelectedConditions() {
       var conditions = [];
 	  var riskValue = 0;
+	  var epValue = 0;
 	  var asthmaRisk = 0;
+
+	   if ($('family_members').value.length > 0){
+		conditions.push("Family members excluding patient: " + $('family_members').value);
+	  }
+	  if ($('position').value.length > 0){
+		value = parseInt($('position').value)
+		if (value == 1){
+		 $('position').value = value + " st Born"
+		}
+		else if (value == 2){
+		 $('position').value = value + " nd Born"
+		}
+		else if (value == 3){
+		 $('position').value = value + " rd Born"
+		}
+		else {
+		 $('position').value = value + " th Born"
+		}
+		conditions.push("Position of patient in family: " + $('position').value);
+	  }
+
+	  if ($('epilepsy').value.length > 0){
+		conditions.push("Family history of Epilepsy: " + $('epilepsy').value);
+	  }
+
+	  if ($('convulsion').value.length > 0){
+		conditions.push("Family history of Convulsions: " + $('convulsion').value);
+	  }
+
+	   if ($('seizures').value.length > 0){
+		conditions.push("Family history of Seizures: " + $('seizures').value);
+	  }
+
+	   if ($('mental_disorder').value.length > 0){
+		conditions.push("Family history of Mental Disorders: " + $('mental_disorder').value);
+	  }
 
       if ($('cardiovascular').value.length > 0){
 		if ($('cardiovascular').value == "Yes")
@@ -25,7 +64,7 @@
 		  asthmaRisk += 1
 		conditions.push("Family history of premature cardiovascular death: " + $('cardiovascular').value);
 	  }
-        
+
 	  if ($('asthma').value.length > 0){
 		if ($('asthma').value == "Yes")
 		  asthmaRisk += 1
@@ -46,7 +85,7 @@
 
 		conditions.push("Family history of diabetes: " + $('diabetes').value);
 	  }
-        
+
 
       if ($('hypertension').value.length > 0){
 		if ($('hypertension').value == "Yes")
@@ -54,11 +93,11 @@
 
 		conditions.push("Family history of hypertension: " + $('hypertension').value);
 	  }
-        
+
       if ($('kidney').value.length > 0){
 		if ($('kidney').value == "Yes")
 		  riskValue += 1
-		
+
 		conditions.push("Family history of kidney disease: " + $('kidney').value);
 	  }
 
@@ -95,19 +134,99 @@
 	  $('inputFrame'+tstCurrentPage).innerHTML = '<div id="summary">' + html + '</div>' ;
 	  $("clearButton").style.display = "none";
   }
+  function setLimit(){
+	maximum = parseInt($('family_members').value) + 1;
+  }
+  function limitNumber(td){
+	if (td.value > maximum){
+	  return false
+	}
+	else {
+	  return true
+	}
+  }
 </script>
 
-<form method='post' action='/encounters/create' id="family_history">
+<form method='post' action='/encounters/create' id="family_history" name="family_history">
 	<input type='hidden' name='program' value='CHRONIC CARE PROGRAM' />
 	<input type='hidden' name='encounter_type' value='FAMILY MEDICAL HISTORY ' />
 	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
 	<input type='hidden' name='user_id' value='<%= @user.id %>' />
-	
-	<select id='cardiovascular' 
+<%#= raise @user.id.to_yaml %>
+	<input type='text' id='family_members'
+	   name='concept[Number of people in household excluding patient]'
+	   helpText='Number of family members '
+	   field_type="number"  pos='1'
+	   min = 1
+	   max = 20
+	   condition='program == "EPILEPSY PROGRAM"'
+	   tt_pageStyleClass = "Numeric NumbersWithUnknown"
+	   tt_onLoad ="showCategory('Family History')"
+	   tt_onUnLoad = "setLimit()"/>
+
+	<input type='text' id='position'
+		 helpText='Patient birth order position'
+		 name='concept[position]'
+		 field_type="number"  pos='1'
+
+		 min = 1
+		 max = 20
+		 validationCode = "limitNumber(this)"
+		 validationMessage = "Birth position can not be greater than total number of people"
+		 condition='program == "EPILEPSY PROGRAM"'
+		 tt_pageStyleClass = "Numeric NumbersWithUnknown"
+		 tt_onLoad ="showCategory('Family History');this.value = ''"/>
+
+  <select id='epilepsy'
+			name='concept[epilepsy]'
+			helpText='Family History of epilepsy? '
+			condition='program == "EPILEPSY PROGRAM"'
+			tt_onLoad ="showCategory('Family History')"
+			tt_requireNextClick = false >
+	<option></option>
+	<option value='No'>No</option>
+	<option value='Yes'>Yes</option>
+	</select>
+
+  	<select id='convulsion'
+			name='concept[Convulsion]'
+			helpText='Family History of Convulsions? '
+			condition='program == "EPILEPSY PROGRAM"'
+			tt_onLoad ="showCategory('Family History')"
+			tt_requireNextClick = false >
+	<option></option>
+	<option value='No'>No</option>
+	<option value='Yes'>Yes</option>
+	</select>
+
+	<select id='seizures'
+			name='concept[Seizures]'
+			helpText='Family History of Seizures '
+			condition='program == "EPILEPSY PROGRAM"'
+			tt_onLoad ="showCategory('Family History')"
+			tt_requireNextClick = false >
+	<option></option>
+	<option value='No'>No</option>
+	<option value='Yes'>Yes</option>
+	</select>
+
+  	<select id='mental_disorder'
+			name='concept[Mental Disorders]'
+			condition='program == "EPILEPSY PROGRAM"'
+			helpText='Family History of Mental Disorders '
+			tt_onLoad ="showCategory('Family History')"
+			tt_requireNextClick = false >
+	<option></option>
+	<option value='No'>No</option>
+	<option value='Yes'>Yes</option>
+	</select>
+<%# end %>
+	<select id='cardiovascular'
 			name='concept[Does the family have a history of cardiovascular related diseases?]'
 			helpText='Family History of Premature cardiovascular death? '
 			tt_onLoad ="showCategory('Family History')"
-			tt_requireNextClick = false />
+			condition='program != "EPILEPSY PROGRAM"'
+			tt_requireNextClick = false >
 	<option></option>
 	<option value='No'>No</option>
 	<option value='Yes'>Yes</option>
@@ -118,6 +237,7 @@
 			helpText='Family History of Diabetes? '
 			pos='1'
 			tt_onLoad ="showCategory('Family History')"
+			condition='program != "EPILEPSY PROGRAM"'
 			tt_requireNextClick = false >
 	<option></option>
 	<option value='No'>No</option>
@@ -129,6 +249,7 @@
 			helpText='Does the family have a history of hypertension? '
 			pos='2'
 			tt_onLoad ="showCategory('Family History')"
+			condition='program != "EPILEPSY PROGRAM"'
 			tt_requireNextClick = false >
 	<option></option>
 	<option value='No'>No</option>
@@ -141,6 +262,7 @@
 			helpText='Family History Kidney disease? '
 			pos='3'
 			tt_onLoad ="showCategory('Family History')"
+			condition='program != "EPILEPSY PROGRAM"'
 			tt_requireNextClick = false >
 	<option></option>
 	<option value='No'>No</option>
@@ -152,6 +274,7 @@
 			helpText='Family History Asthma? '
 			pos='3'
 			tt_onLoad ="showCategory('Family History')"
+			condition='program != "EPILEPSY PROGRAM"'
 			tt_requireNextClick = false >
 	<option></option>
 	<option value='No'>No</option>
@@ -163,12 +286,13 @@
 			helpText='Family History TB? '
 			pos='3'
 			tt_onLoad ="showCategory('Family History')"
+			condition='program != "EPILEPSY PROGRAM"'
 			tt_requireNextClick = false >
 	<option></option>
 	<option value='No'>No</option>
 	<option value='Yes'>Yes</option>
 	</select>
- 
+
 <label for='summary'>Summary</label>
 	<%= text_field_tag :summary, nil, {
 	  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';showCategory('Family History')",

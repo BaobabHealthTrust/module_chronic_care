@@ -132,16 +132,20 @@ if params[:user_id].nil?
 
 	redirect_to '/encounters/no_patient' and return if @user.nil?
 	treatments_list = get_global_property_value("lab_results").split(";") rescue ""
+	if current_program == "EPILEPSY PROGRAM"
+				@sugar = ["FASTING BLOOD SUGAR", "RANDOM BLOOD SUGAR"]
+	else
+				@cholesterol = ["FASTING BLOOD SUGAR", "RANDOM BLOOD SUGAR", "CREATININE", "HbA1c"]
 
-	@cholesterol = ["FASTING BLOOD SUGAR", "RANDOM BLOOD SUGAR", "CREATININE", "HbA1c"]
+				@sugar = ["CHOLESTEROL FASTING", "CHOLESTEROL NOT FASTING", "CREATININE"]
+
+				@cholesterol = treatments_list - @cholesterol
+
+				@sugar = treatments_list - @sugar
+
+				@generic = treatments_list - (@sugar + @cholesterol)
+	end
 	
-	@sugar = ["CHOLESTEROL FASTING", "CHOLESTEROL NOT FASTING", "CREATININE"]
-	
-	@cholesterol = treatments_list - @cholesterol
-
-  @sugar = treatments_list - @sugar
-
-	@generic = treatments_list - (@sugar + @cholesterol)
 
 	end
 
@@ -221,7 +225,7 @@ if params[:user_id].nil?
 	 @treatements_list = ["Heart disease", "Stroke", "TIA", "Diabetes", "Kidney Disease"]
 
 	 @treatements_list.delete_if {|var| var == "Diabetes"} if @diabetic.upcase == "YES"
-
+	 @current_program = current_program
 	end
 
 	def complications
@@ -286,7 +290,7 @@ if params[:user_id].nil?
 		redirect_to "/protocol_patients/vitals?patient_id=#{@patient.id}&user_id=#{@user["user_id"]}" and return
 	end
 	
-  @first_vist = is_first_hypertension_clinic_visit(@person.id)
+  @first_vist = is_first_hypertension_clinic_visit(@patient.id)
 
 	if @cholesterol_value == 0
 		flash[:notice] = "No Cholesterol Value, please capture vitals."
@@ -313,6 +317,9 @@ if params[:user_id].nil?
 	@first_visit = is_first_hypertension_clinic_visit(@patient.id)
 	
 	@current_program = current_program
+		if @current_program == "EPILEPSY PROGRAM"
+				render :template => "/protocol_patients/epilepsy_clinic_visit"
+		end
 
 	end
 
@@ -326,12 +333,14 @@ if params[:user_id].nil?
 			end
 
 			@user = User.find(params[:user_id]) rescue nil?
-
+			
 			redirect_to '/encounters/no_patient' and return if @user.nil?
 
 			@diabetic = Vitals.current_encounter(@patient, "assessment", "Patient has Diabetes") rescue []
 
 			@first_visit = is_first_hypertension_clinic_visit(@patient.id)
+
+			@current_program = current_program
 
 	end
 
@@ -353,6 +362,5 @@ if params[:user_id].nil?
 			@first_visit = is_first_hypertension_clinic_visit(@patient.id)
 			
 			@current_program = current_program
-			#raise @current_program.to_yaml
 	end
 end

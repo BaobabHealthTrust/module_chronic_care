@@ -7,6 +7,94 @@
   #tt_page_any_drug_allergies #viewport {
     height: 200px;
   }
+    #tt_page_patient_has_any_of_the_following #viewport {
+    height: 500px;
+  }
+
+    th { text-align: center;
+	 vertical-align: middle;
+	 background-color: #9250DE;
+	 color: white;
+	 height: 10%;
+	 border-radius: 20px ;
+}
+  #charttable{
+	border-color:#ff0000 #0000ff;
+	border-radius: 20px ;
+	border-style: outset;
+	height: 600px;
+	overflow: scroll;
+  }
+
+  .data {
+    color: black;
+    font-size: 25px;
+  }
+
+  .create_button {
+	background-color: #7784AE;
+	border-bottom: 1px outset black;
+	border-radius: 7px 7px 7px 7px;
+	border-style: outset;
+	border-top: 1px outset black;
+	color: #E8EAF1;
+	display: block;
+	padding: 10px 16px 10px 10px;
+	text-align: center;
+	text-decoration: none !important;
+	font-size:27px;
+	width: 327%;
+	height: 70px;
+  }
+
+  .menu{
+	border-radius: 20px ;
+	border-style:solid;
+	border-color:#ff0000 #0000ff;
+  }
+
+  .range{
+	height: 5%;
+	width: 400px;
+	background-color:white;
+	border-radius: 20px ;
+	border-style:solid;
+	border-color:#ff0000 #0000ff;
+  }
+  #summary_container {
+    bottom: 124px;
+    font-size: 20px;
+    left: 25px;
+    position: absolute;
+    z-index: 600;
+    border-radius: 10px 10px 10px 10px;
+    width: 47.2em;
+    border-style: solid;
+    border-width: 1px;
+    background-color: lightgrey;
+    display: none;
+    -moz-user-select: none;
+    height: 18em;
+    overflow: auto;
+  }
+
+  .summary {
+    font-size: 27px;
+    padding-left: 15px;
+  }
+
+  .header {
+    font-size: 27px;
+    color: white;
+    padding-left: 30px;
+    border-style: solid;
+    border-width: 0px 0px 1px 0px;
+  }
+  .warning{
+	color: red;
+	font-weight:bold;
+	font-size: 25px;
+  }
 </style>
 
 <script type="text/javascript">
@@ -14,6 +102,57 @@
   tt_cancel_destination = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
 
   <% @side_effects = MedicationService.concept_set('MALAWI ART DRUG INDUCED SYMPTOM SET') %>
+var conditions = [];
+
+function selectedOptions(selected){
+	 var x = 1
+      for (i = 0; i < selected.options.length; i++) {
+        if (selected.options[i].selected) {
+            conditions.push( x + " : <i>" + selected.options[i].value) + "</i>";
+			x += 1
+        }
+    }
+
+}
+	function showSelectedConditions() {
+      conditions = [];
+	   var i = 0
+	  if ($('drug_allergy').value.length > 0)
+        conditions.push("Allergies: " + $('drug_allergy').value);
+	  
+      if ($('choice').value.length > 0)
+       { conditions.push("Chronic Diseases: ");
+	   selectedOptions($('choice'));
+	   i += 1
+	 }
+
+
+	  if ($('regimen_concept_id').value.length > 0)
+        {conditions.push("Treatment Received: ");
+		selectedOptions($('regimen_concept_id'))
+	  }
+
+	  if ($('epilepsy').value.length > 0)
+        {
+		  conditions.push("Epilepsy experienced on: ");
+		  selectedOptions($('epilepsy'))
+		}
+
+      var html
+      html = "<ul>"
+      for(var i=0;i < conditions.length;i++) {
+        if (conditions[i].length > 0)
+          html += "<li class='data'>" + conditions[i] + "</li>";
+      }
+      html += "</ul>"
+	  if (i > 0){
+		html += "<span class='warning'>Please refer patient for advice</span>";
+			$('refer_to_clinician').value = "Yes"
+	  }
+
+	  $('inputFrame'+tstCurrentPage).innerHTML = '<div id="summary">' + html + '</div>' ;
+	  $("clearButton").style.display = "none";
+  }
 
 </script>
 <%	@concept = []
@@ -25,8 +164,9 @@
 	<input type='hidden' name='encounter_type' value='GENERAL HEALTH' />
 	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
 	<input type='hidden' name='user_id' value='<%= @user.id %>' />
+	<input type='hidden' name='concept[refer to clinician]' id="refer_to_clinician">
 <% if @diabetic.upcase == "YES" %>
-	<input type='hidden' name='concept[Chronic disease][]' value='Diabetes' />
+	<input type='hidden' name='concept[Chronic disease][]' value='Diabetes' id = "diabetes" />
 <% end %>
 
 <%= select_tag "choice", options_for_select(@treatements_list),
@@ -56,4 +196,20 @@
 	:name => 'concept[Drug Allergy]',
 	:helpText => "Any drug allergies",
 	:tt_onLoad => "showCategory('General Health')"} %>
+
+<%= select_tag "epilepsy", options_for_select(["Effects on occupation", "School", "Marital status", "Overprotection"]),
+		{:id => 'epilepsy',
+		:optional => true,
+		:multiple => true,
+		:name => 'concept[epilepsy][]',
+		:tt_pageStyleClass => "MultiSelectList",
+		:condition => "$('choice').value.length > 0",
+		:helpText => "Effects of Epilepsy experienced on the following: ",
+		:tt_onLoad => "showCategory('General Health')"} %>
+
+<label for='summary'>Summary</label>
+	<%= text_field_tag :summary, nil, {
+	  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';showCategory('General Health')",
+	  :optional => "true",
+	  :tt_pageStyleClass => "NoControls" } %>
 </form>

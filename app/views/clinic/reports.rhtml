@@ -62,15 +62,23 @@
 <div style="width: 100%; text-align: center;">
   <table id="stats" style="margin-bottom: 8px;" cellpadding="5">
     <tr style="color: #fff; background-color: #6281a7;">
-      <th colspan="3" style="padding: 10px;">
+      <th colspan="4" style="padding: 10px;">
         Reports
       </th>
     </tr>
     <tr>
-      <td colspan="3">
+      <td colspan="4">
       </td>
     </tr>
     <tr>
+	  <td style="height: 70px; width: 250px;">
+        <button class="btn" onclick="window.parent.location='/report/cohort_menu?user_id=<%= params[:user_id]
+              %>&location_id=<%= session[:location_id] || params[:location_id] %>'">
+          <span>
+            Cohort
+          </span>
+        </button>
+      </td>
       <td style="height: 70px; width: 250px;">
         <button class="btn" onclick="window.parent.location='/report/ccc_register?user_id=<%= params[:user_id]
               %>&location_id=<%= session[:location_id] || params[:location_id] %>'">

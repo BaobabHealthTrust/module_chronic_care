@@ -2,7 +2,7 @@
 class EncountersController < ApplicationController
 
   def create
-
+		#raise params.to_yaml
     User.current = User.find(@user["user_id"]) rescue nil
 
     Location.current = Location.find(params[:location_id] || session[:location_id]) rescue nil
@@ -81,6 +81,7 @@ class EncountersController < ApplicationController
 				redirect_to params[:next_url] and return if !params[:next_url].nil?
 					begin
 						redirect_to @task.asthma_next_task.url and return if current_program == "ASTHMA PROGRAM"
+						redirect_to @task.epilepsy_next_task.url and return if current_program == "EPILEPSY PROGRAM"
 						redirect_to @task.next_task.url and return
 					rescue
 						redirect_to "/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}&disable=true" and return
@@ -363,8 +364,10 @@ class EncountersController < ApplicationController
 			end
 
 			if params[:encounter_type] == "TREATMENT "
-				if params[:concept]["Prescribe Drugs"].to_s.upcase == "NO"
+				if params[:concept]["Prescribe Drugs"].to_s.upcase == "NO" 
 						redirect_to "/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}&disable=true" and return
+				elsif params[:concept]["Prescribe Drugs"].blank?
+						redirect_to "/protocol_patients/assessment?patient_id=#{params[:patient_id]}&user_id=#{params[:user_id]}&disable=true" and return
 				else
 						redirect_to "/prescriptions/prescribe?user_id=#{@user["user_id"]}&patient_id=#{params[:patient_id]}" and return
 				end
@@ -379,6 +382,7 @@ class EncountersController < ApplicationController
 			end
 			begin
 				redirect_to @task.asthma_next_task.url and return if current_program == "ASTHMA PROGRAM"
+				redirect_to @task.epilepsy_next_task.url and return if current_program == "EPILEPSY PROGRAM"
 				redirect_to @task.next_task.url and return
 			rescue
 				redirect_to "/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}&disable=true" and return

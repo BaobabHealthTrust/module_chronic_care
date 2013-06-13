@@ -85,9 +85,9 @@
 	conntinue.setAttribute('onmousedown','go();')
 	
   }
-
+  <%#= raise @current_task.url.to_yaml %>
   function go() {
-	document.location = "<%= @task.next_task.url rescue backlink %>"
+	document.location = "<%= @current_task.url rescue backlink %>"
   }
 
   function weightGraph(){

@@ -37,8 +37,11 @@ class PatientsController < ApplicationController
       @demographics_url = @demographics_url + "/demographics/#{@patient.id}?user_id=#{@user.id}&ext=true"
     end
 		@demographics_url = "http://" + @demographics_url if !@demographics_url.match(/http:/)
+	
 		if current_program == "ASTHMA PROGRAM"
 			@task.asthma_next_task rescue ""
+		elsif current_program == "EPILEPSY PROGRAM"
+			@task.epilepsy_next_task rescue ""
 		else
 			@task.next_task rescue ""
 		end
@@ -140,7 +143,15 @@ class PatientsController < ApplicationController
 		@relation = params[:relation] rescue nil
 		@person = Person.find(@found_person_id) rescue nil
 		@task = TaskFlow.new(params[:user_id], @person.id) rescue nil
-		@next_task = @task.next_task.encounter_type.gsub('_',' ') rescue nil
+
+		@next_task = @task.next_task.encounter_type.gsub('_',' ') if current_program == "HYPERTENSION PROGRAM" rescue nil
+		@next_task = @task.asthma_next_task.encounter_type.gsub('_',' ') if current_program == "ASTHMA PROGRAM" rescue nil
+		@next_task = @task.epilepsy_next_task.encounter_type.gsub('_',' ') if current_program == "EPILEPSY PROGRAM" rescue nil
+
+		@current_task = @task.next_task if current_program == "HYPERTENSION PROGRAM" rescue nil
+		@current_task = @task.asthma_next_task if current_program == "ASTHMA PROGRAM" rescue nil
+		@current_task = @task.epilepsy_next_task if current_program == "EPILEPSY PROGRAM" rescue nil
+
 		@arv_number = PatientService.get_patient_identifier(@person, 'ARV Number') rescue ""		
 		@patient_bean = PatientService.get_patient(@person) rescue ""
 		@location = Location.find(params[:location_id] || session[:location_id]).name rescue nil

@@ -170,6 +170,11 @@
 	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
 	<input type='hidden' name='user_id' value='<%= @user.id %>' />
 
+  <%= touch_yes_no_tag "seizures focal", @patient, nil,
+			{	:id => 'seizure_focal',
+			:allowFreeText => 'false',
+			:helpText => "Is the patient in active seizure?" } %>
+
   <% options=default.merge({
       :field_type => 'text',
       :helpText => "Select the type of test taken:",
@@ -301,7 +306,7 @@
     <%= hidden_field_tag("observations[][patient_id]", @patient.id) %>
     <%= hidden_field_tag("observations[][obs_datetime]", DateTime.now()) %>
 
-
+<% unless @cholesterol.blank? %>
 	  <% options=default.merge({
       :field_type => 'text',
       :helpText => "Select the type of test taken:",
@@ -312,8 +317,9 @@
 	  :tt_onLoad => "showCategory('Lab Results')"
     }) %>
 
+	
   <%= select_tag("test_type_values",options_for_select(@cholesterol),options)%>
-
+	
     <% options = default.merge({
           :id           => "cf_unit",
           :field_type   => "text",
@@ -429,7 +435,8 @@
     <%= hidden_field_tag("observations[][parent_concept_name]", "", {:id => 'cnf_parent_concept_name'}) %>
     <%= hidden_field_tag("observations[][patient_id]", @patient.id) %>
     <%= hidden_field_tag("observations[][obs_datetime]", DateTime.now()) %>
-
+<% end %>
+<% unless @generic.blank? %>
 	 <% options=default.merge({
       :field_type => 'text',
       :helpText => "Select the type of test taken:",
@@ -440,8 +447,9 @@
 	  :tt_onLoad => "showCategory('Lab Results')"
     }) %>
 
+	
   <%= select_tag("test_type_values",options_for_select(@generic),options)%>
-
+	
  <% options = default.merge({
           :id           => "ctn_unit",
           :field_type   => "text",
@@ -499,7 +507,7 @@
     <%= hidden_field_tag("observations[][parent_concept_name]", "", {:id => 'ctn_parent_concept_name'}) %>
     <%= hidden_field_tag("observations[][patient_id]", @patient.id) %>
     <%= hidden_field_tag("observations[][obs_datetime]", DateTime.now()) %>
-
+<% end %>
 
 
 	<% if @retrospective %>
