@@ -1,3 +1,41 @@
+<style>
+  #tt_page_cause_of_seizure .inputFrameClass {
+  height: 610px;
+}
+  #tt_page_cause_of_seizure #viewport {
+  height: 560px;
+}
+  #tt_page_seizure_duration .inputFrameClass {
+  height: 610px;
+}
+  #tt_page_seizure_duration #viewport {
+  height: 600px;
+}
+  #tt_page_menstrual_history .inputFrameClass {
+  height: 610px;
+}
+  #tt_page_menstrual_history #viewport {
+  height: 600px;
+}
+  #tt_page_what_the_patient_experienced_during_seizure .inputFrameClass {
+  height: 610px;
+}
+  #tt_page_what_the_patient_experienced_during_seizure #viewport {
+  height: 600px;
+}
+  #tt_page_what_the_patient_experienced_after_seizure .inputFrameClass {
+  height: 610px;
+}
+  #tt_page_what_the_patient_experienced_after_seizure #viewport {
+  height: 600px;
+}
+  #tt_page_what_witness_saw .inputFrameClass {
+  height: 610px;
+}
+  #tt_page_what_witness_saw #viewport {
+  height: 560px;
+}
+</style>
 <script type='text/javascript' language='javascript'>
 <!--
 	tt_cancel_show = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
@@ -7,61 +45,42 @@
 
 <form method='post' action='/encounters/create'>
 	<input type='hidden' name='program' value='CHRONIC CARE PROGRAM' />
-	<input type='hidden' name='encounter_type' value='CLINIC VISIT ' />
+	<input type='hidden' name='encounter_type' value='EPILEPSY CLINIC VISIT' />
 	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
 	<input type='hidden' name='user_id' value='<%= @user.id %>' />
+	<input type='hidden' id='seizure_focal'  />
 	<table>
-		<tr>
-			<td>
-				Is the patient in active seizure? 
-			</td>
-			<td>
-<select id='1.1.1' 
-		name='concept[seizures focal]'
-		helpText='Is the patient in active seizure? '
-		pos='1'
-		tt_requireNextClick = false >
-<option></option>
-<option value='No'>No</option>
- <option value='Yes'>Yes</option>
- </select>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				blood sugar Value 
-			</td>
-			<td>
-<input type='text' id='1.1.2'  
-	   name='concept[blood sugar Value]'
-	   helpText='blood sugar Value '
-	   tt_pageStyleClass='NumbersOnlyWithUnknown'
-	   field_type ="number"
-	   condition='__$("1.1.1").value.toLowerCase() == "yes"'
-	   pos='2' />
-			</td>
-		</tr>
-		<tr>
-			<td>
-				MRDT 
-			</td>
-			<td>
-<input type='text' id='1.1.3'  
-	   name='concept[blood sugar Value]'
-	   helpText='MRDT '
-	   tt_pageStyleClass='NumbersOnlyWithUnknown'
-	   condition='__$("1.1.1").value.toLowerCase() == "yes"'  pos='3' />
-			</td>
-		</tr>
-		<tr>
+
+
+	  <tr>
+		<td>
+<% if params[:repeat] == "true" %>
+  <%= touch_yes_no_tag "seizures focal", @patient, nil,
+			{	:id => 'seizure_focal',
+			:name => 'concept[Patient in active seizure]',
+			:allowFreeText => 'false',
+			:helpText => "Is the patient still in active seizure?" } %>
+<% end %>	
+		</td>
 			<td>
 				Administer Treatment 
 			</td>
 			<td>
-<% if @first_visit == true and @patient.age > 14 %>
+<% if @first_visit == true and @patient.age > 14 and @mrdt == "YES" %>
 <select type='text' id='1.1.4'
 	   name='concept[Diazepam]'
-	   helpText='Administer Diazepam '
+	   helpText='Administer 10mg iv Diazepam'
+	   condition ="$('seizure_focal').value.toLowerCase() != 'no'"
+	   pos='4' >
+  <option></option>
+  <option value="No">No</option>
+  <option value="Yes">Yes</option>
+</select>
+<% elsif @first_visit == true and @patient.age <= 14 and @mrdt == "YES" %>
+<select type='text' id='1.1.4'
+	   name='concept[Diazepam]'
+	   helpText='Administer (paraldehyde 0.2mls/kg) Diazepam'
+	   condition ="$('seizure_focal').value.toLowerCase() != 'no'"
 	   pos='4' >
   <option></option>
   <option value="No">No</option>
@@ -75,8 +94,366 @@
 				time of Seizure
 			</td>
 			<td>
-<input type='text' id='1.1.6'  name='concept[time of Seizure]' helpText='time of Seizure'  fieldtype='time'  pos='6' />
+<% unless params[:repeat] == "true" %>
+<input type='text' id='1.1.6'
+	   name='concept[date of seizure]'
+	   helpText='Date of Seizure'
+	   field_type='date'
+	   pos='6' />
+
+<input type='text' id='1.1.7'
+	   name='concept[time of seizure]'
+	   helpText='Time of Seizure'
+	   field_type='advancedTime'
+	   pos='6' />
+
 			</td>
 		</tr>
+		<tr>
+			<td>
+				Year of first Seizure
+			</td>
+			<td>
+<input type='text' id='1.1.7'
+	   name='concept[Year of first Seizure]'
+	   helpText='Year of first Seizure'
+	   absoluteMax = '<%= Date.today.year %>'
+	   absoluteMin = '<%= Date.today.year.to_i - @patient.age.to_i %>'
+	   field_type='number' 
+	   tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"
+	   pos='7' />
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Age of first Seizure
+			</td>
+			<td>
+<input type='text'
+	   id='1.1.8'
+	   name='concept[Age of first Seizure]'
+	   helpText='Age of first Seizure'
+	   absoluteMax = '<%= @patient.age.to_i %>'
+	   absoluteMin = 0
+	   tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"
+	   field_type='number'  pos='8' />
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Cause of Seizure
+			</td>
+			<td>
+<select id='1.1.9'
+		name='concept[Cause of Seizure][]'
+		helpText='Cause of Seizure' pos='9'
+		multiple="multiple"
+		optional="true"
+		tt_onLoad ="__$('keyboard').style.display = 'none';"
+		field_type="text" >
+<option></option>
+<option value='alcohol or drugs'>alcohol or drugs</option>
+<option value='head or brain trauma'>head or brain trauma</option>
+<option value='progressive brain disease'>progressive brain disease</option>
+<option value='hemimegalencephaly'>hemimegalencephaly</option>
+<option value='stroke'>stroke</option>
+<option value='brain tumors'>brain tumors</option>
+<option value='cortical dysplasia'>cortical dysplasia</option>
+<option value='mesial temporal sclerosis'>mesial temporal sclerosis</option>
+<option value='drug withdrawal'>drug withdrawal</option>
+<option value='medications'>medications</option>
+
+<option value='birth trauma'>birth trauma</option>
+ <option value='Alzheimer's disease'>Alzheimer's disease</option>
+ <option value='neurological problems'>neurological problems</option>
+ <option value='infection'>infection</option>
+ <option value='fever/infection'>fever/infection</option>
+ <option value='metabolic or chemical imbalances in the body'>metabolic or chemical imbalances in the body</option>
+ <option value='Menstruation'>Menstruation</option>
+ <option value='congenital (present at birth) problems or conditions'>congenital (present at birth) problems or conditions</option>
+ <option value='genetic factors'>genetic factors</option>
+<option value='unknown'>unknown</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				How often seizure occurs
+			</td>
+			<td>
+<select id='seizure_occurance' name='concept[How often seizure occurs]' helpText='How often seizure occurs' fieldtype='number'  pos='10' >
+<option></option>
+<option value='regularly'>Regularly</option>
+ <option value='Occasionally'>Occasionally</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Duration
+			</td>
+			<td>
+<select id='seizure_occurance'
+		name='concept[Seizures]'
+		helpText='Seizure duration'
+		tt_onLoad ="__$('keyboard').style.display = 'none';"
+		pos='10'
+		field_type="text" >
+<option></option>
+<option value='less than 1 hour'>less than 1 hour</option>
+<option value='1 hour'>1 hour</option>
+<% (2..10).each do |i| %>
+<option value='<%= i %> hours'><%= i %> hours</option>
+<%  end %>
+<option value='More than 10 hours'>More than 10 hours</option>
+ <option value='unknown'>unknown</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				How often seizure occurs
+			</td>
+			<td>
+<select id='1.1.10' name='concept[Seizure remission]' helpText='Seizure remission' fieldtype='number'  pos='10' >
+<option></option>
+<option value='Spontaneous'>Spontaneous</option>
+ <option value='Has not improved'>Has not improved</option>
+ <option value='Has improved'>Has improved</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Head injuries
+			</td>
+			<td>
+<select id='1.1.11' name='concept[Head injury]' helpText='Head injuries' pos='13' >
+<option></option>
+<option value='No'>No</option>
+ <option value='Yes'>Yes</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Head surgery
+			</td>
+			<td>
+<select id='1.1.12' name='concept[surgery]' helpText='Head surgery' pos='14' >
+<option></option>
+<option value='No'>No</option>
+ <option value='Yes'>Yes</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Complications during patient's birth
+			</td>
+			<td>
+<select id='1.1.13' name="concept[Complications during patient's birth]" helpText="Complications during patient's birth" pos='15' >
+<option></option>
+<option value='Development'>Development</option>
+ <option value='Neonatal'>Neonatal</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Menstrual History
+			</td>
+			<td>
+<select id='1.1.14' 
+		name='concept[Menstrual History][]'
+		helpText='Menstrual History'
+		pos='16'
+		tt_onLoad ="__$('keyboard').style.display = 'none';"
+		multiple="multiple"
+		optional="true"
+		field_type="text" >
+<option></option>
+<option value='Rising feeling in the stomach'>Rising feeling in the stomach</option>
+ <option value='Darkening in eyes'>Darkening in eyes</option>
+ <option value='Heart palpitations'>Heart palpitations</option>
+ <option value='Strange Smell'>Strange Smell</option>
+ <option value='Headeche'>Headeche</option>
+ <option value='Dizziness'>Dizziness</option>
+ <option value='Jerking/witching'>Jerking/witching</option>
+ <option value='Tingling'>Tingling</option>
+ <option value='Numbness'>Numbness</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				what the patient experienced during seizure
+			</td>
+			<td>
+<select id='1.1.15' 
+		name='concept[what patient experienced during seizure][]'
+		helpText='What patient experienced during seizure'
+		pos='17'
+		multiple="multiple"
+		optional="true"
+		tt_onLoad ="__$('keyboard').style.display = 'none';"
+		field_type="text" >
+<option></option>
+<option value='Rising feeling in the stomach'>Rising feeling in the stomach</option>
+ <option value='Darkening in eyes'>Darkening in eyes</option>
+ <option value='Heart palpitations'>Heart palpitations</option>
+ <option value='Strange Smell'>Strange Smell</option>
+ <option value='Headeche'>Headeche</option>
+ <option value='Dizziness'>Dizziness</option>
+ <option value='Jerking/witching'>Jerking/witching</option>
+ <option value='Tingling'>Tingling</option>
+ <option value='Numbness'>Numbness</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				what the patient experienced after seizure
+			</td>
+			<td>
+<select id='1.1.16' 
+		name='concept[observation][]'
+		helpText='What the patient experienced after seizure '
+		pos='18'
+		multiple="multiple"
+		optional="true"
+		tt_onLoad ="__$('keyboard').style.display = 'none';"
+		field_type="text" >
+<option></option>
+<option value='Loss of memory'>Loss of memory</option>
+ <option value='Tiredness'>Tiredness</option>
+ <option value='Muscle aches'>Muscle aches</option>
+ <option value='Weakness'>Weakness</option>
+ <option value='Sleepiness'>Sleepiness</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				witness was available before the seizure
+			</td>
+			<td>
+<select id='1.1.17'
+		name='concept[was witness available before seizure?]'
+		helpText='Witness was available before the seizure '
+		pos='19' >
+<option></option>
+<option value='No'>No</option>
+ <option value='Yes'>Yes</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				What witness saw
+			</td>
+			<td>
+<select id='1.1.18'
+		name='concept[witness saw before seizure][]'
+		helpText='What witness saw '
+		condition='$("1.1.17").value == "Yes"'
+		pos='20'
+		multiple="multiple"
+		optional="true"
+		tt_onLoad ="__$('keyboard').style.display = 'none';"
+		field_type="text" >
+<option></option>
+<option value='Crying'>Crying</option>
+ <option value='Shouting'>Shouting</option>
+ <option value='Irritability'>Irritability</option>
+ <option value='Change in facial appearance (Red eyes)'>Change in facial appearance (Red eyes)</option>
+ <option value='Change in mood/behavior'>Change in mood/behavior</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				witness was available during seizure
+			</td>
+			<td>
+<select id='1.1.19'
+		name='concept[was witness available during seizure?]'
+		helpText='Witness was available during seizure '
+		pos='21' >
+<option></option>
+<option value='No'>No</option>
+ <option value='Yes'>Yes</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				What witness saw
+			</td>
+			<td>
+<select id='1.1.20'
+		name='concept[witness saw during seizure][]'
+		helpText='What witness saw'
+		condition='$("1.1.19").value == "Yes"'
+		pos='22'
+		multiple="multiple"
+		optional="true"
+		tt_onLoad ="__$('keyboard').style.display = 'none';"
+		field_type="text" >
+<option></option>
+<option value='Bitting tongue or lips'>Bitting tongue or lips</option>
+<option value='Incontinence of stool/urine'>Incontinence of stool/urine</option>
+<option value='Foaming'>Foaming</option>
+ <option value='Cyanosis'>Cyanosis</option>
+ <option value='Noisy /labored breathing'>Noisy /labored breathing</option>
+ <option value='Rhythmical of jerk in the trunk'>Rhythmical of jerk in the trunk</option>
+ <option value='Movement/jerking of limbs'>Movement/jerking of limbs</option>
+ <option value='Facial twitching'>Facial twitching</option>
+ <option value='Fall'>Fall</option>
+ <option value='CLoss of consciousness'>CLoss of consciousness</option>
+ <option value='Stiffening or limpness of the body'>Stiffening or limpness of the body</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				witness was available after seizure
+			</td>
+			<td>
+<select id='1.1.21'
+		name='concept[was witness available after seizure?]'
+		helpText='Witness was available after seizure '
+		pos='23' >
+<option></option>
+<option value='No'>No</option>
+ <option value='Yes'>Yes</option>
+ </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				What witness saw
+			</td>
+			<td>
+<select id='1.1.22' 
+		name='concept[witness saw after seizure][]'
+		helpText='What witness saw '
+		pos='24'
+		multiple="multiple"
+		condition='$("1.1.21").value == "Yes"'
+		optional="true"
+		tt_onLoad ="__$('keyboard').style.display = 'none';"
+		field_type="text" >
+<option></option>
+<option value='Confusion'>Confusion</option>
+ <option value='Inactivity'>Inactivity</option>
+ <option value='Change in mood'>Change in mood</option>
+ <option value='Weakness'>Weakness</option>
+ <option value='Sleepiness'>Sleepiness</option>
+ </select>
+<% end %>
+			</td>
+		</tr>
+
 	</table>
 </form>

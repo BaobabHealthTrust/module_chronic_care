@@ -83,7 +83,7 @@
   tt_cancel_destination = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
   var currentBmi;
   var currentWeight;
-  var currentHeight;
+  var currentHeight = '<%= @current_hieght %>'
   var currentHeightPercentile;
   var currentWeightPercentile;
   var displayText;
@@ -211,7 +211,6 @@
 
    function showSelectedConditions() {
       var conditions = [];
-	  currentHeight = '<%= @current_hieght %>'
 	  sex = '<%= @patient.gender.downcase  rescue "" %>'
 	  if (sex == "female")
 		  sex = "f"
@@ -705,7 +704,7 @@
 	 tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"
 	 tt_onLoad ="showCategory('Vitals')"/>
 
-<% if @current_height.to_i == 0 %>
+<% if @current_height == 0 %>
 	<input type='text' id='height'
 	name='concept[Height (cm)]'
 	helpText='Height (cm)'

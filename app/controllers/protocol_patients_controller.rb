@@ -145,7 +145,8 @@ if params[:user_id].nil?
 
 				@generic = treatments_list - (@sugar + @cholesterol)
 	end
-	
+
+	@current_program = current_program
 
 	end
 
@@ -162,7 +163,8 @@ if params[:user_id].nil?
 	@user = User.find(params[:user_id]) rescue nil?
 
 	redirect_to '/encounters/no_patient' and return if @user.nil?
-	@current_hieght = Vitals.get_patient_attribute_value(@patient, "current_height")
+	@current_hieght = Vitals.current_vitals(@patient, "HEIGHT (CM)").value_numeric.to_i rescue 0
+	
 	@treatements_list = get_global_property_value("vitals").split(";") rescue ""
 
 	end
@@ -299,7 +301,7 @@ if params[:user_id].nil?
 	end
 
 	def clinic_visit
-
+	#raise params.to_yaml
 	@patient = Patient.find(params[:patient_id]) rescue nil
 
 	redirect_to '/encounters/no_patient' and return if @patient.nil?
@@ -318,6 +320,10 @@ if params[:user_id].nil?
 	
 	@current_program = current_program
 		if @current_program == "EPILEPSY PROGRAM"
+			  @mrdt = Vitals.current_vitals(@patient, "RDT or blood smear positive for malaria") rescue nil
+				unless @mrdt.blank?
+						@mrdt = @mrdt.value_text.upcase rescue ConceptName.find_by_concept_id(@mrdt.value_coded).name.upcase
+				end
 				render :template => "/protocol_patients/epilepsy_clinic_visit"
 		end
 

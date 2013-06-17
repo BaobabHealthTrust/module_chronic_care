@@ -82,15 +82,15 @@
 			def self.current_vitals(patient, vital_sign, session_date = Time.now())
 				concept = ConceptName.find_by_name(vital_sign).concept_id
 				Observation.find(:first,:order => "obs_datetime DESC, date_created DESC",
-                                  :conditions =>["DATE(obs_datetime) <= ? AND person_id = ? AND concept_id = ?",
-                                  session_date,patient.id, concept])
+                                  :conditions =>["obs_datetime <= ? AND person_id = ? AND concept_id = ?",
+                                  session_date, patient.id, concept])
 			end
 
 			def self.current_encounter(patient, enc, concept, session_date = Date.today)
 				concept = ConceptName.find_by_name(concept).concept_id
 				encounter = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
                                   :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
-                                  session_date ,patient.id,EncounterType.find_by_name(enc).id]).encounter_id
+                                  session_date ,patient.id, EncounterType.find_by_name(enc).id]).encounter_id
 				Observation.find(:all, :order => "obs_datetime DESC,date_created DESC", :conditions => ["encounter_id = ? AND concept_id = ?", encounter, concept])
 			end
 

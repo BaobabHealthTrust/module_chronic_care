@@ -375,10 +375,20 @@ class EncountersController < ApplicationController
       @task = TaskFlow.new(params[:user_id] || User.first.id, patient.id)
 			
       redirect_to params[:next_url] and return if !params[:next_url].nil?
-
+			
 			if params[:encounter_type].to_s.upcase == "APPOINTMENT"
 						print_and_redirect("/patients/dashboard_print_visit/#{params[:patient_id]}?user_id=#{params[:user_id]}","/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}")
 						return
+			elsif params[:encounter_type].to_s.upcase == "EPILEPSY CLINIC VISIT"
+						@mrdt = Vitals.current_vitals(Patient.find(params[:patient_id]), "Patient in active seizure")
+						
+						unless @mrdt.blank?
+								@mrdt = @mrdt.value_text.upcase rescue ConceptName.find_by_concept_id(@mrdt.value_coded).name.upcase
+								if @mrdt == "YES"
+									redirect_to "/protocol_patients/clinic_visit?patient_id=#{params[:patient_id]}&user_id=#{params[:user_id]}&repeat=true"
+									return
+								end
+						end
 			end
 			begin
 				redirect_to @task.asthma_next_task.url and return if current_program == "ASTHMA PROGRAM"
