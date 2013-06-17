@@ -165,7 +165,7 @@ class TaskFlow
 					next if ! self.current_user_activities.include?(tsk.downcase)
           visit = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
                                   :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name("DIABETES HYPERTENSION INITIAL VISIT").id])
+                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name("EPILEPSY CLINIC VISIT").id])
 
 					next if !visit.blank?
 
