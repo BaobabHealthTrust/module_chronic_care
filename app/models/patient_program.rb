@@ -55,10 +55,10 @@ class PatientProgram < ActiveRecord::Base
 			#raise self.program.program_workflows.map(&:program_workflow_states).flatten.to_yaml
       #selected_state = self.program.program_workflows.map(&:program_workflow_states).flatten.select{|pws|
 				selected_state = ""
-				#raise params[:state]["state"].to_yaml
+				#raise params[:state].to_yaml
        # pws.concept.fullname.upcase() == params[:state].upcase()}.first rescue nil
 			 self.program.program_workflows.map(&:program_workflow_states).flatten.select{|pws|
-				selected_state = pws if pws.concept.fullname.upcase == params[:state]["state"].upcase
+				selected_state = pws if pws.concept.fullname.upcase == (params[:state]["state"].upcase || params[:state].to_yaml)
 				} 
 				
       state = self.patient_states.last rescue []

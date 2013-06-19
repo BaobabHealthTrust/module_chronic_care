@@ -42,7 +42,11 @@
 	tt_cancel_destination = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
 	var firstvisit = '<%= @first_visit.to_s %>'
 	</script>
-
+<%
+sex = @patient.gender.upcase
+				sex = 'M' if @patient.gender.upcase == 'MALE'
+				sex = 'F' if @patient.gender.upcase == 'FEMALE'
+				%>
 <form method='post' action='/encounters/create'>
 	<input type='hidden' name='program' value='CHRONIC CARE PROGRAM' />
 	<input type='hidden' name='encounter_type' value='EPILEPSY CLINIC VISIT' />
@@ -105,7 +109,7 @@
 	   name='concept[time of seizure]'
 	   helpText='Time of Seizure'
 	   field_type='advancedTime'
-	   pos='6' />
+	   pos='28' />
 
 			</td>
 		</tr>
@@ -114,6 +118,7 @@
 				Year of first Seizure
 			</td>
 			<td>
+<% if @first_visit == true %>
 <input type='text' id='1.1.7'
 	   name='concept[Year of first Seizure]'
 	   helpText='Year of first Seizure'
@@ -122,6 +127,7 @@
 	   field_type='number' 
 	   tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"
 	   pos='7' />
+
 			</td>
 		</tr>
 		<tr>
@@ -137,6 +143,7 @@
 	   absoluteMin = 0
 	   tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"
 	   field_type='number'  pos='8' />
+<% end %>
 			</td>
 		</tr>
 		<tr>
@@ -252,11 +259,13 @@
 				Complications during patient's birth
 			</td>
 			<td>
+<% if @first_visit == true %>
 <select id='1.1.13' name="concept[Complications during patient's birth]" helpText="Complications during patient's birth" pos='15' >
 <option></option>
 <option value='Development'>Development</option>
  <option value='Neonatal'>Neonatal</option>
  </select>
+<% end %>
 			</td>
 		</tr>
 		<tr>
@@ -264,6 +273,7 @@
 				Menstrual History
 			</td>
 			<td>
+<% if sex == 'F' %>
 <select id='1.1.14' 
 		name='concept[Menstrual History][]'
 		helpText='Menstrual History'
@@ -283,6 +293,7 @@
  <option value='Tingling'>Tingling</option>
  <option value='Numbness'>Numbness</option>
  </select>
+<% end %>
 			</td>
 		</tr>
 		<tr>

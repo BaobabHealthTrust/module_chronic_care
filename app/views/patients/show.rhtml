@@ -34,7 +34,12 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
 <% if !next_task.nil? %>
     setTimeout("showNexttask()", 500);
 <% end %>
-  
+
+  function addDiv(){
+	alert("here")
+	var html = "<div style='display: table-row;'><div style='display: table-cell;margin: 5px;margin-top: 0px;padding: 2px;'>Patient State</div><div style='display: table-cell;margin: 5px;margin-top: 0px;padding: 2px;'>State</div>";
+	document.getElementById('mainTopicContent').innerHTML += html;
+  }
 </script>
 
 <style type="text/css">
@@ -84,7 +89,7 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
 
 <div id='contented'>
   <div id='description' style='color:#777;position:absolute;margin-top:-70px;'>
-    <form id = 'dashboard' action='home.html'>
+    <form id = 'dashboard' action='home.html' onload="addDiv()">
       <div>Patient Dashboard</div>
       <div id='project_name'>
         <div style="margin-top: 0px; color: #6281A7; font-size: 0.6em;">
@@ -102,7 +107,7 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
         <option value='/patients/current_visit/<%= @patient.id %>?user_id=<%= @user.id %>'>Current Visit</option>
         <option value='/patients/visit_history/<%= @patient.id %>?user_id=<%= @user.id %>'>Visit History</option>
 		<option value='/patients/patient_report/<%= @patient.id %>?user_id=<%= @user.id %>'>Report</option>
-		<!-- <option value='/patients/hiv_status/<%= @patient.id %>?user_id=<%= @user.id %>'>HIV Status</option> --->
+		
       </select>
       <select id="links">
 

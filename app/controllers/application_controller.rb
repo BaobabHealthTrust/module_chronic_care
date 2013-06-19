@@ -35,8 +35,20 @@ class ApplicationController < ActionController::Base
 		return false
 	end
 
+  def is_first_epilepsy_clinic_visit(patient_id)
+		session_date = session[:datetime].to_date rescue Date.today
+		hyp_encounter = Encounter.find(:first,:conditions =>["voided = 0 AND patient_id = ? AND encounter_type = ? AND DATE(encounter_datetime) < ?",
+				patient_id, EncounterType.find_by_name('EPILEPSY CLINIC VISIT').id, session_date ]) rescue nil
+		return true if hyp_encounter.nil?
+		return false
+	end
+
 	def current_program
 		return session[:selected_program] rescue "HYPERTENSION PROGRAM"
+	end
+
+  def present_date
+		return  session[:datetime].to_date rescue Date.today
 	end
 
   protected

@@ -114,7 +114,9 @@ if params[:user_id].nil?
 	@user = User.find(params[:user_id]) rescue nil?
 
 	redirect_to '/encounters/no_patient' and return if @user.nil?
-	
+	if current_program == "EPILEPSY PROGRAM"
+		render :template => "/protocol_patients/epilepsy_diagnosis"
+	end
 
 	end
 
@@ -316,17 +318,18 @@ if params[:user_id].nil?
 
 	@diabetic = Vitals.current_encounter(@patient, "assessment", "Patient has Diabetes") rescue []
 	
-	@first_visit = is_first_hypertension_clinic_visit(@patient.id)
+	
 	
 	@current_program = current_program
 		if @current_program == "EPILEPSY PROGRAM"
+			  @first_visit = is_first_epilepsy_clinic_visit(@patient.id)
 			  @mrdt = Vitals.current_vitals(@patient, "RDT or blood smear positive for malaria") rescue nil
 				unless @mrdt.blank?
 						@mrdt = @mrdt.value_text.upcase rescue ConceptName.find_by_concept_id(@mrdt.value_coded).name.upcase
 				end
 				render :template => "/protocol_patients/epilepsy_clinic_visit"
 		end
-
+		@first_visit = is_first_hypertension_clinic_visit(@patient.id) unless current_program == "EPILEPSY PROGRAM"
 	end
 
 	def family_history

@@ -154,8 +154,8 @@ class EncountersController < ApplicationController
                 obs.update_attribute("value_datetime", value)
 
               when "time"
-
-                obs.update_attribute("value_datetime", "#{Date.today.strftime("%Y-%m-%d")} " + value)
+								obs.update_attribute("value_text", value) if key == "time of seizure"
+                obs.update_attribute("value_datetime", "#{Date.today.strftime("%Y-%m-%d")} " + value) if key != "time of seizure"
 
               when "number"
 
@@ -363,8 +363,8 @@ class EncountersController < ApplicationController
 				#end
 			end
 
-			if params[:encounter_type] == "TREATMENT "
-				if params[:concept]["Prescribe Drugs"].to_s.upcase == "NO" 
+			if params[:encounter_type] == "TREATMENT"
+				if params[:concept]["Prescribe Drugs"].to_s.upcase == "EPILEPSY DRUGS" || params[:concept]["Prescribe Drugs"].to_s.upcase == "HYPERTENSION/DIABETES DRUGS" || params[:concept]["Prescribe Drugs"].to_s.upcase == "ASTHMA DRUGS"
 						redirect_to "/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}&disable=true" and return
 				elsif params[:concept]["Prescribe Drugs"].blank?
 						redirect_to "/protocol_patients/assessment?patient_id=#{params[:patient_id]}&user_id=#{params[:user_id]}&disable=true" and return

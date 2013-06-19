@@ -2,6 +2,10 @@
 <!--
 	tt_cancel_show = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
 	tt_cancel_destination = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
+	function changeProgram(){
+	  alert($('1.1.1').value)
+	  $('outcome').value = $('1.1.1').value
+	}
 	</script>
 
 <form method='post' action='/encounters/create'>
@@ -9,21 +13,40 @@
 	<input type='hidden' name='encounter_type' value='UPDATE OUTCOME' />
 	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
 	<input type='hidden' name='user_id' value='<%= @user.id %>' />
+	<input type='hidden' id="outcome" name='concept[outcome]' />
 	<table>
 		<tr>
 			<td>
 				New Outcome 
 			</td>
 			<td>
-<select id='1.1.1' name='programs[][states][][state]'  helpText='New Outcome ' pos='1' >
+<select id='1.1.1' 
+		name='programs[][states][][state]'
+		helpText='New Outcome '
+		pos='1'
+		tt_onload= "showCategory('Outcome Update')"
+		tt_onUnload ="changeProgram()">
 <option></option>
 <option value='Patient transferred out'>Patient Transfered Out</option>
  <option value='Patient died'>Patient Died</option>
  <option value='Discharged'>Discharged</option>
- <option value ="on treatment">On treatment</option>
- <option value='Alive'>Alive</option>
+ <option value ='On treatment'>On treatment</option>
+ <option value ='Patient defaulted'>Defaulted</option>
  </select>
+		</td>
+<td>
+			  <%= touch_select_tag "location",  @patient, nil,
+			  {	:id => "location",
+			  :value_datetime => true,
+			  :name => "concept[transferred to]",
+			  :helpText => "Select Location transferred to:",
+			  :ajaxURL => '/location/locations?search_string=',
+			  :condition => '$("1.1.1").value == "Patient transferred out"',
+			  :tt_onload=> "showCategory('Outcome Update')"
+			}%>
 			</td>
+
+			
 		</tr>
 	</table>
 </form>

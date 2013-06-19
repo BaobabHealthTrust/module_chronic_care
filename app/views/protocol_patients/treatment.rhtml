@@ -14,7 +14,7 @@
 
 <form method='post' action='/encounters/create'>
 	<input type='hidden' name='program' value='CHRONIC CARE PROGRAM' />
-	<input type='hidden' name='encounter_type' value='TREATMENT ' />
+	<input type='hidden' name='encounter_type' value='TREATMENT' />
 	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
 	<input type='hidden' name='user_id' value='<%= @user.id %>' />
 	<% if params[:ext].to_i == 1 %>
@@ -216,8 +216,9 @@
 <% if params[:ext].to_i != 1 %>
 <select id='1.1.7' name='concept[Prescribe Drugs]' helpText='Prescribe Drugs? ' pos='7' tt_onload="showCategory('Treatment')">
 <option></option>
-<option value='No'>No</option>
- <option value='Yes'>Yes</option>
+<option value='Hypertension/Diabetes drugs'>Hypertension/Diabetes drugs</option>
+ <option value='Asthma drugs'>Asthma drugs</option>
+ <option value='No'>None</option>
  </select>
 <% end %>
 			</td>

@@ -168,7 +168,7 @@ class DispensationsController < ApplicationController
     observations.each do |ob|
       @transfer_out_site = ob.to_s if ob.to_s.include?('Transfer out to')
     end
-
+		#raise complete.to_yaml
     if complete
       unless params[:location]
         if (CoreService.get_global_property_value('auto_set_appointment') rescue false) && (@transfer_out_site.blank?)

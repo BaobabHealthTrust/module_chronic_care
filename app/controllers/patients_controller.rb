@@ -53,7 +53,7 @@ class PatientsController < ApplicationController
   def current_visit
     @patient = Patient.find(params[:id] || params[:patient_id]) rescue nil
 
-    ProgramEncounter.current_date = (session[:date_time] || Time.now)
+    ProgramEncounter.current_date = (session[:datetime] || Time.now)
     
     @programs = @patient.program_encounters.current.collect{|p|
 
@@ -156,12 +156,19 @@ class PatientsController < ApplicationController
 		@patient_bean = PatientService.get_patient(@person) rescue ""
 		@location = Location.find(params[:location_id] || session[:location_id]).name rescue nil
 		@conditions = []
-		@conditions.push("Visit Type											:  First Vist") if  is_first_hypertension_clinic_visit(@person.id) == true
-		@conditions.push("Visit Type											:  Follow up visit") if  is_first_hypertension_clinic_visit(@person.id) != true
-		risk = Vitals.current_encounter(@person.patient, "assessment", "assessment comments") rescue "Previous Hypetension Assessment : Not Available"
-		@conditions.push("Expected Appointment date: #{Vitals.get_patient_attribute_value(@person.patient, 'appointment date').to_date.strftime('%d/%m/%Y') rescue 'None'}") if  is_first_hypertension_clinic_visit(@person.id) != true
-		@conditions.push("#{risk} ")
-		@conditions.push("Asthma Expected Peak Flow Rate  : #{Vitals.expectect_flow_rate(@person.patient)} Litres/Minute") if  is_first_hypertension_clinic_visit(@person.id) != true
+		if current_program == "EPILEPSY PROGRAM"
+						@conditions.push("Visit Type											:  First Vist") if  is_first_epilepsy_clinic_visit(@person.id) == true
+						@conditions.push("Visit Type											:  Follow up visit") if  is_first_epilepsy_clinic_visit(@person.id) != true
+						@conditions.push("Expected Appointment date: #{Vitals.get_patient_attribute_value(@person.patient, 'appointment date').to_date.strftime('%d/%m/%Y') rescue 'None'}") if  is_first_epilepsy_clinic_visit(@person.id) != true
+		else
+						@conditions.push("Visit Type											:  First Vist") if  is_first_hypertension_clinic_visit(@person.id) == true
+						@conditions.push("Visit Type											:  Follow up visit") if  is_first_hypertension_clinic_visit(@person.id) != true
+
+						risk = Vitals.current_encounter(@person.patient, "assessment", "assessment comments") rescue "Previous Hypetension Assessment : Not Available"
+						@conditions.push("Expected Appointment date: #{Vitals.get_patient_attribute_value(@person.patient, 'appointment date').to_date.strftime('%d/%m/%Y') rescue 'None'}") if  is_first_hypertension_clinic_visit(@person.id) != true
+						@conditions.push("#{risk} ")
+						@conditions.push("Asthma Expected Peak Flow Rate  : #{Vitals.expectect_flow_rate(@person.patient)} Litres/Minute") if  is_first_hypertension_clinic_visit(@person.id) != true
+		end
 		render :layout => 'menu'
 	end
 
@@ -309,6 +316,13 @@ class PatientsController < ApplicationController
 		@status = ConceptName.find_by_concept_id(Vitals.get_patient_attribute_value(@patient, "hiv")).name rescue []
   end
 
+	def graph
+    @currentWeight = params[:currentWeight]
+		@estimated = params[:estimated]
+		@expected = params[:expected]
+    render :template => "graphs/#{params[:data]}", :layout => false
+  end
+
 	def number_of_booked_patients
 		@user = User.find(params[:user_id]) rescue nil
 		@patient = Patient.find(params[:patient_id] || params[:id]) rescue nil
@@ -344,26 +358,30 @@ class PatientsController < ApplicationController
 
 	def patient_visit_label(patient, date = Date.today)
     result = Location.find(session[:location_id]).name.match(/outpatient/i)
+		#visit = visits(patient, date)[date] rescue {}
+
+		return if visit.blank?
+    #visit_data = mastercard_visit_data(visit)
 
     label = ZebraPrinter::StandardLabel.new
     label.draw_text("Printed: #{Date.today.strftime('%b %d %Y')}",597,280,0,1,1,1,false)
     label.draw_text("#{seen_by(patient,date)}",597,250,0,1,1,1,false)
     label.draw_text("#{date.strftime("%B %d %Y").upcase}",25,30,0,3,1,1,false)
-    label.draw_text("#{arv_number}",565,30,0,3,1,1,true)
+   # label.draw_text("#{arv_number}",565,30,0,3,1,1,true)
     label.draw_text("#{patient.name}(#{patient.gender})",25,60,0,3,1,1,false)
-    label.draw_text("#{'(' + visit.visit_by + ')' unless visit.visit_by.blank?}",255,30,0,2,1,1,false)
-    label.draw_text("#{visit.height.to_s + 'cm' if !visit.height.blank?}  #{visit.weight.to_s + 'kg' if !visit.weight.blank?}  #{'BMI:' + visit.bmi.to_s if !visit.bmi.blank?} #{'(PC:' + pill_count[0..24] + ')' unless pill_count.blank?}",25,95,0,2,1,1,false)
-    label.draw_text("SE",25,130,0,3,1,1,false)
-    label.draw_text("TB",110,130,0,3,1,1,false)
+    #label.draw_text("#{'(' + visit.visit_by + ')' unless visit.visit_by.blank?}",255,30,0,2,1,1,false)
+    #label.draw_text("#{visit.height.to_s + 'cm' if !visit.height.blank?}  #{visit.weight.to_s + 'kg' if !visit.weight.blank?}  #{'BMI:' + visit.bmi.to_s if !visit.bmi.blank?} #{'(PC:' + pill_count[0..24] + ')' unless pill_count.blank?}",25,95,0,2,1,1,false)
+    #label.draw_text("SE",25,130,0,3,1,1,false)
+    #label.draw_text("TB",110,130,0,3,1,1,false)
     label.draw_text("Adh",185,130,0,3,1,1,false)
     label.draw_text("DRUG(S) GIVEN",255,130,0,3,1,1,false)
     label.draw_text("OUTC",577,130,0,3,1,1,false)
     label.draw_line(25,150,800,5)
-    label.draw_text("#{visit.tb_status}",110,160,0,2,1,1,false)
-    label.draw_text("#{adherence_to_show(visit.adherence).gsub('%', '\\\\%') rescue nil}",185,160,0,2,1,1,false)
-    label.draw_text("#{visit_data['outcome']}",577,160,0,2,1,1,false)
-    label.draw_text("#{visit_data['outcome_date']}",655,130,0,2,1,1,false)
-    label.draw_text("#{visit_data['next_appointment']}",577,190,0,2,1,1,false) if visit_data['next_appointment']
+    #label.draw_text("#{visit.tb_status}",110,160,0,2,1,1,false)
+    #label.draw_text("#{adherence_to_show(visit.adherence).gsub('%', '\\\\%') rescue nil}",185,160,0,2,1,1,false)
+   # label.draw_text("#{visit_data['outcome']}",577,160,0,2,1,1,false)
+   # label.draw_text("#{visit_data['outcome_date']}",655,130,0,2,1,1,false)
+    #label.draw_text("#{visit_data['next_appointment']}",577,190,0,2,1,1,false) if visit_data['next_appointment']
     starting_index = 25
     start_line = 160
 
@@ -389,4 +407,262 @@ class PatientsController < ApplicationController
     label.print(2)
     #end
   end
+
+	  def seen_by(patient,date = Date.today)
+    provider = patient.encounters.find_by_date(date).collect{|e| next unless e.name == 'HIV CLINIC CONSULTATION' ; [e.name,e.creator]}.compact
+    provider_username = "#{'Seen by: ' + User.find(provider[0].last).username}" unless provider.blank?
+    if provider_username.blank?
+      clinic_encounters = ["EPILEPSY CLINIC VISIT","DIABETES HYPERTENSION INITIAL VISIT","TREATMENT",'APPOINTMENT']
+      encounter_type_ids = EncounterType.find(:all,:conditions =>["name IN (?)",clinic_encounters]).collect{| e | e.id }
+      encounter = Encounter.find(:first,:conditions =>["patient_id = ? AND encounter_type In (?)",
+					patient.id,encounter_type_ids],:order => "encounter_datetime DESC")
+      provider_username = "#{'Recorded by: ' + User.find(encounter.creator).username}" rescue nil
+    end
+    provider_username
+  end
+
+	def mastercard_visit_data(visit)
+		    return if visit.blank?
+    data = {}
+
+    data["outcome"] = visit.outcome rescue nil
+    data["outcome_date"] = "#{visit.date_of_outcome.to_date.strftime('%b %d %Y')}" if visit.date_of_outcome
+
+    if visit.appointment_date
+      data["next_appointment"] = "Next: #{visit.appointment_date.strftime('%b %d %Y')}"
+    end
+
+    count = 1
+    (visit.s_eff.split("<br/>").compact.reject(&:blank?) || []).each do |side_eff|
+      data["side_eff#{count}"] = "25",side_eff[0..5]
+      count+=1
+    end if visit.s_eff
+
+    count = 1
+    (visit.gave || []).each do | drug, pills |
+      string = "#{drug} (#{pills})"
+      if string.length > 26
+        line = string[0..25]
+        line2 = string[26..-1]
+        data["arv_given#{count}"] = "255",line
+        data["arv_given#{count+=1}"] = "255",line2
+      else
+        data["arv_given#{count}"] = "255",string
+      end
+      count+= 1
+    end rescue []
+
+    unless visit.cpt.blank?
+      data["arv_given#{count}"] = "255","CPT (#{visit.cpt})" unless visit.cpt == 0
+    end rescue []
+
+    data
+	end
+
+	def visits(patient_obj, encounter_date = nil)
+    patient_visits = {}
+    yes = ConceptName.find_by_name("YES")
+    concept_names = ["APPOINTMENT DATE", "HEIGHT (CM)", 'WEIGHT (KG)',
+			"BODY MASS INDEX, MEASURED", "RESPONSIBLE PERSON PRESENT",
+			"PATIENT PRESENT FOR CONSULTATION", "TB STATUS",
+			"AMOUNT DISPENSED", "ARV REGIMENS RECEIVED ABSTRACTED CONSTRUCT",
+			"DRUG INDUCED", "AMOUNT OF DRUG BROUGHT TO CLINIC",
+			"WHAT WAS THE PATIENTS ADHERENCE FOR THIS DRUG ORDER",
+			"CLINICAL NOTES CONSTRUCT"]
+    concept_ids = ConceptName.find(:all, :conditions => ["name in (?)", concept_names]).map(&:concept_id)
+
+    if encounter_date.blank?
+      observations = Observation.find(:all,
+				:conditions =>["voided = 0 AND person_id = ? AND concept_id IN (?)",
+					patient_obj.patient_id, concept_ids],
+				:order =>"obs_datetime").map{|obs| obs if !obs.concept.nil?}
+    else
+      observations = Observation.find(:all,
+        :conditions =>["voided = 0 AND person_id = ? AND Date(obs_datetime) = ? AND concept_id IN (?)",
+          patient_obj.patient_id,encounter_date.to_date, concept_ids],
+        :order =>"obs_datetime").map{|obs| obs if !obs.concept.nil?}
+    end
+		#raise observations.last.concept_id.to_s.to_yaml
+		gave_hash = Hash.new(0)
+		observations.map do |obs|
+			drug = Drug.find(obs.order.drug_order.drug_inventory_id) rescue nil
+			#if !drug.blank?
+				#tb_medical = MedicationService.tb_medication(drug)
+				#next if tb_medical == true
+			#end
+			encounter_name = obs.encounter.name rescue []
+			next if encounter_name.blank?
+			next if encounter_name.match(/REGISTRATION/i)
+			next if encounter_name.match(/HIV STAGING/i)
+			visit_date = obs.obs_datetime.to_date
+			patient_visits[visit_date] = Mastercard.new() if patient_visits[visit_date].blank?
+
+
+			concept_name = obs.concept.fullname
+
+			if concept_name.upcase == 'APPOINTMENT DATE'
+				patient_visits[visit_date].appointment_date = obs.value_datetime
+			elsif concept_name.upcase == 'HEIGHT (CM)'
+				patient_visits[visit_date].height = obs.answer_string
+			elsif concept_name.upcase == 'WEIGHT (KG)'
+				patient_visits[visit_date].weight = obs.answer_string
+			elsif concept_name.upcase == 'BODY MASS INDEX, MEASURED'
+				patient_visits[visit_date].bmi = obs.answer_string
+			elsif concept_name == 'RESPONSIBLE PERSON PRESENT' or concept_name == 'PATIENT PRESENT FOR CONSULTATION'
+				patient_visits[visit_date].visit_by = '' if patient_visits[visit_date].visit_by.blank?
+				patient_visits[visit_date].visit_by+= "P" if obs.to_s.squish.match(/Patient present for consultation: Yes/i)
+				patient_visits[visit_date].visit_by+= "G" if obs.to_s.squish.match(/Responsible person present: Yes/i)
+			#elsif concept_name.upcase == 'TB STATUS'
+			#	status = tb_status(patient_obj).upcase rescue nil
+			#	patient_visits[visit_date].tb_status = status
+			#	patient_visits[visit_date].tb_status = 'noSup' if status == 'TB NOT SUSPECTED'
+			#	patient_visits[visit_date].tb_status = 'sup' if status == 'TB SUSPECTED'
+			#	patient_visits[visit_date].tb_status = 'noRx' if status == 'CONFIRMED TB NOT ON TREATMENT'
+			#	patient_visits[visit_date].tb_status = 'Rx' if status == 'CONFIRMED TB ON TREATMENT'
+			#	patient_visits[visit_date].tb_status = 'Rx' if status == 'CURRENTLY IN TREATMENT'
+
+			elsif concept_name.upcase == 'AMOUNT DISPENSED'
+
+				drug = Drug.find(obs.value_drug) rescue nil
+				#tb_medical = MedicationService.tb_medication(drug)
+				#next if tb_medical == true
+				next if drug.blank?
+				drug_name = drug.concept.shortname rescue drug.name
+				if drug_name.match(/Cotrimoxazole/i) || drug_name.match(/CPT/i)
+					patient_visits[visit_date].cpt += obs.value_numeric unless patient_visits[visit_date].cpt.blank?
+					patient_visits[visit_date].cpt = obs.value_numeric if patient_visits[visit_date].cpt.blank?
+				else
+					tb_medical = MedicationService.tb_medication(drug)
+					patient_visits[visit_date].gave = [] if patient_visits[visit_date].gave.blank?
+					patient_visits[visit_date].gave << [drug_name,obs.value_numeric]
+					drugs_given_uniq = Hash.new(0)
+					(patient_visits[visit_date].gave || {}).each do |drug_given_name,quantity_given|
+						drugs_given_uniq[drug_given_name] += quantity_given
+					end
+					patient_visits[visit_date].gave = []
+					(drugs_given_uniq || {}).each do |drug_given_name,quantity_given|
+						patient_visits[visit_date].gave << [drug_given_name,quantity_given]
+					end
+				end
+				#if !drug.blank?
+				#	tb_medical = MedicationService.tb_medication(drug)
+					#patient_visits[visit_date].ipt = [] if patient_visits[visit_date].ipt.blank?
+					#patient_visits[visit_date].tb_status = "tb medical" if tb_medical == true
+					#raise patient_visits[visit_date].tb_status.to_yaml
+				#end
+
+			elsif concept_name.upcase == 'ARV REGIMENS RECEIVED ABSTRACTED CONSTRUCT'
+				patient_visits[visit_date].reg = 'Unknown' if obs.value_coded == ConceptName.find_by_name("Unknown antiretroviral drug").concept_id
+				patient_visits[visit_date].reg =  Concept.find_by_concept_id(obs.value_coded).concept_names.typed("SHORT").first.name if !patient_visits[visit_date].reg
+
+			elsif concept_name.upcase == 'DRUG INDUCED'
+				symptoms = obs.to_s.split(':').map do | sy |
+					sy.sub(concept_name,'').strip.capitalize
+				end rescue []
+				patient_visits[visit_date].s_eff = symptoms.join("<br/>") unless symptoms.blank?
+
+			elsif concept_name.upcase == 'AMOUNT OF DRUG BROUGHT TO CLINIC'
+				drug = Drug.find(obs.order.drug_order.drug_inventory_id) rescue nil
+				#tb_medical = MedicationService.tb_medication(drug) unless drug.nil?
+				#next if tb_medical == true
+				next if drug.blank?
+				drug_name = drug.concept.shortname rescue drug.name
+				patient_visits[visit_date].pills = [] if patient_visits[visit_date].pills.blank?
+				patient_visits[visit_date].pills << [drug_name,obs.value_numeric] rescue []
+
+			elsif concept_name.upcase == 'WHAT WAS THE PATIENTS ADHERENCE FOR THIS DRUG ORDER'
+				drug = Drug.find(obs.order.drug_order.drug_inventory_id) rescue nil
+				#tb_medical = MedicationService.tb_medication(drug) unless drug.nil?
+				#next if tb_medical == true
+				next if obs.value_numeric.blank?
+				patient_visits[visit_date].adherence = [] if patient_visits[visit_date].adherence.blank?
+				patient_visits[visit_date].adherence << [Drug.find(obs.order.drug_order.drug_inventory_id).name,(obs.value_numeric.to_s + '%')]
+			elsif concept_name == 'CLINICAL NOTES CONSTRUCT' || concept_name == 'Clinical notes construct'
+				patient_visits[visit_date].notes+= '<br/>' + obs.value_text unless patient_visits[visit_date].notes.blank?
+				patient_visits[visit_date].notes = obs.value_text if patient_visits[visit_date].notes.blank?
+			end
+		end
+
+    #patients currents/available states (patients outcome/s)
+    program_id = Program.find_by_name('HIV PROGRAM').id
+    if encounter_date.blank?
+      patient_states = PatientState.find(:all,
+				:joins => "INNER JOIN patient_program p ON p.patient_program_id = patient_state.patient_program_id",
+				:conditions =>["patient_state.voided = 0 AND p.voided = 0 AND p.program_id = ? AND p.patient_id = ?",
+					program_id,patient_obj.patient_id],:order => "patient_state_id ASC")
+    else
+      patient_states = PatientState.find(:all,
+				:joins => "INNER JOIN patient_program p ON p.patient_program_id = patient_state.patient_program_id",
+				:conditions =>["patient_state.voided = 0 AND p.voided = 0 AND p.program_id = ? AND start_date = ? AND p.patient_id =?",
+					program_id,encounter_date.to_date,patient_obj.patient_id],:order => "patient_state_id ASC")
+    end
+
+#=begin
+    patient_states.each do |state|
+      visit_date = state.start_date.to_date rescue nil
+      next if visit_date.blank?
+      patient_visits[visit_date] = Mastercard.new() if patient_visits[visit_date].blank?
+      patient_visits[visit_date].outcome = state.program_workflow_state.concept.fullname rescue 'Unknown state'
+      patient_visits[visit_date].date_of_outcome = state.start_date
+    end
+#=end
+
+    patient_visits.each do |visit_date,data|
+      next if visit_date.blank?
+     # patient_visits[visit_date].outcome = hiv_state(patient_obj,visit_date)
+      #patient_visits[visit_date].date_of_outcome = visit_date
+
+			status = tb_status(patient_obj, visit_date).upcase rescue nil
+			patient_visits[visit_date].tb_status = status
+			patient_visits[visit_date].tb_status = 'noSup' if status == 'TB NOT SUSPECTED'
+			patient_visits[visit_date].tb_status = 'sup' if status == 'TB SUSPECTED'
+			patient_visits[visit_date].tb_status = 'noRx' if status == 'CONFIRMED TB NOT ON TREATMENT'
+			patient_visits[visit_date].tb_status = 'Rx' if status == 'CONFIRMED TB ON TREATMENT'
+			patient_visits[visit_date].tb_status = 'Rx' if status == 'CURRENTLY IN TREATMENT'
+    end
+
+    unless encounter_date.blank?
+      outcome = patient_visits[encounter_date].outcome rescue nil
+      if outcome.blank?
+        state = PatientState.find(:first,
+					:joins => "INNER JOIN patient_program p ON p.patient_program_id = patient_state.patient_program_id",
+					:conditions =>["patient_state.voided = 0 AND p.voided = 0 AND p.program_id = ? AND p.patient_id = ?",
+						program_id,patient_obj.patient_id],:order => "date_enrolled DESC,start_date DESC")
+
+        patient_visits[encounter_date] = Mastercard.new() if patient_visits[encounter_date].blank?
+        patient_visits[encounter_date].outcome = state.program_workflow_state.concept.fullname rescue 'Unknown state'
+        patient_visits[encounter_date].date_of_outcome = state.start_date rescue nil
+      end
+    end
+
+    patient_visits
+  end
+
+
+	def tb_status(patient, visit_date = Date.today)
+		state = Concept.find(Observation.find(:first,
+        :order => "obs_datetime DESC,date_created DESC",
+        :conditions => ["person_id = ? AND concept_id = ? AND value_coded IS NOT NULL AND obs_datetime <= ?",
+          patient.id, ConceptName.find_by_name("TB STATUS").concept_id, visit_date]).value_coded).fullname rescue "UNKNOWN"
+		#programs = patient.patient_programs.all rescue []
+
+		#programs.each do |prog|
+		#		tb_program = Program.find_by_name('TB PROGRAM').id
+		#		patient_program_id = PatientProgram.find_by_sql("SELECT  patient_program_id FROM patient_program
+		#										WHERE patient_id = #{patient.id}
+		#										AND program_id = #{tb_program}
+		#										AND voided = 0 LIMIT 1").first.patient_program_id  rescue state
+
+		#		state = PatientState.find_by_sql("SELECT state  FROM patient_state
+		#										WHERE patient_program_id = #{patient_program_id}
+		#										AND voided = 0
+		#										AND start_date <= '#{visit_date}'
+		#										ORDER BY start_date DESC").last.state  rescue state
+		#		state = ProgramWorkflowState.find_state(state).concept.fullname rescue state
+		#end
+
+		state
+
+  end
+
 end
