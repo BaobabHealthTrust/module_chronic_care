@@ -2,12 +2,13 @@
 class TaskFlow
 
   attr_accessor :patient, :person, :user, :current_date, :tasks, :current_user_activities,
-    :encounter_type, :url, :task_scopes, :task_list, :labels, :redirect_to, :current_program
+    :encounter_type, :url, :task_scopes, :task_list, :labels, :redirect_to, :current_program, :present_date
     
   def initialize(user_id, patient_id, session_date = Date.today)
     self.patient = Patient.find(patient_id)
     self.user = User.find(user_id)
     self.current_date = session_date
+		#self.current_date = self.present_date
 		
 
     if File.exists?("#{Rails.root}/config/protocol_task_flow.yml")
@@ -142,7 +143,7 @@ class TaskFlow
 
 			encounters =  [
                       'VITALS','FAMILY HISTORY','SOCIAL HISTORY', 'LAB RESULTS',
-											'CLINIC VISIT', 'MEDICAL HISTORY','TREATMENT', 'OUTCOME'
+											'CLINIC VISIT', 'TREATMENT', 'OUTCOME'
                      ]
 		observation = Observation.find(:all,
 												:conditions => ["encounter_id = ?", Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
@@ -267,21 +268,6 @@ class TaskFlow
 					self.encounter_type = "HIV STATUS"
 					self.url = "/protocol_patients/hiv_status?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?("HIV STATUS")
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
-						return self
-					end
-
-				when "ASTHMA MEASURE"
-					next if ! self.current_user_activities.include?(tsk.downcase)
-					assessment = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
-
-					next if !assessment.blank?
-					self.encounter_type = "ASTHMA MEASURE"
-					self.url = "/protocol_patients/asthma_measure?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
-					if ! my_activities.include?(tsk)
 						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
 					else
 						return self
