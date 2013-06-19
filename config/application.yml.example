@@ -1,19 +1,27 @@
 ## YAML Template.
 ---
 production:
-  project.name: Early Infant Diagnosis
-  facility.name: Test Centre
-  patient.registration.url: http://localhost:3005
+  project.name: Chronic Care Clinic
+  facility.name: Baobab Test Centre
+  auto_set_appointment: true
+  patient.registration.url: http://192.168.100.110:3005
   user.management.url: http://localhost:3004
+  use_drug_barcodes_only: true
+  logo: mw.gif
 
 development:
-  project.name: Early Infant Diagnosis
-  facility.name: Test Centre
+  project.name: Chronic Care Clinic
+  facility.name: Baobab Test Centre
+  auto_set_appointment: true
   patient.registration.url: http://localhost:3005
   user.management.url: http://localhost:3004
+  use_drug_barcodes_only: false
+  logo: mw.gif
 
 test: &TEST
-  project.name: Early Infant Diagnosis
-  facility.name: Test Centre
+  project.name: Chronic Care Clinic
+  facility.name: Baobab Test Centre
+  auto_set_appointment: true
   patient.registration.url: http://localhost:3005
   user.management.url: http://localhost:3004
+  logo: mw.gif
