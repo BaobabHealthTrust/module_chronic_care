@@ -27,7 +27,8 @@
 			{	:id => "patient_type",
 				:name => "concept[TYPE OF PATIENT]",
 				:multiple => false,
-				:helpText => "Is the patient a:" } %>
+				:helpText => "Is the patient a:",
+                                :tt_onload=> "showCategory('Clinic Visit')"} %>
 
 		   <%= touch_location_tag "location",  @patient, nil,
 			  {	:id => "location",
@@ -45,7 +46,9 @@
 			</td>
 			<td>
 <% if @first_visit != true %>
-<select id='1.1.1' name='concept[HAVE YOU EVER HAD TB?]' helpText='Have you been diagnosed with TB since your LAST clinic visit? ' pos='1' >
+<select id='1.1.1' name='concept[HAVE YOU EVER HAD TB?]' 
+        helpText='Have you been diagnosed with TB since your LAST clinic visit? ' pos='1'
+        tt_onload="showCategory('Clinic Visit')">
 <option></option>
 <option value='No'>No</option>
  <option value='Yes'>Yes</option>
@@ -61,10 +64,11 @@
 			{	:id => "year_of_tb_diagnosis",
 				:multiple => true,
 				:name => "concept[TB DIAGNOSIS DATE][]",
-          		:condition => "$('1.1.1').value.match(/^yes$/i);",
-          		:tt_pageStyleClass => "longSelectList",
-          		:absoluteMin => "1950", :min => "1940", :absoluteMax => Date.today.year,
-				:helpText => "Year(s) of TB Diagnosis" } %>
+                                :condition => "$('1.1.1').value.match(/^yes$/i);",
+                                :tt_pageStyleClass => "longSelectList",
+                                :absoluteMin => "1950", :min => "1940", :absoluteMax => Date.today.year,
+				:helpText => "Year(s) of TB Diagnosis",
+                                :tt_onload=> "showCategory('Clinic Visit')"} %>
 <% end %>
 			</td>
 		</tr>
@@ -74,7 +78,11 @@
 			</td>
 			<td>
 <% if @first_visit == true || !@diabetic.blank? %>
-<select id='1.1.3' name='concept[Patient has Diabetes]' helpText='Is patient diabetic? ' pos='3' >
+<select id='1.1.3' 
+        name='concept[Patient has Diabetes]'
+        helpText='Is patient diabetic? '
+        pos='3'
+        tt_onload="showCategory('Clinic Visit')">
 <option></option>
 <option value='No'>No</option>
  <option value='Yes'>Yes</option>
@@ -91,10 +99,11 @@
 			{	:id => "year_of_tb_diagnosis",
 				:multiple => true,
 				:name => "concept[DIABETES DIAGNOSIS DATE][]",
-          		:condition => "$('1.1.3').value.match(/^yes$/i);",
-          		:tt_pageStyleClass => "longSelectList",
-          		:absoluteMin => "1950", :min => "1940", :absoluteMax => Date.today.year,
-				:helpText => "Year(s) of Diabetes Diagnosis" } %>
+                                :condition => "$('1.1.3').value.match(/^yes$/i);",
+                                :tt_pageStyleClass => "longSelectList",
+                                :absoluteMin => "1950", :min => "1940", :absoluteMax => Date.today.year,
+				:helpText => "Year(s) of Diabetes Diagnosis",
+                                :tt_onload=> "showCategory('Clinic Visit')"} %>
 <% end %>
 			</td>
 		</tr>
@@ -104,7 +113,11 @@
 			</td>
 			<td>
 <% if @patient.gender.upcase == ("F" || "FEMALE")  %>
-<select id='1.1.5' name='concept[Is patient pregnant?]' helpText='Is Patient Pregnant' pos='5' >
+<select id='1.1.5' 
+        name='concept[Is patient pregnant?]'
+        helpText='Is Patient Pregnant'
+        pos='5'
+        tt_onload="showCategory('Clinic Visit')">
 <option></option>
 <option value='No'>No</option>
  <option value='Yes'>Yes</option>
@@ -116,7 +129,11 @@
 				Is Patient breastfeeding
 			</td>
 			<td>
-<select id='1.1.6' name='concept[Is patient breast feeding?]' helpText='Is Patient breastfeeding' pos='6' >
+<select id='1.1.6' 
+        name='concept[Is patient breast feeding?]'
+        helpText='Is Patient breastfeeding'
+        pos='6'
+        tt_onload="showCategory('Clinic Visit')">
 <option></option>
 <option value='No'>No</option>
  <option value='Yes'>Yes</option>

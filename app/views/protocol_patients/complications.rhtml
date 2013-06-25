@@ -211,7 +211,7 @@ function selectedOptions(selected){
 
 <%= select_tag "Complication", options_for_select(@treatements_list),
 	{ :field_type => 'text',
-      :helpText => "Patient has any of the following:",
+      :helpText => "Patient has any of the following",
       :id => "choice",
 	  :name=> "concept[Complications][]",
       :multiple => true,

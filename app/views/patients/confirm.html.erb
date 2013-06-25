@@ -70,6 +70,9 @@
 <%= javascript_include_tag "jquery.flot" %>
 <%= javascript_include_tag "prototype" %>
 <script>
+   jQuery(document).ready(function() {
+        weightGraph();
+      });
 
   function cancel(){ document.location = "/clinic?user_id=<%=@user['user_id']%>&location_id=<%=@current_location%>" }
   var conditions = []
@@ -97,7 +100,7 @@
          @obs = @person.observations.find_by_concept_name("WEIGHT (KG)")
          @obs.sort_by{|obs| obs.obs_datetime}.each do |obs|
            @min = obs.obs_datetime if obs.obs_datetime < @min %>
-        [<%= obs.obs_datetime.to_f -%>, <%= obs.value_numeric -%>],<% end %>
+        [<%= obs.obs_datetime.to_f -%>, <%= obs.value_text.to_i -%>],<% end %>
     ];
     <% @min = @max - 1.year if @min > @max - 1.year %>
 
@@ -132,7 +135,7 @@
       xaxis: { min: max-range, max: max, ticks: patient_ticks}
     }
 
-
+    document.getElementById('tabPageContainer').innerHTML = "<div id='charts' style='background: width:100%;'></div>" ;
     jQuery.plot(jQuery("#charts"), get_data(null, null), plot_options);
   }
 

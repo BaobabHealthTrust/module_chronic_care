@@ -309,19 +309,26 @@ th { text-align: center;
 	 $("bp").innerHTML += "Risk Value: <i style='font-size: 1.2em; float: right;'>" + riskValue + "</i>";
 	timedEvent = setTimeout('calculateBP(' + pos + ')', 500);
   }
+   function upcaseFirst(property) {
+        return property.replace(/_/g, ' ').replace(/(\w+)/g, function(match) {
+            return match.charAt(0).toUpperCase() + match.slice(1);
+          });
+    };
+
+
    function showSelectedConditions() {
       var conditions = [];
 	  var cholesterol = '<%= @cholesterol_value.to_i / 18  %>'
       var html
-	  
+                
 		conditions.push("Age : " + '<%= @patient.age %>');
 
-        conditions.push("Gender : " + '<%= @patient.gender %>');
+                conditions.push("Gender : " + '<%= @patient.gender %>');
 
 		conditions.push("Smoker : " + '<%= @smoking_status %>');
 
 		if ($('diabetic').value.length > 0)
-        conditions.push("Diabetes : " + $('diabetic').value.humanize);
+                conditions.push("Diabetes : " + $('diabetic').value);
 
 		age = '<%= @patient.age.to_i %>'
 

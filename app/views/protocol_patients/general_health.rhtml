@@ -141,9 +141,14 @@ function selectedOptions(selected){
       var html
       html = "<ul>"
       for(var i=0;i < conditions.length;i++) {
-        if (conditions[i].length > 0)
+        if (conditions[i].length > 0){
           html += "<li class='data'>" + conditions[i] + "</li>";
+        }  
       }
+
+      if (conditions.length <= 0) {
+          html += "<li class='data'>No conditions selected</li>";
+        }
       html += "</ul>"
 	  if (i > 0){
 		html += "<span class='warning'>Please refer patient for advice</span>";
@@ -190,7 +195,7 @@ function selectedOptions(selected){
 		:helpText => "Treatment Received",
 		:tt_onLoad => "showCategory('General Health')"} %>
 
- <%= touch_yes_no_unknown_tag "Drug Allergy", @patient, nil,
+ <%= select_tag "Drug Allergy", options_for_select(["","Yes", "No"]),
 	{	:id => "drug_allergy",
 	:condition => "$('choice').value.length > 0" ,
 	:name => 'concept[Drug Allergy]',

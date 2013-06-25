@@ -365,11 +365,11 @@ class EncountersController < ApplicationController
 
 			if params[:encounter_type] == "TREATMENT"
 				if params[:concept]["Prescribe Drugs"].to_s.upcase == "EPILEPSY DRUGS" || params[:concept]["Prescribe Drugs"].to_s.upcase == "HYPERTENSION/DIABETES DRUGS" || params[:concept]["Prescribe Drugs"].to_s.upcase == "ASTHMA DRUGS"
-						redirect_to "/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}&disable=true" and return
+						redirect_to "/prescriptions/prescribe?user_id=#{@user["user_id"]}&patient_id=#{params[:patient_id]}" and return
 				elsif params[:concept]["Prescribe Drugs"].blank?
 						redirect_to "/protocol_patients/assessment?patient_id=#{params[:patient_id]}&user_id=#{params[:user_id]}&disable=true" and return
 				else
-						redirect_to "/prescriptions/prescribe?user_id=#{@user["user_id"]}&patient_id=#{params[:patient_id]}" and return
+            redirect_to "/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}&disable=true" and return
 				end
 			end
       @task = TaskFlow.new(params[:user_id] || User.first.id, patient.id)
