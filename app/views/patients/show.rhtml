@@ -216,6 +216,7 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
           <option link="<%= @demographics_url %>" ttSize = "160px">
             Demographics
           </option>
+          <option link='<%= "/patients/mastercard/#{@patient.id}?user_id=#{@user.id}"  %>' ttSize = "160px">Mastercard</option>
         <% end %>
 		  
 		<% if @disable.to_s != "true" %>

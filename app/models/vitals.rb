@@ -83,15 +83,23 @@
 				concept = ConceptName.find_by_name(vital_sign).concept_id
 				Observation.find(:first,:order => "obs_datetime DESC, date_created DESC",
                                   :conditions =>["obs_datetime <= ? AND person_id = ? AND concept_id = ?",
+                                  session_date, patient.id, concept]) rescue nil
+			end
+
+      def self.todays_vitals(patient, vital_sign, session_date = Time.now())
+				concept = ConceptName.find_by_name(vital_sign).concept_id
+				Observation.find(:first,:order => "obs_datetime DESC, date_created DESC",
+                                  :conditions =>["obs_datetime = ? AND person_id = ? AND concept_id = ?",
                                   session_date, patient.id, concept])
 			end
 
 			def self.current_encounter(patient, enc, concept, session_date = Date.today)
 				concept = ConceptName.find_by_name(concept).concept_id
+        
 				encounter = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
                                   :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
-                                  session_date ,patient.id, EncounterType.find_by_name(enc).id]).encounter_id
-				Observation.find(:all, :order => "obs_datetime DESC,date_created DESC", :conditions => ["encounter_id = ? AND concept_id = ?", encounter, concept])
+                                  session_date ,patient.id, EncounterType.find_by_name(enc).id]).encounter_id rescue nil
+				Observation.find(:all, :order => "obs_datetime DESC,date_created DESC", :conditions => ["encounter_id = ? AND concept_id = ?", encounter, concept]) rescue nil
 			end
 
 	def self.drugs_given_on(patient, date = Date.today)
@@ -117,6 +125,28 @@
         AND obs_datetime >=? AND obs_datetime <=?",
         patient.id,concept_id,start_date,end_date],
         :order =>"obs_datetime")
+  end
+
+  def self.occupation(patient)
+    specified_id = PersonAttributeType.find_by_name("Occupation").person_attribute_type_id
+    return PersonAttribute.find(:first, :conditions => ["person_id = ? AND person_attribute_type_id = ?", patient.person.id, specified_id]) #rescue nil
+  end
+
+   def self.guardian(patient)
+    person_id = Relationship.find(:first,:order => "date_created DESC",
+      :conditions =>["person_a = ?",patient.person.id]).person_b rescue nil
+    guardian_name = name(Person.find(person_id))
+    guardian_name rescue nil
+  end
+
+  def self.name(person)
+    "#{person.names.first.given_name} #{person.names.first.family_name}".titleize rescue nil
+  end
+
+  def self.is_transfer_in(patient)
+    patient_transfer_in = patient.person.observations.recent(1).question("TYPE OF PATIENT").all rescue nil
+    return false if patient_transfer_in.blank?
+    return true
   end
 end
 

@@ -58,7 +58,8 @@ sex = @patient.gender.upcase
 
 	  <tr>
 		<td>
-<% if params[:repeat] == "true" %>
+  <%#= raise @in_seizure.to_yaml %>
+<% if params[:repeat] == "true" || @in_seizure.blank? %>
   <%= touch_yes_no_tag "seizures focal", @patient, nil,
 			{	:id => 'seizure_focal',
 			:name => 'concept[Patient in active seizure]',
