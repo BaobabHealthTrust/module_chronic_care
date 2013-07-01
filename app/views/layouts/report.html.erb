@@ -111,7 +111,7 @@
         <div id="footer" class="dark">
           <div id="buttons" class="buttons" style="top:0px">
             <button id="logout" class="blue left" style="position :relative; float:right;"><span>Finish</span></button>
-            <% if @user['name'].upcase == "SUPER USER" %>
+            <% if (@user['name'].upcase rescue nil) == "SUPER USER" %>
             <!--button id="staging" class="yellow"><span>Staging</span></button-->
             <% end %>
           </div>

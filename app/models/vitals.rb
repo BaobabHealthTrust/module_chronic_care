@@ -70,13 +70,15 @@
 				return pefr
 			end
 
-			def self.current_treatment_encounter(patient, date = Time.now(), provider = user_person_id)
-				type = EncounterType.find_by_name("TREATMENT")
+        def self.current_treatment_encounter(patient, provider, date = Time.now())
+         #raise user_person_id.to_yaml
+				#types = Encounter.find_by_sql("select * from encounter_type where name = 'TREATMENT'").first.encounter_type_id
+       
 				encounter = patient.encounters.find(:first,:conditions =>["encounter_datetime BETWEEN ? AND ? AND encounter_type = ?",
 													date.to_date.strftime('%Y-%m-%d 00:00:00'),
 													date.to_date.strftime('%Y-%m-%d 23:59:59'),
-													type.id])
-				encounter ||= patient.encounters.create(:encounter_type => type.id,:encounter_datetime => date, :provider_id => provider)
+													EncounterType.find_by_name("TREATMENT").id])
+				encounter ||= patient.encounters.create(:encounter_type => EncounterType.find_by_name("TREATMENT").id,:encounter_datetime => date, :provider_id => provider)
 			end
 
 			def self.current_vitals(patient, vital_sign, session_date = Time.now())

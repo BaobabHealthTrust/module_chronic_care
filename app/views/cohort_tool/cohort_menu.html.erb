@@ -1,17 +1,7 @@
 <script>
   var tt_cancel_destination = "/clinic" // /reports"
 </script>
-<style>
-  .inputFrameClass{
-	height:600px;
-  }
-  #viewport{
-	height:550px ! important;
-  }
-</style>
-<form id='quarter' action="/cohort_tool/dm_cohort" method='post'>
-	<input type='hidden' name='location_id' value='<%= params[:location_id] %>' />
-	<input type='hidden' name='user_id' value='<%= params[:user_id] %>' />
+<form id='quarter' action="cohort" method='post'> 
   <%
     qtrs = ['']
     current_qtr = ""
@@ -34,6 +24,6 @@
     }
 
   %>
-  <%= select_tag 'quarter', options_for_select( qtrs ), {:helpText => "Select Quarter", :tt_onLoad => "__$('keyboard').style.display = 'none'"} %>
+  <%= select_tag 'quarter', options_for_select( qtrs ), {:helpText => "Select Quarter"} %>
 
 </form>

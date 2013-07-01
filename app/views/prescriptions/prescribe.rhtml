@@ -144,14 +144,15 @@
     var helpText = $('helpText'+tstCurrentPage);
     helpText.innerHTML = text;
     var formulation = encodeURIComponent($('formulation').value);     
-    var aUrl = "/prescriptions/units?formulation=" + formulation;
+    var aUrl = "/prescriptions/units?user_id=<%= @user.id %>&patient_id=<%= @patient.id %>&formulation=" + formulation;
+    
     var httpRequest = new XMLHttpRequest(); 
     httpRequest.onreadystatechange = function() { 
       set_help_text(helpText, httpRequest); 
     };
     try {
       httpRequest.open('GET', aUrl, true);
-      httpRequest.send(null);    
+      httpRequest.send(null);
     } catch(e){
     }
   }

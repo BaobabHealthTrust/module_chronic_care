@@ -2,12 +2,11 @@
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
-    <%#= raise @user.to_yaml %>
     <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
     <%= @title = "#{controller.controller_name.humanize} #{controller.action_name.humanize}" rescue ""  %>
     <script language="javascript">
-      tstUsername = "<%= @user.username unless @user.nil? %>";
-      tstCurrentDate = "<%= Time.now.strftime("%Y-%m-%d") %>";
+      tstUsername = "<%= current_user.username unless current_user.nil? %>";
+      tstCurrentDate = "<%= Time.now.strftime("%Y/%m/%d") %>";
       var tt_cancel_destination = null;
     </script>
     <%= stylesheet_link_tag "mateme" %>
@@ -38,10 +37,7 @@
         <%= yield %>  
         <div id="footer">
           <div id="buttons" class="buttonsDiv" style="top:0px">
-            <button id="finishButton" class="button navButton green" onclick="if (tt_cancel_destination) window.location = tt_cancel_destination;"><span>Finish</span></button>
-            <button id="switch_view" class="button navButton blue" onclick="showReport();"><span>Survival Analysis</span></button>
-			<button id="switch_view_children" class="button navButton blue" onclick="showReportChildren();"><span>Children Survival Analysis</span></button>
-			<button id="switch_view_women" class="button navButton blue" onclick="showReportWomen();"><span>Women Survival Analysis</span></button>
+            <button id="finishButton" class="button navButton green" onclick="if (tt_cancel_destination) window.location = tt_cancel_destination;"><span>Finish</span></button></div>
             <div id="tt_extraButtons"/>
           </div>
           

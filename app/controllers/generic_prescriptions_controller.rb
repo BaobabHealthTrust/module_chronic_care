@@ -40,7 +40,13 @@ class GenericPrescriptionsController < ApplicationController
       user_person_id = User.find_by_user_id(params[:user_id]).person_id
     end
 
-    @encounter = Vitals.current_treatment_encounter( @patient, session_date, user_person_id)
+    @encounter = @patient.encounters.find(:first,:conditions =>["encounter_datetime BETWEEN ? AND ? AND encounter_type = ?",
+                  session_date.to_date.strftime('%Y-%m-%d 00:00:00'),
+                  session_date.to_date.strftime('%Y-%m-%d 23:59:59'),
+                  EncounterType.find_by_name("TREATMENT").id])
+    @encounter ||= @patient.encounters.create(:encounter_type => EncounterType.find_by_name("TREATMENT").id,:encounter_datetime => session_date, :provider_id => user_person_id)
+
+    #@encounter = Vitals.current_treatment_encounter( @patient, user_person_id, session_date)
     @diagnosis = Observation.find(params[:diagnosis]) rescue nil
     @suggestions.each do |suggestion|
       unless (suggestion.blank? || suggestion == '0' || suggestion == 'New Prescription')

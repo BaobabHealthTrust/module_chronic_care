@@ -237,8 +237,8 @@ def mastercard_demographics(patient_obj)
     visits.hiv_test_location = location_name rescue nil
     visits.guardian = Vitals.guardian(patient_obj) rescue nil
     visits.reason_for_art_eligibility = PatientService.reason_for_art_eligibility(patient_obj) rescue nil
-    visits.transfer_in = Vitals.current_vitals(patient_obj, "TYPE OF PATIENT").to_s.split(":")[1] rescue nil #pb: bug-2677 Made this to use the newly created patient model method 'transfer_in?'
-    visits.transfer_in.match(/transfer in/i) ? visits.transfer_in = 'NO' : visits.transfer_in = 'YES'
+    visits.transfer_in = Vitals.current_vitals(patient_obj, "TYPE OF PATIENT").to_s.split(":")[1].match(/transfer in/i) rescue nil #pb: bug-2677 Made this to use the newly created patient model method 'transfer_in?'
+    ! visits.transfer_in.blank? ? visits.transfer_in = 'NO' : visits.transfer_in = 'YES'
 
     transferred_out_details = Observation.find(:last, :conditions =>["concept_id = ? and person_id = ?",
         ConceptName.find_by_name("TRANSFER OUT TO").concept_id,patient_obj.id]) rescue ""
@@ -363,6 +363,18 @@ def mastercard_demographics(patient_obj)
     visits.amputation = Vitals.current_encounter(patient_obj, "COMPLICATIONS", "COMPLICATIONS").to_s.match(/Complications:  Amputation/i) rescue nil
     ! visits.amputation.blank? ? visits.amputation = "Y" : visits.amputation = "N"
 
+    #raise Vitals.current_encounter(patient_obj, "COMPLICATIONS", "COMPLICATIONS").to_s.to_yaml
+     visits.neuropathy = Vitals.current_encounter(patient_obj, "COMPLICATIONS", "COMPLICATIONS").to_s.match(/Complications:   Peripheral nueropathy/i) rescue nil
+    ! visits.neuropathy.blank? ? visits.neuropathy = "Y" : visits.neuropathy = "N"
+
+     visits.foot_ulcers = Vitals.current_encounter(patient_obj, "COMPLICATIONS", "COMPLICATIONS").to_s.match(/Complications:   Foot ulcers/i) rescue nil
+    ! visits.foot_ulcers.blank? ? visits.foot_ulcers = "Y" : visits.foot_ulcers = "N"
+
+    visits.impotence = Vitals.current_encounter(patient_obj, "COMPLICATIONS", "COMPLICATIONS").to_s.match(/Complications:  Impotence/i) rescue nil
+    ! visits.impotence.blank? ? visits.impotence = "Y" : visits.impotence = "N"
+
+    visits.comp_other = Vitals.current_encounter(patient_obj, "COMPLICATIONS", "COMPLICATIONS").to_s.match(/Complications:   Others/i) rescue nil
+    ! visits.comp_other.blank? ? visits.comp_other = "Y" : visits.comp_other = "N"
 
     hiv_staging = Encounter.find(:last,:conditions =>["encounter_type = ? and patient_id = ?",
         EncounterType.find_by_name("HIV Staging").id,patient_obj.id])
