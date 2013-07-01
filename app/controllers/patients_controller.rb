@@ -455,7 +455,7 @@ def mastercard_demographics(patient_obj)
 			"WHAT WAS THE PATIENTS ADHERENCE FOR THIS DRUG ORDER",
 			"CLINICAL NOTES CONSTRUCT", "REGIMEN CATEGORY"]
     concept_ids = ConceptName.find(:all, :conditions => ["name in (?)", concept_names]).map(&:concept_id)
-
+    
     if encounter_date.blank?
       observations = Observation.find(:all,
 				:conditions =>["voided = 0 AND person_id = ? AND concept_id IN (?)",
@@ -482,7 +482,7 @@ def mastercard_demographics(patient_obj)
 			visit_date = obs.obs_datetime.to_date
 			patient_visits[visit_date] = Mastercard.new() if patient_visits[visit_date].blank?
 
-
+      
 			concept_name = obs.concept.fullname
 
 			if concept_name.upcase == 'APPOINTMENT DATE'
@@ -623,6 +623,11 @@ def mastercard_demographics(patient_obj)
     patient_visits
   end
 
+  def calculate_bp(patient, visit_date)
+    systolic = Vitals.current_vitals(patient, "Systolic blood pressure", visit_date).value_numeric
+    diastolic = Vitals.current_vitals(patient, "Diastolic blood pressure", visit_date).value_numeric
+    return (systolic.to_i / diastolic.to_i)
+  end
 
   def number_of_booked_patients
     date = params[:date].to_date
@@ -929,7 +934,7 @@ def mastercard_demographics(patient_obj)
   end
 
 	def mastercard_visit_data(visit)
-		    return if visit.blank?
+		return if visit.blank?
     data = {}
 
     data["outcome"] = visit.outcome rescue nil
@@ -967,6 +972,7 @@ def mastercard_demographics(patient_obj)
 	end
 
 	def visits(patient_obj, encounter_date = nil)
+    
     patient_visits = {}
     yes = ConceptName.find_by_name("YES")
     concept_names = ["APPOINTMENT DATE", "HEIGHT (CM)", 'WEIGHT (KG)',
@@ -1004,7 +1010,8 @@ def mastercard_demographics(patient_obj)
 			visit_date = obs.obs_datetime.to_date
 			patient_visits[visit_date] = Mastercard.new() if patient_visits[visit_date].blank?
 
-
+      patient_visits[visit_date].bp = calculate_bp(patient_obj, visit_date)
+      
 			concept_name = obs.concept.fullname
 
 			if concept_name.upcase == 'APPOINTMENT DATE'
