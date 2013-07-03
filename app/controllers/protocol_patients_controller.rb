@@ -153,21 +153,27 @@ class ProtocolPatientsController < ApplicationController
 	end
 
 	def vitals
-
-    @patient = Patient.find(params[:patient_id]) rescue nil
-
-    redirect_to '/encounters/no_patient' and return if @patient.nil?
+    current_date = (!session[:datetime].nil? ? session[:datetime].to_date : Date.today)
+    @patient = Patient.find(params[:patient_id]) #rescue nil
+    
+    redirect_to '/encounters/no_patient' and return if @patient.blank?
 
     if params[:user_id].nil?
       redirect_to '/encounters/no_user' and return
     end
 
-    @user = User.find(params[:user_id]) rescue nil?
+    @user = User.find(params[:user_id]) rescue nil
 
     redirect_to '/encounters/no_patient' and return if @user.nil?
-  
-    @current_hieght = Vitals.current_vitals(@patient, "HEIGHT (CM)").value_numeric.to_i rescue 0
-    #raise @current_hieght.to_yaml
+
+    concept = ConceptName.find_by_sql("select concept_id from concept_name where name = 'height (cm)' and voided = 0").first.concept_id
+
+
+    @current_hieght  = Observation.find_by_sql("SELECT * from obs where concept_id = '#{concept}' AND person_id = '#{@patient.id}'
+                    AND DATE(obs_datetime) <= '#{current_date}' AND voided = 0
+                    ORDER BY  obs_datetime DESC, date_created DESC LIMIT 1").first rescue 0
+
+   @current_hieght = @current_hieght.value_numeric.to_i rescue @current_hieght.value_text.to_i rescue nil
     @treatements_list = get_global_property_value("vitals").split(";") rescue ""
   
 	end
@@ -375,9 +381,8 @@ class ProtocolPatientsController < ApplicationController
 
     @first_visit = is_first_hypertension_clinic_visit(@patient.id)
 		 occupation_attribute = PersonAttributeType.find_by_name("Occupation")
-     @person_attribute = PersonAttribute.find(:first, :conditions => ["person_id = ? AND person_attribute_type_id = ?", @patient.person.id, occupation_attribute.person_attribute_type_id]) rescue nil
+     @person_attribute = PersonAttribute.find(:first, :conditions => ["person_id = ? AND person_attribute_type_id = ?", @patient.person.id, occupation_attribute.person_attribute_type_id]).value rescue "Unknown"
      
-
     @current_program = current_program
 	end
 end
