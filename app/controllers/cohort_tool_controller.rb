@@ -1098,13 +1098,14 @@ class CohortToolController < ApplicationController
     @quarter = params[:quarter]
     @start_date, @end_date = Report.generate_cohort_date_range(@quarter)
     @user = User.find(params["user_id"]) rescue nil
+    @logo = CoreService.get_global_property_value('logo').to_s
     #cohort = Cohort.new(start_date,end_date)
     #@cohort = cohort.report
     #@survival_analysis = SurvivalAnalysis.report(cohort)
 
     #@start_date = params[:start_date] rescue nil
     #@end_date = params[:end_date] rescue nil
-
+    #raise @end_date.to_yaml
     report = Reports::CohortDm.new(@start_date, @end_date)
     @facility = Location.current_health_center.name rescue ''
 
@@ -1354,7 +1355,7 @@ class CohortToolController < ApplicationController
                                   @maculopathy
 
     #render :layout => "report"
-    render :layout => false
+    render :template => "/cohort_tool/cohort", :layout => "cohort"
   end
 
 end
