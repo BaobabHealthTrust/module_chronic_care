@@ -142,7 +142,7 @@ class TaskFlow
       # If user does not have this activity, goto the patient dashboard
 
 			encounters =  [
-                      'VITALS','FAMILY HISTORY','SOCIAL HISTORY', 'LAB RESULTS',
+                      'VITALS','FAMILY HISTORY','SOCIAL HISTORY', 'GENERAL HEALTH','LAB RESULTS',
 											'CLINIC VISIT', 'TREATMENT', 'OUTCOME'
                      ]
 		observation = Observation.find(:all,
@@ -268,6 +268,24 @@ class TaskFlow
 					self.encounter_type = "HIV STATUS"
 					self.url = "/protocol_patients/hiv_status?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?("HIV STATUS")
+						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
+					else
+						return self
+					end
+        when "GENERAL HEALTH"
+					next if ! self.current_user_activities.include?(tsk.downcase)
+					self.patient.encounters.each do | enc |
+					 found = true if enc.name.upcase == "GENERAL HEALTH"
+					end
+					next if found == true
+          history = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
+                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
+                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
+
+					next if !history.blank?
+					self.encounter_type = 'GENERAL HEALTH'
+					self.url = "/protocol_patients/general_health?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+				  if ! my_activities.include?(tsk)
 						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
 					else
 						return self
