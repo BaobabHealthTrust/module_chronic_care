@@ -155,7 +155,7 @@
 <%#= raise @user.id.to_yaml %>
 	<input type='text' id='family_members'
 	   name='concept[Number of people in household excluding patient]'
-	   helpText='Number of family members '
+	   helpText='Number of family members including the deceased?'
 	   field_type="number"  pos='1'
 	   min = 1
 	   max = 20
@@ -165,7 +165,7 @@
 	   tt_onUnLoad = "setLimit()"/>
 
 	<input type='text' id='position'
-		 helpText='Patient birth order position'
+		 helpText='Patient birth order position?'
 		 name='concept[position]'
 		 field_type="number"  pos='1'
 
@@ -201,7 +201,7 @@
 
 	<select id='seizures'
 			name='concept[Seizures]'
-			helpText='Family History of Seizures '
+			helpText='Family History of Seizures?'
 			condition='program == "EPILEPSY PROGRAM"'
 			tt_onLoad ="showCategory('Family History')"
 			tt_requireNextClick = false >
@@ -213,7 +213,7 @@
   	<select id='mental_disorder'
 			name='concept[Mental Disorders]'
 			condition='program == "EPILEPSY PROGRAM"'
-			helpText='Family History of Mental Disorders '
+			helpText='Family History of Mental Disorders?'
 			tt_onLoad ="showCategory('Family History')"
 			tt_requireNextClick = false >
 	<option></option>

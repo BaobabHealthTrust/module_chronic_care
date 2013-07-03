@@ -587,7 +587,7 @@
 	 tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"
 	 tt_onLoad ="showCategory('Vitals')"/>
 <%#= raise @current_hieght.to_yaml %>
-<% if @current_hieght == 0 %>
+<% if @current_hieght.blank? || @patient.age.to_i < 14 %>
 	<input type='text' id='height'
 	name='concept[Height (cm)]'
 	helpText='Height (cm)'
