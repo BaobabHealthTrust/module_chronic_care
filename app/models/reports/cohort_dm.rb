@@ -1216,8 +1216,8 @@ class Reports::CohortDm
                                    LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
 		                                 WHERE concept_id = (SELECT concept_id FROM concept_name \
 		                                    WHERE name = 'Cardiac') OR UCASE(value_text) = 'CARDIAC' \
-		                                  AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') >= '" + @start_date +
-		      "' AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "' \
+		                                  AND DATE(patient.date_created) >= '" + @start_date +
+		      "' AND DATE(patient.date_created) <= '" + @end_date + "' \
                                     AND patient.voided = 0").length
   end
 
@@ -1255,8 +1255,8 @@ class Reports::CohortDm
                                    LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
 		                                 WHERE value_coded = (SELECT concept_id FROM concept_name \
 		                                    WHERE name = 'stroke' and concept_name_type = 'FULLY_SPECIFIED') OR value_text = 'stroke' \
-		                                  AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') >= '" + @start_date +
-		      "' AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "' \
+		                                  AND DATE(patient.date_created) >= '" + @start_date +
+		      "' AND DATE(patient.date_created) <= '" + @end_date + "' \
                                     AND patient.voided = 0").length
   end
 
