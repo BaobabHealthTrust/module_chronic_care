@@ -5,6 +5,12 @@
   }
 
 </style>
+<script>
+  function returnToMenu(){
+    window.location = '/clinic?user_id=<%= @user.id %>';
+  }
+
+</script>
 <html>
   <head>
     <title>DM Cohort Report</title>
@@ -17,7 +23,7 @@
     <div class="btn-menu">
       <button id="regenerate_button" class="button navButton blue" onclick="document.getElementById('frmMain').submit();"><span>Regenerate</span></button>
       <button id="print_button" class="button navButton blue" onclick="window.print()"><span>Print</span></button>
-      <button id="finish_button" class="button navButton green" onclick="window.location = '/people'"><span>Finish</span></button>
+      <button id="finish_button" class="button navButton green" onclick="returnToMenu()"><span>Finish</span></button>
       <button id="back_button" class="button navButton red" onclick="window.location = '/cohort_tool/dm_cohort_report_options'"><span>Back</span></button>
     </div>
 

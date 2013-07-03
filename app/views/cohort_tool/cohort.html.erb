@@ -1,589 +1,576 @@
-<html>
-<head>
-<%#= javascript_include_tag "prototype" %>
-<%#= stylesheet_link_tag "cohort" %>
-<script>
-  var tt_cancel_destination = "/cohort_tool/cohort_menu"  
+<!DOCTYPE html PUBLIC"-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+      <meta content="utf-8" http-equiv="encoding">
+        <%= javascript_include_tag "prototype" %>
+        <%= stylesheet_link_tag "cohort" %>
+        <script>
+          var tt_cancel_destination = "/"
 
-  function showReport() {
-    cohort = document.getElementsByClassName('scrollTableContainer')[0]
-    survival_analysis = document.getElementsByClassName('survival-analysis')[0]
-    switch_button = $('switch_view')
-    if (switch_button.innerHTML.sub('<span>','').sub('</span>','') == 'Survival Analysis'){
-      cohort.style.display = 'none'
-      switch_button.innerHTML = "<span>Cohort</span>"
-      survival_analysis.style.display = 'inline'
-    } else {
-      cohort.style.display = 'inline'
-      switch_button.innerHTML = "<span>Survival Analysis</span>"
-      survival_analysis.style.display = 'none'
-    } 
-     
-  }
-</script>
-<style>
-  table {
-    border-style:none;
-    border-width:1px;
-  }
+          function showReport() {
+            document.forms[0].submit();
+          }
 
-  th {
-    border-style:none;
-    border-width:1px;
-  }
+          function showReportChildren() {
+            document.forms[1].submit();
+          }
 
-  td {
-    text-align:center;
-    border-style:solid;
-    border-width:1px;
-  }
+          function showReportWomen() {
+            document.forms[2].submit();
+          }
+        </script>
+        <style>
 
-  .row_break td {
-    border-width:0px;
-  }
+          table {
+            border-style:none;
+            border-width:1px;
+            width:95% !important;
+            top: 10%;
+            left: 150%;
+          }
 
-  div.scrollTableContainer {
-    border-style:solid;
-  }
+          th {
+            border-style:none;
+            border-width:1px;
+          }
 
-  .survival-analysis th, .survival-analysis td {
-    text-align:left;
-  }
-</style>
+          td {
+            text-align:center;
+            border-style:solid;
+            border-width:1px;
+          }
 
-<title>Cohort<%= Location.current_health_center.name + "  " + @quarter %></title>
-</head>
+          .row_break td {
+            border-width:0px;
+          }
 
-<body>
-<h1><%= Location.current_health_center.name + "  " + @quarter %></h1>
-<br />
+          div.scrollTableContainer {
+            border-style:solid;
+            height:68%;
+            width: 98%;
+            float: right;
+            position:relative;
+          }
 
-<div class='scrollTableContainer'>
-<table class='dataTable' cellspacing='0'>
-<thead>
-<tr>
-  <th>&nbsp;</th>
-  <th style = "text-align:left;">PATIENT'S REGISTRATION DETAILS</th>
-  <th>NEWLY REGISTRATED IN quarter</th>
-  <th>CUMULATED EVER REGISTRATED</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-  <td style ="border-width:0px">6</td>
-  <td style="text-align:left;">Total registrated</td>
-  <td><%= @cohort['Newly total registrated'] %></td>
-  <td><%= @cohort['Total registrated'] %></td>
-</tr>
+          .survival-analysis th, .survival-analysis td {
+            text-align:left;
+          }
 
-<tr class = 'row_break'>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-</tr>
+          .clinic_own_data {
+            position:relative;
+            float:left;
+            display:block;
+            padding-left:10px;
+          }
 
-<tr class = 'row_break'>
-  <td>7</td>
-  <td style="text-align:left;border-width:1px 0px 0px 1px">Patients initiated on ART first time</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Patients initiated on ART']%></td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Total Patients initiated on ART']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>8</td>
-  <td style="text-align:left;border-width:0px 0px 0px 1px">Patients re-initiated on ART</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Patients reinitiated on ART']%></td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Total Patients reinitiated on ART']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>9</td>
-  <td style="text-align:left;border-width:0px 0px 1px 1px">Patients transfered in on ART</td>
-  <td style="border-width:1px 0px 1px 1px"><%=@cohort['Newly transferred in patients'] %></td>
-  <td style="border-width:1px 0px 1px 1px"><%=@cohort['Total transferred in patients'] %></td>
-</tr>
+          .checked_data {
+            position:relative;
+            float:right;
+            display:block;
+            padding-right:10px;
+          }
+          a{
+            text-decoration: none !important;
+            color: #E8EAF1;
+          }
+          a:hover {
+            color:black;
+          }
+          .clinic_data_value:hover {
+            color:black;
+          }
+          .checked_data_value:hover{
+            color:black;
+          }
+          td.create_button:hover{
+            color:black;
+          }
+          .clinic_data_value {
+            position:relative;
+            float:left;
+            display:block;
+            border: 0px 0px 2px 0px;
+            border-top: 1px outset black;
+            border-bottom: 1px outset black;
+            border-radius: 7px 7px 7px 7px;
+            border-left:0px;
+            margin-top:2px;
+            border-style: outset;
+            width:30%;
+            height:100%;
+            padding: 10px 16px 10px 10px;
+            text-align: center;
+            text-decoration: none !important;
+            background-color: #7784AE;
+            color: #E8EAF1;
+            display: block;
+            font-size:13px;
+          }
+          .create_button a{
+            background-color: #7784AE;
+            border-bottom: 1px outset black;
+            border-radius: 7px 7px 7px 7px;
+            border-style: outset;
+            border-top: 1px outset black;
+            color: #E8EAF1;
+            display: block;
+            padding: 10px 16px 10px 10px;
+            text-align: center;
+            text-decoration: none !important;
+            font-size:13px;
+          }
+          .heading {
+            background-color: #7784AE;
+            width: 100px;
+            height: 100%;
+            color: #E8EAF1;
+            font-size: 18px;
+          }
 
-<tr class = 'row_break'>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-</tr>
+          td.left_top_right {
+            border-width:3px 3px 0px 3px;
+          }
 
-<tr class = 'row_break'>
-  <td>10</td>
-  <td style="text-align:left;border-width:1px 0px 0px 1px">Male (all ages)</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Newly registrated male'] %></td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Total registrated male'] %></td>
-</tr>
-<tr class = 'row_break'>
-  <td>11</td>
-  <td style="text-align:left;border-width:0px 0px 0px 1px">Non-pregnant females (all ages)</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Newly registrated women (non-pregnant)']%></td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Total registrated women (non-pregnant)']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>12</td>
-  <td style="text-align:left;border-width:0px 0px 1px 1px">Pregnant females (all ages)</td>
-  <td style="border-width:1px 0px 1px 1px"><%=@cohort['Newly registrated women (pregnant)']%></td>
-  <td style="border-width:1px 0px 1px 1px"><%=@cohort['Total registrated women (pregnant)']%></td>
-</tr>
+          td.right_bottom_left {
+            border-width:1px 3px 3px 3px;
+          }
 
+          td.left_right {
+            border-width:1px 3px 0px 3px;
+          }
 
-<tr class = 'row_break'>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-</tr>
+          td.left_top_right_bottom {
+            border-width:3px 3px 3px 3px;
+          }
 
+          .regimen {
+            position:absolute;
+            top:0px;
+            left:1px;
+            border-radius:100px;
+            background:white;
+            color:black;
+            text-align:center;
+            font-size:15px;
+          }
+          td.regimen_name_top {
+            text-align:left;
+            border-width:1px 0px 0px 0px;
+            padding-left:100px;
+          }
 
-<tr class = 'row_break'>
-  <td>13</td>
-  <td style="text-align:left;border-width:1px 0px 0px 1px">Infants (0 - 17 months at ART initiation)</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Newly registrated infants']%></td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Total registrated infants']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>14</td>
-  <td style="text-align:left;border-width:0px 0px 0px 1px">Children (18 months - 14 years at initiation)</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Newly registrated children']%></td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Total registrated children']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>15</td>
-  <td style="text-align:left;border-width:0px 0px 0px 1px">Adult (15 years or older at ART initiation)</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Newly registrated adults']%></td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Total registrated adults']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>&nbsp;</td>
-  <td style="text-align:left;border-width:0px 0px 1px 1px">Unknown age</td>
-  <td style="border-width:1px 0px 1px 1px"><%=@cohort['']%></td>
-  <td style="border-width:1px 0px 1px 1px"><%=@cohort['']%></td>
-</tr>
+          td.regimen_name {
+            text-align:left;
+            border-width:0px 0px 0px 0px;
+            padding-left:100px;
+          }
 
-<tr class = 'row_break'>
-  <td>&nbsp;</td>
-  <td style="text-align:left;">Reason for starting ART</td>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-</tr>
+          td.regimen_name_bottom {
+            text-align:left;
+            border-width:0px 0px 1px 0px;
+            padding-left:100px;
+          }
 
-<tr class = 'row_break'>
-  <td>16</td>
-  <td style="text-align:left;border-width:1px 0px 0px 1px">Presumed severe HIV disease in infants</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Total Presumed severe HIV disease in infants']%></td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Total Presumed severe HIV disease in infants']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>17</td>
-  <td style="text-align:left;border-width:0px 0px 0px 1px">Confirmed HIV infection in infants (PCR)</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Confirmed HIV infection in infants (PCR)']%></td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Total Confirmed HIV infection in infants (PCR)']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>18</td>
-  <td style="text-align:left;border-width:0px 0px 0px 1px">WHO stage 1 or 2 ,CD4 below threshold</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['WHO stage 1 or 2, CD4 below threshold']%></td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Total WHO stage 1 or 2, CD4 below threshold']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>19</td>
-  <td style="text-align:left;border-width:0px 0px 0px 1px">WHO stage 2,total lymphocytes < 1,200/mm3</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['WHO stage 2, total lymphocytes']%></td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Total WHO stage 2, total lymphocytes']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>20</td>
-  <td style="text-align:left;border-width:0px 0px 0px 1px">WHO stage 3</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['WHO stage 3']%></td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Total WHO stage 3']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>21</td>
-  <td style="text-align:left;border-width:0px 0px 0px 1px">WHO stage 4</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['WHO stage 4']%></td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Total WHO stage 4']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>22</td>
-  <td style="text-align:left;border-width:0px 0px 0px 1px">Breastfeeding</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Patient breastfeeding']%></td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Total Patient breastfeeding']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>23</td>
-  <td style="text-align:left;border-width:0px 0px 0px 1px">Pregnant</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Patient pregnant'] %></td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Total Patient pregnant']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>24</td>
-  <td style="text-align:left;border-width:0px 0px 0px 1px">HIV infected</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['HIV infected']%></td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Total HIV infected']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>25</td>
-  <td style="text-align:left;border-width:0px 0px 1px 1px">Unknown / other reason outside guidelines</td>
-  <td style="border-width:1px 0px 1px 1px"><%=@cohort['Unknown reason']%></td>
-  <td style="border-width:1px 0px 1px 1px"><%=@cohort['Total Unknown reason']%></td>
-</tr>
+          b {
+            position:relative;
+            float:left;
+            display:block;
+            width:68px;
+            padding-left:5px;
+          }
+          tr{
+            width:100% !important;
+          }
+          td.bg {
+            background-color:lightgrey;
+            -moz-user-select:none;
+          }
 
-<tr class = 'row_break'>
-  <td>&nbsp;</td>
-  <td style="text-align:left;">Stage defining conditions at ART initiation</td>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-</tr>
+          .logo {
+            float:left;
+            height: 8em;
+          }
+          #range{
+            float:left;
+            height: 8em;
+          }
+          .dataTable{
+            width:6%
+          }
 
-<tr class = 'row_break'>
-  <td>26</td>
-  <td style="text-align:left;border-width:1px 0px 0px 1px">No TB</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['No TB']%></td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Total No TB']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>27</td>
-  <td style="text-align:left;border-width:0px 0px 0px 1px">TB within the past 2 years</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['TB within the last 2 years']%></td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Total TB within the last 2 years']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>28</td>
-  <td style="text-align:left;border-width:0px 0px 0px 1px">Current episode of TB</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Current episode of TB']%></td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Total Current episode of TB']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>29</td>
-  <td style="text-align:left;border-width:0px 0px 1px 1px">Kaposis Sarcoma</td>
-  <td style="border-width:1px 0px 1px 1px"><%=@cohort['Kaposis Sarcoma']%></td>
-  <td style="border-width:1px 0px 1px 1px"><%=@cohort['Total Kaposis Sarcoma']%></td>
-</tr>
+        </style>
 
-<tr class = 'row_break'>
-  <td>&nbsp;</td>
-  <td style="text-align:left;">Primary outcomes as of the end of the quarter evaluated (only cumulative)</td>
-  <td>&nbsp;</td>
-  <td style="text-align:center;">Cumulative ever registrated</td>
-</tr>
+        <title>Cohort<%= Location.current_health_center.name + "  " + @quarter %></title>
+        </head>
+        <body>
 
 
-<tr class = 'row_break'>
-  <td>30</td>
-  <td style="text-align:left;border-width:1px 0px 1px 1px">Total alive and on ART</td>
-  <td style="border-width:1px 0px 1px 0px">&nbsp;</td>
-  <td style="border-width:1px"><%=@cohort['Total alive and on ART']%></td>
-</tr>
+          <br />
+          <table>
+            <tr>
+              <td  style="text-align:left;border-width:0px 0px 0px 0px"><%= image_tag(@logo,:class=>"logo")%></td>
+              <td  style="text-align:left;border-width:0px 0px 0px 0px">
+                <table>
+                  <tr>
+                    <td  style="text-align:left;border-width:0px 0px 0px 0px">
+                      <h2><%= Location.current_health_center.name + " : " + @quarter %></h2>
+                      <b>Start Date: </b><%= @specified_period[0].to_date.strftime("%A %d %B, %Y") %> </br>
+                      <b> End Date: </b><%= @specified_period[1].to_date.strftime("%A %d %B, %Y") %>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
 
-
-<tr class = 'row_break'>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-</tr>
+          <br />
 
 
 
-<tr class = 'row_break'>
-  <td>31</td>
-  <td style="text-align:left;border-width:1px 0px 0px 1px">Died within the 1st month of ART initiation</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Died within the 1st month after ART initiation']%></td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Total Died within the 1st month after ART initiation']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>32</td>
-  <td style="text-align:left;border-width:0px 0px 0px 1px">Died within the 2nd month of ART initiation</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Died within the 2nd month after ART initiation']%></td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Total Died within the 2nd month after ART initiation']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>33</td>
-  <td style="text-align:left;border-width:0px 0px 0px 1px">Died within the 3rd month of ART initiation</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Died within the 3rd month after ART initiation']%></td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Total Died within the 3rd month after ART initiation']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>34</td>
-  <td style="text-align:left;border-width:0px 0px 1px 1px">Died after the 3rd month of ART initiation</td>
-  <td style="border-width:1px 0px 1px 1px"><%=@cohort['Died after the end of the 3rd month after ART initiation']%></td>
-  <td style="border-width:1px 0px 1px 1px"><%=@cohort['Total Died after the end of the 3rd month after ART initiation']%></td>
-</tr>
 
+          <div class='scrollTableContainer'>
+            <table cellspacing='0' align="center" width="98%" height="95%">
+              <thead>
+                <tr>
 
-<tr class = 'row_break'>
-  <td>35</td>
-  <td style="text-align:left;border-width:1px 0px 0px 1px">Died Total</td>
-  <td style="border-width:1px 0px 0px 0px">&nbsp;</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Died total']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>36</td>
-  <td style="text-align:left;border-width:0px 0px 0px 1px">Defaulted (more than 2 months overdue after expected to have run out of ARVs)</td>
-  <td style="border-width:0px">&nbsp;</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Defaulted']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>37</td>
-  <td style="text-align:left;border-width:0px 0px 0px 1px">Stopped taking ARVs (clinician or patient own decision,last known alive)</td>
-  <td style="border-width:0px">&nbsp;</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['Stopped taking ARVs']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>38</td>
-  <td style="text-align:left;border-width:0px 0px 1px 1px">Transfered out</td>
-  <td style="border-width:0px 0px 1px 0px;">&nbsp;</td>
-  <td style="border-width:1px 0px 1px 1px"><%=@cohort['Transferred out']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>&nbsp;</td>
-  <td style="text-align:left;border-width:0px 0px 1px 1px;">Unknown outcome</td>
-  <td style="border-width:0px 0px 1px 0px;">&nbsp;</td>
-  <td style="border-width:0px 1px 1px 1px;"><%=@cohort['']%></td>
-</tr>
+                  <th style = "text-align:left;">PATIENT'S REGISTRATION DETAILS</th>
+                  <th>NEWLY REGISTRATED IN quarter</th>
+                  <th>CUMULATED EVER REGISTRATED</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
 
+                  <td style="text-align:left;">Total registrated</td>
+                  <td><%=  @total_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
 
-<tr class = 'row_break'>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-</tr>
+                <tr class = 'row_break'>
 
-<tr class = 'row_break'>
-  <td>&nbsp;</td>
-  <td style="text-align:left;">Secondary outcomes of those alive on ART as of last visit before end of quarter</td>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-</tr>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
 
-<tr class = 'row_break'>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-</tr>
+                <tr class = 'row_break'>
 
-<tr class = 'row_break'>
-  <td>39</td>
-  <td style="text-align:left;">ARV regimens</td>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-</tr>
+                  <td style="text-align:left;border-width:1px 0px 0px 1px">Males</td>
+                  <td style="border-width:1px 1px 1px 1px"><%=  @total_men_registered %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @total_men_ever_registered %></td>
+                </tr>
+                <tr class = 'row_break'>
 
-<tr class = 'row_break'>
-  <td>&nbsp;</td>
-  <td style="text-align:left;border-width:1px 0px 0px 1px">D4T + 3TC + NVP</font></td>
-  <td style="border-width:1px 0px 0px 1px">A1<br />P1</td>
-  <td style="border-width:1px 0px 0px 1px">
-    <%=@cohort['Regimens']['A1'] || '0'%><br />
-    <%=@cohort['Regimens']['P1'] || '0'%><br />
-  </td>
-</tr>
-<tr class = 'row_break'>
-  <td>&nbsp;</td>
-  <td style="text-align:left;border-width:1px 0px 1px 1px;">AZT + 3TC + NVP</td>
-  <td style="border-width:1px 0px 0px 1px;">A2<br />P2</td>
-  <td style="border-width:1px 0px 0px 1px">
-    <%=@cohort['Regimens']['A2'] || '0'%><br />
-    <%=@cohort['Regimens']['P2'] || '0'%>
-  </td>
-</tr>
-<tr class = 'row_break'>
-  <td>&nbsp;</td>
-  <td style="border-width:0px 0px 1px 1px;text-align:left;">D4T + 3TC + EFV</td>
-  <td style="border-width:1px 0px 0px 1px;">A3<br />P3</td>
-  <td style="border-width:1px 0px 0px 1px">
-    <%=@cohort['Regimens']['A3'] || '0'%><br />
-    <%=@cohort['Regimens']['P3'] || '0'%>
-  </td>
-</tr>
-<tr class = 'row_break'>
-  <td>&nbsp;</td>
-  <td style="border-width:0px 0px 0px 1px;text-align:left;">AZT + 3TC + EFV</td>
-  <td style="border-width:1px 0px 1px 1px;">A4<br />P4</td>
-  <td style="border-width:1px 0px 0px 1px">
-    <%=@cohort['Regimens']['A4'] || '0'%><br />
-    <%=@cohort['Regimens']['P4'] || '0'%>
-  </td>
-</tr>
-<tr class = 'row_break'>
-  <td>&nbsp;</td>
-  <td style="text-align:left;border-width:1px 0px 1px 1px;">TDF + 3TC + EFV</td>
-  <td style="border-width:0px 0px 1px 1px;">A5<br />P5</td>
-  <td style="border-width:1px 0px 0px 1px">
-    <%=@cohort['Regimens']['A5'] || '0'%><br />
-    <%=@cohort['Regimens']['P5'] || '0'%>
-</tr>
-<tr class = 'row_break'>
-  <td>&nbsp;</td>
-  <td style="text-align:left;border-width:0px 0px 0px 1px;">TDF + 3TC + NVP</td>
-  <td style="border-width:0px 0px 1px 1px;">A6<br />P6</td>
-  <td style="border-width:1px 0px 1px 1px">
-    <%=@cohort['Regimens']['A6'] || '0'%><br />
-    <%=@cohort['Regimens']['P6'] || '0'%>
-  </td>
-</tr>
+                  <td style="text-align:left;border-width:0px 0px 1px 1px">Females</td>
+                  <td style="border-width:1px 1px 1px 1px"><%=  @total_women_registered %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%=  @total_women_everregistered %></td>
+                </tr>
 
-<!-- start -->
+                <tr class = 'row_break'>
 
-<tr class = 'row_break'>
-  <td>&nbsp;</td>
-  <td style="text-align:left;border-width:1px 0px 0px 1px;">TDF + 3TC + LPV/r</td>
-  <td style="border-width:0px 0px 1px 1px;">A7<br />P7</td>
-  <td style="border-width:0px 0px 1px 1px">
-    <%=@cohort['Regimens']['A7'] || '0'%><br />
-    <%=@cohort['Regimens']['P7'] || '0'%>
-  </td>
-</tr>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+                <tr class = 'row_break heading'>
+                  <td colspan="3" style="text-align:center;border-width:0px 0px 0px 0px">Outcomes</td>
+                </tr>
+                <tr class = 'row_break'>
 
-<tr class = 'row_break'>
-  <td>&nbsp;</td>
-  <td style="text-align:left;border-width:1px 0px 0px 1px;">AZT + 3TC + LPV/r</td>
-  <td style="border-width:0px 0px 1px 1px;">A8<br />P8</td>
-  <td style="border-width:0px 0px 1px 1px">
-    <%=@cohort['Regimens']['A8'] || '0'%><br />
-    <%=@cohort['Regimens']['P8'] || '0'%>
-  </td>
-</tr>
+                  <td style="text-align:left;border-width:1px 0px 0px 1px">Alive and on treatment</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @alive %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @alive_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
 
-<tr class = 'row_break'>
-  <td>&nbsp;</td>
-  <td style="text-align:left;border-width:1px 0px 0px 1px;">ABC + 3TC + LPV/r</td>
-  <td style="border-width:0px 0px 1px 1px;">A9<br />P9</td>
-  <td style="border-width:0px 0px 1px 1px">
-    <%=@cohort['Regimens']['A9'] || '0'%><br />
-    <%=@cohort['Regimens']['P9'] || '0'%>
-  </td>
-</tr>
-<!-- end -->
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Dead</td>
+                  <td style="border-width:1px 1px 1px 1px"><%=@dead %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%=@dead_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
 
-<tr class = 'row_break'>
-  <td>40</td>
-  <td style="text-align:left;border-width:1px 0px 1px 1px;">Non-standard</td>
-  <td style="border-width:0px 0px 1px 1px;">(Patients on any other regimens)</td>
-  <td style="border-width:0px 1px 1px 1px;"><%=@cohort['Regimens']['UNKNOWN ANTIRETROVIRAL DRUG'] || '0'%></td>
-</tr>
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Defaulters</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @defaulters %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @defaulters_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
 
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Transfer Out</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @transfer_out %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @transfer_out_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
 
-<tr class = 'row_break'>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-</tr>
+                  <td style="text-align:left;border-width:0px 0px 1px 1px">Stop Treatment</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @stopped_treatment %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @stopped_treatment_ever %></td>
+                </tr>
 
-<tr class = 'row_break'>
-  <td>41</td>
-  <td style="text-align:left;border-width:1px 0px 1px 1px;">Total patients with side effects</td>
-  <td style="border-width:1px 0px 1px 0px;">&nbsp;</td>
-  <td style="border-width:1px"><%=@cohort['']%></td>
-</tr>
+                <tr class = 'row_break'>
 
-<tr class = 'row_break'>
-  <td>&nbsp;</td>
-  <td style="text-align:left;border-width:0px">Adherence</td>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-</tr>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
 
-<tr class = 'row_break'>
-  <td>42</td>
-  <td style="text-align:left;border-width:1px 0px 0px 1px;">Patients with 0 - 6 doses missed at their last visit (before end of quarter evaluated)</td>
-  <td style="border-width:1px 0px 0px 0px;">&nbsp;</td>
-  <td style="border-width:1px 0px 0px 1px;"><%=@cohort['']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>43</td>
-  <td style="text-align:left;border-width:1px 0px 1px 1px;">Patients with 7+ doses missed at their last visit (before end of quarter evaluated)</td>
-  <td style="border-width:1px 0px 1px 0px;">&nbsp;</td>
-  <td style="border-width:1px"><%=@cohort['']%></td>
-</tr>
-
-<tr class = 'row_break'>
-  <td>&nbsp;</td>
-  <td style="text-align:left;border-width:0px">Current TB status,any form of TB</td>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-</tr>
-
-<tr class = 'row_break'>
-  <td>44</td>
-  <td style="text-align:left;border-width:1px 0px 0px 1px;">TB not suspected</td>
-  <td style="border-width:1px 0px 0px 0px;">&nbsp;</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['TB not suspected']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>45</td>
-  <td style="text-align:left;border-width:1px 0px 1px 1px;">TB suspected</td>
-  <td style="border-width:1px 0px 1px 0px;">&nbsp;</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['TB suspected']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>46</td>
-  <td style="text-align:left;border-width:0px 0px 1px 1px;">TB confirmed, currently not yet on TB treatment</td>
-  <td style="border-width:0px 0px 1px 0px;">&nbsp;</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['TB confirmed not treatment']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>47</td>
-  <td style="text-align:left;border-width:0px 0px 1px 1px;">TB confirmed, on TB treatment</td>
-  <td style="border-width:0px 0px 1px 0px;">&nbsp;</td>
-  <td style="border-width:1px 0px 0px 1px"><%=@cohort['TB confirmed on treatment']%></td>
-</tr>
-<tr class = 'row_break'>
-  <td>&nbsp;</td>
-  <td style="text-align:left;border-width:0px 0px 1px 1px;">Unknown TB status</td>
-  <td style="border-width:0px 0px 1px 0px;">&nbsp;</td>
-  <td style="border-width:1px 0px 1px 1px"><%=@cohort['TB Unknown']%></td>
-</tr>
-
-</tbody>
-</table>
-</div>
-
-<div class = 'survival-analysis'>
-<table>
-<% @survival_analysis.each do | key , values | %>
-  <tr>
-    <th><%=key%></th>
-    <th>&nbsp;</th>
-  </tr>
-  <tr>
-    <td>New patients registered for ART</td>
-    <td style = "text-align:right;"><%=values['New patients registered for ART']%></td>
-  </tr>
-  <tr>
-    <td>Number Alive and on ART</td>
-    <td style = "text-align:right;"><%=values['Number Alive and on ART']%></td>
-  </tr>
-  <tr>
-    <td>Number Dead</td>
-    <td style = "text-align:right;"><%=values['Number Dead']%></td>
-  </tr>
-  <tr>
-    <td>Number Defaulted</td>
-    <td style = "text-align:right;"><%=values['Unknown']%></td>
-  </tr>
-  <tr>
-    <td>Number Stopped Treatment</td>
-    <td style = "text-align:right;"><%=values['Number Stopped Treatment']%></td>
-  </tr>
-  <tr>
-    <td>Number Transferred out</td>
-    <td style = "text-align:right;"><%=values['Number Transferred out']%></td>
-  </tr>
-  <tr>
-    <td>Number Unknown</td>
-    <td style = "text-align:right;"><%=values['Unknown']%></td>
-  </tr>
-<% end rescue nil%>
-</table>
-</div>
+                <tr class = 'row_break heading'>
+                  <td align="center" colspan="3">Treatment Of Those Who Are Alive And On Treatment</td>
+                </tr>
 
 
 
-</body>
-</html>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:1px 0px 0px 1px">Diet only</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @on_diet %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @on_diet_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Oral hypoglycaemic agents only</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @oral_treatments %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @oral_treatments_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Insulin only</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @insulin %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @insulin_ever %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Insulin and oral hypoglycaemic agents</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @oral_and_insulin %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @oral_and_insulin_ever %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Metformin</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @metformin %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @metformin_ever %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Glibenclamide</td>
+                  <td style="border-width:1px 0px 1px 1px"><%= @glibenclamide %></td>
+                  <td style="border-width:1px 0px 1px 1px"><%= @glibenclamide_ever %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Lente Insulin</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @lente_insulin %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @lente_insulin_ever %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 1px 1px">Soluble Insulin</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @soluble_insulin %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @soluble_insulin_ever %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+
+                <tr class = 'row_break heading'>
+
+                  <td style="text-align:center;" colspan="3">Complications Of Those Who Are Alive And On Treatment</td>
+                  
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:1px 1px 0px 1px">Heart Failure</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @heart_failure %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @heart_failure_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Heart Attack/M. Infraction</td>
+                  <td style="border-width:1px 0px 0px 1px"><%= @mi %></td>
+                  <td style="border-width:1px 1px 0px 1px"><%= @mi_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Kidney Failure</td>
+                  <td style="border-width:1px 0px 0px 1px"><%= @kidney_failure %></td>
+                  <td style="border-width:1px 1px 0px 1px"><%= @kidney_failure_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Stroke</td>
+                  <td style="border-width:1px 0px 0px 1px"><%= @stroke %></td>
+                  <td style="border-width:1px 1px 0px 1px"><%= @stroke_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">TIA</td>
+                  <td style="border-width:1px 0px 0px 1px"><%= @tia %></td>
+                  <td style="border-width:1px 1px 0px 1px"><%= @tia_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Foot ulcers</td>
+                  <td style="border-width:1px 0px 0px 1px"><%= @ulcers %></td>
+                  <td style="border-width:1px 1px 0px 1px"><%= @ulcers_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Impotence</td>
+                  <td style="border-width:1px 0px 0px 1px"><%= @impotence %></td>
+                  <td style="border-width:1px 1px 0px 1px"><%= @impotence_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Gangrene/Amputation</td>
+                  <td style="border-width:1px 0px 0px 1px"><%= @amputation %></td>
+                  <td style="border-width:1px 1px 0px 1px"><%= @amputation_ever  %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Diabetic Retinopathy</td>
+                  <td style="border-width:1px 0px 0px 1px"><%= @diabetic_retinopathy %></td>
+                  <td style="border-width:1px 1px 0px 1px"><%= @diabetic_retinopathy_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Cataracts</td>
+                  <td style="border-width:1px 0px 1px 1px"><%= @cataracts %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @cataracts_ever %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Nephropathy</td>
+                  <td style="border-width:1px 0px 0px 1px"><%= @nephropathy %></td>
+                  <td style="border-width:1px 1px 0px 1px"><%= @nephropathy_ever %></td>
+                </tr>
+
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Neuropathy</td>
+                  <td style="border-width:1px 0px 0px 1px"><%= @neuropathy %></td>
+                  <td style="border-width:1px 1px 0px 1px"><%= @neuropathy_ever %></td>
+                </tr>
+
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Macrovascular</td>
+                  <td style="border-width:1px 0px 0px 1px"><%=  @macrovascular %></td>
+                  <td style="border-width:1px 1px 0px 1px"><%=  @macrovascular_ever %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 1px 1px">No recorded complications</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @no_complications %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @no_complications_ever %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+
+                <tr class = 'row_break heading'>
+
+                  <td  style="text-align:center;" colspan="3">TB Status Of All Patients Registered</td>
+                 
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:1px 0px 0px 1px">TB Status Known</td>
+                  <td style="border-width:1px 0px 0px 1px"><%= @tb_known %></td>
+                  <td style="border-width:1px 1px 0px 1px"><%= @tb_known_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">TB Ever</td>
+                  <td style="border-width:1px 0px 0px 1px"><%= @tb %></td>
+                  <td style="border-width:1px 1px 0px 1px"><%= @tb_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">TB Since Diabetes Diagnosis</td>
+                  <td style="border-width:1px 0px 0px 1px"><%= @tb_after_diabetes %></td>
+                  <td style="border-width:1px 1px 0px 1px"><%= @tb_after_diabetes_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">No TB</td>
+                  <td style="border-width:1px 0px 1px 1px"><%= @no_tb %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @no_tb_ever %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 1px 1px">TB Status Unknown</td>
+                  <td style="border-width:1px 0px 1px 1px"><%= @tb_unknown %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @tb_unknown_ever %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+
+                <tr class = 'row_break heading'>
+
+                  <td  style="text-align:center;" colspan="3">HIV Status Of All Patients Registered</td>
+                  
+                </tr>
+
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:1px 0px 0px 1px">Reactive Not on ART</td>
+                  <td style="border-width:1px 0px 1px 1px"><%= @reactive_not_on_art %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @reactive_not_on_art_ever %></td>
+                </tr>
+
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Reactive on ART</td>
+                  <td style="border-width:1px 0px 1px 1px"><%= @reactive_on_art %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @reactive_on_art_ever %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Non Reactive</td>
+                  <td style="border-width:1px 0px 1px 1px"><%= @non_reactive %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @non_reactive_ever %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Unknown</td>
+                  <td style="border-width:1px 0px 1px 1px"><%= @unknown %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @unknown_ever %></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+
+
+        </body>
+        </html>
