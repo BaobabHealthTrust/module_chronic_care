@@ -624,9 +624,9 @@ def mastercard_demographics(patient_obj)
   end
 
   def calculate_bp(patient, visit_date)
-    systolic = Vitals.current_vitals(patient, "Systolic blood pressure", visit_date).value_numeric
-    diastolic = Vitals.current_vitals(patient, "Diastolic blood pressure", visit_date).value_numeric
-    return (systolic.to_i / diastolic.to_i)
+    systolic = Vitals.todays_vitals(patient, "Systolic blood pressure", visit_date).value_numeric rescue 0
+    diastolic = Vitals.todays_vitals(patient, "Diastolic blood pressure", visit_date).value_numeric  rescue 0
+    return (systolic.to_i / diastolic.to_i) rescue 0
   end
 
   def number_of_booked_patients
@@ -1010,10 +1010,11 @@ def mastercard_demographics(patient_obj)
 			visit_date = obs.obs_datetime.to_date
 			patient_visits[visit_date] = Mastercard.new() if patient_visits[visit_date].blank?
 
-      patient_visits[visit_date].bp = calculate_bp(patient_obj, visit_date)
-      
-			concept_name = obs.concept.fullname
 
+      #patient_visits[visit_date].bp = calculate_bp(patient_obj, visit_date)
+
+			concept_name = obs.concept.fullname
+      
 			if concept_name.upcase == 'APPOINTMENT DATE'
 				patient_visits[visit_date].appointment_date = obs.value_datetime
 			elsif concept_name.upcase == 'HEIGHT (CM)'
