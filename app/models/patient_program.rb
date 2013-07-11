@@ -47,7 +47,7 @@ class PatientProgram < ActiveRecord::Base
   end
   
   def transition(params)
-     
+    
     ActiveRecord::Base.transaction do
       # Find the state by name
       # Used upcase below as we were having problems matching the concept fullname with the state
@@ -55,11 +55,17 @@ class PatientProgram < ActiveRecord::Base
 			#raise self.program.program_workflows.map(&:program_workflow_states).flatten.to_yaml
       #selected_state = self.program.program_workflows.map(&:program_workflow_states).flatten.select{|pws|
 				selected_state = ""
-				#raise params[:state].to_yaml
+
+        if params[:state]["state"].blank?
+          current_state = params[:state]
+        else
+          current_state = params[:state]["state"]
+        end
+				
        # pws.concept.fullname.upcase() == params[:state].upcase()}.first rescue nil
 			 self.program.program_workflows.map(&:program_workflow_states).flatten.select{|pws|
-				selected_state = pws if pws.concept.fullname.upcase == (params[:state]["state"].upcase || params[:state].to_yaml)
-				} 
+				selected_state = pws if pws.concept.fullname.upcase == current_state.upcase
+				}
 				
       state = self.patient_states.last rescue []
       if (state && selected_state == state.program_workflow_state)

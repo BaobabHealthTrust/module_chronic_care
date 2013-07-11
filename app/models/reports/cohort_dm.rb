@@ -107,11 +107,12 @@ class Reports::CohortDm
   def total_men_registered
 		Patient.count(:all,
 									:include => {:person =>{}},
-									:conditions => ["patient.date_created >= ? AND
-																		patient.date_created <= ?
-																		AND UCASE(person.gender) = ?
+									:conditions => ["DATE(patient.date_created) >= ? AND
+																		DATE(patient.date_created) <= ?
+																		AND (UCASE(person.gender) = ?
+                                    OR UCASE(person.gender) = ?)
 																		AND patient.voided = 0",
-																		@start_date, @end_date, "M"]
+																		@start_date, @end_date, "M", "MALE"]
 								 )
   end
 
@@ -120,10 +121,11 @@ class Reports::CohortDm
 									:include => {:person =>{}},
 									:conditions => ["patient.date_created >= ?
 																		AND patient.date_created <= ?
-																		AND UCASE(person.gender) = ?
+																		AND (UCASE(person.gender) = ?
+                                    OR UCASE(person.gender) = ?)
 																		AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) >= 15
 																		AND patient.voided = 0",
-																		@start_date, @end_date, "M"]
+																		@start_date, @end_date, "M", "MALE"]
 									)
   end
 
@@ -133,9 +135,10 @@ class Reports::CohortDm
 								 :conditions => ["patient.date_created >= ?
 								 									AND patient.date_created <= ?
 																	AND UCASE(person.gender) = ?
+                                  OR UCASE(person.gender) = ?
 																	AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) <= 14
 																	AND patient.voided = 0",
-																	@start_date, @end_date, "M"]
+																	@start_date, @end_date, "M", "MALE"]
 								)
   end
 
@@ -144,9 +147,10 @@ class Reports::CohortDm
 									:include => {:person =>{}},
 									:conditions => ["patient.date_created >= ? AND
 																		patient.date_created <= ?
-																		AND UCASE(person.gender) = ?
+																		AND (UCASE(person.gender) = ?
+                                    OR UCASE(person.gender) = ?)
 																		AND patient.voided = 0",
-																		@start_date, @end_date, "F"]
+																		@start_date, @end_date, "F", "FEMALE"]
 								 )
   end
 
@@ -156,9 +160,10 @@ class Reports::CohortDm
 									:conditions => ["patient.date_created >= ?
 																		AND patient.date_created <= ?
 																		AND UCASE(person.gender) = ?
+                                    OR UCASE(person.gender) = ?
 																		AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) >= 15
 																		AND patient.voided = 0",
-																		@start_date, @end_date, "F"]
+																		@start_date, @end_date, "F", "FEMALE"]
 									)
   end
 
@@ -168,9 +173,10 @@ class Reports::CohortDm
 								 :conditions => ["patient.date_created >= ?
 								 									AND patient.date_created <= ?
 																	AND UCASE(person.gender) = ?
+                                  OR UCASE(person.gender) = ?
 																	AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) <= 14
 																	AND patient.voided = 0",
-																	@start_date, @end_date, "F"]
+																	@start_date, @end_date, "F", "FEMALE"]
 								)
   end
 
@@ -204,9 +210,10 @@ class Reports::CohortDm
     Patient.count(:all,
     							:include => {:person =>{}},
     							:conditions => ["person.gender = ?
+                                    OR UCASE(person.gender) = ?
     																AND patient.voided = 0
     																AND patient.date_created <= ?",
-    																"M", @end_date])
+    																"M", "MALE", @end_date])
   end
 
   def total_adult_men_ever_registered
@@ -215,43 +222,48 @@ class Reports::CohortDm
 									:conditions => ["person.gender = ?
 																		AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) >= 15
 																		AND patient.voided = 0
-																		AND patient.date_created <= ?", "M", @end_date])
+                                    OR UCASE(person.gender) = ?
+																		AND patient.date_created <= ?", "M", "MALE", @end_date])
   end
 
   def total_boy_children_ever_registered
 		Patient.count(:all,
 									:include => {:person =>{}},
 									:conditions => ["person.gender = ?
+                                   OR UCASE(person.gender) = ?
 																		AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) <= 14
 																		AND patient.voided = 0
-																		AND patient.date_created <= ?", "M", @end_date])
+																		AND patient.date_created <= ?", "M", "MALE", @end_date])
   end
 
   def total_women_ever_registered
     Patient.count(:all,
     							:include => {:person =>{}},
-    							:conditions => ["person.gender = ?
+    							:conditions => ["(person.gender = ?
+                                    OR UCASE(person.gender) = ?)
     																AND patient.voided = 0
     																AND patient.date_created <= ?",
-    																"F", @end_date])
+    																"F", "FEMALE", @end_date])
   end
 
   def total_adult_women_ever_registered
 		Patient.count(:all,
 									:include => {:person =>{}},
 									:conditions => ["person.gender = ?
+                                    OR UCASE(person.gender) = ?
 																		AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) >= 15
 																		AND patient.voided = 0
-																		AND patient.date_created <= ?", "F", @end_date])
+																		AND patient.date_created <= ?", "F", "FEMALE", @end_date])
   end
 
   def total_girl_children_ever_registered
 		Patient.count(:all,
 									:include => {:person =>{}},
 									:conditions => ["person.gender = ?
+                                    OR UCASE(person.gender) = ?
 																		AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) <= 14
 																		AND patient.voided = 0
-																		AND patient.date_created <= ?", "F", @end_date])
+																		AND patient.date_created <= ?", "F", "FEMALE", @end_date])
   end
 
   # Oral Treatments
@@ -1048,12 +1060,52 @@ class Reports::CohortDm
 
   # Outcome
   def dead_ever
-  	@dead_ever = Person.find(:all, :conditions => ["person_id IN (SELECT patient_id FROM patient) AND dead = 1 AND DATE(death_date) <= DATE('#{@end_date}')"]).length
+        program_id = Program.find_by_name("CHRONIC CARE PROGRAM").id
+    
+    patient_died = ConceptName.find_all_by_name('PATIENT DIED')
+		state = ProgramWorkflowState.find(
+		  :first,
+		  :conditions => ["concept_id IN (?)",
+					      patient_died.map{|c|c.concept_id}]
+		).program_workflow_state_id
+
+   
+		@dead = PatientState.find_by_sql("
+            SELECT s.patient_program_id, patient_id,patient_state_id,start_date, n.name name,state
+            FROM patient_state s
+            LEFT JOIN patient_program p ON p.patient_program_id = s.patient_program_id
+            LEFT JOIN program_workflow pw ON pw.program_id = p.program_id
+            LEFT JOIN program_workflow_state w ON w.program_workflow_id = pw.program_workflow_id
+            AND w.program_workflow_state_id = s.state
+            LEFT JOIN concept_name n ON w.concept_id = n.concept_id
+            WHERE p.voided = 0 AND s.voided = 0
+            AND p.program_id = #{program_id}
+            AND s.start_date <= '#{@end_date}'
+            AND n.name = 'PATIENT DIED'
+            ORDER BY patient_state_id DESC, start_date DESC").length
   end
 
   def dead
-  	@dead = Person.find(:all,
-  											:conditions => ["person_id IN (SELECT patient_id FROM patient) AND dead = 1 AND DATE(death_date) >= DATE('#{@start_date}') AND DATE(death_date) <= DATE('#{@end_date}')"]).length
+    program_id = Program.find_by_name("CHRONIC CARE PROGRAM").id
+    
+    patient_died = ConceptName.find_all_by_name('PATIENT DIED')
+
+   
+		@dead = PatientState.find_by_sql("
+            SELECT s.patient_program_id, patient_id,patient_state_id,start_date, n.name name,state
+            FROM patient_state s
+            LEFT JOIN patient_program p ON p.patient_program_id = s.patient_program_id
+            LEFT JOIN program_workflow pw ON pw.program_id = p.program_id
+            LEFT JOIN program_workflow_state w ON w.program_workflow_id = pw.program_workflow_id
+            AND w.program_workflow_state_id = s.state
+            LEFT JOIN concept_name n ON w.concept_id = n.concept_id
+            WHERE p.voided = 0 AND s.voided = 0
+            AND p.program_id = #{program_id}
+            AND (s.start_date >= '#{@start_date}'
+            AND s.start_date <= '#{@end_date}')
+            AND n.name = 'PATIENT DIED'
+            ORDER BY patient_state_id DESC, start_date DESC").length
+
   end
 
   def alive_ever
@@ -1066,71 +1118,83 @@ class Reports::CohortDm
  end
 
   def transfer_out_ever
-			sql = "SELECT DISTINCT p.patient_id 
-						FROM patient p
-								 LEFT JOIN patient_program pp
-								 ON p.patient_id = pp.patient_id
-								 					 LEFT JOIN patient_state st
-								 					 ON pp.patient_program_id = st.patient_program_id
-								 					 						LEFT JOIN program_workflow_state pws
-								 					 						ON st.state = pws.program_workflow_state_id
-								 					 											LEFT JOIN concept_name cn ON pws.concept_id = cn.concept_id
-						WHERE st.end_date IS NULL AND cn.name = 'Patient transferred out' AND st.voided = 0
-									AND DATE_FORMAT(st.date_created, '%Y-%m-%d') <= '#{@end_date}'
-									AND pp.program_id = #{@diabetes_program_id}"
+		 program_id = Program.find_by_name("CHRONIC CARE PROGRAM").id
 
-			Patient.find_by_sql(sql).length
+		@transferred_out_ever = PatientState.find_by_sql("
+            SELECT s.patient_program_id, patient_id,patient_state_id,start_date, n.name name,state
+            FROM patient_state s
+            LEFT JOIN patient_program p ON p.patient_program_id = s.patient_program_id
+            LEFT JOIN program_workflow pw ON pw.program_id = p.program_id
+            LEFT JOIN program_workflow_state w ON w.program_workflow_id = pw.program_workflow_id
+            AND w.program_workflow_state_id = s.state
+            LEFT JOIN concept_name n ON w.concept_id = n.concept_id
+            WHERE p.voided = 0 AND s.voided = 0
+            AND p.program_id = #{program_id}
+            AND s.start_date <= '#{@end_date}'
+            AND n.name = 'Patient transferred (External facility)'
+            ORDER BY patient_state_id DESC, start_date DESC").length
   end
 
   def transfer_out
-			sql = "SELECT DISTINCT p.patient_id 
-						FROM patient p
-								 LEFT JOIN patient_program pp
-								 ON p.patient_id = pp.patient_id
-								 					 LEFT JOIN patient_state st
-								 					 ON pp.patient_program_id = st.patient_program_id
-								 					 						LEFT JOIN program_workflow_state pws
-								 					 						ON st.state = pws.program_workflow_state_id
-								 					 											LEFT JOIN concept_name cn ON pws.concept_id = cn.concept_id
-						WHERE st.end_date IS NULL AND cn.name = 'Patient transferred out' AND st.voided = 0
-									AND DATE_FORMAT(st.date_created, '%Y-%m-%d') >= '#{@start_date}' AND DATE_FORMAT(st.date_created, '%Y-%m-%d') <= '#{@end_date}' 
-									AND pp.program_id = #{@diabetes_program_id}"
+		 program_id = Program.find_by_name("CHRONIC CARE PROGRAM").id
 
-			Patient.find_by_sql(sql).length
+    patient_died = ConceptName.find_all_by_name('PATIENT DIED')
+
+		@dead = PatientState.find_by_sql("
+            SELECT s.patient_program_id, patient_id,patient_state_id,start_date, n.name name,state
+            FROM patient_state s
+            LEFT JOIN patient_program p ON p.patient_program_id = s.patient_program_id
+            LEFT JOIN program_workflow pw ON pw.program_id = p.program_id
+            LEFT JOIN program_workflow_state w ON w.program_workflow_id = pw.program_workflow_id
+            AND w.program_workflow_state_id = s.state
+            LEFT JOIN concept_name n ON w.concept_id = n.concept_id
+            WHERE p.voided = 0 AND s.voided = 0
+            AND p.program_id = #{program_id}
+            AND (s.start_date >= '#{@start_date}'
+            AND s.start_date <= '#{@end_date}')
+            AND n.name = 'Patient transferred (External facility)'
+            ORDER BY patient_state_id DESC, start_date DESC").length
   end
 
   def stopped_treatment_ever
-			sql = "SELECT DISTINCT p.patient_id 
-						FROM patient p
-								 LEFT JOIN patient_program pp
-								 ON p.patient_id = pp.patient_id
-								 					 LEFT JOIN patient_state st
-								 					 ON pp.patient_program_id = st.patient_program_id
-								 					 						LEFT JOIN program_workflow_state pws
-								 					 						ON st.state = pws.program_workflow_state_id
-								 					 											LEFT JOIN concept_name cn ON pws.concept_id = cn.concept_id
-						WHERE st.end_date IS NULL AND cn.name = 'TREATMENT STOPPED' AND st.voided = 0
-									AND DATE_FORMAT(st.date_created, '%Y-%m-%d') <= '#{@end_date}'
-									AND pp.program_id = #{@diabetes_program_id}"
+		 program_id = Program.find_by_name("CHRONIC CARE PROGRAM").id
 
-			Patient.find_by_sql(sql).length
+    patient_died = ConceptName.find_all_by_name('PATIENT DIED')
+
+		@dead = PatientState.find_by_sql("
+            SELECT s.patient_program_id, patient_id,patient_state_id,start_date, n.name name,state
+            FROM patient_state s
+            LEFT JOIN patient_program p ON p.patient_program_id = s.patient_program_id
+            LEFT JOIN program_workflow pw ON pw.program_id = p.program_id
+            LEFT JOIN program_workflow_state w ON w.program_workflow_id = pw.program_workflow_id
+            AND w.program_workflow_state_id = s.state
+            LEFT JOIN concept_name n ON w.concept_id = n.concept_id
+            WHERE p.voided = 0 AND s.voided = 0
+            AND p.program_id = #{program_id}
+            AND s.start_date <= '#{@end_date}'
+            AND n.name = 'Discharged'
+            ORDER BY patient_state_id DESC, start_date DESC").length
   end
 
   def stopped_treatment
-			sql = "SELECT DISTINCT p.patient_id 
-						FROM patient p
-								 LEFT JOIN patient_program pp
-								 ON p.patient_id = pp.patient_id
-								 					 LEFT JOIN patient_state st
-								 					 ON pp.patient_program_id = st.patient_program_id
-								 					 						LEFT JOIN program_workflow_state pws
-								 					 						ON st.state = pws.program_workflow_state_id
-								 					 											LEFT JOIN concept_name cn ON pws.concept_id = cn.concept_id
-						WHERE st.end_date IS NULL AND cn.name = 'TREATMENT STOPPED' AND st.voided = 0
-									AND DATE_FORMAT(st.date_created, '%Y-%m-%d') >= '#{@start_date}' AND DATE_FORMAT(st.date_created, '%Y-%m-%d') <= '#{@end_date}' 
-									AND pp.program_id = #{@diabetes_program_id}"
-									
-			Patient.find_by_sql(sql).length
+		 program_id = Program.find_by_name("CHRONIC CARE PROGRAM").id
+
+    patient_died = ConceptName.find_all_by_name('PATIENT DIED')
+
+		@dead = PatientState.find_by_sql("
+            SELECT s.patient_program_id, patient_id,patient_state_id,start_date, n.name name,state
+            FROM patient_state s
+            LEFT JOIN patient_program p ON p.patient_program_id = s.patient_program_id
+            LEFT JOIN program_workflow pw ON pw.program_id = p.program_id
+            LEFT JOIN program_workflow_state w ON w.program_workflow_id = pw.program_workflow_id
+            AND w.program_workflow_state_id = s.state
+            LEFT JOIN concept_name n ON w.concept_id = n.concept_id
+            WHERE p.voided = 0 AND s.voided = 0
+            AND p.program_id = #{program_id}
+            AND (s.start_date >= '#{@start_date}'
+            AND s.start_date <= '#{@end_date}')
+            AND n.name = 'Discharged'
+            ORDER BY patient_state_id DESC, start_date DESC").length
   end
 
   # Treatment (Alive and Even Defaulters)
@@ -1160,25 +1224,25 @@ class Reports::CohortDm
 
   # Outcome: Defaulters
   def defaulters_ever
-  @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders \
-                                LEFT OUTER JOIN patient ON patient.patient_id = orders.patient_id \
-                                WHERE DATEDIFF('#{@end_date}', auto_expire_date)/30 > 6 \
-                                  AND patient.voided = 0 AND \
+  @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders 
+                                      LEFT OUTER JOIN patient ON patient.patient_id = orders.patient_id \
+                                      WHERE DATEDIFF('#{@end_date}', auto_expire_date)/30 > 2 \
+                                      AND patient.voided = 0 AND \
                                       DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
 																			AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
 																			concept_set IN (#{@diabetes_id}, #{@hypertensition_id}, #{@hypertensition_medication_id})) \
-                                  GROUP BY patient_id").length
+                                      GROUP BY patient_id").length
   end
 
   def defaulters
-    @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders LEFT OUTER JOIN patient ON \
-                                        patient.patient_id = orders.patient_id WHERE DATEDIFF('#{@end_date}', auto_expire_date)/30 > 6 \
+    @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders LEFT OUTER JOIN patient ON 
+                                        patient.patient_id = orders.patient_id WHERE DATEDIFF('#{@end_date}', auto_expire_date)/30 > 2
                                         AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') >= '" +
-        @start_date + "' AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "' \
-                                    AND patient.voided = 0 \
-																			AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
-																			concept_set IN (#{@diabetes_id}, #{@hypertensition_id}, #{@hypertensition_medication_id})) \
-                                          GROUP BY patient_id").length
+                                        @start_date + "' AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "' 
+                                        AND patient.voided = 0 
+                                        AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE 
+                                        concept_set IN (#{@diabetes_id}, #{@hypertensition_id}, #{@hypertensition_medication_id})) 
+                                        GROUP BY patient_id").length
   end
 
   # Maculopathy
@@ -1205,115 +1269,115 @@ class Reports::CohortDm
   def heart_failure_ever
     @orders = Order.find_by_sql("SELECT DISTINCT person_id FROM obs \
                                   LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
-                                  WHERE concept_id = (SELECT concept_id FROM concept_name \
-                                      WHERE name = 'Cardiac') OR UCASE(value_text) = 'CARDIAC' \
+                                  WHERE (concept_id = (SELECT concept_id FROM concept_name \
+                                      WHERE name = 'Cardiac') OR UCASE(value_text) = 'CARDIAC') \
                                     AND patient.voided = 0 AND \
-                                        DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'").length
+                                        patient.date_created <= '" + @end_date + "'").length
   end
 
   def heart_failure
-    @orders = Order.find_by_sql("SELECT DISTINCT person_id FROM obs \
-                                   LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
-		                                 WHERE concept_id = (SELECT concept_id FROM concept_name \
-		                                    WHERE name = 'Cardiac') OR UCASE(value_text) = 'CARDIAC' \
-		                                  AND DATE(patient.date_created) >= '" + @start_date +
-		      "' AND DATE(patient.date_created) <= '" + @end_date + "' \
-                                    AND patient.voided = 0").length
+    @orders = Order.find_by_sql("SELECT DISTINCT person_id FROM obs 
+                                 LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id 
+		                             WHERE (concept_id = (SELECT concept_id FROM concept_name
+		                             WHERE name = 'Cardiac') OR UCASE(value_text) = 'CARDIAC')
+		                             AND patient.date_created >= '#{@start_date}'
+                                 AND patient.date_created <= '#{@end_date}'
+                                 AND patient.voided = 0").length
   end
 
   #mi
   def mi_ever
     @orders = Order.find_by_sql("SELECT DISTINCT person_id FROM obs \
                                   LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
-                                  WHERE value_coded = (SELECT concept_id FROM concept_name \
-                                      WHERE name = 'Myocardial injactia(MI)') OR value_text = 'Myocardial injactia(MI)' \
+                                  WHERE (value_coded = (SELECT concept_id FROM concept_name \
+                                      WHERE name = 'Myocardial injactia(MI)') OR value_text = 'Myocardial injactia(MI)') \
                                     AND patient.voided = 0 AND \
-                                        DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'").length
+                                        patient.date_created <= '" + @end_date + "'").length
   end
 
   def mi
     @orders = Order.find_by_sql("SELECT DISTINCT person_id FROM obs \
                                    LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
-		                                 WHERE value_coded = (SELECT concept_id FROM concept_name \
-		                                    WHERE name = 'Myocardial injactia(MI)') OR value_text = 'Myocardial injactia(MI)' \
-		                                  AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') >= '" + @start_date +
-		      "' AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "' \
+		                                 WHERE (value_coded = (SELECT concept_id FROM concept_name \
+		                                    WHERE name = 'Myocardial injactia(MI)') OR value_text = 'Myocardial injactia(MI)') \
+		                                  AND patient.date_created >= '" + @start_date +
+		      "' AND patient.date_created <= '" + @end_date + "' \
                                     AND patient.voided = 0").length
   end
 
   def stroke_ever
     @orders = Order.find_by_sql("SELECT DISTINCT person_id FROM obs \
                                   LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
-                                  WHERE value_coded = (SELECT concept_id FROM concept_name \
-                                      WHERE name = 'stroke' and concept_name_type = 'FULLY_SPECIFIED') OR value_text = 'stroke' \
+                                  WHERE (value_coded = (SELECT concept_id FROM concept_name \
+                                      WHERE name = 'stroke' and concept_name_type = 'FULLY_SPECIFIED') OR value_text = 'stroke') \
                                     AND patient.voided = 0 AND \
-                                        DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'").length
+                                        patient.date_created <= '" + @end_date + "'").length
   end
 
   def stroke
     @orders = Order.find_by_sql("SELECT DISTINCT person_id FROM obs \
                                    LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
-		                                 WHERE value_coded = (SELECT concept_id FROM concept_name \
-		                                    WHERE name = 'stroke' and concept_name_type = 'FULLY_SPECIFIED') OR value_text = 'stroke' \
-		                                  AND DATE(patient.date_created) >= '" + @start_date +
-		      "' AND DATE(patient.date_created) <= '" + @end_date + "' \
+		                                 WHERE (value_coded = (SELECT concept_id FROM concept_name \
+		                                    WHERE name = 'stroke' and concept_name_type = 'FULLY_SPECIFIED') OR value_text = 'stroke') \
+		                                  AND patient.date_created >= '" + @start_date +
+		      "' AND patient.date_created <= '" + @end_date + "' \
                                     AND patient.voided = 0").length
   end
 
   def tia_ever
     @orders = Order.find_by_sql("SELECT DISTINCT person_id FROM obs \
                                   LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
-                                  WHERE value_coded = (SELECT concept_id FROM concept_name \
-                                      WHERE name = 'TIA' and concept_name_type = 'FULLY_SPECIFIED') OR value_text = 'TIA' \
+                                  WHERE (value_coded = (SELECT concept_id FROM concept_name \
+                                      WHERE name = 'TIA' and concept_name_type = 'FULLY_SPECIFIED') OR value_text = 'TIA') \
                                     AND patient.voided = 0 AND \
-                                        DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'").length
+                                        patient.date_created <= '" + @end_date + "'").length
   end
 
   def tia
     @orders = Order.find_by_sql("SELECT DISTINCT person_id FROM obs \
                                    LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
-		                                 WHERE value_coded = (SELECT concept_id FROM concept_name \
-		                                    WHERE name = 'TIA' and concept_name_type = 'FULLY_SPECIFIED') OR value_text = 'TIA' \
-		                                  AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') >= '" + @start_date +
-		      "' AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "' \
+		                                 WHERE (value_coded = (SELECT concept_id FROM concept_name \
+		                                    WHERE name = 'TIA' and concept_name_type = 'FULLY_SPECIFIED') OR value_text = 'TIA') \
+		                                  AND patient.date_created >= '" + @start_date +
+		      "' AND patient.date_created <= '" + @end_date + "' \
                                     AND patient.voided = 0").length
   end
 
   def ulcers_ever
     @orders = Order.find_by_sql("SELECT DISTINCT person_id FROM obs \
                                   LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
-                                  WHERE value_coded = (SELECT concept_id FROM concept_name \
-                                      WHERE name = 'Foot ulcers' and concept_name_type = 'FULLY_SPECIFIED') OR value_text = 'Foot ulcers' \
+                                  WHERE (value_coded = (SELECT concept_id FROM concept_name \
+                                      WHERE name = 'Foot ulcers' and concept_name_type = 'FULLY_SPECIFIED') OR value_text = 'Foot ulcers') \
                                     AND patient.voided = 0 AND \
-                                        DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'").length
+                                        patient.date_created <= '" + @end_date + "'").length
   end
 
   def ulcers
     @orders = Order.find_by_sql("SELECT DISTINCT person_id FROM obs \
                                    LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
-		                                 WHERE value_coded = (SELECT concept_id FROM concept_name \
-		                                    WHERE name = 'Foot ulcers' and concept_name_type = 'FULLY_SPECIFIED') OR value_text = 'Foot ulcers' \
-		                                  AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') >= '" + @start_date +
-		      "' AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "' \
+		                                 WHERE (value_coded = (SELECT concept_id FROM concept_name \
+		                                    WHERE name = 'Foot ulcers' and concept_name_type = 'FULLY_SPECIFIED') OR value_text = 'Foot ulcers') \
+		                                  AND patient.date_created >= '" + @start_date +
+		      "' AND patient.date_created <= '" + @end_date + "' \
                                     AND patient.voided = 0").length
   end
 
   def impotence_ever
     @orders = Order.find_by_sql("SELECT DISTINCT person_id FROM obs \
                                   LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
-                                  WHERE value_coded = (SELECT concept_id FROM concept_name \
-                                      WHERE name = 'Impotence' and concept_name_type = 'FULLY_SPECIFIED') OR value_text = 'Impotence' \
+                                  WHERE (value_coded = (SELECT concept_id FROM concept_name \
+                                      WHERE name = 'Impotence' and concept_name_type = 'FULLY_SPECIFIED') OR value_text = 'Impotence') \
                                     AND patient.voided = 0 AND \
-                                        DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'").length
+                                        patient.date_created <= '" + @end_date + "'").length
   end
 
   def impotence
     @orders = Order.find_by_sql("SELECT DISTINCT person_id FROM obs \
                                    LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
-		                                 WHERE value_coded = (SELECT concept_id FROM concept_name \
-		                                    WHERE name = 'Impotence' and concept_name_type = 'FULLY_SPECIFIED') OR value_text = 'Impotence' \
-		                                  AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') >= '" + @start_date +
-		      "' AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "' \
+		                                 WHERE (value_coded = (SELECT concept_id FROM concept_name \
+		                                    WHERE name = 'Impotence' and concept_name_type = 'FULLY_SPECIFIED') OR value_text = 'Impotence') \
+		                                  AND patient.date_created >= '" + @start_date +
+		      "' AND patient.date_created <= '" + @end_date + "' \
                                     AND patient.voided = 0").length
   end
 
@@ -1321,38 +1385,38 @@ class Reports::CohortDm
     def amputation_ever
     @orders = Order.find_by_sql("SELECT DISTINCT person_id FROM obs \
                                   LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
-                                  WHERE value_coded = (SELECT concept_id FROM concept_name \
-                                      WHERE name = 'Amputation' and concept_name_type = 'FULLY_SPECIFIED') OR value_text = 'Amputation' \
+                                  WHERE (value_coded = (SELECT concept_id FROM concept_name \
+                                      WHERE name = 'Amputation' and concept_name_type = 'FULLY_SPECIFIED') OR value_text = 'Amputation') \
                                     AND patient.voided = 0 AND \
-                                        DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'").length
+                                        patient.date_created <= '" + @end_date + "'").length
   end
 
   def amputation
     @orders = Order.find_by_sql("SELECT DISTINCT person_id FROM obs \
                                    LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
-		                                 WHERE value_coded = (SELECT concept_id FROM concept_name \
-		                                    WHERE name = 'Amputation' and concept_name_type = 'FULLY_SPECIFIED') OR value_text = 'Amputation' \
-		                                  AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') >= '" + @start_date +
-		      "' AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "' \
+		                                 WHERE (value_coded = (SELECT concept_id FROM concept_name \
+		                                    WHERE name = 'Amputation' and concept_name_type = 'FULLY_SPECIFIED') OR value_text = 'Amputation') \
+		                                  AND patient.date_created >= '" + @start_date +
+		      "' AND patient.date_created <= '" + @end_date + "' \
                                     AND patient.voided = 0").length
   end
 
   def kidney_failure_ever
     @orders = Order.find_by_sql("SELECT DISTINCT person_id FROM obs \
                                   LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
-                                  WHERE concept_id = (SELECT concept_id FROM concept_name \
-                                      WHERE name = 'Creatinine' and concept_name_type IS NULL) OR UCASE(value_text) = 'CREATININE' \
+                                  WHERE (concept_id = (SELECT concept_id FROM concept_name \
+                                      WHERE name = 'Creatinine' and concept_name_type IS NULL) OR UCASE(value_text) = 'CREATININE') \
                                     AND patient.voided = 0 AND \
-                                        DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'").length
+                                        patient.date_created <= '" + @end_date + "'").length
   end
 
   def kidney_failure
     @orders = Order.find_by_sql("SELECT DISTINCT person_id FROM obs \
                                    LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
-		                                 WHERE concept_id = (SELECT concept_id FROM concept_name \
-		                                    WHERE name = 'Creatinine' and concept_name_type IS NULL) OR UCASE(value_text) = 'CREATININE' \
-		                                  AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') >= '" + @start_date +
-		      "' AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "' \
+		                                 WHERE (concept_id = (SELECT concept_id FROM concept_name \
+		                                    WHERE name = 'Creatinine' and concept_name_type IS NULL) OR UCASE(value_text) = 'CREATININE') \
+		                                  AND patient.date_created >= '" + @start_date +
+		      "' AND patient.date_created <= '" + @end_date + "' \
                                     AND patient.voided = 0").length
   end
 
