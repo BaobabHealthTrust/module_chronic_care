@@ -1152,7 +1152,7 @@ class CohortToolController < ApplicationController
 
     @total_ever_registered = report.total_ever_registered
 
-
+    #raise report.total_women_registered.to_yaml
 
     @total_men_registered = report.total_men_registered
 
