@@ -216,8 +216,8 @@
                   <tr>
                     <td  style="text-align:left;border-width:0px 0px 0px 0px">
                       <h2><%= Location.current_health_center.name + " : " + @quarter %></h2>
-                      <b>Start Date: </b><%= @specified_period[0].to_date.strftime("%A %d %B, %Y") %> </br>
-                      <b> End Date: </b><%= @specified_period[1].to_date.strftime("%A %d %B, %Y") %>
+                      <h2>Start Date: <%= @specified_period[0].to_date.strftime("%A %d %B, %Y") %> </h2>
+                      <h2> End Date: <%= @specified_period[1].to_date.strftime("%A %d %B, %Y") %></h2>
                     </td>
                   </tr>
                 </table>
@@ -265,7 +265,7 @@
 
                   <td style="text-align:left;border-width:0px 0px 1px 1px">Females</td>
                   <td style="border-width:1px 1px 1px 1px"><%=  @total_women_registered %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%=  @total_women_everregistered %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%=  @total_women_ever_registered %></td>
                 </tr>
 
                 <tr class = 'row_break'>
