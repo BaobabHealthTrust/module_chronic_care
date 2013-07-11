@@ -138,6 +138,15 @@ function selectedOptions(selected){
 		  selectedOptions($('epilepsy'))
 		}
 
+          if ($('1.1.13').value.length > 0)
+        {
+		  conditions.push("Complications during birth: " + $('1.1.13').value));
+		}
+
+            if ($('explanation').value.length > 0)
+        {
+		  conditions.push("Epilepsy experienced on: " + $('explanation').value));
+		}
       var html
       html = "<ul>"
       for(var i=0;i < conditions.length;i++) {
@@ -202,6 +211,16 @@ function selectedOptions(selected){
 	:helpText => "Any drug allergies",
 	:tt_onLoad => "showCategory('General Health')"} %>
 
+        <select id='1.1.13' name="concept[Complications during patient's birth]"
+                helpText="Complications during patient's birth"
+                pos='15'
+                multiple ="true"
+                optional ="true">
+        <option></option>
+        <option value='Development'>Development</option>
+       <option value='Neonatal'>Neonatal</option>
+ </select>
+
 <%= select_tag "epilepsy", options_for_select(["Effects on occupation", "School", "Marital status", "Overprotection"]),
 		{:id => 'epilepsy',
 		:optional => true,
@@ -211,6 +230,13 @@ function selectedOptions(selected){
 		:condition => "$('choice').value.length > 0",
 		:helpText => "Effects of Epilepsy experienced on the following: ",
 		:tt_onLoad => "showCategory('General Health')"} %>
+
+        <textarea name="concept[CLINICAL NOTES CONSTRUCT]"
+                  helpText="Explanation of effects experienced"
+                  condition="$('epilepsy').value.length > 0"
+                  idn="explanation"
+                  >
+        </textarea>
 
 <label for='summary'>Summary</label>
 	<%= text_field_tag :summary, nil, {

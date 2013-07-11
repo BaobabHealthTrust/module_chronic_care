@@ -2,11 +2,18 @@
   #tt_page_cause_of_seizure .inputFrameClass {
   height: 610px;
 }
-  #tt_page_cause_of_seizure #viewport {
+  #tt_page_what_started_the_seizure #viewport {
   height: 560px;
 }
   #tt_page_seizure_duration .inputFrameClass {
   height: 610px;
+}
+
+ #tt_page_clinical_medicine_for_seizure_taken_before .inputFrameClass {
+  height: 610px;
+}
+ #tt_page_clinical_medicine_for_seizure_taken_before #viewport {
+  height: 540px;
 }
   #tt_page_seizure_duration #viewport {
   height: 600px;
@@ -154,7 +161,7 @@ sex = @patient.gender.upcase
 			<td>
 <select id='1.1.9'
 		name='concept[Cause of Seizure][]'
-		helpText='Cause of Seizure' pos='9'
+		helpText='What started the seizure' pos='9'
 		multiple="multiple"
 		optional="true"
 		tt_onLoad ="__$('keyboard').style.display = 'none';"
@@ -208,7 +215,8 @@ sex = @patient.gender.upcase
 		pos='10'
 		field_type="text" >
 <option></option>
-<option value='less than 1 hour'>less than 1 hour</option>
+<option value='less than 1 hour'>less than 30 minutes</option>
+<option value='30 minutes'>30 minutes</option>
 <option value='1 hour'>1 hour</option>
 <% (2..10).each do |i| %>
 <option value='<%= i %> hours'><%= i %> hours</option>
@@ -232,6 +240,42 @@ sex = @patient.gender.upcase
 			</td>
 		</tr>
 		<tr>
+                  <td>
+<select id='1.1.23' name='concept[Seizure medicine taken before][]' helpText='Has patient taken Clinical medicine for seizure before' pos='13' >
+<option></option>
+<option value='No'>No</option>
+ <option value='Yes'>Yes</option>
+ </select>
+			</td>
+
+ <%	@concept = []
+	@regimen_concepts.each do |reg|
+		@concept << reg.concept.fullname
+ end %>
+
+<td>
+		<%= select_tag "treatment", options_for_select(@concept),
+		{:id => 'treatment',
+		:optional => true,
+		:multiple => true,
+		:name => 'concept[Seizure medicine taken before][]',
+                :condition => '__$("1.1.23").value.toLowerCase() == "yes"',
+		:tt_pageStyleClass => "MultiSelectList",
+		:helpText => "Clinical medicine for seizure taken before",
+		:tt_onLoad => "showCategory('Clinic Visit')" } %>
+			</td>
+
+                        <td>
+<select id='1.1.24' name='concept[Herbal traditional medications]' helpText='Has patient taken traditional medicine for seizure before' pos='13' >
+<option></option>
+<option value='No'>No</option>
+ <option value='Yes'>Yes</option>
+ </select>
+			</td>
+
+
+		</tr>
+
 			<td>
 				Head injuries
 			</td>
@@ -255,26 +299,13 @@ sex = @patient.gender.upcase
  </select>
 			</td>
 		</tr>
-		<tr>
-			<td>
-				Complications during patient's birth
-			</td>
-			<td>
-<% if @first_visit == true %>
-<select id='1.1.13' name="concept[Complications during patient's birth]" helpText="Complications during patient's birth" pos='15' >
-<option></option>
-<option value='Development'>Development</option>
- <option value='Neonatal'>Neonatal</option>
- </select>
-<% end %>
-			</td>
-		</tr>
+	
 		<tr>
 			<td>
 				Menstrual History
 			</td>
 			<td>
-<% if sex == 'F' %>
+<% if sex == 'F' and  @patient.age > 14 %>
 <select id='1.1.14' 
 		name='concept[Menstrual History][]'
 		helpText='Menstrual History'

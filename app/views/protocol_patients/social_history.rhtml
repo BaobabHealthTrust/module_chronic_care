@@ -13,6 +13,11 @@
 	font-weight:bold;
 	font-size: 25px;
   }
+  span{
+        color: red;
+	font-weight:bold;
+	font-size: 25px;
+  }
 </style>
 <script type='text/javascript' language='javascript'>
 <!--
@@ -133,7 +138,7 @@
 		<tr>
                 <select id='education'
                         name='concept[Education level completed]'
-                        helpText='Education level completed?    :Patient occupation is <%= @person_attribute %>'
+                        helpText='Education level completed?<%= @person_attribute %>'
 			tt_onLoad ="showCategory('Social History')"
 			condition='program == "EPILEPSY PROGRAM"'
 			tt_requireNextClick = false >
@@ -146,7 +151,7 @@
 
 	<select id='substance_use'
 			name='concept[Substance use]'
-			helpText='Use of substance?    :Patient occupation is <%= @person_attribute %> '
+			helpText='Use of substance?<%= @person_attribute %> '
 			pos='3'
 			condition='program == "EPILEPSY PROGRAM"'
 			tt_onLoad ="showCategory('Social History')"
@@ -158,7 +163,7 @@
 
  <select id='pork'
 			name='concept[Food package provided]'
-			helpText='Eats pork?    :Patient occupation is <%= @person_attribute %> '
+			helpText='Eats pork? <%= @person_attribute %> '
 			pos='3'
 			condition='program == "EPILEPSY PROGRAM"'
 			tt_onLoad ="showCategory('Social History')"
@@ -174,7 +179,7 @@
 			<td>
 <select id='smoking'
 		name='concept[Smoking History]'
-		helpText='Ever smoked?    :Patient occupation is <%= @person_attribute %> '
+		helpText='Ever smoked?  <%= @person_attribute %> '
 		pos='0'
 		tt_onLoad ="showCategory('Social History')"
 		tt_requireNextClick = false >
@@ -191,7 +196,7 @@
 			<td>
 <input type='text' id='number_of_cigarettes'
 	   name='concept[Number of cigarettes smoked per day]'
-	   helpText='Number of cigarettes per day?    :Patient occupation is <%= @person_attribute %> '
+	   helpText='Number of cigarettes per day? <%= @person_attribute %> '
 	   field_type="number"  pos='1'
 	   min = 1
 	   max = 90
@@ -211,7 +216,7 @@
 <% if @current_program == "ASTHMA PROGRAM"  %>
 	   <select id='duration'
 			   name='concept[smoking duration]'
-			   helpText='How long Have been smoking?    :Patient occupation is <%= @person_attribute %> '
+			   helpText='How long Have been smoking? <%= @person_attribute %> '
 			   tt_onLoad ="showCategory('Social History')"
 			   condition='__$("smoking").value.toLowerCase() == "yes"'
 			   tt_requireNextClick = false >
@@ -231,7 +236,7 @@
 
 <select id='current_smoker' 
 		name='concept[current smoker]'
-		helpText='Do you currently smoke?    :Patient occupation is <%= @person_attribute %> '
+		helpText='Do you currently smoke?  <%= @person_attribute %> '
 		pos='3'
 		condition='__$("smoking").value.toLowerCase() == "yes"'
 		tt_onLoad ="showCategory('Social History')"
@@ -247,7 +252,7 @@
 <% if @current_program == "ASTHMA PROGRAM"  %>
 <select id='smoke_history' 
 		name='concept[Family health seeking behavior construct]'
-		helpText='Do you have a family member who smokes?    :Patient occupation is <%= @person_attribute %> '
+		helpText='Do you have a family member who smokes? <%= @person_attribute %> '
 		pos='3'
 		condition='(__$("smoking").value.toLowerCase() == "yes") && (__$("current_smoker").value.toLowerCase() == "no")'
 		tt_onLoad ="showCategory('Social History')"
@@ -268,7 +273,7 @@
 
 <select id='drink_alcohol'
 		name='concept[Does the patient drink alcohol?]'
-		helpText='Does patient drink alcohol?    :Patient occupation is <%= @person_attribute %> '
+		helpText='Does patient drink alcohol?  <%= @person_attribute %> '
 		pos='4'
 		 tt_onLoad ="showCategory('Social History')"
 		 tt_requireNextClick = false >
@@ -285,7 +290,7 @@
 			<td>
 <input type='text' id='drinks_per_day'
 	   name='concept[Alcoholic drinks per day]'
-	   helpText='Alcohol drinks per day?    :Patient occupation is <%= @person_attribute %> '
+	   helpText='Alcohol drinks per day? <%= @person_attribute %> '
 	   field_type="number"
 	   pos='5'
 	   condition='__$("drink_alcohol").value.toLowerCase() == "yes"'
@@ -300,7 +305,7 @@
 			<td>
 <input type='text' id='days_per_week'
 	   name='concept[Number of days per week alcohol is used]'
-	   helpText='Number of days per week alcohol is used?    :Patient occupation is <%= @person_attribute %> '
+	   helpText='Number of days per week alcohol is used?  <%= @person_attribute %> '
 	   field_type="number"
 	   pos='6'
 	   min = 1
@@ -321,7 +326,7 @@
 	<select id='patient_home' 
 			condition='program == "ASTHMA PROGRAM"'
 			name='concept[Patient lives or works near?]'
-			helpText='Patient lives or works near?    :Patient occupation is <%= @person_attribute %> ' pos='3'
+			helpText='Patient lives or works near? <%= @person_attribute %> ' pos='3'
 			tt_onLoad ="showCategory('Social History')"
 			tt_requireNextClick = false >
 	 <option></option>
@@ -334,7 +339,7 @@
 	<td>
 	<select id='exposed'
 			name='concept[patient has been exposed to pollution?]'
-			helpText='Patient exposed to pollution?    :Patient occupation is <%= @person_attribute %> '
+			helpText='Patient exposed to pollution? <%= @person_attribute %> '
 			pos='3'
 			condition='program == "ASTHMA PROGRAM"'
 			tt_onLoad ="showCategory('Social History')"
@@ -348,7 +353,7 @@
 	<td>
           <select id='cooking'
                   name='concept[patient mode of cooking]'
-                  helpText='Patient mode of coking?    <>:Patient occupation is <%= @person_attribute %> '
+                  helpText='Patient mode of coking? <%= @person_attribute %> '
 			pos='3'
 			condition='program == "ASTHMA PROGRAM"'
 			tt_onLoad ="showCategory('Social History')"
