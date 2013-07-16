@@ -1316,9 +1316,9 @@ class CohortToolController < ApplicationController
 
     @stopped_treatment = report.stopped_treatment
 
-    @alive_ever = report.alive_ever.to_i - report.defaulters_ever.to_i - report.transfer_out_ever.to_i - report.stopped_treatment_ever.to_i
+    @alive_ever = @total_ever_registered.to_i - report.defaulters_ever.to_i - report.transfer_out_ever.to_i - report.stopped_treatment_ever.to_i
 
-    @alive = report.alive.to_i - report.defaulters.to_i - report.transfer_out.to_i - report.stopped_treatment.to_i
+    @alive = @total_registered.to_i - report.defaulters.to_i - report.transfer_out.to_i - report.stopped_treatment.to_i
 
     @on_diet_ever = @alive_ever.to_i - @oral_treatments_ever.to_i - @insulin_ever.to_i - @oral_and_insulin_ever.to_i
 
