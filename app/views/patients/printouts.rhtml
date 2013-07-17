@@ -1,0 +1,85 @@
+<style type="text/css">
+  body {
+    -moz-user-select:none;
+  }
+
+  #stats {
+    width:98%;
+    border:1px solid #eee;
+    margin:10px;
+    margin-top: 0px;
+    background:white;
+  }
+  #stats td, #stats th {
+    text-align:center;
+  }
+  .odd {
+    background-color: #eeeef7;
+  }
+  .even {
+    background-color: #fff;
+  }
+
+  #table_div {
+    overflow:auto;
+    height: 320px;
+    background-color: white;
+    border: solid 1px #eee;
+    border-width: 1px;
+    overflow: hidden;
+  }
+
+  .btn {
+    min-height: 50px;
+    min-width: 250px;
+    margin: 0px;
+    margin-bottom: 5px;
+    font-size: 1.2em;
+    background-color: #6281a7;
+    color: #FFF;
+    font-weight: normal;
+    border: 5px outset #000;
+    padding: 10px;
+    cursor: pointer;
+    background:url(/touchscreentoolkit/lib/images/btn_blue.png) right repeat;
+    -moz-user-select:none;
+    -moz-user-focus:disabled;
+  }
+
+  .btn:hover {
+    background:url(/touchscreentoolkit/lib/images/btn_blue_hover.png) right repeat;
+    -moz-user-select:none;
+    -moz-user-focus:disabled;
+  }
+
+  .btn:active {
+    background:url(/touchscreentoolkit/lib/images/btn_yellow.png) right repeat;
+    border: 3px inset #000;
+  }
+
+</style>
+
+<div style="width: 100%;">
+  <table id="stats" style="margin-bottom: 8px;" cellpadding="5">
+    <tr style="color: #fff; background-color: #6281a7; text-align: center;">
+      <th colspan="4" style="padding: 10px;">
+        Patient Printouts
+      </th>
+    </tr>
+    <tr>
+      <td colspan="4">
+      </td>
+    </tr>
+    <tr>
+        <td style="height: 70px; width: 250px; text-align: left;">
+        <button class="btn" onclick="window.parent.location='/patients/specific_patient_visit_date_label?patient_id=<%=@patient.id%>&user_id=<%=  params[:user_id] %>'">
+          <span>
+            Visit Summary
+          </span>
+        </button>
+      </td>
+      
+    </tr>
+    
+  </table>
+</div>

@@ -807,8 +807,8 @@ def mastercard_demographics(patient_obj)
 				@transfer_out_site = obs.to_s if obs.to_s.include?('Transfer out to')
 			end
     end
-		@sbp = Vitals.get_patient_attribute_value(@patient, "systolic blood pressure")
-		@dbp = Vitals.get_patient_attribute_value(@patient, "diastolic blood pressure")
+		@sbp = current_vitals(@patient, "systolic blood pressure").value_numeric rescue 0
+		@dbp = current_vitals(@patient, "diastolic blood pressure").value_numeric rescue 0
 
 		@complications = Vitals.current_encounter(@patient, "complications", "complications") rescue []
 								
@@ -835,6 +835,12 @@ def mastercard_demographics(patient_obj)
     #@reason_for_art_eligibility = PatientService.reason_for_art_eligibility(@patient)
     #@arv_number = PatientService.get_patient_identifier(@patient, 'ARV Number')
 
+    render :layout => false
+  end
+
+  def printouts
+    @user = User.find(params[:user_id]) rescue nil
+		@patient = Patient.find(params[:patient_id] || params[:id]) rescue nil
     render :layout => false
   end
 
@@ -901,15 +907,15 @@ def mastercard_demographics(patient_obj)
    # label.draw_text("#{arv_number}",565,30,0,3,1,1,true)
     label.draw_text("#{patient.name}(#{patient.gender})",25,60,0,3,1,1,false)
     #label.draw_text("#{'(' + visit.visit_by + ')' unless visit.visit_by.blank?}",255,30,0,2,1,1,false)
-    label.draw_text("#{visit.height.to_s + 'cm' if !visit.height.blank?}  #{visit.weight.to_s + 'kg' if !visit.weight.blank?}  #{'BMI:' + visit.bmi.to_s if !visit.bmi.blank?}",25,95,0,2,1,1,false)
+    label.draw_text("#{visit.height.to_s + 'cm' if !visit.height.blank?}  #{visit.weight.to_s + 'kg' if !visit.weight.blank?}  #{'BMI:' + visit.bmi.to_s if !visit.bmi.blank?}  #{'BP :' + visit_data['bp'] }",25,95,0,2,1,1,false)
     #label.draw_text("SE",25,130,0,3,1,1,false)
     label.draw_text("TB",110,130,0,3,1,1,false)
-    label.draw_text("BP",185,130,0,3,1,1,false)
+    #label.draw_text("BP",185,130,0,3,1,1,false)
     label.draw_text("DRUG(S) GIVEN",255,130,0,3,1,1,false)
     label.draw_text("OUTC",577,130,0,3,1,1,false)
     label.draw_line(25,150,800,5)
     label.draw_text("#{visit.tb_status}",110,160,0,2,1,1,false)
-    label.draw_text("#{visit_data['bp'] rescue nil}",185,160,0,2,1,1,false)
+    #label.draw_text("#{visit_data['bp'] rescue nil}",185,160,0,2,1,1,false)
     label.draw_text("#{visit_data['outcome']}",577,160,0,2,1,1,false)
     label.draw_text("#{visit_data['outcome_date']}",655,130,0,2,1,1,false)
     label.draw_text("#{visit_data['next_appointment']}",577,190,0,2,1,1,false) if visit_data['next_appointment']
@@ -1194,7 +1200,8 @@ def mastercard_demographics(patient_obj)
 
   def specific_patient_visit_date_label
 		session_date = params[:session_date].to_date rescue Date.today
-    print_string = patient_visit_label(@patient, session_date)# rescue (raise "Unable to find patient (#{params[:patient_id]}) or generate a visit label for that patient")
+    @patient = Patient.find(params[:patient_id])
+    print_string = patient_visit_label(@patient, session_date) rescue (raise "Unable to find patient (#{params[:patient_id]}) or generate a visit label for that patient")
     send_data(print_string,:type=>"application/label; charset=utf-8", :stream=> false, :filename=>"#{params[:patient_id]}#{rand(10000)}.lbl", :disposition => "inline")
   end
 

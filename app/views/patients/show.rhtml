@@ -106,8 +106,8 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
       <select id="tabs">
         <option value='/patients/current_visit/<%= @patient.id %>?user_id=<%= @user.id %>'>Current Visit</option>
         <option value='/patients/visit_history/<%= @patient.id %>?user_id=<%= @user.id %>'>Visit History</option>
-		<option value='/patients/patient_report/<%= @patient.id %>?user_id=<%= @user.id %>'>Report</option>
-		
+        <option value='/patients/patient_report/<%= @patient.id %>?user_id=<%= @user.id %>'>Report</option>
+        <option value='/patients/printouts/<%= @patient.id %>?user_id=<%= @user.id %>'>Printouts</option>		
       </select>
       <select id="links">
 
