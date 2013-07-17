@@ -362,9 +362,12 @@ class EncountersController < ApplicationController
                   }) }
 				#end
 			end
-
+      #raise params[:concept].to_yaml
+      if (params[:concept]["Diazepam"].upcase rescue [])== "YES"
+          	redirect_to "/prescriptions/prescribe?user_id=#{@user["user_id"]}&patient_id=#{params[:patient_id]}" and return
+      end
 			if params[:encounter_type] == "TREATMENT"
-				if params[:concept]["Prescribe Drugs"].to_s.upcase == "EPILEPSY DRUGS" || params[:concept]["Prescribe Drugs"].to_s.upcase == "HYPERTENSION/DIABETES DRUGS" || params[:concept]["Prescribe Drugs"].to_s.upcase == "ASTHMA DRUGS"
+				if  params[:concept]["Prescribe Drugs"].to_s.upcase == "EPILEPSY DRUGS" || params[:concept]["Prescribe Drugs"].to_s.upcase == "HYPERTENSION/DIABETES DRUGS" || params[:concept]["Prescribe Drugs"].to_s.upcase == "ASTHMA DRUGS"
 						redirect_to "/prescriptions/prescribe?user_id=#{@user["user_id"]}&patient_id=#{params[:patient_id]}" and return
 				elsif params[:concept]["Prescribe Drugs"].blank?
 						redirect_to "/protocol_patients/assessment?patient_id=#{params[:patient_id]}&user_id=#{params[:user_id]}&disable=true" and return

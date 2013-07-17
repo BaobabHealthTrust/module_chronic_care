@@ -215,6 +215,9 @@ def mastercard_demographics(patient_obj)
     
   	#patient_bean = PatientService.get_patient(patient_obj.person)
     visits = Mastercard.new()
+    visits.zone = get_global_property_value("facility.zone.name") rescue "Unknown"
+    visits.clinic = get_global_property_value("facility.name") rescue "Unknown"
+    visits.district = get_global_property_value("facility.district") rescue "Unknown"
     visits.patient_id = patient_obj.id
     visits.arv_number = patient_obj.arv_number rescue nil
     visits.address = patient_obj.address
@@ -227,7 +230,6 @@ def mastercard_demographics(patient_obj)
     visits.landmark = patient_obj.person.addresses.first.address1 rescue ""
     visits.init_wt = Vitals.get_patient_attribute_value(patient_obj, "initial_weight")
     visits.init_ht = Vitals.get_patient_attribute_value(patient_obj, "initial_height")
-    visits.bmi = Vitals.get_patient_attribute_value(patient_obj, "initial_bmi")
     visits.agrees_to_followup = patient_obj.person.observations.recent(1).question("Agrees to followup").all rescue nil
     visits.agrees_to_followup = visits.agrees_to_followup.to_s.split(':')[1].strip rescue nil
     visits.hiv_test_date = patient_obj.person.observations.recent(1).question("Confirmatory HIV test date").all rescue nil
@@ -237,11 +239,10 @@ def mastercard_demographics(patient_obj)
     visits.hiv_test_location = location_name rescue nil
     visits.guardian = Vitals.guardian(patient_obj) rescue nil
     visits.reason_for_art_eligibility = PatientService.reason_for_art_eligibility(patient_obj) rescue nil
-    visits.transfer_in = Vitals.current_vitals(patient_obj, "TYPE OF PATIENT").to_s.split(":")[1].match(/transfer in/i) rescue nil #pb: bug-2677 Made this to use the newly created patient model method 'transfer_in?'
+    visits.transfer_in = current_vitals(patient_obj, "TYPE OF PATIENT").to_s.split(":")[1].match(/transfer in/i) rescue nil #pb: bug-2677 Made this to use the newly created patient model method 'transfer_in?'
     ! visits.transfer_in.blank? ? visits.transfer_in = 'NO' : visits.transfer_in = 'YES'
 
-    transferred_out_details = Observation.find(:last, :conditions =>["concept_id = ? and person_id = ?",
-        ConceptName.find_by_name("TRANSFER OUT TO").concept_id,patient_obj.id]) rescue ""
+    transferred_out_details = Observation.find(:last, :conditions =>["concept_id = ? and person_id = ?", ConceptName.find_by_name("TRANSFER OUT TO").concept_id,patient_obj.id]) rescue ""
 
 		visits.transferred_out_to = transferred_out_details.value_text if transferred_out_details
 		visits.transferred_out_date = transferred_out_details.obs_datetime if transferred_out_details
@@ -310,71 +311,87 @@ def mastercard_demographics(patient_obj)
     if staging_ans.blank?
       staging_ans = patient_obj.person.observations.recent(1).question("WHO STG CRIT").all
     end
+    #raise current_vitals(patient_obj, "cardiovascular complications present").to_yaml
 
+    visits.diagnosis_asthma = current_encounter(patient_obj, "ASTHMA MEASURE", "ASTHMA").to_s.split(":")[1].match(/yes/i) rescue nil
+    ! visits.diagnosis_asthma.blank? ? visits.diagnosis_asthma = "Y" : visits.diagnosis_asthma = "N"
+
+    visits.diagnosis_stroke = current_encounter(patient_obj, "GENERAL HEALTH", "CHRONIC DISEASE").to_s.match(/Acute cerebrovascular attack/i) rescue nil
+    ! visits.diagnosis_stroke.blank? ? visits.diagnosis_stroke = "Y" : visits.diagnosis_stroke = "N"
   
-    visits.smoking = Vitals.current_vitals(patient_obj, "current smoker").to_s.split(":")[1].match(/yes/i) rescue nil
+    visits.smoking = current_vitals(patient_obj, "current smoker").to_s.split(":")[1].match(/yes/i) rescue nil
     ! visits.smoking.blank? ? visits.smoking = "Y" : visits.smoking = "N"
 
-    visits.alcohol = Vitals.current_vitals(patient_obj, "Does the patient drink alcohol?").to_s.split(":")[1].match(/yes/i) rescue nil
+    visits.alcohol = current_vitals(patient_obj, "Does the patient drink alcohol?").to_s.split(":")[1].match(/yes/i) rescue nil
     ! visits.alcohol.blank? ? visits.alcohol = 'Y' : visits.alcohol = 'N'
 
-    visits.dm = Vitals.current_vitals(patient_obj, "diabetes family history").to_s.split(":")[1].match(/yes/i) rescue nil
+    visits.dm = current_vitals(patient_obj, "diabetes family history").to_s.split(":")[1].match(/yes/i) rescue nil
     ! visits.dm.blank? ? visits.dm = "Y" : visits.dm = "N"
 
-    visits.htn = Vitals.current_vitals(patient_obj, "Does the family have a history of hypertension?").to_s.split(":")[1].match(/yes/i) rescue nil
+    visits.htn = current_vitals(patient_obj, "Does the family have a history of hypertension?").to_s.split(":")[1].match(/yes/i) rescue nil
     ! visits.htn.blank? ? visits.htn = "Y" : visits.htn = "N"
 
-    visits.tb_within_last_two_yrs = Vitals.current_vitals(patient_obj, "tb in previous two years").to_s.split(":")[1].match(/yes/i) rescue nil
+    visits.tb_within_last_two_yrs = current_vitals(patient_obj, "tb in previous two years").to_s.split(":")[1].match(/yes/i) rescue nil
     ! visits.tb_within_last_two_yrs.blank? ? visits.tb_within_last_two_yrs = "Y" : visits.tb_within_last_two_yrs = "N"
 
-    visits.asthma = Vitals.current_encounter(patient_obj, "MEDICAL HISTORY", "asthma").to_s.split(":")[1].asthma.match(/yes/i) rescue nil
+    visits.asthma = current_encounter(patient_obj, "MEDICAL HISTORY", "asthma").to_s.split(":")[1].asthma.match(/yes/i) rescue nil
     visits.asthma == "yes" ? visits.asthma = "Y" : visits.asthma = "N"
 
-    visits.stroke = Vitals.current_vitals(patient_obj, "ever had a stroke").split(":")[1].match(/yes/i) rescue nil
+    visits.stroke = current_vitals(patient_obj, "ever had a stroke").to_s.split(":")[1].match(/yes/i) rescue nil
     ! visits.stroke.blank? ? visits.stroke = "Y" : visits.stroke = "N"
 
-    visits.hiv_status = Vitals.current_vitals(patient_obj, "hiv status").split(":")[1].match(/positive/i) rescue nil
+    visits.hiv_status = current_encounter(patient_obj, "UPDATE HIV STATUS", "HIV STATUS").to_s.split(":")[1].match(/positive/i) rescue nil
     ! visits.hiv_status.blank? ? visits.hiv_status = "R" : visits.hiv_status = "NR"
 
-    visits.art_status = Vitals.current_vitals(patient_obj, "on art").split(":")[1].match(/yes/i) rescue nil
+    visits.art_status = current_vitals(patient_obj, "on art").to_s.split(":")[1].match(/yes/i) rescue nil
     ! visits.art_status.blank? ? visits.art_status = "Y" : visits.art_status = "N"
 
-    visits.oedema = Vitals.current_encounter(patient_obj, "COMPLICATIONS", "oedema")
+     visits.oedema = current_encounter(patient_obj, "COMPLICATIONS", "oedema") rescue []
     ! visits.oedema.blank? ? visits.oedema = "Y Date: #{visits.oedema.to_s.split(":")[1]}" : visits.oedema = "N"
 
-    visits.cardiac = Vitals.current_encounter(patient_obj, "COMPLICATIONS", "Cardiac")
+    visits.cardiac = current_encounter(patient_obj, "COMPLICATIONS", "Cardiac") rescue []
     ! visits.cardiac.blank? ? visits.cardiac = "Y Date: #{visits.cardiac.to_s.split(":")[1]}" : visits.cardiac = "N"
 
-    visits.mi = Vitals.current_encounter(patient_obj, "COMPLICATIONS", "myocardial injactia")
+    visits.mi = current_encounter(patient_obj, "COMPLICATIONS", "myocardial injactia") rescue []
     ! visits.mi.blank? ? visits.mi = "Y Date: #{visits.mi.to_s.split(":")[1]}" : visits.mi = "N"
 
-    visits.funduscopy = Vitals.current_encounter(patient_obj, "COMPLICATIONS", "fundus")
+    visits.funduscopy = current_encounter(patient_obj, "COMPLICATIONS", "fundus") rescue []
     ! visits.funduscopy.blank? ? visits.funduscopy = "Y Date: #{visits.funduscopy.to_s.split(":")[1]}" : visits.funduscopy = "N"
 
-    visits.creatinine = Vitals.current_encounter(patient_obj, "COMPLICATIONS", "Creatinine")
+    visits.creatinine = current_encounter(patient_obj, "COMPLICATIONS", "Creatinine") rescue []
     ! visits.creatinine.blank? ? visits.creatinine = "Y Date: #{visits.creatinine.to_s.split(":")[1]}" : visits.creatinine = "N"
 
-    visits.comp_stroke = Vitals.current_encounter(patient_obj, "COMPLICATIONS", "stroke")
+    visits.comp_stroke = current_encounter(patient_obj, "COMPLICATIONS", "stroke") rescue []
     ! visits.comp_stroke.blank? ? visits.creatinine = "Y" : visits.comp_stroke = "N"
 
-    chronic_diseases = Vitals.current_encounter(patient_obj, "GENERAL HEALTH", "CHRONIC DISEASE").to_s.match(/Chronic disease:   TIA/i) rescue nil
+    chronic_diseases = current_encounter(patient_obj, "GENERAL HEALTH", "CHRONIC DISEASE").to_s.match(/Chronic disease:   TIA/i) rescue nil
     ! chronic_diseases.blank? ? visits.tia = "Y" : visits.tia = "N"
 
-    visits.amputation = Vitals.current_encounter(patient_obj, "COMPLICATIONS", "COMPLICATIONS").to_s.match(/Complications:  Amputation/i) rescue nil
+    visits.amputation = current_encounter(patient_obj, "COMPLICATIONS", "COMPLICATIONS").to_s.match(/Complications:  Amputation/i) rescue nil
     ! visits.amputation.blank? ? visits.amputation = "Y" : visits.amputation = "N"
 
     #raise Vitals.current_encounter(patient_obj, "COMPLICATIONS", "COMPLICATIONS").to_s.to_yaml
-     visits.neuropathy = Vitals.current_encounter(patient_obj, "COMPLICATIONS", "COMPLICATIONS").to_s.match(/Complications:   Peripheral nueropathy/i) rescue nil
+     visits.neuropathy = current_encounter(patient_obj, "COMPLICATIONS", "COMPLICATIONS").to_s.match(/Complications:   Peripheral nueropathy/i) rescue nil
     ! visits.neuropathy.blank? ? visits.neuropathy = "Y" : visits.neuropathy = "N"
 
-     visits.foot_ulcers = Vitals.current_encounter(patient_obj, "COMPLICATIONS", "COMPLICATIONS").to_s.match(/Complications:   Foot ulcers/i) rescue nil
+     visits.foot_ulcers = current_encounter(patient_obj, "COMPLICATIONS", "COMPLICATIONS").to_s.match(/Complications:   Foot ulcers/i) rescue nil
     ! visits.foot_ulcers.blank? ? visits.foot_ulcers = "Y" : visits.foot_ulcers = "N"
 
-    visits.impotence = Vitals.current_encounter(patient_obj, "COMPLICATIONS", "COMPLICATIONS").to_s.match(/Complications:  Impotence/i) rescue nil
+    visits.impotence = current_encounter(patient_obj, "COMPLICATIONS", "COMPLICATIONS").to_s.match(/Complications:  Impotence/i) rescue nil
     ! visits.impotence.blank? ? visits.impotence = "Y" : visits.impotence = "N"
 
-    visits.comp_other = Vitals.current_encounter(patient_obj, "COMPLICATIONS", "COMPLICATIONS").to_s.match(/Complications:   Others/i) rescue nil
+    visits.comp_other = current_encounter(patient_obj, "COMPLICATIONS", "COMPLICATIONS").to_s.match(/Complications:   Others/i) rescue nil
     ! visits.comp_other.blank? ? visits.comp_other = "Y" : visits.comp_other = "N"
+
+    visits.diagnosis_dm = current_vitals(patient_obj, "Patient has Diabetes").to_s.match(/yes/i) rescue nil
+    ! visits.diagnosis_dm.blank? ? visits.diagnosis_dm = "Y" : visits.diagnosis_dm = "N"
+
+    visits.diagnosis_htn = current_vitals(patient_obj, "cardiovascular system diagnosis").to_s.match(/Hypertension /i) rescue nil
+
+    ! visits.diagnosis_htn.blank? ? visits.diagnosis_htn = "Y" : visits.diagnosis_htn = "N"
+
+    visits.diagnosis_dm_htn = "N"
+    visits.diagnosis_dm_htn = "Y" if visits.diagnosis_htn = "Y" and visits.diagnosis_dm = "Y"
 
     hiv_staging = Encounter.find(:last,:conditions =>["encounter_type = ? and patient_id = ?",
         EncounterType.find_by_name("HIV Staging").id,patient_obj.id])
@@ -569,7 +586,8 @@ def mastercard_demographics(patient_obj)
 		end
 
     #patients currents/available states (patients outcome/s)
-    program_id = Program.find_by_name('HIV PROGRAM').id
+    program_id = Program.find_by_name('CHRONIC CARE PROGRAM').id
+    
     if encounter_date.blank?
       patient_states = PatientState.find(:all,
 				:joins => "INNER JOIN patient_program p ON p.patient_program_id = patient_state.patient_program_id",
@@ -624,9 +642,10 @@ def mastercard_demographics(patient_obj)
   end
 
   def calculate_bp(patient, visit_date)
-    systolic = Vitals.todays_vitals(patient, "Systolic blood pressure", visit_date).value_numeric rescue 0
-    diastolic = Vitals.todays_vitals(patient, "Diastolic blood pressure", visit_date).value_numeric  rescue 0
-    return (systolic.to_i / diastolic.to_i) rescue 0
+    systolic = Vitals.todays_vitals(patient, "Systolic blood pressure", visit_date).value_numeric.to_i rescue 0
+    diastolic = Vitals.todays_vitals(patient, "Diastolic blood pressure", visit_date).value_numeric.to_i rescue 0
+    
+    return "#{systolic}/#{diastolic}"
   end
 
   def number_of_booked_patients
@@ -869,11 +888,11 @@ def mastercard_demographics(patient_obj)
   end
 
 	def patient_visit_label(patient, date = Date.today)
-    result = Location.find(session[:location_id]).name.match(/outpatient/i)
-		#visit = visits(patient, date)[date] rescue {}
+    #result = Location.find(session[:location_id]).name.match(/outpatient/i)
+		visit = visits(patient, date)[date] rescue {}
 
 		return if visit.blank?
-    #visit_data = mastercard_visit_data(visit)
+    visit_data = mastercard_visit_data(visit)
 
     label = ZebraPrinter::StandardLabel.new
     label.draw_text("Printed: #{Date.today.strftime('%b %d %Y')}",597,280,0,1,1,1,false)
@@ -882,18 +901,18 @@ def mastercard_demographics(patient_obj)
    # label.draw_text("#{arv_number}",565,30,0,3,1,1,true)
     label.draw_text("#{patient.name}(#{patient.gender})",25,60,0,3,1,1,false)
     #label.draw_text("#{'(' + visit.visit_by + ')' unless visit.visit_by.blank?}",255,30,0,2,1,1,false)
-    #label.draw_text("#{visit.height.to_s + 'cm' if !visit.height.blank?}  #{visit.weight.to_s + 'kg' if !visit.weight.blank?}  #{'BMI:' + visit.bmi.to_s if !visit.bmi.blank?} #{'(PC:' + pill_count[0..24] + ')' unless pill_count.blank?}",25,95,0,2,1,1,false)
+    label.draw_text("#{visit.height.to_s + 'cm' if !visit.height.blank?}  #{visit.weight.to_s + 'kg' if !visit.weight.blank?}  #{'BMI:' + visit.bmi.to_s if !visit.bmi.blank?}",25,95,0,2,1,1,false)
     #label.draw_text("SE",25,130,0,3,1,1,false)
-    #label.draw_text("TB",110,130,0,3,1,1,false)
-    label.draw_text("Adh",185,130,0,3,1,1,false)
+    label.draw_text("TB",110,130,0,3,1,1,false)
+    label.draw_text("BP",185,130,0,3,1,1,false)
     label.draw_text("DRUG(S) GIVEN",255,130,0,3,1,1,false)
     label.draw_text("OUTC",577,130,0,3,1,1,false)
     label.draw_line(25,150,800,5)
-    #label.draw_text("#{visit.tb_status}",110,160,0,2,1,1,false)
-    #label.draw_text("#{adherence_to_show(visit.adherence).gsub('%', '\\\\%') rescue nil}",185,160,0,2,1,1,false)
-   # label.draw_text("#{visit_data['outcome']}",577,160,0,2,1,1,false)
-   # label.draw_text("#{visit_data['outcome_date']}",655,130,0,2,1,1,false)
-    #label.draw_text("#{visit_data['next_appointment']}",577,190,0,2,1,1,false) if visit_data['next_appointment']
+    label.draw_text("#{visit.tb_status}",110,160,0,2,1,1,false)
+    label.draw_text("#{visit_data['bp'] rescue nil}",185,160,0,2,1,1,false)
+    label.draw_text("#{visit_data['outcome']}",577,160,0,2,1,1,false)
+    label.draw_text("#{visit_data['outcome_date']}",655,130,0,2,1,1,false)
+    label.draw_text("#{visit_data['next_appointment']}",577,190,0,2,1,1,false) if visit_data['next_appointment']
     starting_index = 25
     start_line = 160
 
@@ -937,6 +956,7 @@ def mastercard_demographics(patient_obj)
 		return if visit.blank?
     data = {}
 
+    data["bp"] = visit.bp rescue nil
     data["outcome"] = visit.outcome rescue nil
     data["outcome_date"] = "#{visit.date_of_outcome.to_date.strftime('%b %d %Y')}" if visit.date_of_outcome
 
@@ -971,6 +991,22 @@ def mastercard_demographics(patient_obj)
     data
 	end
 
+  def current_vitals(patient, vital_sign, session_date = Date.today)
+				concept = ConceptName.find_by_sql("select concept_id from concept_name where name = '#{vital_sign}' and voided = 0").first.concept_id
+				Observation.find_by_sql("SELECT * from obs where concept_id = '#{concept}' AND person_id = '#{patient.id}'
+                    AND DATE(obs_datetime) <= '#{session_date}' AND voided = 0
+                    ORDER BY  obs_datetime DESC, date_created DESC LIMIT 1").first rescue nil
+	end
+
+  def current_encounter(patient, enc, concept, session_date = Date.today)
+				concept = ConceptName.find_by_name(concept).concept_id
+
+				encounter = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
+                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
+                                  session_date ,patient.id, EncounterType.find_by_name(enc).id]).encounter_id rescue nil
+				Observation.find(:all, :order => "obs_datetime DESC,date_created DESC", :conditions => ["encounter_id = ? AND concept_id = ?", encounter, concept]) rescue nil
+  end
+  
 	def visits(patient_obj, encounter_date = nil)
     
     patient_visits = {}
@@ -1011,8 +1047,9 @@ def mastercard_demographics(patient_obj)
 			patient_visits[visit_date] = Mastercard.new() if patient_visits[visit_date].blank?
 
 
-      #patient_visits[visit_date].bp = calculate_bp(patient_obj, visit_date)
-
+      patient_visits[visit_date].bp = calculate_bp(patient_obj, visit_date)
+      program_id = Program.find_by_name('CHRONIC CARE PROGRAM').id
+      
 			concept_name = obs.concept.fullname
       
 			if concept_name.upcase == 'APPOINTMENT DATE'
@@ -1099,7 +1136,8 @@ def mastercard_demographics(patient_obj)
 		end
 
     #patients currents/available states (patients outcome/s)
-    program_id = Program.find_by_name('HIV PROGRAM').id
+    program_id = Program.find_by_name('CHRONIC CARE PROGRAM').id
+    
     if encounter_date.blank?
       patient_states = PatientState.find(:all,
 				:joins => "INNER JOIN patient_program p ON p.patient_program_id = patient_state.patient_program_id",
@@ -1111,17 +1149,17 @@ def mastercard_demographics(patient_obj)
 				:conditions =>["patient_state.voided = 0 AND p.voided = 0 AND p.program_id = ? AND start_date = ? AND p.patient_id =?",
 					program_id,encounter_date.to_date,patient_obj.patient_id],:order => "patient_state_id ASC")
     end
-
+    
 #=begin
     patient_states.each do |state|
       visit_date = state.start_date.to_date rescue nil
       next if visit_date.blank?
       patient_visits[visit_date] = Mastercard.new() if patient_visits[visit_date].blank?
-      patient_visits[visit_date].outcome = state.program_workflow_state.concept.fullname rescue 'Unknown state'
+      patient_visits[visit_date].outcome = state.program_workflow_state.concept.fullname rescue 'Alive'
       patient_visits[visit_date].date_of_outcome = state.start_date
     end
 #=end
-
+    
     patient_visits.each do |visit_date,data|
       next if visit_date.blank?
      # patient_visits[visit_date].outcome = hiv_state(patient_obj,visit_date)
@@ -1129,6 +1167,7 @@ def mastercard_demographics(patient_obj)
 
 			status = tb_status(patient_obj, visit_date).upcase rescue nil
 			patient_visits[visit_date].tb_status = status
+      patient_visits[visit_date].tb_status = 'noSup' if status == 'UNKNOWN'
 			patient_visits[visit_date].tb_status = 'noSup' if status == 'TB NOT SUSPECTED'
 			patient_visits[visit_date].tb_status = 'sup' if status == 'TB SUSPECTED'
 			patient_visits[visit_date].tb_status = 'noRx' if status == 'CONFIRMED TB NOT ON TREATMENT'
@@ -1153,6 +1192,11 @@ def mastercard_demographics(patient_obj)
     patient_visits
   end
 
+  def specific_patient_visit_date_label
+		session_date = params[:session_date].to_date rescue Date.today
+    print_string = patient_visit_label(@patient, session_date)# rescue (raise "Unable to find patient (#{params[:patient_id]}) or generate a visit label for that patient")
+    send_data(print_string,:type=>"application/label; charset=utf-8", :stream=> false, :filename=>"#{params[:patient_id]}#{rand(10000)}.lbl", :disposition => "inline")
+  end
 
 	def tb_status(patient, visit_date = Date.today)
 		state = Concept.find(Observation.find(:first,

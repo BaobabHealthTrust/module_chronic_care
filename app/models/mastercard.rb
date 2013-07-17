@@ -15,6 +15,8 @@ class Mastercard
    :ever_received_art, :last_art_drugs_taken, :last_art_drugs_date_taken, :smoking, :alcohol, :dm, :htn, :asthma, :stroke, :bp,
    :oedema, :mi, :cardiac, :funduscopy, :creatinine, :comp_stroke, :tia, :amputation, :impotence, :foot_ulcers, :neuropathy, :comp_other,
    :first_positive_hiv_test_site, :first_positive_hiv_test_date, :first_positive_hiv_test_arv_number, :hiv_status,
-   :first_positive_hiv_test_type, :months_on_art, :transferred_out_to, :transferred_out_date, :art_start_date, :current_drugs_given
+   :first_positive_hiv_test_type, :months_on_art, :transferred_out_to, :transferred_out_date, :art_start_date, :current_drugs_given,
+   :diagnosis_dm, :diagnosis_htn, :diagnosis_dm_htn, :diagnosis_asthma, :diagnosis_stroke, :diagnosis_other,
+   :zone, :district, :clinic
 
 end 
