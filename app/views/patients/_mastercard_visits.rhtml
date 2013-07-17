@@ -113,14 +113,8 @@ background-position: 0% -30px;
   <th width=85>BMI</th>
   <th width="85">BP</th>
   <th width=180>Outcome</th>
-  <th width=180>Reg</th>
-  <th width=70>Adh</th>
   <th width=100>TB Sts</th>
-  <th width=85>S. Eff</th>
-  <th width=100>Pills</th>
   <th width=200>Gave</th>
-  <th width=85 style="border-width:1px 0px 1px 1px;">CPT</th>
-  <th width=85 style="border-width:1px 1px 1px 0px;">&nbsp;</th>
 </tr>
 </thead>
 <tbody>
@@ -129,46 +123,38 @@ background-position: 0% -30px;
   previous_outcome = ""
   #raise @visits.to_yaml
    @visits.sort.map{|date,data| 
-    unless data.reg.blank?
-      outcome = 'ON ART' 
+    unless data.gave.blank?
+      outcome = 'ALIVE'
     end
-    outcome = data.outcome if data.outcome != 'ON ANTIRETROVIRALS' and !data.outcome.blank?
+    outcome = data.outcome if data.outcome != 'On treatment' or !data.outcome.blank?
 	 #next if data.tb_status == "tb medical"
     previous_outcome = outcome if !data.outcome.blank?
     
    %>
     <tr>
-      <td><a href='/patients/specific_patient_visit_date_label?session_date=<%=date%>&patient_id=<%=@patient_id%>' class='rounded' style='text-decoration:none;'><span><%=date.to_date.strftime('%d-%b-%Y')%></span></a></td>
+      <td><a href='/patients/specific_patient_visit_date_label?session_date=<%=date%>&patient_id=<%=@patient_id%>&user_id=<%=  params[:user_id] %>' class='rounded' style='text-decoration:none;'><span><%=date.to_date.strftime('%d-%b-%Y')%></span></a></td>
       <td><%= data.weight || '&nbsp;'%></td>
       <td><%= data.height || '&nbsp;'%></td>
       <td><%= data.bmi || '&nbsp;'%></td>
+      <td><%= data.bp || '&nbsp;'%></td>
       <td><%= outcome || previous_outcome || '&nbsp;'%></td>
-      <td><%= data.reg || '&nbsp;'%></td>
-      <td>
-      <% adherence = nil
-      (data.adherence || []).each do | name , percentage |
-        adherence += "<br/>#{name} (#{percentage})" unless adherence.blank?
-        adherence = "#{name} (#{percentage})" if adherence.blank?
-      end %>
-      <%= adherence || '&nbsp;'%>
-      </td>
       <td><%= data.tb_status || '&nbsp;'%></td>
-      <td>
+      
       <% side_effects = nil
       (data.s_eff.split("<br/>").compact.reject(&:blank?) || []).each do | side_effect |
         side_effects += "<br/>#{side_effect}" unless side_effects.blank?
         side_effects = "#{side_effect}" if side_effects.blank?
       end if data.s_eff%>
-      <%= side_effects || '&nbsp;'%>
-      </td>
-      <td>
+      <%#= side_effects || '&nbsp;'%>
+      
+      
       <% pills = nil
       (data.pills || []).each do | drug_name,count |
         pills += "<br/>#{drug_name}: #{count}" unless pills.blank?
         pills = "#{drug_name}: #{count}" if pills.blank?
       end %>
-      <%= pills || '&nbsp;'%>
-      </td>
+      <%#= pills || '&nbsp;'%>
+      
       <td>
       <% gave = nil
       (data.gave || []).each do | name , quantity |
@@ -177,8 +163,6 @@ background-position: 0% -30px;
       end %>
       <%= gave || '&nbsp;'%>
       </td>
-      <td style="border-width:1px 0px 1px 1px;"><%=data.cpt || '&nbsp;'%></td>
-      <td style="border-width:1px 1px 1px 0px;">&nbsp;</td>
   <%}%>
 </tr>
 <tr style="border-width:0px;height:auto;">

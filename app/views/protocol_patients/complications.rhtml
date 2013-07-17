@@ -3,6 +3,13 @@
     height: 500px;
   }
 
+  #tt_page_complications_summary  .inputFrameClass {
+  height: 600px;
+}
+
+ #tt_page_complications_summary  #viewport {
+  height: 600px;
+}
     th { text-align: center;
 	 vertical-align: middle;
 	 background-color: #9250DE;
@@ -193,7 +200,7 @@ function selectedOptions(selected){
 
       }
       html += "</ul>"
-	  $('inputFrame'+tstCurrentPage).innerHTML = '<div id="summary">' + html + '</div>' ;
+	  $('inputFrame'+tstCurrentPage).innerHTML = '<div id="summary" style="width:98%;overflow:scroll;hieght:500px ! important;">' + html + '</div>' ;
 	  $("clearButton").style.display = "none";
   }
 

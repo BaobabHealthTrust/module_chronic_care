@@ -142,6 +142,7 @@
         </button>
 
         <% if @source.nil? %>
+        <!--
           <button class="button navButton blue" style="float: left;"
           	<% if !@show_mastercard_counter %>
                   onmousedown="window.location = '/patients/print_mastercard?patient_id=<%=@patient.id%>&user_id=<%= @user["user_id"] %>'">
@@ -152,7 +153,8 @@
               Print Mastercard
             </span>
           </button>
-
+        -->
+<!--
           <%if @show_mastercard_counter %>
                 <button id="back" class="<%=@prev_button_class%>" style="position:relative; float:left;" onclick="prev()">
                 	<span>Previous</span>
@@ -178,7 +180,7 @@
         <%#end%>
 
       </div>
-
+-->
       <div id="msgBox">
         <table>
           <tr>

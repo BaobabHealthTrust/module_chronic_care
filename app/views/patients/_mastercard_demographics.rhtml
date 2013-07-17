@@ -6,9 +6,9 @@
     <td colspan="7" style="height:40px;padding-left:10px;border-style:solid;border-width:0px 0px 1px 0px;"><b><font size="4"> Diabetes, Cardio Vascular( Hypertension) and Asthma Care: Adult  Patient Master Card Version 2</font></b></td>
   </tr>
   <tr>
-    <td colspan="2" style="height:30px;padding-left:10px;border-style:solid;border-width:0px 0px 1px 0px;"><b><font size="4"> Zone Name:</font></b></td>
-    <td colspan="3" style="height:30px;padding-left:10px;border-style:solid;border-width:0px 0px 1px 0px;"><b><font size="4"> Clinic Name and Number:</font></b></td>
-    <td colspan="2" style="height:30px;padding-left:10px;border-style:solid;border-width:0px 0px 1px 0px;"><b><font size="4"> District</font></b></td>
+    <td colspan="2" style="height:30px;padding-left:10px;border-style:solid;border-width:0px 0px 1px 0px;"><b><font size="4"> Zone Name: <%= @data_demo.zone -%></font></b></td>
+    <td colspan="3" style="height:30px;padding-left:10px;border-style:solid;border-width:0px 0px 1px 0px;"><b><font size="4"> Clinic Name and Number:  <%= @data_demo.clinic -%></font></b></td>
+    <td colspan="2" style="height:30px;padding-left:10px;border-style:solid;border-width:0px 0px 1px 0px;"><b><font size="4"> District:  <%= @data_demo.district -%></font></b></td>
   </tr>
 
   <tr valign="top">
@@ -147,31 +147,36 @@
         <tr>
           <td style="border-style:solid;border-width:0px 0px 1px 1px;">DM
           </td>
-          <td style="border-style:solid;border-width:0px 0px 1px 1px;">&nbsp;
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.diagnosis_dm -%>
           </td>
         </tr>
         <tr>
           <td style="border-style:solid;border-width:0px 0px 1px 1px;">HTN
           </td>
-          <td style="border-style:solid;border-width:0px 0px 1px 1px;">&nbsp;
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.diagnosis_htn -%>
           </td>
         </tr>
         <tr>
           <td style="border-style:solid;border-width:0px 0px 1px 1px;">DM+HTN
           </td>
-          <td style="border-style:solid;border-width:0px 0px 1px 1px;">&nbsp;
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.diagnosis_dm_htn -%>
           </td>
         </tr>
         <tr>
           <td style="border-style:solid;border-width:0px 0px 1px 1px;">Asthma
           </td>
-          <td style="border-style:solid;border-width:0px 0px 1px 1px;">&nbsp;
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.diagnosis_asthma -%>
           </td>
         </tr>
         <tr>
           <td style="border-style:solid;border-width:0px 0px 1px 1px;">Stroke
           </td>
-          <td style="border-style:solid;border-width:0px 0px 1px 1px;">&nbsp;
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.diagnosis_stroke -%>
           </td>
         </tr>
         <tr>

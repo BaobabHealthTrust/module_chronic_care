@@ -11,12 +11,22 @@
     height: 500px;
   }
 
+#tt_page_summary  .inputFrameClass {
+  height: 600px;
+}
+
+ #tt_page_summary  #viewport {
+  height: 600px;
+}
     th { text-align: center;
 	 vertical-align: middle;
 	 background-color: #9250DE;
 	 color: white;
 	 height: 10%;
 	 border-radius: 20px ;
+}
+ul {
+  height: 500px ! important;
 }
   #charttable{
 	border-color:#ff0000 #0000ff;
@@ -74,8 +84,6 @@
     background-color: lightgrey;
     display: none;
     -moz-user-select: none;
-    height: 18em;
-    overflow: auto;
   }
 
   .summary {
@@ -140,12 +148,13 @@ function selectedOptions(selected){
 
           if ($('1.1.13').value.length > 0)
         {
-		  conditions.push("Complications during birth: " + $('1.1.13').value));
+		  conditions.push("Complications during birth: " );
+                  selectedOptions( $('1.1.13'))
 		}
 
             if ($('explanation').value.length > 0)
         {
-		  conditions.push("Epilepsy experienced on: " + $('explanation').value));
+		  conditions.push("Epilepsy experienced on: " + $('explanation').value);
 		}
       var html
       html = "<ul>"
@@ -158,13 +167,13 @@ function selectedOptions(selected){
       if (conditions.length <= 0) {
           html += "<li class='data'>No conditions selected</li>";
         }
-      html += "</ul>"
+     
 	  if (i > 0){
-		html += "<span class='warning'>Please refer patient for advice</span>";
+		html += "<li class='warning'>Please refer patient for advice</li>";
 			$('refer_to_clinician').value = "Yes"
 	  }
-
-	  $('inputFrame'+tstCurrentPage).innerHTML = '<div id="summary">' + html + '</div>' ;
+       html += "</ul>"
+	  $('inputFrame'+tstCurrentPage).innerHTML = '<div id="summary" style="width:98%;overflow:scroll;hieght:500px ! important;">' + html + '</div>' ;
 	  $("clearButton").style.display = "none";
   }
 
@@ -211,10 +220,10 @@ function selectedOptions(selected){
 	:helpText => "Any drug allergies",
 	:tt_onLoad => "showCategory('General Health')"} %>
 
-        <select id='1.1.13' name="concept[Complications during patient's birth]"
+        <select id='1.1.13' name="concept[Complications during patient's birth][]"
                 helpText="Complications during patient's birth"
                 pos='15'
-                multiple ="true"
+                multiple ="multiple"
                 optional ="true">
         <option></option>
         <option value='Development'>Development</option>
@@ -234,7 +243,7 @@ function selectedOptions(selected){
         <textarea name="concept[CLINICAL NOTES CONSTRUCT]"
                   helpText="Explanation of effects experienced"
                   condition="$('epilepsy').value.length > 0"
-                  idn="explanation"
+                  id="explanation"
                   >
         </textarea>
 
