@@ -1,9 +1,9 @@
   module Vitals 
-	include CoreService
+	#include CoreService
   #include Openmrs
 
 			def self.get_patient_attribute_value(patient, attribute_name, session_date = Date.today)
-
+        
 				sex = patient.gender.upcase
 				sex = 'M' if patient.gender.upcase == 'MALE'
 				sex = 'F' if patient.gender.upcase == 'FEMALE'
