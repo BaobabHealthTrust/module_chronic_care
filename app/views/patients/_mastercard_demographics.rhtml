@@ -94,7 +94,7 @@
             <%= @data_demo.htn -%>
           </td>
         </tr>
-        
+
       </table>
     </td>
     <td colspan="1" style="height:30px;padding-left:10px;border-style:solid;border-width:1px 1px 1px 1px;">
@@ -266,6 +266,17 @@
           </td>
           <td style="border-style:solid;border-width:0px 0px 1px 1px;">
             <%= @data_demo.comp_other -%>
+          </td>
+        </tr>
+      </table>
+
+      <table width="98%" align="center">
+        <tr style="border-width:0px;height:auto;">
+          <td style="border-width:0px;height:auto;"><%= '&nbsp;'%></td>
+        </tr>
+        <tr>
+          <td style="border-style:solid;border-width:1px 1px 1px 1px;">
+            Next Appointment Date : <%= @data_demo.appointment_date.split(":")[1] rescue "Not Available" %>
           </td>
         </tr>
       </table>
