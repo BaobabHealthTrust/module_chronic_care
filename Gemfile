@@ -1,7 +1,10 @@
 source 'http://rubygems.org'
 
 gem 'rails', '2.3.5'
-gem 'rest-client', '1.6.3'
+gem 'settingslogic'                                                             
+gem 'fastercsv'                                                                 
+gem 'rest-client'                                                               
+gem 'mechanize'    
 gem 'mysql'
 gem 'actionmailer', '2.3.5'
 gem 'actionpack', '2.3.5'
