@@ -49,7 +49,7 @@
     </td>
     <td colspan="2" style="height:30px;padding-left:10px;border-style:solid;border-width:1px 1px 1px 1px;">
       <font size="4">Risk Factors</font>
-      <table>
+      <table width="98%">
         <tr>
           <td style="border-style:solid;border-width:0px 0px 1px 1px;">Smoking
           </td>
@@ -94,12 +94,20 @@
             <%= @data_demo.htn -%>
           </td>
         </tr>
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            Asthma
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%#= @data_demo.htn -%>&nbsp;
+          </td>
+        </tr>
 
       </table>
     </td>
     <td colspan="1" style="height:30px;padding-left:10px;border-style:solid;border-width:1px 1px 1px 1px;">
       <font size="4">Medical History</font>
-      <table>
+      <table width="98%">
         <tr>
           <td style="border-style:solid;border-width:0px 0px 1px 1px;">Any Asthma attacks in past month
           </td>
@@ -190,7 +198,7 @@
     </td>
     <td colspan="2" style="height:30px;padding-left:10px;border-style:solid;border-width:1px 1px 1px 1px;">
       <font size="4">Complications</font>
-      <table>
+      <table width="98%">
         <tr>
           <td style="border-style:solid;border-width:0px 0px 1px 1px;">Heart Failure
           </td>
@@ -275,7 +283,7 @@
           <td style="border-width:0px;height:auto;"><%= '&nbsp;'%></td>
         </tr>
         <tr>
-          <td style="border-style:solid;border-width:1px 1px 1px 1px;">
+          <td style="border-style:solid;border-width:1px 1px 1px 1px;font-size:18px;font-weght:bold;">
             Next Appointment Date : <%= @data_demo.appointment_date.split(":")[1] rescue "Not Available" %>
           </td>
         </tr>

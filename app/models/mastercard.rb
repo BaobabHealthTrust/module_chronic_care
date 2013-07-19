@@ -17,6 +17,6 @@ class Mastercard
    :first_positive_hiv_test_site, :first_positive_hiv_test_date, :first_positive_hiv_test_arv_number, :hiv_status,
    :first_positive_hiv_test_type, :months_on_art, :transferred_out_to, :transferred_out_date, :art_start_date, :current_drugs_given,
    :diagnosis_dm, :diagnosis_htn, :diagnosis_dm_htn, :diagnosis_asthma, :diagnosis_stroke, :diagnosis_other,
-   :zone, :district, :clinic, :smoker, :alcohol, :cva_risk, :fbs, :urine
+   :zone, :district, :clinic, :smoker, :alcohol, :cva_risk, :fbs, :urine, :history_asthma
 
 end 
