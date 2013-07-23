@@ -58,26 +58,9 @@ class PatientsController < ApplicationController
     @patient = Patient.find(params[:id] || params[:patient_id]) rescue nil
 
     ProgramEncounter.current_date = @retrospective
-=begin
-   @programs = @patient.program_encounters.each { |p|
-     if p.date_time.strftime("%d-%b-%Y") == @retrospective.strftime("%d-%b-%Y")
-          [p.id,
-           p.to_s,
-           p.program_encounter_types.collect{|e|
-             [
-                e.encounter_id, e.encounter.type.name,
-                e.encounter.encounter_datetime.strftime("%H:%M"),
-                e.encounter.creator
-             ]
-           },
-           p.date_time.strftime("%d-%b-%Y")
-         ]
-     end
 
-    } if !@patient.nil?
-
-=end
-    @programs = @patient.program_encounters.current.collect{|p|
+    @programs = @patient.program_encounters.find(:all, :conditions => ["DATE(date_time) = ?", @retrospective.to_date],
+                                                 :order => ["date_time DESC"]).collect{|p|
 
       [
         p.id,
@@ -93,7 +76,6 @@ class PatientsController < ApplicationController
       ]
     } if !@patient.nil?
 
-    #raise @programs.inspect
     render :layout => false
   end
 
