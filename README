@@ -45,5 +45,11 @@ B. WHEN A DATABASE ALREADY EXISTS
   	b. Edit application.yml.example in config with proper parameters as well
    
 C. Load recent meta_data (openmrs_17)
-C. Run the application with nginx
+D. Run the application with nginx
  (Check in redmine under "knowledge base" on how to set up nginx)
+ 
+E. Post Deployment.
+
+  Set the logged in user activities from my_account>my_activities according to the required workflows
+  Set the clinic's Lab results and vitals required from the properties menu.
+  select the required program for the user.
