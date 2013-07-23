@@ -2,9 +2,13 @@
 class EncountersController < ApplicationController
 
   def create
-		#raise params.to_yaml
+    
+    @retrospective = session[:datetime]
+		@retrospective = Time.now if session[:datetime].blank?
     User.current = User.find(@user["user_id"]) rescue nil
 
+
+    #raise @retrospective.to_yaml
     Location.current = Location.find(params[:location_id] || session[:location_id]) rescue nil
 
     patient = Patient.find(params[:patient_id]) rescue nil
@@ -33,13 +37,13 @@ class EncountersController < ApplicationController
 
             @program_encounter = ProgramEncounter.find_by_program_id(@program.id,
               :conditions => ["patient_id = ? AND DATE(date_time) = ?",
-                patient.id, Date.today.strftime("%Y-%m-%d")])
+                patient.id, @retrospective.strftime("%Y-%m-%d")])
 
             if @program_encounter.blank?
 
               @program_encounter = ProgramEncounter.create(
                 :patient_id => patient.id,
-                :date_time => Time.now,
+                :date_time => @retrospective,
                 :program_id => @program.id
               )
 
@@ -59,7 +63,7 @@ class EncountersController < ApplicationController
               @current = PatientProgram.create(
                 :patient_id => patient.id,
                 :program_id => @program.id,
-                :date_enrolled => Time.now
+                :date_enrolled => @retrospective
               )
 
             end
@@ -106,8 +110,8 @@ class EncountersController < ApplicationController
 
                 @current.transition({
                     :state => "#{value}",
-                    :start_date => Time.now,
-                    :end_date => Time.now
+                    :start_date => @retrospective,
+                    :end_date => @retrospective
                   }) if !selected_state.nil?
               end
 							
@@ -194,8 +198,8 @@ class EncountersController < ApplicationController
 
                   @current.transition({
                       :state => "#{item}",
-                      :start_date => Time.now,
-                      :end_date => Time.now
+                      :start_date => @retrospective,
+                      :end_date => @retrospective
                     }) if !selected_state.nil?
                 end
 
@@ -243,7 +247,7 @@ class EncountersController < ApplicationController
 
                 when "time"
 
-                  obs.update_attribute("value_datetime", "#{Date.today.strftime("%Y-%m-%d")} " + item)
+                  obs.update_attribute("value_datetime", "#{@retrospective.strftime("%Y-%m-%d")} " + item)
 
                 when "number"
 

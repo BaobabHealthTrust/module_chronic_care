@@ -2,7 +2,7 @@
 class ApplicationController < ActionController::Base
   helper :all
 
-  before_filter :check_user, :except => [:prescribe, :locations, :user_login, :user_logout, :missing_program, :static_locations,
+  before_filter :check_user, :except => [:print_patient_mastercard, :print_mastercard, :prescribe, :locations, :user_login, :user_logout, :missing_program, :static_locations,
     :missing_concept, :no_user, :no_patient, :project_users_list, :show_selected_fields, :check_role_activities, :missing_encounter_type]
   
   def get_global_property_value(global_property)
@@ -58,7 +58,7 @@ class ApplicationController < ActionController::Base
   end
 
   def check_user
-		#raise get_global_property_value("user.management.url").to_s.to_yaml
+		
     link = get_global_property_value("user.management.url").to_s rescue nil
 
     if link.nil?
