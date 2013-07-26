@@ -104,5 +104,9 @@ module ApplicationHelper
     fancy = get_global_property_value("interface") == "fancy" rescue false
     fancy ? "touch-fancy.css" : "touch.css"
   end
+
+  def current_program
+		return session[:selected_program] rescue "HYPERTENSION PROGRAM"
+	end
 	
 end
