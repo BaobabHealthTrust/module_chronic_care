@@ -22,7 +22,7 @@
 		   <%
 				ajax_url = "/location/locations?patient_id=#{@patient.id}&user_id=#{@user['user_id']}&search_string="
 			%>
-		  <% type_list = ["NEW PATIENT", "TRANSFER IN", "TEMPORARY PATIENT"] %>
+		  <% type_list = ["NEW PATIENT", "TRANSFER IN"] %>
 		  <%= touch_select_tag "TYPE OF PATIENT", @patient, options_for_select(type_list),
 			{	:id => "patient_type",
 				:name => "concept[TYPE OF PATIENT]",

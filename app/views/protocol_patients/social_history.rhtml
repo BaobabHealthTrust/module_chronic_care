@@ -104,6 +104,9 @@
 	  if ($('days_per_week').value.length > 0)
         conditions.push("Number of Alcohol drinking days per week: " + $('days_per_week').value + " Days");
 
+       if ($('employment').value.length > 0)
+        conditions.push("Type of employment: " + $('employment').value);
+
       var html
       html = "<ul>"
       for(var i=0;i < conditions.length;i++) {
@@ -364,6 +367,20 @@
 	 <option value='Firewood'>Firewood</option>
 	 <option value='Charcoal'>Charcoal</option>
 	 <option value='None'>None</option>
+   </select>
+	</td>
+
+        <td>
+          <select id='employment'
+                  name='concept[type of employment]'
+                  helpText='Type of employment? <%= @person_attribute %> '
+			pos='3'
+			condition='program == "HYPERTENSION PROGRAM"'
+			tt_onLoad ="showCategory('Social History')"
+			tt_requireNextClick = false >
+	 <option></option>
+	 <option value='Sedentary'>Sedentary</option>
+	 <option value='Active'>Active</option>
    </select>
 	</td>
 		  <td>

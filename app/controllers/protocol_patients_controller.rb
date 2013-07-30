@@ -229,14 +229,25 @@ class ProtocolPatientsController < ApplicationController
     @regimen_concepts = MedicationService.hypertension_dm_drugs
 
     @circumference = Observation.find_by_sql("SELECT * from obs
-                   WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'Head circumference' LIMIT 1) AND voided = 0
+                   WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'waist circumference' LIMIT 1) AND voided = 0
                    AND voided = 0 AND person_id = #{@patient.id} ORDER BY obs_datetime DESC LIMIT 1").first.value_numeric rescue nil
     @diabetic = ConceptName.find_by_concept_id(Vitals.get_patient_attribute_value(@patient, "Patient has Diabetes")).name rescue "unknown"
+
+
+    @bmi = Observation.find_by_sql("SELECT * from obs
+                   WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'Body mass index, measured' LIMIT 1) AND voided = 0
+                   AND voided = 0 AND person_id = #{@patient.id} ORDER BY obs_datetime DESC LIMIT 1")
+    @bmi = @bmi.first.value_text.to_i rescue @bmi.first.value_numeric rescue 0
 
     @treatements_list = ["Heart disease", "Stroke", "TIA", "Diabetes", "Kidney Disease"]
 
       @treatements_list.delete_if {|var| var == "Diabetes"} if @diabetic.upcase == "YES"
     @current_program = current_program
+    if current_program == "HYPERTENSION PROGRAM"
+      if @bmi < 25 and @circumference < 90
+        @task = "disable" 
+      end
+    end
 	end
 
 	def complications
@@ -250,10 +261,16 @@ class ProtocolPatientsController < ApplicationController
     end
 
     @user = User.find(params[:user_id]) rescue nil?
+     @treatements_list = ["Amputation", "Stroke", "Myocardial injactia(MI)", "Creatinine", "Funduscopy","Shortness of breath","Oedema","CVA", "Peripheral nueropathy", "Foot ulcers", "Impotence", "Others"]
 
     redirect_to '/encounters/no_patient' and return if @user.nil?
-	
-
+    current_date = (!session[:datetime].nil? ? session[:datetime].to_date : Date.today)
+	  enc = check_encounter(@patient, "lab results", current_date ).to_s
+    
+    @treatements_list.delete_if {|var| var == "Oedema"} if ! enc.match(/Blood Sugar Test Type:  Fasting/)
+    @treatements_list.delete_if {|var| var == "Shortness of breath"} if ! enc.match(/Blood Sugar Test Type:  Random/)
+    @treatements_list.delete_if {|var| var == "Funduscopy"} if ! enc.match(/Cholesterol Test Type:  Fasting/)
+    @treatements_list.delete_if {|var| var == "Creatinine"} if ! enc.match(/Cholesterol Test Type:  Not Fasting/)
 	end
 
 	def assessment
@@ -395,4 +412,10 @@ class ProtocolPatientsController < ApplicationController
      @person_attribute = "<span>   :Patient occupation is " + @person_attribute + "</span>"
     @current_program = current_program
 	end
+
+  def check_encounter(patient, enc, current_date = Date.today)
+    Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
+                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
+                                  current_date.to_date.to_date, patient.id,EncounterType.find_by_name(enc).id])
+  end
 end

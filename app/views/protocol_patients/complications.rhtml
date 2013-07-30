@@ -214,7 +214,7 @@ function selectedOptions(selected){
 	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
 	<input type='hidden' name='user_id' value='<%= @user.id %>' />
 
-	<% @treatements_list = ["Amputation", "Stroke", "Myocardial injactia(MI)", "Creatinine", "Funduscopy","Shortness of breath","Oedema","CVA", "Peripheral nueropathy", "Foot ulcers", "Impotence", "Others"] %>
+	
 
 <%= select_tag "Complication", options_for_select(@treatements_list),
 	{ :field_type => 'text',
