@@ -152,7 +152,7 @@
 	<input type='hidden' name='encounter_type' value='FAMILY MEDICAL HISTORY ' />
 	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
 	<input type='hidden' name='user_id' value='<%= @user.id %>' />
-<%#= raise @user.id.to_yaml %>
+
 	<input type='text' id='family_members'
 	   name='concept[Number of people in household excluding patient]'
 	   helpText='Number of family members including the deceased?'
@@ -225,7 +225,18 @@
 			name='concept[Does the family have a history of cardiovascular related diseases?]'
 			helpText='Family History of Premature cardiovascular death? '
 			tt_onLoad ="showCategory('Family History')"
-			condition='program != "EPILEPSY PROGRAM"'
+			condition='program == "HYPERTENSION PROGRAM"'
+			tt_requireNextClick = false >
+	<option></option>
+	<option value='No'>No</option>
+	<option value='Yes'>Yes</option>
+	</select>
+
+        <select id='cardiovascular'
+			name='concept[Does the family have a history of cardiovascular related diseases?]'
+			helpText='Family History of cardiovascular related diseases? '
+			tt_onLoad ="showCategory('Family History')"
+			condition='program == "ASTHMA PROGRAM"'
 			tt_requireNextClick = false >
 	<option></option>
 	<option value='No'>No</option>
@@ -237,7 +248,7 @@
 			helpText='Family History of Diabetes? '
 			pos='1'
 			tt_onLoad ="showCategory('Family History')"
-			condition='program != "EPILEPSY PROGRAM"'
+			condition='program == "HYPERTENSION PROGRAM"'
 			tt_requireNextClick = false >
 	<option></option>
 	<option value='No'>No</option>
@@ -249,7 +260,7 @@
 			helpText='Does the family have a history of hypertension? '
 			pos='2'
 			tt_onLoad ="showCategory('Family History')"
-			condition='program != "EPILEPSY PROGRAM"'
+			condition='program == "HYPERTENSION PROGRAM"'
 			tt_requireNextClick = false >
 	<option></option>
 	<option value='No'>No</option>
@@ -262,7 +273,7 @@
 			helpText='Family History Kidney disease? '
 			pos='3'
 			tt_onLoad ="showCategory('Family History')"
-			condition='program != "EPILEPSY PROGRAM"'
+			condition='program == "HYPERTENSION PROGRAM"'
 			tt_requireNextClick = false >
 	<option></option>
 	<option value='No'>No</option>
@@ -274,7 +285,7 @@
 			helpText='Family History Asthma? '
 			pos='3'
 			tt_onLoad ="showCategory('Family History')"
-			condition='program != "EPILEPSY PROGRAM"'
+			condition='program == "ASTHMA PROGRAM"'
 			tt_requireNextClick = false >
 	<option></option>
 	<option value='No'>No</option>

@@ -28,7 +28,8 @@
 				:name => "concept[TYPE OF PATIENT]",
 				:multiple => false,
 				:helpText => "Is the patient a:",
-                                :tt_onload=> "showCategory('Clinic Visit')"} %>
+                                :tt_onload=> "showCategory('Clinic Visit')",
+                                :tt_requireNextClick => false } %>
 
 		   <%= touch_location_tag "location",  @patient, nil,
 			  {	:id => "location",
@@ -48,7 +49,8 @@
 <% if @first_visit != true %>
 <select id='1.1.1' name='concept[HAVE YOU EVER HAD TB?]' 
         helpText='Have you been diagnosed with TB since your LAST clinic visit? ' pos='1'
-        tt_onload="showCategory('Clinic Visit')">
+        tt_onload="showCategory('Clinic Visit')"
+        tt_requireNextClick = false >
 <option></option>
 <option value='No'>No</option>
  <option value='Yes'>Yes</option>
@@ -82,6 +84,7 @@
         name='concept[Patient has Diabetes]'
         helpText='Is patient diabetic? '
         pos='3'
+        tt_requireNextClick = false
         tt_onload="showCategory('Clinic Visit')">
 <option></option>
 <option value='No'>No</option>
@@ -116,6 +119,7 @@
 <select id='1.1.5' 
         name='concept[Is patient pregnant?]'
         helpText='Is Patient Pregnant'
+        tt_requireNextClick = false
         pos='5'
         tt_onload="showCategory('Clinic Visit')">
 <option></option>
@@ -132,6 +136,7 @@
 <select id='1.1.6' 
         name='concept[Is patient breast feeding?]'
         helpText='Is Patient breastfeeding'
+        tt_requireNextClick = false
         pos='6'
         tt_onload="showCategory('Clinic Visit')">
 <option></option>

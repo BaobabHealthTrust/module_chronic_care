@@ -136,16 +136,19 @@
       </h2>
 
       <table id="stats" style="margin-bottom: 8px;" cellpadding="5">
+        <% unless @prescriptions.blank? %>
         <tr style="color: #fff; background-color: #6281a7;">
 		  <td style="text-align:left;" colspan="2">Treatment</td>
         </tr>
-		<% i = 0
+        <% 
+                  i = 0
 		  @prescriptions.each do |comp |
 		   %>
 		<tr><td width="10%"><%= (i + 1) %></td><td width="90%"> <%= comp %></td>
 		</tr>
 		<%
-		end %>
+		end
+              end %>
 
 		<tr style="color: #fff; background-color: #6281a7;">
 		  <td  style="text-align:left;" colspan="2">
@@ -154,26 +157,33 @@
 		</tr>
 		<tr >
 		  <td>Systolic </td> <td>: <%=  @sbp.to_i %></td></tr>
+                
 		<tr >
 		  <td>Diastolic </td> <td>: <%=  @dbp.to_i %></td></tr>
-
+                  <% unless @complications.blank? %>
 		<tr style="color: #fff; background-color: #6281a7;">
 		  <td  style="text-align:left;" colspan="2">
 			Complications
 		  </td>
 		</tr>
+                
 		<% @complications.each do |comp | 
 		   %>
 		<tr>
 		  <td><%= comp.to_s.split(":")[0] %></td><td> <%= comp.to_s.split(":")[1] %></td>
 		</tr>
-		<% end %>
+		<% end
+              end %>
+                <% unless @diabetic.blank? %>
 		<tr style="color: #fff; background-color: #6281a7;">
 		  <td  style="text-align:left;" colspan="2">
 			Diabetic
 		  </td>
 		</tr>
 		<tr><td>Patient Has Diabetes</td><td><%=  @diabetic %></td></tr>
+                <% end 
+                
+                unless @risk.blank? %>
 
 		<tr style="color: #fff; background-color: #6281a7;">
 		  <td  style="text-align:left;" colspan="2">
@@ -181,6 +191,7 @@
 		  </td>
 		</tr>
 		<tr><td><%=  @risk.last.to_s.split(":")[0] %></td><td><%=  @risk.last.to_s.split(":")[1] %></td></tr>
+                <% end %>
       </table>
     </div>
 

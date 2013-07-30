@@ -178,14 +178,14 @@
 
 			</td>
 			<td>
-    <%= touch_yes_no_unknown_tag "Refer to HTC", @patient, nil,
+    <%= touch_yes_no_tag "Refer to HTC", @patient, nil,
       {:id => "refer_to_htc",
 	  :name => "name[Refer to HTC]",
       :condition => '(checkTestDate() == "true") && ($("status").value.toLowerCase() == "negative")',
       :tt_pageStyleClass => "NoKeyboard",
       :helpText => "Patient has been -ve for more than 3 months. Refer patient to HTC?" } %>
 
-	<%= touch_yes_no_unknown_tag "Refer to HTC", @patient, nil,
+	<%= touch_yes_no_tag "Refer to HTC", @patient, nil,
       {:id => "refer_to_htc",
       :name => "name[Refer to HTC]",
 	  :condition => '$("status").value.toLowerCase() == "unknown"',

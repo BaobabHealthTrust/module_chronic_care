@@ -3,6 +3,15 @@
     height: 500px;
   }
 
+  #tt_page_summary #viewport {
+    height: 480px;
+  }
+
+  #tt_page_summary .inputFrameClass {
+    height: 600px;
+    overflow:scroll;
+  }
+
   #summary_container {
     bottom: 124px;
     font-size: 20px;
@@ -17,7 +26,6 @@
     display: none;
     -moz-user-select: none;
     height: 18em;
-    overflow: auto;
   }
 
   .summary {
@@ -97,7 +105,9 @@ function showSelectedConditions() {
 <%	@concept = []
 	@regimen_concepts.each do |reg|
 		@concept << reg.concept.fullname
- end %>
+ end
+ @concept = @concept.uniq
+%>
 	</script>
 
 <form method='post' action='/encounters/create'>
@@ -111,10 +121,15 @@ function showSelectedConditions() {
 				History of TB in the past two years 
 			</td>
 			<td>
-<select id='tb' name='concept[tb in previous two years]' helpText='History of TB in the past two years ' pos='1' tt_onLoad = "showCategory('Medical History')">
+<select id='tb'
+        name='concept[tb in previous two years]'
+        helpText='History of TB in the past two years'
+        pos='1'
+        tt_requireNextClick = false
+        tt_onLoad = "showCategory('Medical History')">
 <option></option>
-<option value='NO'>No</option>
- <option value='YES'>Yes</option>
+<option value = 'NO'>No</option>
+ <option value = 'YES'>Yes</option>
  </select>
 			</td>
 		</tr>
@@ -123,7 +138,12 @@ function showSelectedConditions() {
 				History of stroke 
 			</td>
 			<td>
-<select id='stroke' name='concept[ever had a stroke]' helpText='History of stroke ' pos='2' tt_onLoad = "showCategory('Medical History')" >
+<select id='stroke'
+        name='concept[ever had a stroke]'
+        helpText='History of stroke'
+        pos='2'
+        tt_requireNextClick = false 
+        tt_onLoad = "showCategory('Medical History')" >
 <option></option>
 <option value='NO'>No</option>
  <option value='YES'>Yes</option>
@@ -135,10 +155,16 @@ function showSelectedConditions() {
 				Chest deformaties at birth 
 			</td>
 			<td>
-<select id='deformaties' name='concept[cardiovascular complications present]' helpText='Chest deformaties at birth ' pos='3' tt_onLoad = "showCategory('Medical History')" >
+<select id='deformaties'
+        name='concept[cardiovascular complications present]'
+        helpText='Chest deformaties at birth'
+        tt_requireNextClick = false 
+        pos='3'
+        tt_onLoad = "showCategory('Medical History')" >
 <option></option>
 <option value='NO'>No</option>
  <option value='YES'>Yes</option>
+ <option value='Unknown'>Unknown</option>
  </select>
 			</td>
 		</tr>
@@ -166,10 +192,16 @@ function showSelectedConditions() {
 				Asthma history in the past month 
 			</td>
 			<td>
-<select id='asthma' name='concept[asthma]' helpText='Asthma history in the past month? ' pos='5' tt_onLoad = "showCategory('Medical History')">
+<select id='asthma'
+        name='concept[asthma]'
+        helpText='Asthma history in the past month?'
+        pos='5'
+        tt_requireNextClick = false
+        tt_onLoad = "showCategory('Medical History')">
 <option></option>
 <option value='NO'>No</option>
  <option value='YES'>Yes</option>
+ <option value='Unknown'>Unknown</option>
  </select>
 			</td>
 		</tr>
