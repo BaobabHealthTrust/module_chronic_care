@@ -79,8 +79,6 @@
           </span>
         </button>
       </td>
-    </tr>
-    <tr>
       <td style="height: 70px;">
         <button class="btn" onclick="window.parent.location='/clinic/lab_results?user_id=<%= params[:user_id]
               %>&location_id=<%= session[:location_id] || params[:location_id] %>&src=<%= @host %>'">
@@ -90,5 +88,26 @@
         </button>
       </td>
     </tr>
+    
+
+      <tr>
+      <td style="height: 70px;">
+        <button class="btn" onclick="window.parent.location='/clinic/appointment?user_id=<%= params[:user_id]
+              %>&location_id=<%= session[:location_id] || params[:location_id] %>&src=<%= @host %>'">
+          <span>
+            Auto Set Appointment
+          </span>
+        </button>
+      </td>
+      <td style="height: 70px;">
+        <button class="btn" onclick="window.parent.location='/clinic/current_center?user_id=<%= params[:user_id]
+              %>&location_id=<%= session[:location_id] || params[:location_id] %>&src=<%= @host %>'">
+          <span>
+              Set Current Health Center
+          </span>
+        </button>
+      </td>
+    </tr>
+
   </table>
 </div>

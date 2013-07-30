@@ -116,6 +116,55 @@ class ClinicController < ApplicationController
     render :layout => false
   end
 
+  def current_center
+    if request.post?
+       location = Location.find_by_name(params[:current_center])
+			 current_center = GlobalProperty.find_by_property("current_health_center_name")
+       
+			 if current_center.nil?
+						current_center = GlobalProperty.new
+						current_center.property = "current_health_center_name"
+						current_center.property_value = params[:current_center]
+						current_center.save
+			 else
+				 current_center = GlobalProperty.find_by_property("current_health_center_name")
+				 current_center.property_value = params[:current_center]
+				 current_center.save
+			 end
+
+       current_id = get_global_property_value("current_health_center_id")
+       if current_id.nil?
+						current_id = GlobalProperty.new
+						current_id.property = "current_health_center_id"
+						current_id.property_value = location.id
+						current_id.save
+			 else
+				 current_id = GlobalProperty.find_by_property("current_health_center_id")
+				 current_id.property_value = location.id
+				 current_id.save
+			 end
+			redirect_to "/clinic?user_id=#{params[:user_id]}&location_id=#{session[:location_id] || params[:location_id]}"
+		end
+  end
+
+  def appointment
+    if request.post?
+			 appointment = get_global_property_value("auto_set_appointment") rescue nil
+			 if appointment.nil?
+						appointment= GlobalProperty.new
+						appointment.property = "auto_set_appointment"
+						appointment.property_value = params[:appointment]
+						appointment.save
+			 else
+				 appointment = GlobalProperty.find_by_property("auto_set_appointment")
+				 appointment.property_value = params[:appointment]
+				 appointment.save
+			 end
+			redirect_to "/clinic?user_id=#{params[:user_id]}&location_id=#{session[:location_id] || params[:location_id]}"
+		end
+  end
+
+
 	def vitals
 	  if request.post?
 			 lab_results = get_global_property_value("vitals") rescue nil
