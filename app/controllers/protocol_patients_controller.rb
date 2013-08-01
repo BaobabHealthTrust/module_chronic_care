@@ -104,7 +104,9 @@ class ProtocolPatientsController < ApplicationController
 	def treatment
     @current_program = current_program
     @patient = Patient.find(params[:patient_id]) rescue nil
-
+    current_date = (!session[:datetime].nil? ? session[:datetime].to_date : Date.today)
+    previous_days = 3.months
+    curent_date = current_date - previous_days
     redirect_to '/encounters/no_patient' and return if @patient.nil?
 
     if params[:user_id].nil?
@@ -117,7 +119,42 @@ class ProtocolPatientsController < ApplicationController
     if current_program == "EPILEPSY PROGRAM"
       render :template => "/protocol_patients/epilepsy_diagnosis"
     end
+    @age = @patient.age
+    @sbp = Observation.find_by_sql("SELECT * from obs
+                   WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'SBP' LIMIT 1)
+                   AND voided = 0 AND person_id = #{@patient.id} ORDER BY obs_datetime DESC LIMIT 1").first.value_numeric rescue 0
 
+    @previous_sbp = Observation.find_by_sql("SELECT * from obs
+                   WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'SBP' LIMIT 1)
+                   AND DATE(obs_datetime) <= #{current_date}
+                   AND voided = 0 AND person_id = #{@patient.id} ORDER BY obs_datetime DESC LIMIT 1").first.value_numeric rescue 0
+
+    @previous_dbp = Observation.find_by_sql("SELECT * from obs
+               WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'DBP' LIMIT 1)
+               AND DATE(obs_datetime) <= #{current_date}
+               AND voided = 0 AND person_id = #{@patient.id} ORDER BY obs_datetime DESC LIMIT 1").first.value_numeric rescue 0
+
+
+    @dbp = Observation.find_by_sql("SELECT * from obs
+                   WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'DBP' LIMIT 1)
+                   AND voided = 0 AND person_id = #{@patient.id} ORDER BY obs_datetime DESC LIMIT 1").first.value_numeric rescue 0
+
+
+    @bp = (@sbp / @dbp).to_f rescue 0
+    @previous_bp = (@previous_sbp / @previous_dbp).to_f rescue 0
+    @normal_bp = (180/100)
+
+    @category = "Mild"
+
+    if (@sbp >= 140 and @sbp < 160) and (@dbp >= 100 and @dbp < 110)
+      @category = "Mild"
+    elsif (@sbp >= 160 and @sbp < 180) and (@dbp >= 90 and @dbp < 100)
+      @category = "Moderate"
+    elsif (@sbp >= 180) and (@dbp >= 110)
+      @category = "Severe"
+    end
+    #@sbp = Vitals.current_vitals(@patient, "SYSTOLIC BLOOD PLEASURE")
+    #raise @category.to_yaml
 	end
 
 	def lab_results

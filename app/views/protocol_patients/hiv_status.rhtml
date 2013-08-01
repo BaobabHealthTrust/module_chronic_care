@@ -34,8 +34,19 @@
 	function updateTestDate(){
 		var testDate = new Date($('hiv_test_year').value, $('hiv_test_month').value - 1, $('hiv_test_day').value);
 		$('hiv_test_date').value = testDate;
+                
 	}
-
+        function validateDate(){
+          <% @session_date =   @session_date.to_date %>
+          session = createDate("<%=  @session_date.year %>", "<%=  @session_date.month %>" , "<%=  @session_date.day %>")
+          testDate = createDate($('hiv_test_year').value, $('hiv_test_month').value , $('hiv_test_day').value);
+          if (testDate > session){
+            return false;
+          }
+          else{
+            return true;
+          }
+        }
 	function showSelectedConditions() {
       var conditions = [];
 
@@ -173,6 +184,8 @@
 	:condition => '($("hiv_test_year").value != "Unknown") && ($("hiv_test_month").value != "Unknown") && ($("status").value.toLowerCase() != "unknown")',
 	:tt_onLoad => "getDayOfMonthPicker($('hiv_test_year').value, $('hiv_test_month').value);",
 	:tt_onUnload=> "updateTestDate();",
+        :validationCode => 'validateDate();',
+        :validationMessage => "Test date out of range",
 	:tt_pageStyleClass => 'NumbersOnlyWithUnknown'
   } %>
 

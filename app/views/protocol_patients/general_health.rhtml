@@ -153,8 +153,9 @@
       selectedOptions( $('1.1.13'))
     }
 
-    if ($('explanation').value.length > 0)
+    if ($('explanation').value != "")
     {
+      alert($('explanation').value)
       conditions.push("Epilepsy experienced on: " + $('explanation').value);
     }
     var html
@@ -188,6 +189,7 @@ end %>
   <input type='hidden' name='encounter_type' value='GENERAL HEALTH' />
   <input type='hidden' name='patient_id' value='<%= @patient.id %>' />
   <input type='hidden' name='user_id' value='<%= @user.id %>' />
+  <input type='hidden' id="explanation" value="" />
   <input type='hidden' name='concept[refer to clinician]' id="refer_to_clinician">
   <% if @diabetic.upcase == "YES" %>
     <input type='hidden' name='concept[Chronic disease][]' value='Diabetes' id = "diabetes" />
@@ -242,13 +244,14 @@ end %>
       :helpText => "Effects of Epilepsy experienced on the following: ",
       :tt_onLoad => "showCategory('General Health')"} %>
 
+    <% if @current_program == "EPILEPSY PROGRAM" %>
     <textarea name="concept[CLINICAL NOTES CONSTRUCT]"
               helpText="Explanation of effects experienced"
               condition="$('epilepsy').value.length > 0"
               id="explanation"
               >
     </textarea>
-  
+    <% end %>
   <label for='summary'>Summary</label>
   <%= text_field_tag :summary, nil, {
     :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';showCategory('General Health')",
