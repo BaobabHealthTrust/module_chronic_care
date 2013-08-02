@@ -591,7 +591,10 @@ end
 		@relation = params[:relation] rescue nil
 		@person = Person.find(@found_person_id) rescue nil
 		@task = TaskFlow.new(params[:user_id], @person.id) rescue nil
-    
+    concept_id = ConceptName.find_by_name("WEIGHT (KG)")
+    @obs = Observations.find_by_sql("SELECT * FROM obs WHERE concept_id = #{concept_id}
+                                    AND person_id = #{@person.id}")
+
 		@next_task = @task.next_task.encounter_type.gsub('_',' ') if (current_program == "HYPERTENSION PROGRAM" || current_program.blank?) rescue nil
 		@next_task = @task.asthma_next_task.encounter_type.gsub('_',' ') if current_program == "ASTHMA PROGRAM" rescue nil
 		@next_task = @task.epilepsy_next_task.encounter_type.gsub('_',' ') if current_program == "EPILEPSY PROGRAM" rescue nil

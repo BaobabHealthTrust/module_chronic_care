@@ -14,12 +14,12 @@
   }
 
   #inform{
-	width: 80%;
-	background-color:white;
-	border-radius: 20px ;
-	border-style:solid;
-	border-color:#ff0000 #0000ff;
-	margin:0 auto;
+    width: 80%;
+    background-color:white;
+    border-radius: 20px ;
+    border-style:solid;
+    border-color:#ff0000 #0000ff;
+    margin:0 auto;
   }
   th {
     text-align:left;
@@ -61,8 +61,8 @@
 </style>
 
 <%
-  task = @task
-  #next_task = task.encounter_type.gsub('_',' ') rescue nil
+task = @task
+#next_task = task.encounter_type.gsub('_',' ') rescue nil
 
 %>
 
@@ -70,63 +70,62 @@
 <%= javascript_include_tag "jquery.flot" %>
 <%= javascript_include_tag "prototype" %>
 <script>
-   jQuery(document).ready(function() {
-        weightGraph();
-      });
+  jQuery(document).ready(function() {
+    weightGraph();
+  });
 
   function cancel(){ document.location = "/clinic?user_id=<%=@user['user_id']%>&location_id=<%=@current_location%>" }
   var conditions = []
-  <%
-   backlink = "/patients/show/#{@person.id}?user_id=#{@user['user_id']}"
-  %>
+<%
+backlink = "/patients/show/#{@person.id}?user_id=#{@user['user_id']}"
+%>
 
   function changeAttributes(){
     buttonsdiv = document.getElementById('buttons')
     buttonsdiv.innerHTML+="<button onmousedown='cancel();' id='cancelhButton' class='button red left'><span>Cancel</span></button>";
     conntinue = document.getElementById('finishButton')
     conntinue.innerHTML = '<span>Continue</span>';
-	conntinue.setAttribute('onmousedown','go();')
+    conntinue.setAttribute('onmousedown','go();')
 	
   }
-  <%#= raise @current_task.url.to_yaml %>
+<%#= raise @current_task.url.to_yaml %>
   function go() {
-	document.location = "<%= @current_task.url rescue backlink %>"
+    document.location = "<%= @current_task.url rescue backlink %>"
   }
 
   function weightGraph(){
-     var patient_data = [
-      <% @min = Time.now
-         @max = Time.now
-         @obs = @person.observations.find_by_concept_name("WEIGHT (KG)")
-         @obs.sort_by{|obs| obs.obs_datetime}.each do |obs|
-           @min = obs.obs_datetime if obs.obs_datetime < @min %>
+    var patient_data = [
+<% @min = Time.now
+@max = Time.now
+@obs.sort_by{|obs| obs.obs_datetime}.each do |obs|
+  @min = obs.obs_datetime if obs.obs_datetime < @min %>
         [<%= obs.obs_datetime.to_f -%>, <%= obs.value_text.to_i -%>],<% end %>
     ];
-    <% @min = @max - 1.year if @min > @max - 1.year %>
+<% @min = @max - 1.year if @min > @max - 1.year %>
 
     var patient_ticks = [
-    <% @first = Time.mktime(@min.year, @min.month, 1) # move to the start of the month
-     @last = Time.mktime(@max.year + (@max.month == 12 ? 1 : 0), @max.month + (@max.month < 12 ? 1 : -11), 1)
-     while (@first <= @last) do -%>
-    [<%= @first.to_f -%>, "<div class='xLabel'><%= @first.strftime("%b") -%><br/><b><%= @first.strftime("%Y") if @first.month == 1 -%></b></div>"],
-    <% @first = Time.mktime(@first.year + (@first.month == 12 ? 1 : 0), @first.month + (@first.month < 12 ? 1 : -11), 1) -%>
-    <% end -%>
-];
+<% @first = Time.mktime(@min.year, @min.month, 1) # move to the start of the month
+@last = Time.mktime(@max.year + (@max.month == 12 ? 1 : 0), @max.month + (@max.month < 12 ? 1 : -11), 1)
+while (@first <= @last) do -%>
+        [<%= @first.to_f -%>, "<div class='xLabel'><%= @first.strftime("%b") -%><br/><b><%= @first.strftime("%Y") if @first.month == 1 -%></b></div>"],
+  <% @first = Time.mktime(@first.year + (@first.month == 12 ? 1 : 0), @first.month + (@first.month < 12 ? 1 : -11), 1) -%>
+<% end -%>
+    ];
 
     var range = <%= 1.year.to_f -%>;
     var min = <%= @min.to_f -%>;
     var max = <%= @max.to_f -%>;
     var max_tick = "<%= @max.strftime("%d-%b") -%>";
-//    patient_data.push([max, 0]);
+    //    patient_data.push([max, 0]);
 
     function get_data(x1, x2) {
       return [{
-        color: "green",
-        data: patient_data,
-        points: { show: true},
-        lines: { show: true, fill: true, fillColor: "rgb(61,235,61)" },
-        bars: { show: true }
-      }]
+          color: "green",
+          data: patient_data,
+          points: { show: true},
+          lines: { show: true, fill: true, fillColor: "rgb(61,235,61)" },
+          bars: { show: true }
+        }]
     }
 
     var plot_options = {
@@ -145,46 +144,46 @@
 
 
 
-<div id ='header'>
-  <h1><%= @person.patient.name %>&nbsp;(<%= @person.patient.gender %>)</h1>
-  <table>
-  <tr>
-    <th>Age:</th><td><%= @person.patient.age %></td>
-  </tr>
-  <tr>
-    <th>National ID:</th><td><%= @person.patient.national_id %></td>
-  </tr>
-  <tr>
-    <th>Guardian: </th><td><%= (@person.patient.guardian rescue nil) || 'NONE'%></td>
-  </tr>
-  </table>
-  <div>
+  <div id ='header'>
+    <h1><%= @person.patient.name %>&nbsp;(<%= @person.patient.gender %>)</h1>
     <table>
+      <tr>
+        <th>Age:</th><td><%= @person.patient.age %></td>
+      </tr>
+      <tr>
+        <th>National ID:</th><td><%= @person.patient.national_id %></td>
+      </tr>
+      <tr>
+        <th>Guardian: </th><td><%= (@person.patient.guardian rescue nil) || 'NONE'%></td>
+      </tr>
+    </table>
+    <div>
+      <table>
+        <tr style = "font-size:20px;">
+          <th>Next task : </th><td><%= @next_task.titleize rescue "None"%></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <hr />
+  <div id="inform">
+    <table width="100%">
       <tr style = "font-size:20px;">
-        <th>Next task : </th><td><%= @next_task.titleize rescue "None"%></td>
+        <th>
+		Visit Overview
+        </th>
+      </tr>
+      <tr style = "font-size:20px;">
+
+        <th width="50%">
+          <ul>
+            <% @conditions.each do |condition| %>
+              <li class="<%= cycle('even', 'odd') %>"><%= condition %></li>
+            <%  end %>
+          </ul>
+        </th>
       </tr>
     </table>
   </div>
-</div>
-
-<hr />
-<div id="inform">
-<table width="100%">
-	<tr style = "font-size:20px;">
-	  <th>
-		Visit Overview
-	  </th>
-	</tr>
-	<tr style = "font-size:20px;">
-
-	  <th width="50%">
-		<ul>
-		<% @conditions.each do |condition| %>
-			<li class="<%= cycle('even', 'odd') %>"><%= condition %></li>
-		<%  end %>
-		</ul>
-		</th>
-	</tr>
-  </table>
-</div>
 </body>
