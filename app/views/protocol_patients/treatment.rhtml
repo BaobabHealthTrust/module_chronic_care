@@ -219,6 +219,9 @@
                   name='concept[Reason for referral][]'
                   helpText='Referal Reason'
                   multiple='multiple'
+                  tt_onload="showCategory('Treatment')"
+                  tt_pageStyleClass = "MultiSelectList"
+                   
                   condition='$("1.1.5").value != "UNKNOWN" && $("1.1.4").value.toLowerCase() == "no"' >
             <option></option>
             <option value='Diabetic with ulcers'>Diabetic with ulcers</option>
