@@ -15,6 +15,7 @@ gem 'bundler', '1.3.5'
 gem 'rack', '1.0.1'
 gem 'rails', '2.3.5'
 gem 'rake', '10.1.0'
+gem 'json'
 
 
 
