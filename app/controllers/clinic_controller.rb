@@ -231,7 +231,7 @@ class ClinicController < ApplicationController
   def overview
     @project = get_global_property_value("project.name").downcase.gsub(/\s/, ".") rescue nil
 
-    @encounter_activities = UserProperty.find(:first, :conditions => ["property = '#{@project}.activities' AND user_id = ?", @user['user_id']]).property_value.split(",") rescue nil
+    @encounter_activities = UserProperty.find(:first, :conditions => ["property = '#{@project}.activities' AND user_id = ?", @user['user_id']]).property_value.split(",") rescue []
 		@encounter_activities.push("APPOINTMENT")
 		@to_date = Clinic.overview(@encounter_activities)
 		@current_year = Clinic.overview_thiy_year(@encounter_activities)
