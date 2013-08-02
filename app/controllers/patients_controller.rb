@@ -588,9 +588,10 @@ end
 		@current_user = User.find(@user["user_id"])
 		
 		@found_person_id = params[:found_person_id] || session[:location_id]
-		@relation = params[:relation] rescue nil
-		@person = Person.find(@found_person_id) rescue nil
-		@task = TaskFlow.new(params[:user_id], @person.id) rescue nil
+		@relation = params[:relation] rescue []
+		@person = Person.find(@found_person_id) rescue []
+    @patient = Patient.find(@found_person_id) rescue []
+		@task = TaskFlow.new(params[:user_id], @person.id) rescue []
     concept_id = ConceptName.find_by_name("WEIGHT (KG)")
     @obs = Observation.find_by_sql("SELECT * FROM obs WHERE concept_id = '#{concept_id}'
                                     AND person_id = '#{@person.id}'")

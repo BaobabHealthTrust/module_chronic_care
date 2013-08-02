@@ -145,16 +145,16 @@ while (@first <= @last) do -%>
 
 
   <div id ='header'>
-    <h1><%= @person.patient.name %>&nbsp;(<%= @person.patient.gender %>)</h1>
+    <h1><%= @patient.name %>&nbsp;(<%= @patient.gender %>)</h1>
     <table>
       <tr>
-        <th>Age:</th><td><%= @person.patient.age %></td>
+        <th>Age:</th><td><%= @patient.age %></td>
       </tr>
       <tr>
-        <th>National ID:</th><td><%= @person.patient.national_id %></td>
+        <th>National ID:</th><td><%= @patient.national_id %></td>
       </tr>
       <tr>
-        <th>Guardian: </th><td><%= (@person.patient.guardian rescue nil) || 'NONE'%></td>
+        <th>Guardian: </th><td><%= (@patient.guardian rescue nil) || 'NONE'%></td>
       </tr>
     </table>
     <div>
