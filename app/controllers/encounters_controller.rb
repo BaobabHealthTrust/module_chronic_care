@@ -2,7 +2,7 @@
 class EncountersController < ApplicationController
 
   def create
-    
+   # raise params.to_yaml
     @retrospective = session[:datetime]
 		@retrospective = Time.now if session[:datetime].blank?
     User.current = User.find(@user["user_id"]) rescue nil

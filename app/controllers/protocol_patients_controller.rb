@@ -106,7 +106,7 @@ class ProtocolPatientsController < ApplicationController
     @patient = Patient.find(params[:patient_id]) rescue nil
     current_date = (!session[:datetime].nil? ? session[:datetime].to_date : Date.today)
     previous_days = 3.months
-    curent_date = current_date - previous_days
+    current_date = current_date - previous_days
     redirect_to '/encounters/no_patient' and return if @patient.nil?
 
     if params[:user_id].nil?
@@ -119,6 +119,7 @@ class ProtocolPatientsController < ApplicationController
     if current_program == "EPILEPSY PROGRAM"
       render :template => "/protocol_patients/epilepsy_diagnosis"
     end
+
     @age = @patient.age
     @sbp = Observation.find_by_sql("SELECT * from obs
                    WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'SBP' LIMIT 1)
@@ -139,6 +140,11 @@ class ProtocolPatientsController < ApplicationController
                    WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'DBP' LIMIT 1)
                    AND voided = 0 AND person_id = #{@patient.id} ORDER BY obs_datetime DESC LIMIT 1").first.value_numeric rescue 0
 
+    current_date = current_date + 2.months
+    
+    @previous_treatment = check_encounter(@patient, "TREATMENT", current_date)
+
+    #raise @previous_treatment.to_yaml
 
     @bp = (@sbp / @dbp).to_f rescue 0
     @previous_bp = (@previous_sbp / @previous_dbp).to_f rescue 0
