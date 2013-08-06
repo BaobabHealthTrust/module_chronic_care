@@ -332,13 +332,13 @@ class ProtocolPatientsController < ApplicationController
 
     @diabetic = ConceptName.find_by_concept_id(Vitals.get_patient_attribute_value(@patient, "Patient has Diabetes")).name rescue []
 
-    status = Observation.find_by_sql("SELECT * from obs
+    @status = Observation.find_by_sql("SELECT * from obs
           WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'current smoker' LIMIT 1)
           AND voided = 0
-          AND person_id = #{@patient.id} ORDER BY obs_datetime DESC LIMIT 1").first.value_coded rescue 0
+          AND person_id = #{@patient.id} ORDER BY obs_datetime DESC LIMIT 1").first.value_coded rescue "No"
 
-	
-    @smoking_status = ConceptName.find_by_concept_id(status).name rescue "Unknown"
+	 #raise @status.to_yaml
+    @smoking_status = ConceptName.find_by_concept_id(@status).name rescue "No"
 
     @systolic_value = Observation.find_by_sql("SELECT * from obs
           WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'systolic blood pressure' LIMIT 1)
@@ -351,22 +351,9 @@ class ProtocolPatientsController < ApplicationController
           AND person_id = #{@patient.id} ORDER BY obs_datetime DESC LIMIT 1").first.obs_id rescue nil
 
     @cholesterol_value = Observation.find(:all, :conditions => ['obs_group_id = ?', cholesterol_value]).first.value_numeric.to_i rescue 0
-    if status == 0
-      flash[:notice] = "No smoking status, please capture social history."
-      redirect_to "/protocol_patients/social_history?patient_id=#{@patient.id}&user_id=#{@user["user_id"]}" and return
-    end
 
-    if @systolic_value == 0
-      flash[:notice] = "No Systolic Blood Pressure status, please vitals."
-      redirect_to "/protocol_patients/vitals?patient_id=#{@patient.id}&user_id=#{@user["user_id"]}" and return
-    end
-	
     @first_vist = is_first_hypertension_clinic_visit(@patient.id)
-
-    if @cholesterol_value == 0
-      flash[:notice] = "No Cholesterol Value, please capture vitals."
-      redirect_to "/protocol_patients/vitals?patient_id=#{@patient.id}&user_id=#{@user["user_id"]}" and return
-    end
+    
 	end
 
 	def clinic_visit

@@ -123,6 +123,10 @@
     }
 
   }
+
+  function clearTreatment(){
+    $('regimen_concept_id').value = null
+  }
   function showSelectedConditions() {
     conditions = [];
     var i = 0
@@ -155,7 +159,6 @@
 
     if ($('explanation').value != "")
     {
-      alert($('explanation').value)
       conditions.push("Epilepsy experienced on: " + $('explanation').value);
     }
     var html
@@ -203,7 +206,7 @@ end %>
       :multiple => true,
       :tt_pageStyleClass => "MultiSelectList",
       :optional => true,
-      :tt_onLoad => "showCategory('General Health')"} %>
+      :tt_onLoad => "showCategory('General Health');clearTreatment();"} %>
 
 
     <%= select_tag "treatment", options_for_select(@concept),
