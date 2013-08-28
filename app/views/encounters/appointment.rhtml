@@ -68,17 +68,21 @@
   var counts = <%= @counts.to_json() %>;
 <%
 clinic_holidays = CoreService.get_global_property_value('clinic.holidays') || '1900-12-25,1900-03-03'
-@clinic_days = CoreService.get_global_property_value('clinic.days') rescue nil
-@clinic_days = CoreService.get_global_property_value('peads.clinic.days') rescue nil if PatientService.age(@patient.person).to_i <= 14
+@clinic_days = CoreService.get_global_property_value('clinic.days') rescue []
+@clinic_days = CoreService.get_global_property_value('peads.clinic.days') rescue [] if PatientService.age(@patient.person).to_i <= 14
 days = []
-@clinic_days.include?('Sunday')?days.push("Sunday"):days.push("")
-@clinic_days.include?('Monday')?days.push("Monday"):days.push("")
-@clinic_days.include?('Tuesday')?days.push("Tuesday"):days.push("")
-@clinic_days.include?('Wednesday')?days.push("Wednesday"):days.push("")
-@clinic_days.include?('Thursday')?days.push("Thursday"):days.push("")
-@clinic_days.include?('Friday')?days.push("Friday"):days.push("")
-@clinic_days.include?('Saturday')?days.push("Saturday"):days.push("")
+(@clinic_days || []).include?('Sunday')?days.push("Sunday"):days.push("")
+(@clinic_days || []).include?('Monday')?days.push("Monday"):days.push("")
+(@clinic_days || []).include?('Tuesday')?days.push("Tuesday"):days.push("")
+(@clinic_days || []).include?('Wednesday')?days.push("Wednesday"):days.push("")
+(@clinic_days || []).include?('Thursday')?days.push("Thursday"):days.push("")
+(@clinic_days || []).include?('Friday')?days.push("Friday"):days.push("")
+(@clinic_days || []).include?('Saturday')?days.push("Saturday"):days.push("")
 clinic_holidays = clinic_holidays.split(',').to_json
+
+if @clinic_days.blank?
+   days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+end
 
 %>
   var clinic_holidays = <%= clinic_holidays %>
