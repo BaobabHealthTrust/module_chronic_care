@@ -17,12 +17,16 @@
             "bInfo": true,
             "bPaginate": false
           });
+    document.getElementById("logout").className = "button navButton green"
     search_box = $('#table_id').dataTable()
     search = document.getElementsByTagName("input")[0];
     search.setAttribute("id","search");
     document.getElementById('search').setAttribute("onclick","showKeyboard();");
     document.getElementById("find").innerHTML = "<span>Back</span>";
     document.getElementById("find").style.cssFloat = "left";
+
+    //document.getElementById("logout").className = "button navButton green"
+    
     //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     keyboard = document.getElementsByClassName("keypad")[0]
     function getCharButtonSetID(character,id){
@@ -265,10 +269,10 @@
 			  <% @location.each do | loc, num|  %>
 				<% if ! loc.blank? %>
 				  <tr>
-					<td>
+                                    <td align="center">
 					  <%= loc %>
 					</td>
-					<td>
+					<td align="center">
 					  <%= num %>
 					</td>
 				  </tr>
@@ -294,9 +298,9 @@
           <% @total.each do |patient| %>
             <tr class="<%= cycle('even', 'odd') %>">
               <td width="20%"> <span style="display:block; width:90%;"> <%= "#{patient[0]}" %> </span> </td>
-              <td align="center"  width="5%"> <%= "<span > #{patient[1]} </span> " %></td>
-			  <td  width="20%"><%= "<span > #{patient[2]} </span> " %></td>
-			  <td  width="20%"><%= "<span > #{patient[3]} </span> " %></td>
+              <td align="center"  width="5%" align="center"> <%= "<span > #{patient[1]} </span> " %></td>
+			  <td  width="20%" align="center"><%= "<span > #{patient[2]} </span> " %></td>
+			  <td  width="20%" align="center"><%= "<span > #{patient[3]} </span> " %></td>
             </tr>
           <% end %>
 

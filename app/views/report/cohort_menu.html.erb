@@ -1,5 +1,6 @@
+<%#= raise params.to_yaml %>
 <script>
-  var tt_cancel_destination = "/clinic" // /reports"
+  var tt_cancel_destination = "/clinic?user_id=<%= params['user_id'] %>&location_id=<%= params['location_id'] %>" // /reports"
 </script>
 <style>
   .inputFrameClass{

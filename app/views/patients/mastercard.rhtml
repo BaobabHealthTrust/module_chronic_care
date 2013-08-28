@@ -133,9 +133,9 @@
       <div id="footer" style="">
       	<% report_url = "/patients/show/?patient_id=#{@patient.id}&user_id=#{@user['user_id']}" %>
 
-		    <% if (@show_mastercard_counter.to_s == "true") || (@from_report.to_s == "true") %>
-		    		<% report_url = session[:report_url] if !session[:report_url].blank? %>
-		    <% end %>
+		    <%# if (@show_mastercard_counter.to_s == "true") || (@from_report.to_s == "true") %>
+		    		<%# report_url = session[:report_url] if !session[:report_url].blank? %>
+		    <%# end %>
 
         <button onclick="window.location ='<%="#{report_url}"%>';" class="button navButton green"
                 id="nextButton" style="float: right; margin-right: 10px;" ><span>Finish</span>

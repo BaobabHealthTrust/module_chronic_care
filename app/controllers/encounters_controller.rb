@@ -411,11 +411,12 @@ class EncountersController < ApplicationController
 
   def list_observations
     obs = []
-
-    obs = Encounter.find(params[:encounter_id]).observations.collect{|o|
+    obs = Encounter.find(params[:encounter_id]).observations
+    obs.collect{|o|
       [o.id, o.to_piped_s] rescue nil
     }.compact
 
+    #raise obs.to_yaml
     orders = Encounter.find(params[:encounter_id]).drug_orders.collect{|o|
       [o.id, o.to_piped_s] rescue nil
     }.compact

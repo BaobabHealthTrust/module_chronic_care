@@ -47,9 +47,40 @@ class DispensationsController < ApplicationController
 		
     @encounter = current_dispensation_encounter(@patient, session_date, user_person_id)
 
+     @program = Program.find_by_concept_id(ConceptName.find_by_name('CHRONIC CARE PROGRAM').concept_id) rescue nil
+
+          if !@program.nil?
+
+            @program_encounter = ProgramEncounter.find_by_program_id(@program.id,
+              :conditions => ["patient_id = ? AND DATE(date_time) = ?",
+                @patient.id, session_date.strftime("%Y-%m-%d")])
+
+            if @program_encounter.blank?
+
+              @program_encounter = ProgramEncounter.create(
+                :patient_id => @patient.id,
+                :date_time => session_date,
+                :program_id => @program.id
+              )
+
+            end
+
+            ProgramEncounterDetail.create(
+              :encounter_id => @encounter.id.to_i,
+              :program_encounter_id => @program_encounter.id,
+              :program_id => @program.id
+            )
+
+          @current = PatientProgram.find_by_program_id(@program.id,
+          :conditions => ["patient_id = ? AND COALESCE(date_completed, '') = ''", @patient.id])
+
+          end
+
+          #raise bb.to_yaml
+
     @order = PatientService.current_treatment_encounter( @patient, session_date, user_person_id).drug_orders.find(:first,:conditions => ['drug_order.drug_inventory_id = ?',
              params[:drug_id]]).order rescue []
-
+    
     # Do we have an order for the specified drug?
 		if @order.blank?
 			if params[:location]
@@ -117,7 +148,7 @@ class DispensationsController < ApplicationController
 			@order_id = @order.order_id
 			@drug_value = @order.drug_order.drug_inventory_id
 		end
-
+    
     #assign the order_id and  drug_inventory_id
     # Try to dispense the drug
 
@@ -132,6 +163,7 @@ class DispensationsController < ApplicationController
 
     obs.save
 
+    #raise obs.to_yaml
     if !params[:encounter].blank?
       if params[:encounter][:voided]
         obs.voided = params[:encounter][:voided]
