@@ -411,8 +411,7 @@ class EncountersController < ApplicationController
 
   def list_observations
     obs = []
-    obs = Encounter.find(params[:encounter_id]).observations
-    obs.collect{|o|
+    obs = Encounter.find(params[:encounter_id]).observations.collect{|o|
       [o.id, o.to_piped_s] rescue nil
     }.compact
 
