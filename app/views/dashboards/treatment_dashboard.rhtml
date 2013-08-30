@@ -36,11 +36,13 @@
 		<div id='content'>
 			<form id = 'dashboard' action='/clinic'>
 				<h1 id='project_name'>
-          <span style="font-size: 55px;"><%= @project %></span>
+          <span  style="margin-top: 0px; color: #6281A7; font-size: 0.6em;"><%= @project %></span>
+          <br><span style="font-size:23px; color: #6281A7;"><%=  current_program.humanize.split(" ")[0] rescue "" %></span>
+
 				</h1>
 				<span id='patient_name'><%= @patient.name rescue "" %></span>
 				<span id='patient_id'><%= @patient.national_id rescue "" %></span>
-				<span id='patient_residence'><%= @patient.current_residence rescue "" %></span>
+				<span id='patient_residence'><%= "#{@patient.address}" %></span>
 				<% if @patient.age > 0 %>
 				    <span id='patient_age'><%= @patient.age rescue "" %></span>
 				<% else %>

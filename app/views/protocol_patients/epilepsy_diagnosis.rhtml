@@ -70,6 +70,19 @@
 		condition='$("1.1.3").value == "Yes"'
 		 tt_onload="showCategory('Treatment')">
 <option></option>
+<option value='Generalised'>Generalised Epilepsy</option>
+ <option value='Partial'>Partial epilepsy</option>
+ </select>
+			</td>
+
+ 			<td>
+<select id='general_epilepsy'
+		name='concept[generalised]'
+		helpText='Type of generalised epilepsy '
+		pos='4'
+		condition='$("1.1.4").value == "Generalized"'
+		 tt_onload="showCategory('Treatment')">
+<option></option>
 <option value='Atomic'>Atomic</option>
  <option value='Chlonic'>Chlonic</option>
  <option value='Myclonic'>Myclonic</option>
@@ -84,9 +97,9 @@
 			</td>
 			<td>
 <select id='1.1.5' name='concept[Partial epilepsy]' 
-		helpText='Partial epilepsy? '
+		helpText='Partial epilepsy type? '
 		pos='5'
-		condition='$("1.1.3").value == "No"'
+		condition='$("1.1.4").value == "Partial"'
 		 tt_onload="showCategory('Treatment')" >
 <option></option>
 <option value='Complex'>Complex</option>
@@ -99,7 +112,7 @@
 				Condition to treat
 			</td>
 			<td>
-<select id='1.1.6' name='concept[Condition]' helpText='Condition to treat' pos='6'  condition='$("1.1.3").value == "No"'
+<select id='1.1.6' name='concept[Condition]' helpText='Condition to treat?' pos='6'  condition='$("1.1.3").value == "No"'
 		 tt_onload="showCategory('Treatment')">
 <option></option>
 <option value='Sychogenic'>Sychogenic</option>

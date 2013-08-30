@@ -268,7 +268,8 @@
 		{	:id => "mrdt",
 			:multiple => false,
 			:condition      => "$('seizure_focal').value.toLowerCase() == 'yes'",
-			:helpText => "RDT or blood smear positive for malaria" } %>
+			:helpText => "RDT or blood smear positive for malaria",
+                        :tt_onLoad => "showCategory('Lab Results')"} %>
 
  <% else %>
 	 <% options=default.merge({

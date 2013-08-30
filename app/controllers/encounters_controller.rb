@@ -367,9 +367,9 @@ class EncountersController < ApplicationController
 				#end
 			end
       #raise params[:concept].to_yaml
-      if (params[:concept]["Diazepam"].upcase rescue [])== "YES"
-          	redirect_to "/prescriptions/prescribe?user_id=#{@user["user_id"]}&patient_id=#{params[:patient_id]}" and return
-      end
+      #if (params[:concept]["Diazepam"].upcase rescue [])== "YES"
+      #    	redirect_to "/prescriptions/prescribe?user_id=#{@user["user_id"]}&patient_id=#{params[:patient_id]}" and return
+      #end
 			if params[:encounter_type] == "TREATMENT"
 				if  params[:concept]["Prescribe Drugs"].to_s.upcase == "EPILEPSY DRUGS" || params[:concept]["Prescribe Drugs"].to_s.upcase == "HYPERTENSION/DIABETES DRUGS" || params[:concept]["Prescribe Drugs"].to_s.upcase == "ASTHMA DRUGS"
 						redirect_to "/prescriptions/prescribe?user_id=#{@user["user_id"]}&patient_id=#{params[:patient_id]}" and return
@@ -411,16 +411,19 @@ class EncountersController < ApplicationController
 
   def list_observations
     obs = []
-    obs = Encounter.find(params[:encounter_id]).observations.collect{|o|
-      [o.id, o.to_piped_s] rescue nil
-    }.compact
+    encounter = Encounter.find(params[:encounter_id])
 
-    #raise obs.to_yaml
-    orders = Encounter.find(params[:encounter_id]).drug_orders.collect{|o|
-      [o.id, o.to_piped_s] rescue nil
-    }.compact
-
-    obs = obs + orders
+    if encounter.type.name.upcase == "DISPENSING"
+      obs = encounter.observations.collect{|o|
+        drug = Drug.find(o.value_drug).name
+        mixed = "#{drug} #{o.to_piped_s.humanize}"
+        [o.id, mixed] rescue nil
+      }.compact
+    else
+      obs = encounter.observations.collect{|o|
+        [o.id, o.to_piped_s.humanize] rescue nil
+      }.compact
+    end
 
     render :text => obs.to_json
   end

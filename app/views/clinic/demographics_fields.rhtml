@@ -1,4 +1,3 @@
-
 <style type="text/css">
 
   body{
@@ -79,7 +78,7 @@
     div.style.left = (p[3] - 850) + "px";
     div.style.position = "absolute";
 
-    global_control = id;
+    global_control = id;clinic
 
     var row1 = ["Q","W","E","R","T","Y","U","I","O","P"];
     var row2 = ["A","S","D","F","G","H","J","K","L",":"];
@@ -371,35 +370,70 @@
   }
 
   function handleCustomResult(optionsList, aXMLHttpRequest) {
-    
+
     if (!aXMLHttpRequest) return;
 
     if (!optionsList) return;
-    
+
     if (aXMLHttpRequest.readyState == 4 && (aXMLHttpRequest.status == 200 ||
       aXMLHttpRequest.status == 304)) {
 
       optionsList.innerHTML = "";
 
       var result = JSON.parse(aXMLHttpRequest.responseText);
+      var hash = {"Current District" : "Nationality",
+        "Current T/A" : "Current District",
+        "Current Village" : "Current T/A",
+        "Home of Origin" : "Nationality"
+      }
+
+      reverseHash = {}
+
+      for(var ky in hash){
+        reverseHash[hash[ky]] = reverseHash[hash[ky]] ? reverseHash[hash[ky]] + "," + ky  :  ky;
+      }
 
       var j = 0;
       for(var i in result){
         j++;
-
         var li = document.createElement("li");
-        li.id = "li" + j;
+        li.id = i
         li.setAttribute("tag", j);
         li.setAttribute("target", i);
         li.style.cursor = "pointer";
 
+        if (hash[i]){
+
+          var key = i.replace(/\ /g, "_");
+          var val = hash[i].replace(/\ /g, "_");
+          try{
+            li.setAttribute(key, val)
+          }catch(ex){}
+
+        }
+
         li.onclick = function(){
+          var hooksEls = [];
+          if (hash[this.getAttribute("target")] != "undefined"){
+            hooksEls = getAllByAttribute(hash[this.getAttribute("target")]);
+          }
+
           if(this.innerHTML.match(/unticked/)){
             ajaxCustomRequest(__$('details'),
-            '/clinic/add_field?user_id=<%= @user["user_id"] %>&target=' + this.getAttribute("target"))
+            '/clinic/add_field?user_id=<%= @user["user_id"] rescue params[:user_id] %>&target=' + this.getAttribute("target"));
+
+            for (var j = 0; j < hooksEls.length; j++){
+
+              if (hooksEls[j] != "undefined"){
+                loopResults(hash, hooksEls[j]);
+              }
+            }
+
           } else {
+
             confirmDeletion('Are you sure you want to remove this user from this project?',
             this.getAttribute("target"));
+
           }
         }
 
@@ -455,9 +489,26 @@
     }
   }
 
+  function loopResults(myHash, el){
+
+    ajaxCustomRequest(__$('details'),
+    '/clinic/add_field?user_id=<%= @user["user_id"] rescue params[:user_id] %>&target=' + el.getAttribute("target"));
+    if (myHash[el.getAttribute("target")] && myHash[el.getAttribute("target")] != "undefined"){
+      var el2 = __$(myHash[el.getAttribute("target")])
+      loopResults(myHash, el2);
+    }
+  }
+
   function runCmd(id){
     ajaxCustomRequest(__$('details'),
-    '/clinic/remove_field?user_id=<%= @user["user_id"] %>&target=' + id);
+    '/clinic/remove_field?user_id=<%= @user["user_id"] rescue params[:user_id] %>&target=' + id);
+
+    if (reverseHash[id]){
+      var arr = reverseHash[id].split(",")
+      for (var l = 0; l < arr.length; l++){
+        runCmd(arr[l]);
+      }
+    }
   }
 
   function confirmDeletion(message, id) {
@@ -480,7 +531,20 @@
 
   }
 
-  setTimeout("ajaxCustomRequest(__$('details'), '/clinic/show_selected_fields?user_id=<%params[:user_id]%>')", 100);
+  function getAllByAttribute(attribute){
+
+    var matchingElements = [];
+    var allElements = document.getElementsByTagName('li');
+    for (var k = 0; k < allElements.length; k++){
+      if (allElements[k].getAttribute("target") && allElements[k].getAttribute("target").trim() == attribute)
+      {
+        matchingElements.push(allElements[k]);
+      }
+    }
+    return matchingElements;
+  }
+
+  setTimeout("ajaxCustomRequest(__$('details'), '/clinic/show_selected_fields')", 100);
   //-->
 </script>
 

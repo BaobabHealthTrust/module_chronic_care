@@ -86,14 +86,14 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
     margin-right: auto;
   }
 </style>
-
+<%#= raise @patient.patient_programs.in_programs("chronic care program").to_yaml %>
 <div id='contented'>
   <div id='description' style='color:#777;position:absolute;margin-top:-70px;'>
     <form id = 'dashboard' action='home.html' onload="addDiv()">
       <div>Patient Dashboard</div>
       <div id='project_name'>
         <div style="margin-top: 0px; color: #6281A7; font-size: 0.6em;">
-          <%= @project %>
+<%= @project %> <br><span style="font-size:23px;"><%=  current_program.humanize.split(" ")[0] rescue "" %></span>
         </div>
       </div>
       <span id='patient_name'>

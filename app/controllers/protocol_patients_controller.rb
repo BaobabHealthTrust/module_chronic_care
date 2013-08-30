@@ -72,6 +72,7 @@ class ProtocolPatientsController < ApplicationController
       value = obs.value_numeric.to_i if !obs.value_numeric.blank?
       value = obs.value_text if !obs.value_text.blank?
       value = obs.value_datetime if !obs.value_datetime.blank?
+      @familyvalue = 0
       asthma_values = ["HYPERTENSION", "ASTHMA"]
       if asthma_values.include?(obs.concept.fullname.upcase)
         @familyvalue = value.to_i if obs.concept.fullname.upcase == "ASTHMA"
@@ -395,7 +396,7 @@ class ProtocolPatientsController < ApplicationController
         #@in_seizure = Vitals.todays_vitals(Patient.find(params[:patient_id]), "Patient in active seizure")
         #@in_seizure = @in_seizure.value_text.upcase rescue ConceptName.find_by_concept_id(@in_seizure.value_coded).name.upcase rescue nil
       end
-      render :template => "/protocol_patients/epilepsy_clinic_visit"
+      render :template => "/protocol_patients/epilepsy_clinic_visit" and return
 		end
 		@first_visit = is_first_hypertension_clinic_visit(@patient.id) unless current_program == "EPILEPSY PROGRAM"
 	end

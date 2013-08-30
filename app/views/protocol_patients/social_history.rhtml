@@ -55,65 +55,65 @@
       var conditions = [];
 
       if ($('education').value.length > 0)
-        conditions.push("Highest Education: " + $('education').value);
+        conditions.push("Highest Education: <b>" + $('education').value + "</b>");
 	  
 	  if ($('substance_use').value.length > 0)
-        conditions.push("Substance Use: " + $('substance_use').value);
+        conditions.push("Substance Use: <b>" + $('substance_use').value + "</b>");
 	  
 	  if ($('pork').value.length > 0)
-        conditions.push("Eats pork: " + $('pork').value);
+        conditions.push("Eats pork: <b>" + $('pork').value + "</b>");
 
 	  if ($('smoking').value.length > 0)
-        conditions.push("Smoke Cigarettes: " + $('smoking').value);
+        conditions.push("Smoke Cigarettes: <b>" + $('smoking').value + "</b>");
 
       if ($('number_of_cigarettes').value.length > 0){
 		if ($('smoking').value.toLowerCase() == "yes")
-		  conditions.push("Number of cigarettes per day: " + $('number_of_cigarettes').value + " Cigarettes : 1 per every " + parseInt(cigaretesPerminute) + " Minutes");
+		  conditions.push("Number of cigarettes per day: <b>" + $('number_of_cigarettes').value + " Cigarettes : 1 per every " + parseInt(cigaretesPerminute) + " Minutes </b>");
 	  }
 
 
       if ($('current_smoker').value.length > 0)
-        conditions.push("Currently smokes: " + $('current_smoker').value);
+        conditions.push("Currently smokes: <b>" + $('current_smoker').value + "</b>");
 
 	  if ($('duration').value.length > 0){
-		conditions.push("Duration on smoking: " + $('duration').value);
+		conditions.push("Duration on smoking: <b>" + $('duration').value + "</b>");
 	  }
 	  else {
 		$('duration').value = "Passive Smoker"
-		conditions.push("Duration on smoking: Passive Smoker");
+		conditions.push("Duration on smoking: <b>Passive Smoker</b>");
 	  }
 
 	   if ($('smoke_history').value.length > 0)
-        conditions.push("Patient with family member who smoke: " + $('smoke_history').value);
+        conditions.push("Patient with family member who smoke: <b>" + $('smoke_history').value + "</b>");
 
 	  if ($('patient_home').value.length > 0)
-        conditions.push("Patient lives or works near: " + $('patient_home').value);
+        conditions.push("Patient lives or works near: <b>" + $('patient_home').value + "</b>");
 
 	  if ($('exposed').value.length > 0)
-        conditions.push("Patient exposed to pollution: " + $('exposed').value);
+        conditions.push("Patient exposed to pollution: <b>" + $('exposed').value + "</b>");
 
 	  if ($('cooking').value.length > 0)
-        conditions.push("Patient mode of cooking: " + $('cooking').value);
+        conditions.push("Patient mode of cooking: <b>" + $('cooking').value + "</b>");
 
       if ($('drink_alcohol').value.length > 0)
-        conditions.push("Drinks alcohol: " + $('drink_alcohol').value);
+        conditions.push("Drinks alcohol: <b>" + $('drink_alcohol').value + "</b>");
 
 	  if ($('drinks_per_day').value.length > 0)
-        conditions.push("Drinks of alcohol per day: " + $('drinks_per_day').value + " Units");
+        conditions.push("Drinks of alcohol per day: <b>" + $('drinks_per_day').value + " Units</b>");
 
 	  if ($('days_per_week').value.length > 0)
-        conditions.push("Number of Alcohol drinking days per week: " + $('days_per_week').value + " Days");
+        conditions.push("Number of Alcohol drinking days per week: <b>" + $('days_per_week').value + " Days</b>");
 
        if ($('employment').value.length > 0)
-        conditions.push("Type of employment: " + $('employment').value);
+        conditions.push("Type of employment: <b>" + $('employment').value + "</b>");
 
       var html
-      html = "<ul>"
+      html = "<ol>"
       for(var i=0;i < conditions.length;i++) {
         if (conditions[i].length > 0)
           html += "<li class='data'>" + conditions[i] + "</li>";
       }
-      html += "</ul>"
+      html += "</ol>"
 	  if (($('drinks_per_day').value > 6) || ($('days_per_week').value > 3)){
 		html += "<span class='warning'>Patient is a heavy drinker! <br>Please refer patient for advice on life changes</span>";
 		 	$('alcoholism').value = "Yes"

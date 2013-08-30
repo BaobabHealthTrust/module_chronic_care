@@ -5,17 +5,24 @@ class GenericPrescriptionsController < ApplicationController
     @patient = Patient.find(params[:patient_id] || session[:patient_id]) rescue nil
     @orders = @patient.orders.prescriptions.current.all rescue []
     @history = @patient.orders.prescriptions.historical.all rescue []
-    redirect_to "/prescriptions/new?patient_id=#{params[:patient_id] || session[:patient_id]}&user_id=#{@user.id}" and return if @orders.blank?
+    #redirect_to "/prescriptions/new?patient_id=#{params[:patient_id] || session[:patient_id]}&user_id=#{@user.id}" and return if @orders.blank?
     render :template => 'prescriptions/index', :layout => 'menu'
   end
-  
+
+  def new
+    @patient = Patient.find(params[:patient_id] || session[:patient_id]) rescue nil
+    @patient_diagnoses = current_diagnoses(@patient.person.id)
+    @current_weight = Vitals.current_vitals(@patient, "weight (kg)") rescue nil
+		@current_height = Vitals.current_vitals(@patient, "height (cm)") rescue nil
+  end
+
   def void
 		@user = User.find(params[:user_id]) rescue nil
     @order = Order.find(params[:order_id])
     @order.void
     flash.now[:notice] = "Order was successfully voided"
     if !params[:source].blank? && params[:source].to_s == 'advanced'
-		redirect_to "/prescriptions/advanced_prescription?patient_id=#{params[:patient_id]}&user_id=#{@user.id}" and return
+      redirect_to "/prescriptions/advanced_prescription?patient_id=#{params[:patient_id]}&user_id=#{@user.id}" and return
     else
     	redirect_to :action => "index", :patient_id => params[:patient_id], :user_id => @user.id and return
    	end
@@ -41,9 +48,9 @@ class GenericPrescriptionsController < ApplicationController
     end
 
     @encounter = @patient.encounters.find(:first,:conditions =>["encounter_datetime BETWEEN ? AND ? AND encounter_type = ?",
-                  session_date.to_date.strftime('%Y-%m-%d 00:00:00'),
-                  session_date.to_date.strftime('%Y-%m-%d 23:59:59'),
-                  EncounterType.find_by_name("TREATMENT").id])
+        session_date.to_date.strftime('%Y-%m-%d 00:00:00'),
+        session_date.to_date.strftime('%Y-%m-%d 23:59:59'),
+        EncounterType.find_by_name("TREATMENT").id])
     @encounter ||= @patient.encounters.create(:encounter_type => EncounterType.find_by_name("TREATMENT").id,:encounter_datetime => session_date, :provider_id => user_person_id)
 
     #@encounter = Vitals.current_treatment_encounter( @patient, user_person_id, session_date)
@@ -60,14 +67,35 @@ class GenericPrescriptionsController < ApplicationController
           flash[:notice] = "No matching drugs found for formulation #{params[:formulation]}"
           render :new
           return
-        end  
+        end
+
+        #raise params.to_yaml
         start_date = session_date
         auto_expire_date = session_date.to_date + params[:duration].to_i.days
         prn = params[:prn].to_i
         if params[:type_of_prescription] == "variable"
-          DrugOrder.write_order(@encounter, @patient, @diagnosis, @drug, start_date, auto_expire_date, [params[:morning_dose], params[:afternoon_dose], params[:evening_dose], params[:night_dose]], 'VARIABLE', prn)
+          DrugOrder.write_order(@encounter,
+            @patient,
+            @diagnosis,
+            @drug,
+            start_date,
+            auto_expire_date,
+            [params[:morning_dose],
+              params[:afternoon_dose],
+              params[:evening_dose],
+              params[:night_dose]],
+            'VARIABLE',
+            prn)
         else
-          DrugOrder.write_order(@encounter, @patient, @diagnosis, @drug, start_date, auto_expire_date, params[:dose_strength], params[:frequency], prn)
+          DrugOrder.write_order(@encounter, 
+            @patient,
+            @diagnosis,
+            @drug,
+            start_date,
+            auto_expire_date,
+            params[:dose_strength],
+            params[:frequency],
+            prn)
         end  
       end  
     end
@@ -215,7 +243,7 @@ class GenericPrescriptionsController < ApplicationController
     
 		if params[:prescription].blank?
 			next if params[:formulation].blank?
-          	formulation = (params[:formulation] || '').upcase
+      formulation = (params[:formulation] || '').upcase
 			drug = Drug.find_by_name(formulation) rescue nil
 			unless drug
 				flash[:notice] = "No matching drugs found for formulation #{params[:formulation]}"
@@ -228,7 +256,7 @@ class GenericPrescriptionsController < ApplicationController
 
 			if prescription[:type_of_prescription] == "variable"
 				DrugOrder.write_order(encounter, @patient, nil, drug, start_date, auto_expire_date, [prescription[:morning_dose], 
-					prescription[:afternoon_dose], prescription[:evening_dose], prescription[:night_dose]], 
+            prescription[:afternoon_dose], prescription[:evening_dose], prescription[:night_dose]],
 					prescription[:type_of_prescription], prn)
 			else
 				DrugOrder.write_order(encounter, @patient, nil, drug, start_date, auto_expire_date, prescription[:dose_strength], 
@@ -259,7 +287,7 @@ class GenericPrescriptionsController < ApplicationController
 
 				if prescription[:type_of_prescription] == "variable"
 					DrugOrder.write_order(encounter, @patient, nil, drug, start_date, auto_expire_date, [prescription[:morning_dose], 
-						prescription[:afternoon_dose], prescription[:evening_dose], prescription[:night_dose]], 
+              prescription[:afternoon_dose], prescription[:evening_dose], prescription[:night_dose]],
 						prescription[:type_of_prescription], prn)
 				else
 					DrugOrder.write_order(encounter, @patient, nil, drug, start_date, auto_expire_date, prescription[:dose_strength], 
@@ -276,4 +304,14 @@ class GenericPrescriptionsController < ApplicationController
 		end
 
 	end
+
+  def current_diagnoses(patient_id)
+    patient = Patient.find(patient_id)
+    patient.encounters.current.all(:include => [:observations]).map{|encounter|
+      encounter.observations.all(
+        :conditions => ["obs.concept_id = ? OR obs.concept_id = ?",
+          ConceptName.find_by_name("DIAGNOSIS").concept_id,
+          ConceptName.find_by_name("DIAGNOSIS, NON-CODED").concept_id])
+    }.flatten.compact
+  end
 end

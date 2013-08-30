@@ -37,7 +37,7 @@ class PatientsController < ApplicationController
       @demographics_url = @demographics_url + "/demographics/#{@patient.id}?user_id=#{@user.id}&ext=true"
     end
 		@demographics_url = "http://" + @demographics_url if !@demographics_url.match(/http:/)
-	
+   
 		if current_program == "ASTHMA PROGRAM"
 			@task.asthma_next_task rescue ""
 		elsif current_program == "EPILEPSY PROGRAM"

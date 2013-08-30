@@ -124,13 +124,13 @@
 		submitForm.appendChild(newElement);
 	  }
       var html
-      html = "<ul>"
+      html = "<ol>"
       for(var i=0;i < conditions.length;i++) {
         if (conditions[i].length > 0)
           html += "<li class='data'>" + conditions[i] + "</li>";
 
       }
-      html += "</ul>"
+      html += "</ol>"
 	  $('inputFrame'+tstCurrentPage).innerHTML = '<div id="summary">' + html + '</div>' ;
 	  $("clearButton").style.display = "none";
   }

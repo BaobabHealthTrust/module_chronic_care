@@ -6,9 +6,21 @@
   }
   #tt_page_any_drug_allergies #viewport {
     height: 200px;
-  }
+  } 
   #tt_page_patient_has_any_of_the_following #viewport {
-    height: 500px;
+    height: 550px;
+  }
+
+  #tt_page_patient_has_any_of_the_following .inputFrameClass {
+    height: 600px;
+  }
+
+  #tt_page_any_drug_allergies #viewport {
+    height: 550px;
+  }
+
+  #tt_page_any_drug_allergies .inputFrameClass {
+    height: 600px;
   }
 
   #tt_page_summary  .inputFrameClass {
@@ -200,7 +212,7 @@ end %>
   <% if @task != "disable" %>
     <%= select_tag "choice", options_for_select(@treatements_list),
       { :field_type => 'text',
-      :helpText => "Patient has any of the following:",
+      :helpText => "Patient has any of the following",
       :id => "choice",
       :name=> "concept[Chronic disease][]",
       :multiple => true,
