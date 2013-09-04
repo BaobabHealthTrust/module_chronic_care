@@ -67,16 +67,16 @@ class ProtocolPatientsController < ApplicationController
             current_date, @patient.id,EncounterType.find_by_name("FAMILY MEDICAL HISTORY").id]).encounter_id])
 	
     @estimatedvalue = []
+    @familyvalue = 0
     observation.each {|obs|
       value = ConceptName.find_by_concept_id(obs.value_coded).name if !obs.value_coded.blank?
       value = obs.value_numeric.to_i if !obs.value_numeric.blank?
       value = obs.value_text if !obs.value_text.blank?
-      value = obs.value_datetime if !obs.value_datetime.blank?
-      @familyvalue = 0
+      value = obs.value_datetime if !obs.value_datetime.blank? 
       asthma_values = ["HYPERTENSION", "ASTHMA"]
       if asthma_values.include?(obs.concept.fullname.upcase)
-        @familyvalue = value.to_i if obs.concept.fullname.upcase == "ASTHMA"
-        @estimatedvalue.push("#{obs.concept.fullname.humanize}" + 'in percentage : <i style="color: #B8002E">' + "#{value.to_i}" + '</i>')
+        @familyvalue = value.to_i if obs.concept.fullname.to_s.upcase == "ASTHMA"
+        @estimatedvalue.push("#{obs.concept.fullname.humanize}" + ' in percentage : <i style="color: #B8002E">' + "#{value.to_i}" + '</i>')
         next
       end
       @familyhistory.push("#{obs.concept.fullname.humanize} : #{value}")

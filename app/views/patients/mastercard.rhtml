@@ -123,7 +123,17 @@
     </style>
 
   </head>
-  <%#= raise @user['user_id'].to_yaml %>
+  <%
+
+#@demographics_url = get_global_property_value("patient.registration.url") rescue nil
+
+   # if !@demographics_url.nil?
+    #  @demographics_url = @demographics_url + "/demographics/#{params[:patient_id]}?user_id=#{params[:user_id]}&ext=true"
+    #end
+	#	@demographics_url = "http://" + @demographics_url if !@demographics_url.match(/http:/)
+ #raise @demographics_url.to_yaml
+%>
+
   <body onload="hideLoadMsg();">
     <div id="content">
       <iframe id="main" style="border: 0px solid #fff;"

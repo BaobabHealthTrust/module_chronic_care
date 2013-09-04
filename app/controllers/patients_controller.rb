@@ -9,6 +9,9 @@ class PatientsController < ApplicationController
       redirect_to "/encounters/no_patient" and return
     end
 
+    @retrospective = session[:datetime]
+		@retrospective = Time.now if session[:datetime].blank?
+
     if params[:user_id].nil?
       redirect_to "/encounters/no_user" and return
     end
@@ -16,6 +19,19 @@ class PatientsController < ApplicationController
     @user = User.find(params[:user_id]) rescue nil
     
     redirect_to "/encounters/no_user" and return if @user.nil?
+
+    program = Program.find_by_name("chronic care program").id
+
+    @current_state = PatientProgram.find_by_sql("
+      select p.patient_id, current_state_for_program(p.patient_id, #{program}, '#{@retrospective.to_date}') AS state, c.name as status
+      from patient_program p
+      inner join patient_state ps on ps.state = current_state_for_program(p.patient_id, #{program}, '#{@retrospective.to_date}')
+      inner join program_workflow pw on pw.program_id = p.program_id
+      inner join program_workflow_state pws on pws.program_workflow_id = pw.program_workflow_id
+      inner join concept_name c on c.concept_id = pws.concept_id
+      where p.patient_id = #{@patient.id}
+      order by ps.date_created desc limit 1").first.status rescue ""
+      #raise @current_state.to_s.to_yaml
 
     @task = TaskFlow.new(params[:user_id], @patient.id)
 		
@@ -60,7 +76,7 @@ class PatientsController < ApplicationController
     ProgramEncounter.current_date = @retrospective
 
     @programs = @patient.program_encounters.find(:all, :conditions => ["DATE(date_time) = ?", @retrospective.to_date],
-                                                 :order => ["date_time DESC"]).collect{|p|
+      :order => ["date_time DESC"]).collect{|p|
 
       [
         p.id,
@@ -77,6 +93,136 @@ class PatientsController < ApplicationController
     } if !@patient.nil?
 
     render :layout => false
+  end
+
+  def mastercard_modify
+    if request.method == :get
+      @patient_id = params[:id]
+      @patient = Patient.find(params[:id])
+      @edit_page = edit_mastercard_attribute(params[:field].to_s)
+
+      if @edit_page == "guardian"
+        @guardian = {}
+        @patient.person.relationships.map{|r| @guardian[art_guardian(@patient)] = Person.find(r.person_b).id.to_s;'' }
+        if  @guardian == {}
+          redirect_to :controller => "relationships" , :action => "search",:patient_id => @patient_id
+        end
+      end
+    else
+      @patient_id = params[:patient_id]
+      save_mastercard_attribute(params)
+      if params[:source].to_s == "opd"
+        redirect_to "/patients/opdcard/#{@patient_id}" and return
+      elsif params[:from_demo] == "true"
+        redirect_to :controller => "people" ,
+					:action => "demographics",:id => @patient_id and return
+      else
+        redirect_to :action => "mastercard",:patient_id => @patient_id and return
+      end
+    end
+  end
+
+  def save_mastercard_attribute(params)
+    patient = Patient.find(params[:patient_id])
+    case params[:field]
+    when 'arv_number'
+      type = params['identifiers'][0][:identifier_type]
+      #patient = Patient.find(params[:patient_id])
+      patient_identifiers = PatientIdentifier.find(:all,
+        :conditions => ["voided = 0 AND identifier_type = ? AND patient_id = ?",type.to_i,patient.id])
+
+      patient_identifiers.map{|identifier|
+        identifier.voided = 1
+        identifier.void_reason = "given another number"
+        identifier.date_voided  = Time.now()
+        identifier.voided_by = current_user.id
+        identifier.save
+      }
+
+      identifier = params['identifiers'][0][:identifier].strip
+      if identifier.match(/(.*)[A-Z]/i).blank?
+        params['identifiers'][0][:identifier] = "#{PatientIdentifier.site_prefix}-ARV-#{identifier}"
+      end
+      patient.patient_identifiers.create(params[:identifiers])
+    when "name"
+      names_params =  {"given_name" => params[:given_name].to_s,"family_name" => params[:family_name].to_s}
+      patient.person.names.first.update_attributes(names_params) if names_params
+    when "age"
+      birthday_params = params[:person]
+
+      if !birthday_params.empty?
+        if birthday_params["birth_year"] == "Unknown"
+          PatientService.set_birthdate_by_age(patient.person, birthday_params["age_estimate"])
+        else
+          PatientService.set_birthdate(patient.person, birthday_params["birth_year"], birthday_params["birth_month"], birthday_params["birth_day"])
+        end
+        patient.person.birthdate_estimated = 1 if params["birthdate_estimated"] == 'true'
+        patient.person.save
+      end
+    when "sex"
+      gender ={"gender" => params[:gender].to_s}
+      patient.person.update_attributes(gender) if !gender.empty?
+    when "location"
+      location = params[:person][:addresses]
+      patient.person.addresses.first.update_attributes(location) if location
+    when "occupation"
+      attribute = params[:person][:attributes]
+      occupation_attribute = PersonAttributeType.find_by_name("Occupation")
+      exists_person_attribute = PersonAttribute.find(:first, :conditions => ["person_id = ? AND person_attribute_type_id = ?", patient.person.id, occupation_attribute.person_attribute_type_id]) rescue nil
+      if exists_person_attribute
+        exists_person_attribute.update_attributes({'value' => attribute[:occupation].to_s})
+      end
+    when "guardian"
+      names_params =  {"given_name" => params[:given_name].to_s,"family_name" => params[:family_name].to_s}
+      Person.find(params[:guardian_id].to_s).names.first.update_attributes(names_params) rescue '' if names_params
+    when "address"
+      address2 = params[:person][:addresses]
+      patient.person.addresses.first.update_attributes(address2) if address2
+    when "ta"
+      county_district = params[:person][:addresses]
+      patient.person.addresses.first.update_attributes(county_district) if county_district
+		when "home_district"
+      home_district = params[:person][:addresses]
+      patient.person.addresses.first.update_attributes(home_district) if home_district
+
+    when "cell_phone_number"
+      attribute_type = PersonAttributeType.find_by_name("Cell Phone Number").id
+      person_attribute = patient.person.person_attributes.find_by_person_attribute_type_id(attribute_type)
+      if person_attribute.blank?
+        attribute = {'value' => params[:person]["cell_phone_number"],
+					'person_attribute_type_id' => attribute_type,
+					'person_id' => patient.id}
+        PersonAttribute.create(attribute)
+      else
+        person_attribute.update_attributes({'value' => params[:person]["cell_phone_number"]})
+      end
+    when "office_phone_number"
+      attribute_type = PersonAttributeType.find_by_name("Office Phone Number").id
+      person_attribute = patient.person.person_attributes.find_by_person_attribute_type_id(attribute_type)
+      if person_attribute.blank?
+        attribute = {'value' => params[:person]["office_phone_number"],
+					'person_attribute_type_id' => attribute_type,
+					'person_id' => patient.id}
+        PersonAttribute.create(attribute)
+      else
+        person_attribute.update_attributes({'value' => params[:person]["office_phone_number"]})
+      end
+    when "home_phone_number"
+      attribute_type = PersonAttributeType.find_by_name("Home Phone Number").id
+      person_attribute = patient.person.person_attributes.find_by_person_attribute_type_id(attribute_type)
+      if person_attribute.blank?
+        attribute = {'value' => params[:person]["home_phone_number"],
+					'person_attribute_type_id' => attribute_type,
+					'person_id' => patient.id}
+        PersonAttribute.create(attribute)
+      else
+        person_attribute.update_attributes({'value' => params[:person]["home_phone_number"]})
+      end
+    end
+  end
+
+  def edit_mastercard_attribute(attribute_name)
+    edit_page = attribute_name
   end
 
   def visit_history
@@ -121,6 +267,7 @@ class PatientsController < ApplicationController
   end
 
   def mastercard
+    
     @type = params[:type]
 
     if session[:from_report].to_s == "true"
@@ -140,6 +287,8 @@ class PatientsController < ApplicationController
     @prev_button_class = "yellow"
     @next_button_class = "yellow"
 
+
+    
     # if params[:current].to_i ==  1
     #   @prev_button_class = "gray"
     #elsif params[:current].to_i ==  session[:mastercard_ids].length
@@ -173,7 +322,7 @@ class PatientsController < ApplicationController
     @arv_start_number = params[:arv_start_number]
     @arv_end_number = params[:arv_end_number]
     @show_mastercard_counter = false
-
+    #raise params.to_yaml
     if params[:patient_id].blank?
 
       @show_mastercard_counter = true
@@ -206,6 +355,8 @@ class PatientsController < ApplicationController
 			#raise @data_demo.eptb.to_yaml
       @visits = visits(Patient.find(@patient_id))
     end
+    #raise params.to_yaml
+    
 
     @visits.keys.each do|day|
 			@age_in_months_for_days[day] = PatientService.age_in_months(@patient.person, day.to_date)
@@ -229,7 +380,7 @@ class PatientsController < ApplicationController
         session[:mastercard_counter] = params[:current].to_i - 1
       end
 
-     # @prev_button_class = "yellow"
+      # @prev_button_class = "yellow"
       #@next_button_class = "yellow"
       #if params[:current].to_i ==  1
       #  @prev_button_class = "gray"
@@ -284,25 +435,25 @@ class PatientsController < ApplicationController
       }
 
 
-        file = "/tmp/output-#{@patient.id}" + ".pdf"
+      file = "/tmp/output-#{@patient.id}" + ".pdf"
 
-        t2 = Thread.new{
-          sleep(3)
-          print(file, current_printer)
-        }
+      t2 = Thread.new{
+        sleep(3)
+        print(file, current_printer)
+      }
     end
     
     redirect_to request.request_uri.to_s.gsub('print_mastercard', 'mastercard') and return
   end
 
-def print(file_name, current_printer)
+  def print(file_name, current_printer)
     sleep(3)
     if (File.exists?(file_name))
-     Kernel.system "lp -o sides=two-sided-long-edge -o fitplot #{(!current_printer.blank? ? '-d ' + current_printer.to_s : "")} #{file_name}"
+      Kernel.system "lp -o sides=two-sided-long-edge -o fitplot #{(!current_printer.blank? ? '-d ' + current_printer.to_s : "")} #{file_name}"
     else
       print(file_name)
     end
-end
+  end
 
   def mastercard_demographics(patient_obj)
     

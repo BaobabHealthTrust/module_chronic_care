@@ -99,7 +99,7 @@
         conditions.push("Drinks alcohol: <b>" + $('drink_alcohol').value + "</b>");
 
 	  if ($('drinks_per_day').value.length > 0)
-        conditions.push("Drinks of alcohol per day: <b>" + $('drinks_per_day').value + " Units</b>");
+        conditions.push("Units of alcohol per day: <b>" + $('drinks_per_day').value + " Units</b>");
 
 	  if ($('days_per_week').value.length > 0)
         conditions.push("Number of Alcohol drinking days per week: <b>" + $('days_per_week').value + " Days</b>");
@@ -293,7 +293,7 @@
 			<td>
 <input type='text' id='drinks_per_day'
 	   name='concept[Alcoholic drinks per day]'
-	   helpText='Alcohol drinks per day? <%= @person_attribute %> '
+	   helpText='Alcohol units per day? <%= @person_attribute %> '
 	   field_type="number"
 	   pos='5'
 	   condition='__$("drink_alcohol").value.toLowerCase() == "yes"'

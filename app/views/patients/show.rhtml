@@ -93,7 +93,7 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
       <div>Patient Dashboard</div>
       <div id='project_name'>
         <div style="margin-top: 0px; color: #6281A7; font-size: 0.6em;">
-<%= @project %> <br><span style="font-size:23px;"><%=  current_program.humanize.split(" ")[0] rescue "" %></span>
+<%= @project %> <br><span style="font-size:23px;"><%=  current_program.humanize.split(" ")[0] rescue "" %><br>State: <%= @current_state.humanize %></span>
         </div>
       </div>
       <span id='patient_name'>

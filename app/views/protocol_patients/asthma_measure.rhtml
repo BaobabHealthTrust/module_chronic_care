@@ -155,7 +155,8 @@ function showSelectedConditions() {
 		conditions.push("Patient has cardiovascular related disease: " + $('vascular').value);
 	  }
 	  riskValue = parseInt((riskValue/15) * 100)
-	  totalRisk = parseInt(((riskValue + parseInt(familyvalue)) / 200) * 100)
+          
+	  totalRisk = parseInt((riskValue + parseInt(familyvalue)) / 2)
 	  if (totalRisk > 50){
 		comment = "Patient is asthmatic";
 		$('asthmatic').value = "yes";
@@ -194,7 +195,7 @@ function showSelectedConditions() {
 
 	  family += "</ul>"
 
-	  tabledAnalysis = "<table  id='charttable'  width='100%' valign='top'><tr><th>Medical History</th><th>Family History</th><th>Asthma Test</th></tr>";
+	  tabledAnalysis = "<table  id='charttable'  width='100%' valign='top'><tr><th>Asthma Measure</th><th>Family History</th><th>Asthma Test</th></tr>";
 	  tabledAnalysis += "<tr><td valign='top' width= '30%'>" + html + "</td><td valign='top' width= '30%'>" + family + "</td><td valign='top' width= '40%'>" + vitals + "</td></tr>";
 	  tabledAnalysis += "<tr><td colspan='3' valign ='top'><hr></td></tr>";
 	  tabledAnalysis += "<tr class = 'create_button'  valign='top'><td width= '50%' valign='top'>Patient risk value is at <blink><i style='color: #B8002E'>" + totalRisk + " %</i></blink> </td><td colspan='2' valign='top'><blink>" + comment + "</blink></td></tr></table>"

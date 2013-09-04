@@ -214,8 +214,8 @@
 <select id='on_art' name='concept[on art]' helpText='On ART? ' pos='5'
 		condition = '$("status").value.toLowerCase() == "positive"'>
 <option></option>
-<option value='Yes'>Yes</option>
- <option value='No'>No</option>
+<option value='No'>No</option>
+<option value='Yes'>Yes</option> 
  </select>
 			</td>
 		</tr>
@@ -224,7 +224,7 @@
 				Enroll in HIV program?
 			</td>
 			<td>
-<select id='enroll' name='concept[Patient enrolled in HIV program]' helpText='On ART? ' pos='6'  condition='__$("on_art").value.toLowerCase() == "no"'
+<select id='enroll' name='concept[Patient enrolled in HIV program]' helpText='Enroll in HIV program?' pos='6'  condition='__$("on_art").value.toLowerCase() == "no"'
 		condition = '$("status").value.toLowerCase() == "positive"' >
 <option></option>
 <option value='No'>No</option>

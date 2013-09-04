@@ -2,7 +2,7 @@
 class EncountersController < ApplicationController
 
   def create
-   # raise params.to_yaml
+     
     @retrospective = session[:datetime]
 		@retrospective = Time.now if session[:datetime].blank?
     User.current = User.find(@user["user_id"]) rescue nil
@@ -67,6 +67,15 @@ class EncountersController < ApplicationController
               )
 
             end
+
+            (params[:programs] || []).each do |program|
+                (program[:states] || []).each {|state| @current.transition({
+                    :state => state["state"],
+                    :start_date => (state["state_date"] || Time.now),
+                    :end_date => (state["state_date"] || Time.now)
+                  }) }
+
+                end
 
           else
 
@@ -328,48 +337,6 @@ class EncountersController < ApplicationController
 
       end
 
-      if params[:encounter_type].downcase.strip == "baby delivery" and !params["concept"]["Time of delivery"].nil?
-
-        baby = Baby.new(params[:user_id], params[:patient_id], session[:location_id], (session[:datetime] || Date.today))
-
-        mother = Person.find(params[:patient_id]) rescue nil
-
-        link = get_global_property_value("patient.registration.url").to_s rescue nil
-
-        baby_id = baby.associate_with_mother("#{link}", "Baby #{((params[:baby].to_i - 1) rescue 1)}",
-          "#{(!mother.nil? ? (mother.names.first.family_name rescue "Unknown") :
-          "Unknown")}", params["concept"]["Gender]"], params["concept"]["Date of delivery]"]) # rescue nil
-
-        # Baby identifier
-        concept = ConceptName.find_by_name("Baby outcome").concept_id rescue nil
-
-        obs = Observation.create(
-          :person_id => @encounter.patient_id,
-          :concept_id => concept,
-          :location_id => @encounter.location_id,
-          :obs_datetime => @encounter.encounter_datetime,
-          :encounter_id => @encounter.id,
-          :value_text => baby_id
-        ) if !baby_id.nil?
-
-      end
-			
-			#raise params["concept"]["Patient enrolled in HIV program"].upcase.to_yaml
-		
-
-			#if params[:encounter_type].to_s.upcase == "DIABETES HYPERTENSION INITIAL VISIT" || "UPDATE OUTCOME"
-				(params[:programs] || []).each do |program|
-						(program[:states] || []).each {|state| @current.transition({
-                    :state => state,
-                    :start_date => Time.now,
-                    :end_date => Time.now
-                  }) }
-				#end
-			end
-      #raise params[:concept].to_yaml
-      #if (params[:concept]["Diazepam"].upcase rescue [])== "YES"
-      #    	redirect_to "/prescriptions/prescribe?user_id=#{@user["user_id"]}&patient_id=#{params[:patient_id]}" and return
-      #end
 			if params[:encounter_type] == "TREATMENT"
 				if  params[:concept]["Prescribe Drugs"].to_s.upcase == "EPILEPSY DRUGS" || params[:concept]["Prescribe Drugs"].to_s.upcase == "HYPERTENSION/DIABETES DRUGS" || params[:concept]["Prescribe Drugs"].to_s.upcase == "ASTHMA DRUGS"
 						redirect_to "/prescriptions/prescribe?user_id=#{@user["user_id"]}&patient_id=#{params[:patient_id]}" and return
@@ -379,13 +346,21 @@ class EncountersController < ApplicationController
             redirect_to "/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}&disable=true" and return
 				end
 			end
-      @task = TaskFlow.new(params[:user_id] || User.first.id, patient.id)
+
 			
       redirect_to params[:next_url] and return if !params[:next_url].nil?
 			
 			if params[:encounter_type].to_s.upcase == "APPOINTMENT"
 						print_and_redirect("/patients/dashboard_print_visit/#{params[:patient_id]}?user_id=#{params[:user_id]}","/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}")
 						return
+      elsif params[:encounter_type].to_s.upcase == "UPDATE HIV STATUS"
+            if params[:concept]['Patient enrolled in HIV program'].upcase == "YES"
+               port = request.host_with_port.split(":")[1]
+               link = get_global_property_value("bart2.url").to_s rescue []
+               unless link.blank?
+                redirect_to "#{link}/encounters/new/hiv_reception?show&patient_id=#{params[:patient_id]}&return_ip=http://#{request.remote_ip}:#{port}/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}" and return
+               end
+            end
 			elsif params[:encounter_type].to_s.upcase == "EPILEPSY CLINIC VISIT"
 						@mrdt = Vitals.current_vitals(Patient.find(params[:patient_id]), "Patient in active seizure")
 						
@@ -397,6 +372,9 @@ class EncountersController < ApplicationController
 								end
 						end
 			end
+
+       @task = TaskFlow.new(params[:user_id] || User.first.id, patient.id)
+
 			begin
 				redirect_to @task.asthma_next_task.url and return if current_program == "ASTHMA PROGRAM"
 				redirect_to @task.epilepsy_next_task.url and return if current_program == "EPILEPSY PROGRAM"
