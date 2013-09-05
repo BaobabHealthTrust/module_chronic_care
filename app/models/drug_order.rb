@@ -54,17 +54,20 @@ class DrugOrder < ActiveRecord::Base
   # Eventually it would be good for this to not be hard coded, and the data available in the concept table
   def self.doses_per_day(frequency)
     return 1 if frequency.upcase == "ONCE A DAY (OD)"
+    return 1 if frequency.upcase == "ONCE A DAY"
     return 2 if frequency.upcase == "TWICE A DAY (BD)"
+    return 2 if frequency.upcase == "TWICE A DAY"
     return 3 if frequency.upcase == "THREE A DAY (TDS)"
-    return 4 if frequency.upcase == "FOUR TIMES A DAY (QID)"
-    return 5 if frequency.upcase == "FIVE TIMES A DAY (5X/D)"
-    return 6 if frequency.upcase == "SIX TIMES A DAY (Q4HRS)"
-    return 1 if frequency.upcase == "IN THE MORNING (QAM)"
-    return 1 if frequency.upcase == "ONCE A DAY AT NOON (QNOON)"
-    return 1 if frequency.upcase == "IN THE EVENING (QPM)"
-    return 1 if frequency.upcase == "ONCE A DAY AT NIGHT (QHS)"
-    return 0.5 if frequency.upcase == "EVERY OTHER DAY (QOD)"
-    return 1.to_f / 7.to_f if frequency.upcase == "ONCE A WEEK (QWK)"
+    return 3 if frequency.upcase == "THREE A DAY"
+    return 4 if frequency.upcase == "FOUR TIMES A DAY (QID)" || "FOUR TIMES A DAY"
+    return 5 if frequency.upcase == "FIVE TIMES A DAY (5X/D)" || "FIVE TIMES A DAY"
+    return 6 if frequency.upcase == "SIX TIMES A DAY (Q4HRS)" || "SIX TIMES A DAY"
+    return 1 if frequency.upcase == "IN THE MORNING (QAM)" || "IN THE MORNING"
+    return 1 if frequency.upcase == "ONCE A DAY AT NOON (QNOON)" || "ONCE A DAY AT NOON"
+    return 1 if frequency.upcase == "IN THE EVENING (QPM)" || "IN THE EVENING"
+    return 1 if frequency.upcase == "ONCE A DAY AT NIGHT (QHS)" || "ONCE A DAY AT NIGHT"
+    return 0.5 if frequency.upcase == "EVERY OTHER DAY (QOD)" || "EVERY OTHER DAY"
+    return 1.to_f / 7.to_f if frequency.upcase == "ONCE A WEEK (QWK)" || "ONCE A WEEK"
     return 1.to_f / 28.to_f if frequency.upcase == "ONCE A MONTH"
     return 1.to_f / 14.to_f if frequency.upcase == "TWICE A MONTH"
     1
@@ -91,6 +94,9 @@ class DrugOrder < ActiveRecord::Base
       instructions += " for #{duration} days"
       instructions += " (prn)" if prn == 1
     end
+
+    equivalent_daily_dose = self.doses_per_day(frequency)
+    
     if dose.is_a?(Array)
       total_dose = dose.sum{|amount| amount.to_f rescue 0 }
       return nil if total_dose.blank?
@@ -105,7 +111,8 @@ class DrugOrder < ActiveRecord::Base
     #    instructions += " (prn)" if prn == 1
     #  end
     # end
-		
+    
+   
     ActiveRecord::Base.transaction do
       order = encounter.orders.create(
         :order_type_id => OrderType.find_by_name("Drug Order").id,

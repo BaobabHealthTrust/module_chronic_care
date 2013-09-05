@@ -74,7 +74,7 @@ class GenericPrescriptionsController < ApplicationController
         start_date = session_date
 
         auto_expire_date = session_date.to_date + params[:duration].to_i.days
-
+        #raise @drug.units.to_yaml
         prn = params[:prn].to_i
         if params[:type_of_prescription] == "variable"
           DrugOrder.write_order(@encounter,
