@@ -10,6 +10,25 @@ module ApplicationHelper
 		return property_value
 	end
 
+  def img_button_submit_to(url, image, options = {}, params = {})
+    content = ""
+    content << "<form method='post' action='#{url}'><input type='image' src='#{image}'/>"
+    params.each {|n,v| content << "<input type='hidden' name='#{n}' value='#{v}'/>" }
+    content << "</form>"
+    content
+  end
+
+  def img_button_submit_to_with_confirm(url, image, options = {}, params = {})
+    content = ""
+    content << "<form " + ((options[:form_id])?("id=#{options[:form_id]}"):"id='frm_general'") + " method='post' action='#{url}'><input type='image' src='#{image}' " +
+      ((options[:confirm])?("onclick=\"return confirmRecordDeletion('" +
+      options[:confirm] + "', '" + ((options[:form_id])?("#{options[:form_id]}"):"frm_general") + "')\""):"") + "/>"
+
+    params.each {|n,v| content << "<input type='hidden' name='#{n}' value='#{v}'/>" }
+    content << "</form>"
+    content
+  end
+
   def show_intro_text
     get_global_property_value("show_intro_text").to_s == "true" rescue false
   end
