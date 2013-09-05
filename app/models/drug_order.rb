@@ -94,8 +94,10 @@ class DrugOrder < ActiveRecord::Base
       instructions += " for #{duration} days"
       instructions += " (prn)" if prn == 1
     end
-
-    equivalent_daily_dose = self.doses_per_day(frequency)
+    unless dose.is_a?(Array)
+      
+      equivalent_daily_dose = self.doses_per_day(frequency).to_i * dose.to_i
+    end
     
     if dose.is_a?(Array)
       total_dose = dose.sum{|amount| amount.to_f rescue 0 }
