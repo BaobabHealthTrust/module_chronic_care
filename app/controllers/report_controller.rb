@@ -19,10 +19,13 @@ class ReportController < ApplicationController
 		@gender["M"] = 0
 		(Clinic.total_in_program(Program.find_by_concept_id(Concept.find_by_name('CHRONIC CARE PROGRAM').id).id) || []).each do |patient|
 			pat = Patient.find(patient.patient_id)
-			sex = pat.gender
-			sex = "F" if pat.gender == "Female"
-			sex = "M" if pat.gender == "Male"
-			@gender[sex] += 1
+      sex = ""
+      unless pat.gender.blank?
+        sex = pat.gender
+        sex = "F" if pat.gender == "Female"
+        sex = "M" if pat.gender == "Male"
+        @gender[sex] += 1
+      end
 			(@location[pat.address].nil?) ? @location[pat.address] = 1 : @location[pat.address] += 1
 			@total << [pat.name, sex, pat.age, pat.address]
 		end
