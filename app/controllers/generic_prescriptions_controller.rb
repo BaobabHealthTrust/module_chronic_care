@@ -29,6 +29,7 @@ class GenericPrescriptionsController < ApplicationController
   end
   
   def create
+    #raise params.to_yaml
     @suggestions = params[:suggestion] || ['New Prescription']
     @patient = Patient.find(params[:patient_id] || session[:patient_id]) rescue nil
     if params[:location].blank?
@@ -71,7 +72,9 @@ class GenericPrescriptionsController < ApplicationController
 
         #raise params.to_yaml
         start_date = session_date
+
         auto_expire_date = session_date.to_date + params[:duration].to_i.days
+
         prn = params[:prn].to_i
         if params[:type_of_prescription] == "variable"
           DrugOrder.write_order(@encounter,
@@ -95,7 +98,9 @@ class GenericPrescriptionsController < ApplicationController
             auto_expire_date,
             params[:dose_strength],
             params[:frequency],
-            prn)
+            prn,
+            "",
+            3)
         end  
       end  
     end

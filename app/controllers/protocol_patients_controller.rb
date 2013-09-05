@@ -274,7 +274,7 @@ class ProtocolPatientsController < ApplicationController
 
     @circumference = Observation.find_by_sql("SELECT * from obs
                    WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'waist circumference' LIMIT 1) AND voided = 0
-                   AND voided = 0 AND person_id = #{@patient.id} ORDER BY obs_datetime DESC LIMIT 1").first.value_numeric rescue nil
+                   AND voided = 0 AND person_id = #{@patient.id} ORDER BY obs_datetime DESC LIMIT 1").first.value_numeric rescue 0
     @diabetic = ConceptName.find_by_concept_id(Vitals.get_patient_attribute_value(@patient, "Patient has Diabetes")).name rescue "unknown"
 
 
