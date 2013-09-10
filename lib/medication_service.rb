@@ -35,9 +35,11 @@ module MedicationService
 		diabetes_medication_concept  = ConceptName.find_by_name("DIABETES MEDICATION").concept_id
 		cardiac_medication_concept   = ConceptName.find_by_name("CARDIAC MEDICATION").concept_id
     asthma_medication_concept   = ConceptName.find_by_name("ASTHMA MEDICATION").concept_id
+    epilepsy_medication_concept   = ConceptName.find_by_name("EPILEPSY MEDICATION").concept_id
 		kidney_failure_medication_concept       = ConceptName.find_by_name("KIDNEY FAILURE CARDIAC MEDICATION").concept_id
 		medication_drug_concepts = ConceptName.find_by_sql("SELECT * FROM concept_set WHERE concept_set 
-		IN (#{hypertension_medication_concept}, #{diabetes_medication_concept}, #{cardiac_medication_concept},#{asthma_medication_concept}, #{kidney_failure_medication_concept})")
+		IN (#{hypertension_medication_concept}, #{diabetes_medication_concept}, #{cardiac_medication_concept},
+        #{asthma_medication_concept}, #{kidney_failure_medication_concept}, #{epilepsy_medication_concept})")
 
 		medication_drug_concepts
 	end
