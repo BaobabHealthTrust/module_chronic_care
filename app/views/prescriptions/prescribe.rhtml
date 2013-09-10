@@ -167,6 +167,7 @@
 <form id='prescription' action="/prescriptions/create" method='post'>
   <%= hidden_field_tag :auto, params[:auto] %>
   <%= hidden_field_tag :patient_id, @patient.id %>
+ 
   <input type='hidden' name='user_id' value='<%= @user.id %>' />
   <input type='hidden' name='programs[][states][][state]' value='on treatment' />
 

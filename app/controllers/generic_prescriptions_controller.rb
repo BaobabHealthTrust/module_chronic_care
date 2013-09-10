@@ -29,7 +29,7 @@ class GenericPrescriptionsController < ApplicationController
   end
   
   def create
-    #raise params.to_yaml
+
     @suggestions = params[:suggestion] || ['New Prescription']
     @patient = Patient.find(params[:patient_id] || session[:patient_id]) rescue nil
     if params[:location].blank?
@@ -53,40 +53,40 @@ class GenericPrescriptionsController < ApplicationController
         session_date.to_date.strftime('%Y-%m-%d 23:59:59'),
         EncounterType.find_by_name("TREATMENT").id])
     @encounter ||= @patient.encounters.create(:encounter_type => EncounterType.find_by_name("TREATMENT").id,:encounter_datetime => session_date, :provider_id => user_person_id)
-
-    #@encounter = Vitals.current_treatment_encounter( @patient, user_person_id, session_date)
     @diagnosis = Observation.find(params[:diagnosis]) rescue nil
+        
     @suggestions.each do |suggestion|
       unless (suggestion.blank? || suggestion == '0' || suggestion == 'New Prescription')
         @order = DrugOrder.find(suggestion)
         DrugOrder.clone_order(@encounter, @patient, @diagnosis, @order)
       else
         
-        @formulation = (params[:formulation] || '').upcase
+        @formulation = (params[:formulation] || params[:prescription][0][:formulation] || '').upcase
         @drug = Drug.find_by_name(@formulation) rescue nil
         unless @drug
-          flash[:notice] = "No matching drugs found for formulation #{params[:formulation]}"
+          flash[:notice] = "No matching drugs found for formulation #{@formulation}"
           render :new
           return
         end
 
+        prescriptions = params[:prescription][0] rescue params
         #raise params.to_yaml
         start_date = session_date
 
-        auto_expire_date = session_date.to_date + params[:duration].to_i.days
+        auto_expire_date = session_date.to_date + prescriptions[:duration].to_i.days
         #raise @drug.units.to_yaml
-        prn = params[:prn].to_i
-        if params[:type_of_prescription] == "variable"
+        prn = prescriptions[:prn].to_i
+        if prescriptions[:type_of_prescription] == "variable"
           DrugOrder.write_order(@encounter,
             @patient,
             @diagnosis,
             @drug,
             start_date,
             auto_expire_date,
-            [params[:morning_dose],
-              params[:afternoon_dose],
-              params[:evening_dose],
-              params[:night_dose]],
+            [prescriptions[:morning_dose],
+              prescriptions[:afternoon_dose],
+              prescriptions[:evening_dose],
+              prescriptions[:night_dose]],
             'VARIABLE',
             prn)
         else
@@ -96,8 +96,8 @@ class GenericPrescriptionsController < ApplicationController
             @drug,
             start_date,
             auto_expire_date,
-            params[:dose_strength],
-            params[:frequency],
+            prescriptions[:dose_strength],
+            prescriptions[:frequency],
             prn,
             "",
             3)
@@ -224,7 +224,8 @@ class GenericPrescriptionsController < ApplicationController
 	end
 
 	def generic_advanced_prescription
-		@patient = Patient.find(params[:patient_id] || session[:patient_id]) rescue nil
+    @user = params[:user_id]
+		@patient = Patient.find(params[:patient_id] || session[:patient_id]) rescue []
 		@generics = MedicationService.generic
 		@frequencies = MedicationService.fully_specified_frequencies	
 		@formulations = {}
@@ -238,7 +239,7 @@ class GenericPrescriptionsController < ApplicationController
 		}
 
 		@diagnosis = @patient.current_diagnoses["DIAGNOSIS"] rescue []
-		render :layout => 'application'
+		render :layout => 'application', :template => 'prescriptions/give_drugs'
 	end
   
   

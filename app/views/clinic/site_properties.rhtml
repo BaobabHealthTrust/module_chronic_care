@@ -108,6 +108,16 @@
         </button>
       </td>
     </tr>
+    <tr>
+        <td style="height: 70px;">
+        <button class="btn" onclick="window.parent.location='/clinic/prescriptions?user_id=<%= params[:user_id]
+              %>&location_id=<%= session[:location_id] || params[:location_id] %>&src=<%= @host %>'">
+          <span>
+              Prescription Format
+          </span>
+        </button>
+      </td>
+    </tr>
 
   </table>
 </div>

@@ -69,13 +69,13 @@ class EncountersController < ApplicationController
             end
 
             (params[:programs] || []).each do |program|
-                (program[:states] || []).each {|state| @current.transition({
+              (program[:states] || []).each {|state| @current.transition({
                     :state => state["state"],
                     :start_date => (state["state_date"] || Time.now),
                     :end_date => (state["state_date"] || Time.now)
                   }) }
 
-                end
+            end
 
           else
 
@@ -86,20 +86,20 @@ class EncountersController < ApplicationController
         end
 
 				if  params[:encounter_type] == "LAB RESULTS"
-				#raise params.to_yaml
-				create_obs(@encounter , params)
+          #raise params.to_yaml
+          create_obs(@encounter , params)
 
-				@task = TaskFlow.new(params[:user_id] || User.first.id, patient.id)
-
-				redirect_to params[:next_url] and return if !params[:next_url].nil?
-					begin
+          @task = TaskFlow.new(params[:user_id] || User.first.id, patient.id)
+        
+          redirect_to params[:next_url] and return if !params[:next_url].blank?
+					begin   
 						redirect_to @task.asthma_next_task.url and return if current_program == "ASTHMA PROGRAM"
 						redirect_to @task.epilepsy_next_task.url and return if current_program == "EPILEPSY PROGRAM"
 						redirect_to @task.next_task.url and return
 					rescue
 						redirect_to "/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}&disable=true" and return
 					end
-			 end
+        end
 
         params[:concept].each do |key, value|
           if value.blank?
@@ -338,12 +338,17 @@ class EncountersController < ApplicationController
       end
 
 			if params[:encounter_type] == "TREATMENT"
+        link = get_global_property_value("prescription.types").upcase rescue []
 				if  params[:concept]["Prescribe Drugs"].to_s.upcase == "EPILEPSY DRUGS" || params[:concept]["Prescribe Drugs"].to_s.upcase == "HYPERTENSION/DIABETES DRUGS" || params[:concept]["Prescribe Drugs"].to_s.upcase == "ASTHMA DRUGS"
-						redirect_to "/prescriptions/prescribe?user_id=#{@user["user_id"]}&patient_id=#{params[:patient_id]}" and return
-				elsif params[:concept]["Prescribe Drugs"].blank?
-						redirect_to "/protocol_patients/assessment?patient_id=#{params[:patient_id]}&user_id=#{params[:user_id]}&disable=true" and return
+					if link == "ADVANCED PRESCRIPTION"
+            redirect_to "/prescriptions/generic_advanced_prescription?user_id=#{@user["user_id"]}&patient_id=#{params[:patient_id]}" and return
+          else
+            redirect_to "/prescriptions/prescribe?user_id=#{@user["user_id"]}&patient_id=#{params[:patient_id]}" and return
+          end
+        elsif params[:concept]["Prescribe Drugs"].blank?
+          redirect_to "/protocol_patients/assessment?patient_id=#{params[:patient_id]}&user_id=#{params[:user_id]}&disable=true" and return
 				else
-            redirect_to "/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}&disable=true" and return
+          redirect_to "/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}&disable=true" and return
 				end
 			end
 
@@ -351,29 +356,29 @@ class EncountersController < ApplicationController
       redirect_to params[:next_url] and return if !params[:next_url].nil?
 			
 			if params[:encounter_type].to_s.upcase == "APPOINTMENT"
-						print_and_redirect("/patients/dashboard_print_visit/#{params[:patient_id]}?user_id=#{params[:user_id]}","/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}")
-						return
+        print_and_redirect("/patients/dashboard_print_visit/#{params[:patient_id]}?user_id=#{params[:user_id]}","/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}")
+        return
       elsif params[:encounter_type].to_s.upcase == "UPDATE HIV STATUS"
-            if params[:concept]['Patient enrolled in HIV program'].upcase == "YES"
-               port = request.host_with_port.split(":")[1]
-               link = get_global_property_value("bart2.url").to_s rescue []
-               unless link.blank?
-                redirect_to "#{link}/encounters/new/hiv_reception?show&patient_id=#{params[:patient_id]}&return_ip=http://#{request.remote_ip}:#{port}/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}" and return
-               end
-            end
+        if params[:concept]['Patient enrolled in HIV program'].upcase == "YES"
+          port = request.host_with_port.split(":")[1]
+          link = get_global_property_value("bart2.url").to_s rescue []
+          unless link.blank?
+            redirect_to "#{link}/encounters/new/hiv_reception?show&patient_id=#{params[:patient_id]}&return_ip=http://#{request.remote_ip}:#{port}/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}" and return
+          end
+        end
 			elsif params[:encounter_type].to_s.upcase == "EPILEPSY CLINIC VISIT"
-						@mrdt = Vitals.current_vitals(Patient.find(params[:patient_id]), "Patient in active seizure")
+        @mrdt = Vitals.current_vitals(Patient.find(params[:patient_id]), "Patient in active seizure")
 						
-						unless @mrdt.blank?
-								@mrdt = @mrdt.value_text.upcase rescue ConceptName.find_by_concept_id(@mrdt.value_coded).name.upcase
-								if @mrdt == "YES"
-									redirect_to "/protocol_patients/clinic_visit?patient_id=#{params[:patient_id]}&user_id=#{params[:user_id]}&repeat=true"
-									return
-								end
-						end
+        unless @mrdt.blank?
+          @mrdt = @mrdt.value_text.upcase rescue ConceptName.find_by_concept_id(@mrdt.value_coded).name.upcase
+          if @mrdt == "YES"
+            redirect_to "/protocol_patients/clinic_visit?patient_id=#{params[:patient_id]}&user_id=#{params[:user_id]}&repeat=true"
+            return
+          end
+        end
 			end
 
-       @task = TaskFlow.new(params[:user_id] || User.first.id, patient.id)
+      @task = TaskFlow.new(params[:user_id] || User.first.id, patient.id)
 
 			begin
 				redirect_to @task.asthma_next_task.url and return if current_program == "ASTHMA PROGRAM"
@@ -477,7 +482,7 @@ class EncountersController < ApplicationController
 
 	def create_obs(encounter , params)
 		# Observation handling
-		 #raise params['provider'].to_yaml
+    #raise params['provider'].to_yaml
 		(params[:observations] || []).each do |observation|
 			next if observation[:concept_name] == ""
 			# Check to see if any values are part of this observation
@@ -535,7 +540,7 @@ class EncountersController < ApplicationController
 							:joins => "INNER JOIN drug_order USING (order_id)",
 							:conditions => ["orders.patient_id = ? AND drug_order.drug_inventory_id = ?
 										  AND orders.start_date < ?", encounter.patient_id,
-										  observation[:value_drug], encounter.encounter_datetime.to_date],
+                observation[:value_drug], encounter.encounter_datetime.to_date],
 							:order => "orders.start_date DESC").order_id rescue nil
 						if !order_id.blank?
 							observation[:order_id] = order_id
@@ -579,7 +584,7 @@ class EncountersController < ApplicationController
 				Observation.create(observation)
 			end
 		end
-  	end
+  end
 
 	def update_observation_value(observation)
 		value = observation[:value_coded_or_text]
@@ -609,21 +614,21 @@ class EncountersController < ApplicationController
     
 		#@current_height = Vitals.get_patient_attribute_value(@patient, "current_height")
 		#@min_weight = Vitals.get_patient_attribute_value(@patient, "min_weight")
-        #@max_weight = Vitals.get_patient_attribute_value(@patient, "max_weight")
-        #@min_height = Vitals.get_patient_attribute_value(@patient, "min_height")
-        #@max_height = Vitals.get_patient_attribute_value(@patient, "max_height")
-        #@given_arvs_before = given_arvs_before(@patient)
-        @current_encounters = @patient.encounters.find_by_date(session_date)
-        #@previous_tb_visit = previous_tb_visit(@patient.id)
-        @is_patient_pregnant_value = nil
-        @is_patient_breast_feeding_value = nil
+    #@max_weight = Vitals.get_patient_attribute_value(@patient, "max_weight")
+    #@min_height = Vitals.get_patient_attribute_value(@patient, "min_height")
+    #@max_height = Vitals.get_patient_attribute_value(@patient, "max_height")
+    #@given_arvs_before = given_arvs_before(@patient)
+    @current_encounters = @patient.encounters.find_by_date(session_date)
+    #@previous_tb_visit = previous_tb_visit(@patient.id)
+    @is_patient_pregnant_value = nil
+    @is_patient_breast_feeding_value = nil
 
-				if (params[:encounter_type].upcase rescue '') == 'APPOINTMENT'
-					@todays_date = session_date
-					logger.info('========================== Suggesting appointment date =================================== @ '  + Time.now.to_s)
-					@suggested_appointment_date = suggest_appointment_date
-					logger.info('========================== Completed suggesting appointment date =================================== @ '  + Time.now.to_s)
-				end
+    if (params[:encounter_type].upcase rescue '') == 'APPOINTMENT'
+      @todays_date = session_date
+      logger.info('========================== Suggesting appointment date =================================== @ '  + Time.now.to_s)
+      @suggested_appointment_date = suggest_appointment_date
+      logger.info('========================== Completed suggesting appointment date =================================== @ '  + Time.now.to_s)
+    end
 
 		#@number_of_days_to_add_to_next_appointment_date = number_of_days_to_add_to_next_appointment_date(@patient, session[:datetime] || Date.today)
 
@@ -633,16 +638,16 @@ class EncountersController < ApplicationController
 		  @report_url = nil
 		  @report_url =  params[:report_url]  and @old_appointment = params[:old_appointment] if !params[:report_url].nil?
 		  @current_encounters.reverse.each do |enc|
-		     enc.observations.each do |o|
-		       @location_transferred_to << o.to_s_location_name.strip if o.to_s.include?("Transfer out to") rescue nil
-		     end
-		   end
+        enc.observations.each do |o|
+          @location_transferred_to << o.to_s_location_name.strip if o.to_s.include?("Transfer out to") rescue nil
+        end
+      end
 		end
 
 		if (params[:encounter_type].upcase rescue '') == "DIABETES_INITIAL_QUESTIONS"
 			encounter_available = Encounter.find(:first,:conditions =>["patient_id = ? AND encounter_type = ?",
-				                             @patient.id, EncounterType.find_by_name("DIABETES INITIAL QUESTIONS").id],
-				                             :order =>'encounter_datetime DESC',:limit => 1)
+          @patient.id, EncounterType.find_by_name("DIABETES INITIAL QUESTIONS").id],
+        :order =>'encounter_datetime DESC',:limit => 1)
 
 			if encounter_available.blank?
 				@has_initial_questions = false
@@ -655,8 +660,8 @@ class EncountersController < ApplicationController
 
 			encounter = params[:encounter_type].upcase
 			encounter_available = Encounter.find(:first,:conditions =>["patient_id = ? AND encounter_type = ?",
-				                             @patient.id, EncounterType.find_by_name(encounter.humanize.upcase).id],
-				                             :order =>'encounter_datetime DESC',:limit => 1)
+          @patient.id, EncounterType.find_by_name(encounter.humanize.upcase).id],
+        :order =>'encounter_datetime DESC',:limit => 1)
 			@has_diabetes_history = false
 			@has_general_health = false
 			@past_diabetes_medical_history = false
@@ -715,11 +720,11 @@ class EncountersController < ApplicationController
     encounter_type_ids = EncounterType.find_all_by_name(clinic_encounters).collect{|e|e.id}
 
     latest_encounter_date = Encounter.find(:first,
-        :conditions =>["patient_id = ? AND encounter_datetime >= ?
+      :conditions =>["patient_id = ? AND encounter_datetime >= ?
         AND encounter_datetime <=? AND encounter_type IN(?)",
         patient.id,date.strftime('%Y-%m-%d 00:00:00'),
         date.strftime('%Y-%m-%d 23:59:59'),encounter_type_ids],
-        :order =>"encounter_datetime DESC").encounter_datetime rescue nil
+      :order =>"encounter_datetime DESC").encounter_datetime rescue nil
 
     return [] if latest_encounter_date.blank?
 
@@ -728,10 +733,10 @@ class EncountersController < ApplicationController
 
     concept_id = Concept.find_by_name('AMOUNT DISPENSED').id
     Order.find(:all,:joins =>"INNER JOIN obs ON obs.order_id = orders.order_id",
-        :conditions =>["obs.person_id = ? AND obs.concept_id = ?
+      :conditions =>["obs.person_id = ? AND obs.concept_id = ?
         AND obs_datetime >=? AND obs_datetime <=?",
         patient.id,concept_id,start_date,end_date],
-        :order =>"obs_datetime")
+      :order =>"obs_datetime")
   end
 
 	def prescription_expiry_date(patient, dispensed_date)

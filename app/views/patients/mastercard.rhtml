@@ -1,19 +1,19 @@
 <html>
   <head>
     <title>Mastercard</title>
-    <%#= stylesheet_link_tag "mateme" %>
-    <%#= stylesheet_link_tag fancy_or_high_contrast_touch %>
+<%#= stylesheet_link_tag "mateme" %>
+<%#= stylesheet_link_tag fancy_or_high_contrast_touch %>
 
     <script type="text/javascript">
       var tt_cancel_destination = "/patients/show/?patient_id=" + "<%=@patient_id%>"
 
-     var total  = <%="#{session[:mastercard_ids].length.to_i}" rescue 0%>;
-     var current = <%="#{session[:mastercard_counter].to_i + 1}" rescue 0%>;
+      var total  = <%="#{session[:mastercard_ids].length.to_i}" rescue 0%>;
+      var current = <%="#{session[:mastercard_counter].to_i + 1}" rescue 0%>;
 
       function next(){
         current = current + 1;
         if (current >= total){
-           current = total;
+          current = total;
         }
         document.location = "/patients/mastercard?show_mastercard_counter=true&current=" + current;
       }
@@ -21,7 +21,7 @@
       function prev(){
         current = current - 1 ;
         if (current <= 0){
-           current = 1;
+          current = 1;
         }
         document.location = "/patients/mastercard?show_mastercard_counter=true&current=" + current;
       }
@@ -124,35 +124,34 @@
 
   </head>
   <%
+  #@demographics_url = get_global_property_value("patient.registration.url") rescue nil
 
-#@demographics_url = get_global_property_value("patient.registration.url") rescue nil
-
-   # if !@demographics_url.nil?
-    #  @demographics_url = @demographics_url + "/demographics/#{params[:patient_id]}?user_id=#{params[:user_id]}&ext=true"
-    #end
-	#	@demographics_url = "http://" + @demographics_url if !@demographics_url.match(/http:/)
- #raise @demographics_url.to_yaml
-%>
+  # if !@demographics_url.nil?
+  #  @demographics_url = @demographics_url + "/demographics/#{params[:patient_id]}?user_id=#{params[:user_id]}&ext=true"
+  #end
+  #	@demographics_url = "http://" + @demographics_url if !@demographics_url.match(/http:/)
+  #raise @demographics_url.to_yaml
+  %>
 
   <body onload="hideLoadMsg();">
     <div id="content">
       <iframe id="main" style="border: 0px solid #fff;"
               src="/patients/<%= (!@type.nil? ? "general_mastercard" : "mastercard_printable")
-                  %>?patient_id=<%=@patient.id%>&type=<%= @type %>&user_id=<%= @user['user_id'] %>"></iframe>
+            %>?patient_id=<%=@patient.id%>&type=<%= @type %>&user_id=<%= @user['user_id'] %>"></iframe>
 
       <div id="footer" style="">
-      	<% report_url = "/patients/show/?patient_id=#{@patient.id}&user_id=#{@user['user_id']}" %>
+        <% report_url = "/patients/show/?patient_id=#{@patient.id}&user_id=#{@user['user_id']}" %>
 
-		    <%# if (@show_mastercard_counter.to_s == "true") || (@from_report.to_s == "true") %>
-		    		<%# report_url = session[:report_url] if !session[:report_url].blank? %>
-		    <%# end %>
+<%# if (@show_mastercard_counter.to_s == "true") || (@from_report.to_s == "true") %>
+<%# report_url = session[:report_url] if !session[:report_url].blank? %>
+<%# end %>
 
         <button onclick="window.location ='<%="#{report_url}"%>';" class="button navButton green"
                 id="nextButton" style="float: right; margin-right: 10px;" ><span>Finish</span>
         </button>
 
         <% if @source.nil? %>
-        
+
           <button class="button navButton blue" style="float: left;"
                   onmousedown="window.location = '/patients/print_mastercard?patient_id=<%=@patient.id%>&user_id=<%= @user["user_id"] %>'">
             <span>
@@ -160,41 +159,41 @@
             </span>
           </button>
         <% end %>
-      <div id="msgBox">
-        <table>
-          <tr>
-            <td>Loading: please wait</td>
-            <td>&nbsp;</td>
-            <td class="dots" id="dot1">.</td>
-            <td class="dots" id="dot2">.</td>
-            <td class="dots" id="dot3">.</td>
-            <td class="dots" id="dot4">.</td>
-            <td class="dots" id="dot5">.</td>
-            <td class="dots" id="dot6">.</td>
-            <td class="dots" id="dot7">.</td>
-            <td class="dots" id="dot8">.</td>
-            <td class="dots" id="dot9">.</td>
-            <td class="dots" id="dot10">.</td>
-          </tr>
-        <table>
-      </div>
-    </div>
-  </body>
-</html>
+        <div id="msgBox">
+          <table>
+            <tr>
+              <td>Loading: please wait</td>
+              <td>&nbsp;</td>
+              <td class="dots" id="dot1">.</td>
+              <td class="dots" id="dot2">.</td>
+              <td class="dots" id="dot3">.</td>
+              <td class="dots" id="dot4">.</td>
+              <td class="dots" id="dot5">.</td>
+              <td class="dots" id="dot6">.</td>
+              <td class="dots" id="dot7">.</td>
+              <td class="dots" id="dot8">.</td>
+              <td class="dots" id="dot9">.</td>
+              <td class="dots" id="dot10">.</td>
+            </tr>
+            <table>
+              </div>
+              </div>
+              </body>
+              </html>
 
-<script>
+              <script>
 
-	try {
-		 document.getElementById('navigation_value').innerHTML = "<input value =" + current + " size='3' maxlength='<%= "#{(session[:mastercard_ids].length.to_s rescue 0).split('').count rescue ''}" %>' type='text' readonly='readonly' style='font-size:35px; text-align:right;font-weight: bold; padding-right:10px;' />" + " of " + total;
-	}
-	catch(e) {
-	 try{
-		document.getElementById('navigation_value').innerHTML = ''
-		}catch(d){}
-	}
+                try {
+                  document.getElementById('navigation_value').innerHTML = "<input value =" + current + " size='3' maxlength='<%= "#{(session[:mastercard_ids].length.to_s rescue 0).split('').count rescue ''}" %>' type='text' readonly='readonly' style='font-size:35px; text-align:right;font-weight: bold; padding-right:10px;' />" + " of " + total;
+                }
+                catch(e) {
+                  try{
+                    document.getElementById('navigation_value').innerHTML = ''
+                  }catch(d){}
+                }
 
-  setInterval("showDots();",200);
-  loadMsg();
-</script>
+                setInterval("showDots();",200);
+                loadMsg();
+              </script>
 
 

@@ -1,0 +1,337 @@
+
+
+<tbody class="master">
+  <tr>
+    <!--td colspan="7" style="background-color:#447AA4;height:70px;padding-left:10px;"><b><font size="4">PATIENT MASTER RECORD CARD FOR ARV</font></b></td-->
+    <td colspan="7" style="height:40px;padding-left:10px;border-style:solid;border-width:0px 0px 1px 0px;"><b><font size="4"> Epilepsy Patient Mastercard Version 2</font></b></td>
+  </tr>
+  <tr>
+    <td colspan="2" style="height:30px;padding-left:10px;border-style:solid;border-width:0px 0px 1px 0px;"><b><font size="4"> Zone Name: <%= @data_demo.zone -%></font></b></td>
+    <td colspan="3" style="height:30px;padding-left:10px;border-style:solid;border-width:0px 0px 1px 0px;"><b><font size="4"> Clinic Name and Number:  <%= @data_demo.clinic -%></font></b></td>
+    <td colspan="2" style="height:30px;padding-left:10px;border-style:solid;border-width:0px 0px 1px 0px;"><b><font size="4"> District:  <%= @data_demo.district -%></font></b></td>
+  </tr>
+  <tr valign="top">
+    <td valign="top" colspan="2" style="height:30px;padding-left:10px;border-style:solid;border-width:1px 1px 1px 1px;">
+      <font size="4">Patient/Guardian Details</font>
+      <table width="100%" cellpadding="0">
+        <tr>
+          <td  colspan="1"><%=  "Patient name:" -%></td><td  colspan="3" align="right"><%= @data_demo.name -%></td>
+        </tr>
+        <tr class="master_data">
+          <td width="50%">
+            <%=  "Sex," -%>
+            Height,
+            <%= "Age" -%>
+          </td>
+          <td  width="10%"><%= @data_demo.sex -%></td>
+          <td  width="20%">H : <span style="text-decoration:underline;"><%= @data_demo.init_ht -%></span> CM</td>
+          <td  width="20%"><%= @data_demo.age -%> Yrs &nbsp;
+
+            <%= "DOB:" -%> <%= @data_demo.birth_date -%>
+          </td>
+        </tr>
+        <tr>
+          <td  colspan="1"><%=  "Physical Address:" -%></td><td  colspan="3" align="right"><%= @data_demo.address.to_s -%></td>
+        </tr>
+        <tr class="master_data">
+          <td  colspan="1"><%=  "Guardian Name:" -%></td><td  colspan="3" align="right"><%= @data_demo.guardian -%></td>
+        </tr>
+        <tr>
+          <td  colspan="1">Phone</td><td  colspan="2" align="right">Patient:  <b><%=  PersonAttribute.find(:first, :conditions => ["person_id = ? AND person_attribute_type_id = ?",
+                @data_demo.patient_id, PersonAttributeType.find_by_name("cell phone number").person_attribute_type_id]).value rescue "Not Specified"-%></b><td  colspan="1" align="right">Guardian:&nbsp;</td>
+        </tr>
+        <tr class="master_data">
+          <td  colspan="1"><%=  "Occupation:" -%></td><td  colspan="3" align="right"><%= @data_demo.occupation -%></td>
+        </tr>
+      </table>
+
+    </td>
+    <td colspan="2" style="height:30px;padding-left:10px;border-style:solid;border-width:1px 1px 1px 1px;">
+      <font size="4">Risk Factors</font>
+      <table width="98%">
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">Smoking
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.smoking -%>
+          </td>
+        </tr>
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">Alcohol
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.alcohol -%>
+          </td>
+        </tr>
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">Other Drugs
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.alcohol -%>
+          </td>
+        </tr>
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">Eats Pork
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.pork -%>
+          </td>
+        </tr>
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">Head Banging
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.alcohol -%>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <font size="4" style="height:30px;">&nbsp;</font>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <font size="4" style="height:50px;">&nbsp;</font>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <font size="4" style="height:30px;">Family Medical history</font>
+          </td>
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            Seizure
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.dm -%>
+          </td>
+        </tr>
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            Mental Illness
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.htn -%>
+          </td>
+        </tr>
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            Epilepsy
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.history_asthma -%>&nbsp;
+          </td>
+        </tr>
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">Mental Retardation
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.alcohol -%>
+          </td>
+        </tr>
+      </table>
+    </td>
+    <td colspan="1" style="height:30px;padding-left:10px;border-style:solid;border-width:1px 1px 1px 1px;">
+      <font size="4">Patient History</font>
+      <table width="98%">
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">Any known history of seizure
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.asthma -%>
+          </td>
+        </tr>
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">Previous Head Trauma
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.stroke -%>
+          </td>
+        </tr>
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">Ever had Cysticercosis
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.tb_within_last_two_yrs -%>
+          </td>
+        </tr>
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">Ever had Meningitis
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.hiv_status -%>
+          </td>
+        </tr>
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">Ever had Cerebral Malaria
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.art_status -%>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <font size="4" style="height:30px;">&nbsp;</font>
+          </td>
+        </tr>
+        <tr><td>
+            <font size="4" style="height:30px;">Complications</font>
+          </td>
+        </tr>
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">Burns
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.diagnosis_dm -%>
+          </td>
+        </tr>
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">Injuries
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.diagnosis_htn -%>
+          </td>
+        </tr>
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">Psychosis
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.diagnosis_dm_htn -%>
+          </td>
+        </tr>
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">Hyperactivity
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.diagnosis_asthma -%>
+          </td>
+        </tr>
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">Status Epilepticus
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.diagnosis_stroke -%>
+          </td>
+        </tr>
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">Drug related
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">&nbsp;
+          </td>
+        </tr>
+      </table>
+
+    </td>
+    <td colspan="2" style="height:30px;padding-left:10px;border-style:solid;border-width:1px 1px 1px 1px;">
+      <font size="4">Seizure Type</font>
+      <table width="98%">
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">Tonic Clonic
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.cardiac -%>
+          </td>
+        </tr>
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">Absence
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.mi -%>
+          </td>
+        </tr>
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">Myoclonic
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.funduscopy -%>
+          </td>
+        </tr>
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">Clonic
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.comp_stroke -%>
+          </td>
+        </tr>
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">Tonic
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.tia -%>
+          </td>
+        </tr>
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">Atonic
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.amputation -%>
+          </td>
+        </tr>
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">Simple
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.neuropathy -%>
+          </td>
+        </tr>
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">Complex
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.foot_ulcers -%>
+          </td>
+        </tr>
+        <tr>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">Unclassified
+          </td>
+          <td style="border-style:solid;border-width:0px 0px 1px 1px;">
+            <%= @data_demo.impotence -%>
+          </td>
+        </tr>
+      </table>
+
+      <table width="98%" align="center">
+        <tr style="border-width:0px;height:auto;">
+          <td style="border-width:0px;height:auto;"><%= '&nbsp;'%></td>
+        </tr>
+        <tr>
+          <td style="border-style:solid;border-width:1px 1px 1px 1px;font-size:18px;font-weght:bold;border-color:#0000ff;">
+            Next Appointment Date : <%= @data_demo.appointment_date.split(":")[1] rescue "Not Available" %>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr style="border-style:solid;border-width:1px 1px 1px 1px;font-size:18px;font-weght:bold;border-color:#0000ff;">
+    <td colspan="7">
+      <table width="100%">
+        <tr>
+          <td width="5%">
+            Medication (Initial)
+          </td>
+          <td  width="5%">
+            PHB
+          </td>
+          <td  width="15%">
+            PHT
+          </td>
+          <td  width="15%">
+            CBZ
+          </td>
+          <td  width="15%">
+            SVA
+          </td>
+          <td width="10%">
+            DZ
+          </td>
+          <td  width="10%">
+            Other
+          </td>
+          <td  width="30%">
+            Dosage
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</tbody>

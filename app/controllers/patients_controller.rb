@@ -84,7 +84,7 @@ class PatientsController < ApplicationController
         p.program_encounter_types.collect{|e|
           [
             e.encounter_id, e.encounter.type.name,
-            e.encounter.encounter_datetime.strftime("%H:%M"),
+            (e.encounter.encounter_datetime.strftime("%H:%M") rescue []),
             e.encounter.creator
           ]
         },
@@ -801,11 +801,11 @@ class PatientsController < ApplicationController
     }
 
     @dispensed_order_id = params[:dispensed_order_id]
-    #@reason_for_art_eligibility = PatientService.reason_for_art_eligibility(@patient) rescue nil
-    #@arv_number = PatientService.get_patient_identifier(@patient, 'ARV Number') rescue nil
 
 		@project = get_global_property_value("project.name") rescue "Unknown"
-		
+
+    @advanced = get_global_property_value("prescription.types") rescue "Unknown"
+    
     render :template => 'dashboards/treatment_dashboard', :layout => false
   end
 

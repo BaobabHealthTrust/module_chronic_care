@@ -39,10 +39,10 @@ class ClinicController < ApplicationController
   end
 
 	def programs
-			session[:selected_program] = params[:program] + " PROGRAM"
-			@user_id = params[:user_id]
-			@location_id = params[:location_id]
-			redirect_to "/clinic/index?user_id=#{params[:user_id]}&location_id=#{params[:location_id]}"
+    session[:selected_program] = params[:program] + " PROGRAM"
+    @user_id = params[:user_id]
+    @location_id = params[:location_id]
+    redirect_to "/clinic/index?user_id=#{params[:user_id]}&location_id=#{params[:location_id]}"
 	end
 
   def user_login
@@ -118,48 +118,65 @@ class ClinicController < ApplicationController
 
   def current_center
     if request.post?
-       location = Location.find_by_name(params[:current_center])
-			 current_center = GlobalProperty.find_by_property("current_health_center_name")
+      location = Location.find_by_name(params[:current_center])
+      current_center = GlobalProperty.find_by_property("current_health_center_name")
        
-			 if current_center.nil?
-						current_center = GlobalProperty.new
-						current_center.property = "current_health_center_name"
-						current_center.property_value = params[:current_center]
-						current_center.save
-			 else
-				 current_center = GlobalProperty.find_by_property("current_health_center_name")
-				 current_center.property_value = params[:current_center]
-				 current_center.save
-			 end
+      if current_center.nil?
+        current_center = GlobalProperty.new
+        current_center.property = "current_health_center_name"
+        current_center.property_value = params[:current_center]
+        current_center.save
+      else
+        current_center = GlobalProperty.find_by_property("current_health_center_name")
+        current_center.property_value = params[:current_center]
+        current_center.save
+      end
 
-       current_id = get_global_property_value("current_health_center_id")
-       if current_id.nil?
-						current_id = GlobalProperty.new
-						current_id.property = "current_health_center_id"
-						current_id.property_value = location.id
-						current_id.save
-			 else
-				 current_id = GlobalProperty.find_by_property("current_health_center_id")
-				 current_id.property_value = location.id
-				 current_id.save
-			 end
+      current_id = get_global_property_value("current_health_center_id")
+      if current_id.nil?
+        current_id = GlobalProperty.new
+        current_id.property = "current_health_center_id"
+        current_id.property_value = location.id
+        current_id.save
+      else
+        current_id = GlobalProperty.find_by_property("current_health_center_id")
+        current_id.property_value = location.id
+        current_id.save
+      end
 			redirect_to "/clinic?user_id=#{params[:user_id]}&location_id=#{session[:location_id] || params[:location_id]}"
 		end
   end
 
   def appointment
     if request.post?
-			 appointment = get_global_property_value("auto_set_appointment") rescue nil
-			 if appointment.nil?
-						appointment= GlobalProperty.new
-						appointment.property = "auto_set_appointment"
-						appointment.property_value = params[:appointment]
-						appointment.save
-			 else
-				 appointment = GlobalProperty.find_by_property("auto_set_appointment")
-				 appointment.property_value = params[:appointment]
-				 appointment.save
-			 end
+      appointment = get_global_property_value("auto_set_appointment") rescue nil
+      if appointment.nil?
+        appointment= GlobalProperty.new
+        appointment.property = "auto_set_appointment"
+        appointment.property_value = params[:appointment]
+        appointment.save
+      else
+        appointment = GlobalProperty.find_by_property("auto_set_appointment")
+        appointment.property_value = params[:appointment]
+        appointment.save
+      end
+			redirect_to "/clinic?user_id=#{params[:user_id]}&location_id=#{session[:location_id] || params[:location_id]}"
+		end
+  end
+
+  def prescriptions
+    if request.post?
+      appointment = get_global_property_value("prescription.types") rescue nil
+      if appointment.nil?
+        appointment= GlobalProperty.new
+        appointment.property = "prescription.types"
+        appointment.property_value = params[:prescription]
+        appointment.save
+      else
+        appointment = GlobalProperty.find_by_property("prescription.types")
+        appointment.property_value = params[:prescription]
+        appointment.save
+      end
 			redirect_to "/clinic?user_id=#{params[:user_id]}&location_id=#{session[:location_id] || params[:location_id]}"
 		end
   end
@@ -167,34 +184,34 @@ class ClinicController < ApplicationController
 
 	def vitals
 	  if request.post?
-			 lab_results = get_global_property_value("vitals") rescue nil
-			 if lab_results.nil?
-						lab_results = GlobalProperty.new
-						lab_results.property = "vitals"
-						lab_results.property_value = params[:vitals].join(";")
-						lab_results.save
-			 else
-				 lab_results = GlobalProperty.find_by_property("vitals")
-				 lab_results.property_value = params[:vitals].join(";")
-				 lab_results.save
-			 end
+      lab_results = get_global_property_value("vitals") rescue nil
+      if lab_results.nil?
+        lab_results = GlobalProperty.new
+        lab_results.property = "vitals"
+        lab_results.property_value = params[:vitals].join(";")
+        lab_results.save
+      else
+        lab_results = GlobalProperty.find_by_property("vitals")
+        lab_results.property_value = params[:vitals].join(";")
+        lab_results.save
+      end
 			redirect_to "/clinic?user_id=#{params[:user_id]}&location_id=#{session[:location_id] || params[:location_id]}"
 		end
 	end
 
 	def lab_results
 	  if request.post?
-			 lab_results = get_global_property_value("lab_results") rescue nil
-			 if lab_results.nil?
-						lab_results = GlobalProperty.new
-						lab_results.property = "lab_results"
-						lab_results.property_value = params[:test_type_values].join(";")
-						lab_results.save
-			 else
-				 lab_results = GlobalProperty.find_by_property("lab_results")
-				 lab_results.property_value = params[:test_type_values].join(";")
-				 lab_results.save
-			 end
+      lab_results = get_global_property_value("lab_results") rescue nil
+      if lab_results.nil?
+        lab_results = GlobalProperty.new
+        lab_results.property = "lab_results"
+        lab_results.property_value = params[:test_type_values].join(";")
+        lab_results.save
+      else
+        lab_results = GlobalProperty.find_by_property("lab_results")
+        lab_results.property_value = params[:test_type_values].join(";")
+        lab_results.save
+      end
 			redirect_to "/clinic?user_id=#{params[:user_id]}&location_id=#{session[:location_id] || params[:location_id]}"
 		end	
 	end

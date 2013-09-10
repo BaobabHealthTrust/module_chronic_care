@@ -62,10 +62,19 @@
   </head>
   <body>
   <base target="_parent">
-  <table class="mastercard" id="demographics">
-    <%= render(:partial => "mastercard_demographics", :object => @data) %>
-  </table>
-  <%= render(:partial => "mastercard_visits", :object => @previous_visits) %>
+  <% if current_program == "EPILEPSY PROGRAM" %>
+    <table class="mastercard" id="demographics">
+
+      <%= render(:partial => "epilepsy_mastercard_demographics", :object => @data) %>
+    </table>
+    <%= render(:partial => "epilepsy_mastercard_visits", :object => @previous_visits) %>
+  <% else %>
+    <table class="mastercard" id="demographics">
+
+      <%= render(:partial => "mastercard_demographics", :object => @data) %>
+    </table>
+    <%= render(:partial => "mastercard_visits", :object => @previous_visits) %>
+  <% end %>
   </base>
 </body>
 </html>

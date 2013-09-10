@@ -198,7 +198,8 @@
 <%	@concept = []
 @regimen_concepts.each do |reg|
   @concept << reg.concept.fullname
-end %>
+end
+@concept = @concept.sort.uniq %>
 <form method='post' action="/encounters/create">
   <input type='hidden' name='program' value='CHRONIC CARE PROGRAM' />
   <input type='hidden' name='encounter_type' value='GENERAL HEALTH' />

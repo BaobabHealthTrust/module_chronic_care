@@ -59,12 +59,11 @@
 				</select>
 
 				<select id="links">
-					<optgroup value='/prescriptions/prescribe?user_id=<%=  @user["user_id"] %>&patient_id=<%= @patient.id -%>' label="Drugs">Drugs</optgroup>
 
-					<% if advanced_prescription_interface %>
-						<option value='/prescriptions/generic_advanced_prescription?user_id=<%=  @user["user_id"] %>& patient_id=<%= @patient.id -%>'>Other drugs</option>
+					<% if @advanced.upcase == "ADVANCED PRESCRIPTION" %>
+						<optgroup value='/prescriptions/generic_advanced_prescription?user_id=<%=  @user["user_id"] %>&patient_id=<%= @patient.id -%>' label="Drugs">Drugs</option>
 					<% else %>
-						<option value='/prescriptions/auto?user_id=<%=  @user["user_id"] %>&patient_id=<%= @patient.id -%>'>Other drugs</option>
+						<optgroup value='/prescriptions/prescribe?user_id=<%=  @user["user_id"] %>&patient_id=<%= @patient.id -%>' label="Drugs">Drugs</optgroup>
 					<% end %>
 					<% if @dispense.to_s.downcase == "false" %>
 					 <optgroup value='/dispensations/new?user_id=<%=  @user["user_id"] %>&patient_id=<%= @patient.id -%>' label="Dispense">Dispense</optgroup>
