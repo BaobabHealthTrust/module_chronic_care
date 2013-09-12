@@ -10,6 +10,7 @@ class ReportController < ApplicationController
 	end
 	
 	def ccc_register
+    @user = User.find(params[:user_id]) rescue []
 		@logo = CoreService.get_global_property_value('logo').to_s
 		@report_name = "Chronic Care Clinic Register"
 		@total = []
@@ -29,7 +30,7 @@ class ReportController < ApplicationController
 			(@location[pat.address].nil?) ? @location[pat.address] = 1 : @location[pat.address] += 1
 			@total << [pat.name, sex, pat.age, pat.address]
 		end
-		
+		render :layout => 'application'
 	end
 
 	def hypertension_report

@@ -1,19 +1,19 @@
 <html>
   <head>
-    <%= javascript_include_tag "prototype" %>
+    <%= stylesheet_link_tag "dashboard" %>
     <%= javascript_include_tag 'jquery' %>
-    <%= stylesheet_link_tag 'extra_buttons' %>
-    <%= javascript_include_tag 'jquery_data_table.js' %>
     <script>
       jQuery(document).ready(function($) {
-          
-    document.getElementById("logout").className = "button navButton green" 
+        document.getElementById('content').style = 'position : relative; width : 98%; margin-left : -49%;'
+        document.getElementById('description').style = 'color:#777;position:absolute;margin-top:-70px;'
+        $('#finish').click(function() {
+                window.location = '/clinic/index?user_id=<%=params[:user_id]%>&location_id=<%params[:location_id]%>'
+            })
 
-  })
+      })
     </script>
-
     <style>
-#backspace{
+      #backspace{
         position:absolute;
         left:100px;
         bottom:2px;
@@ -31,7 +31,7 @@
         left:470px;
         bottom:2px;
       }
-       #num{
+      #num{
         position:absolute;
         left:470px;
         bottom:2px;
@@ -51,7 +51,7 @@
       }
     </style>
     <style>
-        div {
+      div {
         -moz-user-select: none;
       }
       .basic_span {
@@ -65,13 +65,13 @@
         float:left
       }
 
-	  .odd {
-		background-color: #eeeef7;
-	  }
-	  .even {
-		background-color: #fff;
-	  }
-	  
+      .odd {
+        background-color: #eeeef7;
+      }
+      .even {
+        background-color: #fff;
+      }
+
       #table_id {
         width: 100%;
       }
@@ -104,21 +104,21 @@
       #table_id_length{
         display:none;
       }
-       #table_id_paginate{
+      #table_id_paginate{
         display:none;
       }
       #num{ display:none; }
       #char{ display:none; }
 
-	  div.scrollTableContainer {
-		border-style:solid;
-		height:68%;
-		width: 99%;
-		left: 10px;
-		overflow: scroll;
+      div.scrollTableContainer {
+        border-style:solid;
+        height:68%;
+        width: 99%;
+        left: 10px;
+        overflow: auto;
         position: absolute;
         top: 152px;
-	  }
+      }
     </style>
   </head>
   <body >
@@ -128,12 +128,12 @@
     <b style="position:relative; top:0px;margin-left:75px"><%= @report_name.humanize.split.map{|w| w.capitalize}.join(' ') %></b><br />
 
 
-   
-    
+
+
 
     <div   class='scrollTableContainer'>
-	   <table width="100%">
-		<!--tr style="color: #fff; background-color: #6281a7;">
+      <!--table width="100%">
+        <tr style="color: #fff; background-color: #6281a7;">
 		  <th colspan="2">
 			Total By Gender
 		  </th>
@@ -146,32 +146,32 @@
 		  <td>Female : <%=  @gender["F"] %></td>
 		  <td colspan="2">
 			<table >
-			  <% @location.each do | loc, num|  %>
-				<% if ! loc.blank? %>
-				  <tr>
+        <% @location.each do | loc, num|  %>
+          <% if ! loc.blank? %>
+                                          <tr>
                                     <td align="center">
-					  <%= loc %>
-					</td>
-					<td align="center">
-					  <%= num %>
-					</td>
-				  </tr>
-				<% end %>
-			  <% end %>
+            <%= loc %>
+                                                </td>
+                                                <td align="center">
+            <%= num %>
+                                                </td>
+                                          </tr>
+          <% end %>
+        <% end %>
 			</table>
 		  </td>
-		</tr-->
-	 </table>
-      <table>
+		</tr>
+      </table-->
+      <table width="100%">
         <thead>
           <tr style="color: #fff; background-color: #6281a7;">
             <th align="left">Name<p />
             </th>
             <th>Gender  <p />
             </th>
-			<th>Age  <p />
+            <th>Age  <p />
             </th>
-			<th>Residence <p />
+            <th>Residence <p />
             </th>
         </thead>
         <tbody>
@@ -179,14 +179,14 @@
             <tr class="<%= cycle('even', 'odd') %>">
               <td width="20%"> <span style="display:block; width:90%;"> <%= "#{patient[0]}" %> </span> </td>
               <td align="center"  width="5%" align="center"> <%= "<span > #{patient[1]} </span> " %></td>
-			  <td  width="20%" align="center"><%= "<span > #{patient[2]} </span> " %></td>
-			  <td  width="20%" align="center"><%= "<span > #{patient[3]} </span> " %></td>
+              <td  width="20%" align="center"><%= "<span > #{patient[2]} </span> " %></td>
+              <td  width="20%" align="center"><%= "<span > #{patient[3]} </span> " %></td>
             </tr>
           <% end %>
 
         </tbody>
       </table>
-	 
+
     </div>
     <div id="keypad">
       <span class="keypad">
@@ -194,6 +194,11 @@
     </center>
 
   </div>
-
+  <div id="footer" class="dark">
+    <div id="buttons" class="buttons" style="top:0px">
+      <button id="finish" class="green"><span>Finish</span></button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

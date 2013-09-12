@@ -378,7 +378,7 @@ class ProtocolPatientsController < ApplicationController
     #@occupation = Vitals.occupation(@patient)
 
 		if @current_program == "EPILEPSY PROGRAM"
-      @regimen_concepts = MedicationService.hypertension_dm_drugs
+      @regimen_concepts = MedicationService.epilepsy_drugs
       @first_visit = is_first_epilepsy_clinic_visit(@patient.id)
       @mrdt = Vitals.current_vitals(@patient, "RDT or blood smear positive for malaria") rescue nil
       unless @mrdt.blank?

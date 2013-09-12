@@ -9,6 +9,13 @@
     height: 610px;
   }
 
+  #tt_page_what_patient_experienced_before_seizure .inputFrameClass {
+    height: 610px;
+  }
+  #tt_page_what_patient_experienced_before_seizure #viewport {
+    height: 540px;
+  }
+
   #tt_page_what_patient_experienced_during_seizure .inputFrameClass {
     height: 610px;
   }
@@ -147,7 +154,7 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
       </tr>
       <tr>
         <td>
-                                  Year of first Seizure
+          Year of first Seizure
         </td>
         <td>
           <% if @first_visit == true %>
@@ -157,7 +164,7 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
                    absoluteMax = '<%= Date.today.year %>'
                    absoluteMin = '<%= Date.today.year.to_i - @patient.age.to_i %>'
                    field_type='number'
-                    tt_onUnLoad = "ageOfFirstSeizure()"
+                   tt_onUnLoad = "ageOfFirstSeizure()"
                    tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"
                    pos='7'
                    tt_onLoad = "showCategory('Clinic Visit')"/>
@@ -166,7 +173,7 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
         </tr>
         <tr>
           <td>
-                                    Age of first Seizure
+            Age of first Seizure
           </td>
           <td>
             <input type='hidden'
@@ -178,7 +185,7 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
       </tr>
       <tr>
         <td>
-                                  Cause of Seizure
+          Cause of Seizure
         </td>
         <td>
           <select id='1.1.9'
@@ -189,33 +196,32 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
                   tt_onLoad ="__$('keyboard').style.display = 'none';showCategory('Clinic Visit')"
                   field_type="text">
             <option></option>
-            <option value='alcohol or drugs'>alcohol or drugs</option>
-            <option value='head or brain trauma'>head or brain trauma</option>
-            <option value='progressive brain disease'>progressive brain disease</option>
-            <option value='hemimegalencephaly'>hemimegalencephaly</option>
-            <option value='stroke'>stroke</option>
-            <option value='brain tumors'>brain tumors</option>
-            <option value='cortical dysplasia'>cortical dysplasia</option>
-            <option value='mesial temporal sclerosis'>mesial temporal sclerosis</option>
-            <option value='drug withdrawal'>drug withdrawal</option>
-            <option value='medications'>medications</option>
+            <option value='head or brain trauma'>Head or brain trauma</option>
+            <option value='progressive brain disease'>Progressive brain disease</option>
+            <option value='hemimegalencephaly'>Hemimegalencephaly</option>
+            <option value='stroke'>Stroke</option>
+            <option value='brain tumors'>Brain tumors</option>
+            <option value='cortical dysplasia'>Cortical dysplasia</option>
+            <option value='mesial temporal sclerosis'>Mesial temporal sclerosis</option>
+            <option value='drug/alcohol withdrawal'>Drug/alcohol withdrawal</option>
+            <option value='medications'>Medications</option>
 
-            <option value='birth trauma'>birth trauma</option>
-            <option value='Alzheimer's disease'>Alzheimer's disease</option>
-            <option value='neurological problems'>neurological problems</option>
-            <option value='infection'>infection</option>
-            <option value='fever/infection'>fever/infection</option>
-            <option value='metabolic or chemical imbalances in the body'>metabolic or chemical imbalances in the body</option>
+            <option value='birth trauma'>Birth trauma</option>
+            <option value="Alzheimer's disease">Alzheimer's disease</option>
+            <option value='neurological problems'>Neurological problems</option>
+            <option value='infection'>Infection</option>
+            <option value='fever/infection'>Fever/infection</option>
+            <option value='metabolic or chemical imbalances in the body'>Metabolic or chemical imbalances in the body</option>
             <option value='Menstruation'>Menstruation</option>
-            <option value='congenital (present at birth) problems or conditions'>congenital (present at birth) problems or conditions</option>
-            <option value='genetic factors'>genetic factors</option>
-            <option value='unknown'>unknown</option>
+            <option value='congenital (present at birth) problems or conditions'>Congenital (present at birth) problems or conditions</option>
+            <option value='genetic factors'>Genetic factors</option>
+            <option value='unknown'>Unknown</option>
           </select>
         </td>
       </tr>
       <tr>
         <td>
-                                  How often seizure occurs
+          How often seizure occurs
         </td>
         <td>
           <select id='seizure_occurance'
@@ -232,7 +238,7 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
       </tr>
       <tr>
         <td>
-                                  Duration
+          Duration
         </td>
         <td>
           <select id='seizure_occurance'
@@ -243,17 +249,16 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
                   field_type="text">
             <option></option>
             <option value='a few seconds'>A few seconds</option>
-            <option value='Within 1 minute'>Within 1 minute</option>
-            <option value='Within 2 minutes'>Within 2 minutes</option>
-            <option value='Within 3 minutes'>Within 3 minutes</option>
-            <option value='Within 4 minutes'>Within 4 minutes</option>
+            <option value='1 minute'>1 minute</option>
+            <option value='less than 5 minutes'>less than 5 minutes</option>
             <option value='More than 5 minutes'>More than 5 minutes</option>
+            <option value='more than 30 minutes'>More than 30 minutes</option>
           </select>
         </td>
       </tr>
       <tr>
         <td>
-                                  How often seizure occurs
+          How often seizure occurs
         </td>
         <td>
           <select id='1.1.10'
@@ -271,7 +276,7 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
       </tr>
       <tr>
         <td>
-          <select id='1.1.23' 
+          <select id='1.1.23'
                   name='concept[Seizure medicine taken before][]'
                   helpText='Has patient taken Clinical medicine for seizure before'
                   pos='13'
@@ -286,7 +291,7 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
         @regimen_concepts.each do |reg|
           @concept << reg.concept.fullname
         end
-      @concept = @concept.sort.uniq %>
+        @concept = @concept.sort.uniq %>
 
         <td>
           <%= select_tag "treatment", options_for_select(@concept),
@@ -301,7 +306,7 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
         </td>
 
         <td>
-          <select id='1.1.24' 
+          <select id='1.1.24'
                   name='concept[Herbal traditional medications]'
                   helpText='Has patient taken traditional medicine for seizure before'
                   pos='13'
@@ -316,10 +321,10 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
       </tr>
 
       <td>
-                                  Head injuries
+        Head injuries
       </td>
       <td>
-        <select id='1.1.11' 
+        <select id='1.1.11'
                 name='concept[Head injury]'
                 helpText='Patient has had head injuries?'
                 pos='13'
@@ -332,10 +337,10 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
       </tr>
       <tr>
         <td>
-                                  Head surgery
+          Head surgery
         </td>
         <td>
-          <select id='1.1.12' 
+          <select id='1.1.12'
                   name='concept[surgery]'
                   helpText='Patient has had head surgery?'
                   pos='14'
@@ -347,37 +352,64 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
         </td>
       </tr>
 
-      <tr>
+      <!--tr>
         <td>
                                   Menstrual History
         </td>
         <td>
-          <% if sex == 'F' and  @patient.age > 14 %>
-            <select id='1.1.14'
-                    name='concept[Menstrual History][]'
-                    helpText='Menstrual History'
-                    pos='16'
-                    tt_onLoad ="__$('keyboard').style.display = 'none';showCategory('Clinic Visit')"
-                    multiple="multiple"
-                    optional="true"
-                    field_type="text">
-              <option></option>
-              <option value='Rising feeling in the stomach'>Rising feeling in the stomach</option>
-              <option value='Darkening in eyes'>Darkening in eyes</option>
-              <option value='Heart palpitations'>Heart palpitations</option>
-              <option value='Strange Smell'>Strange Smell</option>
-              <option value='Headeche'>Headeche</option>
-              <option value='Dizziness'>Dizziness</option>
-              <option value='Jerking/witching'>Jerking/witching</option>
-              <option value='Tingling'>Tingling</option>
-              <option value='Numbness'>Numbness</option>
-            </select>
-          <% end %>
+      <% if sex == 'F' and  @patient.age > 14 %>
+              <select id='1.1.14'
+                      name='concept[Menstrual History][]'
+                      helpText='Menstrual History'
+                      pos='16'
+                      tt_onLoad ="__$('keyboard').style.display = 'none';showCategory('Clinic Visit')"
+                      multiple="multiple"
+                      optional="true"
+                      field_type="text">
+                <option></option>
+                <option value='Rising feeling in the stomach'>Rising feeling in the stomach</option>
+                <option value='Darkening in eyes'>Darkening in eyes</option>
+                <option value='Heart palpitations'>Heart palpitations</option>
+                <option value='Strange Smell'>Strange Smell</option>
+                <option value='Headeche'>Headeche</option>
+                <option value='Dizziness'>Dizziness</option>
+                <option value='Jerking/twitching'>Jerking/witching</option>
+                <option value='Tingling'>Tingling</option>
+                <option value='Numbness'>Numbness</option>
+              </select>
+      <% end %>
+        </td>
+      </tr -->
+      <tr>
+        <td>
+          what the patient experienced during seizure
+        </td>
+        <td>
+          <select id='before'
+                  name='concept[what patient experienced before seizure][]'
+                  helpText='What patient experienced before seizure'
+                  pos='17'
+                  multiple="multiple"
+                  optional="true"
+                  tt_onLoad ="__$('keyboard').style.display = 'none';showCategory('Clinic Visit')"
+                  field_type="text" >
+            <option></option>
+            <option value='No memory recall'>No memory recall</option>
+            <option value='Rising feeling in the stomach'>Rising feeling in the stomach</option>
+            <option value='Darkening in eyes'>Darkening in eyes</option>
+            <option value='Heart palpitations'>Heart palpitations</option>
+            <option value='Strange Smell'>Strange Smell</option>
+            <option value='Headeche'>Headeche</option>
+            <option value='Dizziness'>Dizziness</option>
+            <option value='Jerking/twitching'>Jerking/twitching</option>
+            <option value='Tingling'>Tingling</option>
+            <option value='Numbness'>Numbness</option>
+          </select>
         </td>
       </tr>
       <tr>
         <td>
-                                  what the patient experienced during seizure
+          what the patient experienced during seizure
         </td>
         <td>
           <select id='1.1.15'
@@ -389,13 +421,14 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
                   tt_onLoad ="__$('keyboard').style.display = 'none';showCategory('Clinic Visit')"
                   field_type="text" >
             <option></option>
+            <option value='No memory recall'>No memory recall</option>
             <option value='Rising feeling in the stomach'>Rising feeling in the stomach</option>
             <option value='Darkening in eyes'>Darkening in eyes</option>
             <option value='Heart palpitations'>Heart palpitations</option>
             <option value='Strange Smell'>Strange Smell</option>
             <option value='Headeche'>Headeche</option>
             <option value='Dizziness'>Dizziness</option>
-            <option value='Jerking/witching'>Jerking/witching</option>
+            <option value='Jerking/twitching'>Jerking/twitching</option>
             <option value='Tingling'>Tingling</option>
             <option value='Numbness'>Numbness</option>
           </select>
@@ -403,7 +436,7 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
       </tr>
       <tr>
         <td>
-                                  what the patient experienced after seizure
+          what the patient experienced after seizure
         </td>
         <td>
           <select id='1.1.16'
@@ -415,7 +448,7 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
                   tt_onLoad ="__$('keyboard').style.display = 'none';showCategory('Clinic Visit')"
                   field_type="text" >
             <option></option>
-            <option value='Loss of memory'>Loss of memory</option>
+            <option value='No memory recall'>No memory recall</option>
             <option value='Tiredness'>Tiredness</option>
             <option value='Muscle aches'>Muscle aches</option>
             <option value='Weakness'>Weakness</option>
@@ -425,14 +458,14 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
       </tr>
       <tr>
         <td>
-                                  witness was available before the seizure
+          witness was available before the seizure
         </td>
         <td>
           <select id='1.1.17'
                   name='concept[was witness available before seizure?]'
                   helpText='Witness was available before the seizure '
                   pos='19'
-                   tt_onLoad = "showCategory('Clinic Visit')">
+                  tt_onLoad = "showCategory('Clinic Visit')">
             <option></option>
             <option value='No'>No</option>
             <option value='Yes'>Yes</option>
@@ -441,7 +474,7 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
       </tr>
       <tr>
         <td>
-                                  What witness saw
+          What witness saw
         </td>
         <td>
           <select id='1.1.18'
@@ -464,14 +497,14 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
       </tr>
       <tr>
         <td>
-                                  witness was available during seizure
+          witness was available during seizure
         </td>
         <td>
           <select id='1.1.19'
                   name='concept[was witness available during seizure?]'
                   helpText='Witness was available during seizure '
                   pos='21'
-                   tt_onLoad = "showCategory('Clinic Visit')">
+                  tt_onLoad = "showCategory('Clinic Visit')">
             <option></option>
             <option value='No'>No</option>
             <option value='Yes'>Yes</option>
@@ -480,7 +513,7 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
       </tr>
       <tr>
         <td>
-                                  What witness saw
+          What witness saw
         </td>
         <td>
           <select id='1.1.20'
@@ -493,30 +526,30 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
                   tt_onLoad ="__$('keyboard').style.display = 'none';showCategory('Clinic Visit')"
                   field_type="text" >
             <option></option>
-            <option value='Bitting tongue or lips'>Bitting tongue or lips</option>
+            <option value='Biting of tongue or lips'>Biting of tongue or lips</option>
             <option value='Incontinence of stool/urine'>Incontinence of stool/urine</option>
             <option value='Foaming'>Foaming</option>
             <option value='Cyanosis'>Cyanosis</option>
-            <option value='Noisy /labored breathing'>Noisy /labored breathing</option>
+            <option value='Noisy /laboured breathing'>Noisy /laboured breathing</option>
             <option value='Rhythmical of jerk in the trunk'>Rhythmical of jerk in the trunk</option>
             <option value='Movement/jerking of limbs'>Movement/jerking of limbs</option>
             <option value='Facial twitching'>Facial twitching</option>
             <option value='Fall'>Fall</option>
-            <option value='CLoss of consciousness'>CLoss of consciousness</option>
+            <option value='Loss of consciousness'>Loss of consciousness</option>
             <option value='Stiffening or limpness of the body'>Stiffening or limpness of the body</option>
           </select>
         </td>
       </tr>
       <tr>
         <td>
-                                  witness was available after seizure
+          witness was available after seizure
         </td>
         <td>
           <select id='1.1.21'
                   name='concept[was witness available after seizure?]'
                   helpText='Witness was available after seizure '
                   pos='23'
-                   tt_onLoad = "showCategory('Clinic Visit')">
+                  tt_onLoad = "showCategory('Clinic Visit')">
             <option></option>
             <option value='No'>No</option>
             <option value='Yes'>Yes</option>
@@ -525,7 +558,7 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
       </tr>
       <tr>
         <td>
-                                  What witness saw
+          What witness saw
         </td>
         <td>
           <select id='1.1.22'

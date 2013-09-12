@@ -44,12 +44,12 @@
 		</tr>
 		<tr>
 			<td>
-				Patient epileptic 
+				Confirm diagnosis of epilepsy
 			</td>
 			<td>
 <select id='1.1.3' 
 		name='concept[Known epileptic]'
-		helpText='Patient epileptic '
+		helpText='Confirm diagnosis of epilepsy'
 		pos='3'
 		 tt_onload="showCategory('Treatment')">
 <option></option>
@@ -71,7 +71,7 @@
 		 tt_onload="showCategory('Treatment')">
 <option></option>
 <option value='Generalised'>Generalised Epilepsy</option>
- <option value='Partial'>Partial epilepsy</option>
+ <option value='Focal'>Focal epilepsy</option>
  </select>
 			</td>
 
@@ -96,10 +96,10 @@
 				Partial epilepsy? 
 			</td>
 			<td>
-<select id='1.1.5' name='concept[Partial epilepsy]' 
+<select id='1.1.5' name='concept[Focal]'
 		helpText='Partial epilepsy type? '
 		pos='5'
-		condition='$("1.1.4").value == "Partial"'
+		condition='$("1.1.4").value == "Focal"'
 		 tt_onload="showCategory('Treatment')" >
 <option></option>
 <option value='Complex'>Complex</option>
@@ -115,7 +115,7 @@
 <select id='1.1.6' name='concept[Condition]' helpText='Condition to treat?' pos='6'  condition='$("1.1.3").value == "No"'
 		 tt_onload="showCategory('Treatment')">
 <option></option>
-<option value='Sychogenic'>Sychogenic</option>
+<option value='Psychogenic'>Psychogenic</option>
  <option value='Febrile seizure'>Febrile seizure</option>
  <option value='Syncope'>Syncope</option>
  </select>

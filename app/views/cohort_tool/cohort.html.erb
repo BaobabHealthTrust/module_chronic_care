@@ -4,8 +4,19 @@
   <head>
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
       <meta content="utf-8" http-equiv="encoding">
-        <%= javascript_include_tag "prototype" %>
+        <%= stylesheet_link_tag "dashboard" %>
         <%= stylesheet_link_tag "cohort" %>
+        <%= javascript_include_tag 'jquery' %>
+        <script>
+          jQuery(document).ready(function($) {
+            document.getElementById('content').style = 'position : relative; width : 98%; margin-left : -49%;'
+            document.getElementById('description').style = 'color:#777;position:absolute;margin-top:-70px;'
+            $('#finish').click(function() {
+              window.location = '/clinic/index?user_id=<%=params[:user_id]%>&location_id=<%params[:location_id]%>'
+            })
+
+          })
+        </script>
         <script>
           var tt_cancel_destination = "/"
 
@@ -205,371 +216,356 @@
         <title>Cohort<%= Location.current_health_center.name + "  " + @quarter %></title>
         </head>
         <body>
+          <%= image_tag(@logo,:class=>"logo")%>
 
+          <br /><b style="width:221px;"> <%= Location.current_health_center.name + " : " + @quarter %></b>
+           <br /> <b style="width:221px;">Start Date: <%= @specified_period[0].to_date.strftime("%A %d %B, %Y") %></b>
+           <br /> <b style="width:221px;">End Date: <%= @specified_period[1].to_date.strftime("%A %d %B, %Y") %></b>
 
-          <br />
-          <table>
-            <tr>
-              <td  style="text-align:left;border-width:0px 0px 0px 0px"><%= image_tag(@logo,:class=>"logo")%></td>
-              <td  style="text-align:left;border-width:0px 0px 0px 0px">
-                <table>
+            <div class='scrollTableContainer'>
+              <table cellspacing='0' align="center" width="98%" height="95%">
+                <thead>
                   <tr>
-                    <td  style="text-align:left;border-width:0px 0px 0px 0px">
-                      <h2><%= Location.current_health_center.name + " : " + @quarter %></h2>
-                      <h2>Start Date: <%= @specified_period[0].to_date.strftime("%A %d %B, %Y") %> </h2>
-                      <h2> End Date: <%= @specified_period[1].to_date.strftime("%A %d %B, %Y") %></h2>
-                    </td>
+
+                    <th style = "text-align:left;">PATIENT'S REGISTRATION DETAILS</th>
+                    <th>NEWLY REGISTRATED IN quarter</th>
+                    <th>CUMULATED EVER REGISTRATED</th>
                   </tr>
-                </table>
-              </td>
-            </tr>
-          </table>
+                </thead>
+                <tbody>
+                  <tr>
+
+                    <td style="text-align:left;">Total registrated</td>
+                    <td><%=  @total_registered %></td>
+                    <td><%=  @total_ever_registered %></td>
+                  </tr>
+
+                  <tr class = 'row_break'>
+
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                  </tr>
+
+                  <tr class = 'row_break'>
+
+                    <td style="text-align:left;border-width:1px 0px 0px 1px">Males</td>
+                    <td style="border-width:1px 1px 1px 1px"><%=  @total_men_registered %></td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @total_men_ever_registered %></td>
+                  </tr>
+                  <tr class = 'row_break'>
+
+                    <td style="text-align:left;border-width:0px 0px 1px 1px">Females</td>
+                    <td style="border-width:1px 1px 1px 1px"><%=  @total_women_registered %></td>
+                    <td style="border-width:1px 1px 1px 1px"><%=  @total_women_ever_registered %></td>
+                  </tr>
+
+                  <tr class = 'row_break'>
+
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                  </tr>
+                  <tr class = 'row_break heading'>
+                    <td colspan="3" style="text-align:center;border-width:0px 0px 0px 0px">Outcomes</td>
+                  </tr>
+                  <tr class = 'row_break'>
+
+                    <td style="text-align:left;border-width:1px 0px 0px 1px">Alive and on treatment</td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @alive %></td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @alive_ever %></td>
+                  </tr>
+                  <tr class = 'row_break'>
+
+                    <td style="text-align:left;border-width:0px 0px 0px 1px">Dead</td>
+                    <td style="border-width:1px 1px 1px 1px"><%=@dead %></td>
+                    <td style="border-width:1px 1px 1px 1px"><%=@dead_ever %></td>
+                  </tr>
+                  <tr class = 'row_break'>
 
-          <br />
-
-
-
-
-          <div class='scrollTableContainer'>
-            <table cellspacing='0' align="center" width="98%" height="95%">
-              <thead>
-                <tr>
-
-                  <th style = "text-align:left;">PATIENT'S REGISTRATION DETAILS</th>
-                  <th>NEWLY REGISTRATED IN quarter</th>
-                  <th>CUMULATED EVER REGISTRATED</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-
-                  <td style="text-align:left;">Total registrated</td>
-                  <td><%=  @total_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
-                </tr>
-
-                <tr class = 'row_break'>
-
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
-                </tr>
-
-                <tr class = 'row_break'>
+                    <td style="text-align:left;border-width:0px 0px 0px 1px">Defaulters</td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @defaulters %></td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @defaulters_ever %></td>
+                  </tr>
+                  <tr class = 'row_break'>
 
-                  <td style="text-align:left;border-width:1px 0px 0px 1px">Males</td>
-                  <td style="border-width:1px 1px 1px 1px"><%=  @total_men_registered %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @total_men_ever_registered %></td>
-                </tr>
-                <tr class = 'row_break'>
-
-                  <td style="text-align:left;border-width:0px 0px 1px 1px">Females</td>
-                  <td style="border-width:1px 1px 1px 1px"><%=  @total_women_registered %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%=  @total_women_ever_registered %></td>
-                </tr>
-
-                <tr class = 'row_break'>
-
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
-                </tr>
-                <tr class = 'row_break heading'>
-                  <td colspan="3" style="text-align:center;border-width:0px 0px 0px 0px">Outcomes</td>
-                </tr>
-                <tr class = 'row_break'>
+                    <td style="text-align:left;border-width:0px 0px 0px 1px">Transfer Out</td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @transfer_out %></td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @transfer_out_ever %></td>
+                  </tr>
+                  <tr class = 'row_break'>
 
-                  <td style="text-align:left;border-width:1px 0px 0px 1px">Alive and on treatment</td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @alive %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @alive_ever %></td>
-                </tr>
-                <tr class = 'row_break'>
+                    <td style="text-align:left;border-width:0px 0px 1px 1px">Stop Treatment</td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @stopped_treatment %></td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @stopped_treatment_ever %></td>
+                  </tr>
+
+                  <tr class = 'row_break'>
+
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                  </tr>
+
+                  <tr class = 'row_break heading'>
+                    <td align="center" colspan="3">Treatment Of Those Who Are Alive And On Treatment</td>
+                  </tr>
+
+
+
+                  <tr class = 'row_break'>
+
+                    <td style="text-align:left;border-width:1px 0px 0px 1px">Diet only</td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @on_diet %></td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @on_diet_ever %></td>
+                  </tr>
+                  <tr class = 'row_break'>
+
+                    <td style="text-align:left;border-width:0px 0px 0px 1px">Oral hypoglycaemic agents only</td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @oral_treatments %></td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @oral_treatments_ever %></td>
+                  </tr>
+                  <tr class = 'row_break'>
+
+                    <td style="text-align:left;border-width:0px 0px 0px 1px">Insulin only</td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @insulin %></td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @insulin_ever %></td>
+                  </tr>
+
+                  <tr class = 'row_break'>
+
+                    <td style="text-align:left;border-width:0px 0px 0px 1px">Insulin and oral hypoglycaemic agents</td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @oral_and_insulin %></td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @oral_and_insulin_ever %></td>
+                  </tr>
+
+                  <tr class = 'row_break'>
+
+                    <td style="text-align:left;border-width:0px 0px 0px 1px">Metformin</td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @metformin %></td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @metformin_ever %></td>
+                  </tr>
+
+                  <tr class = 'row_break'>
+
+                    <td style="text-align:left;border-width:0px 0px 0px 1px">Glibenclamide</td>
+                    <td style="border-width:1px 0px 1px 1px"><%= @glibenclamide %></td>
+                    <td style="border-width:1px 0px 1px 1px"><%= @glibenclamide_ever %></td>
+                  </tr>
 
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">Dead</td>
-                  <td style="border-width:1px 1px 1px 1px"><%=@dead %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%=@dead_ever %></td>
-                </tr>
-                <tr class = 'row_break'>
+                  <tr class = 'row_break'>
 
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">Defaulters</td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @defaulters %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @defaulters_ever %></td>
-                </tr>
-                <tr class = 'row_break'>
+                    <td style="text-align:left;border-width:0px 0px 0px 1px">Lente Insulin</td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @lente_insulin %></td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @lente_insulin_ever %></td>
+                  </tr>
 
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">Transfer Out</td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @transfer_out %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @transfer_out_ever %></td>
-                </tr>
-                <tr class = 'row_break'>
+                  <tr class = 'row_break'>
 
-                  <td style="text-align:left;border-width:0px 0px 1px 1px">Stop Treatment</td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @stopped_treatment %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @stopped_treatment_ever %></td>
-                </tr>
-
-                <tr class = 'row_break'>
-
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
-                </tr>
-
-                <tr class = 'row_break heading'>
-                  <td align="center" colspan="3">Treatment Of Those Who Are Alive And On Treatment</td>
-                </tr>
-
-
-
-                <tr class = 'row_break'>
-
-                  <td style="text-align:left;border-width:1px 0px 0px 1px">Diet only</td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @on_diet %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @on_diet_ever %></td>
-                </tr>
-                <tr class = 'row_break'>
-
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">Oral hypoglycaemic agents only</td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @oral_treatments %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @oral_treatments_ever %></td>
-                </tr>
-                <tr class = 'row_break'>
-
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">Insulin only</td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @insulin %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @insulin_ever %></td>
-                </tr>
-
-                <tr class = 'row_break'>
-
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">Insulin and oral hypoglycaemic agents</td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @oral_and_insulin %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @oral_and_insulin_ever %></td>
-                </tr>
-
-                <tr class = 'row_break'>
-
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">Metformin</td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @metformin %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @metformin_ever %></td>
-                </tr>
-
-                <tr class = 'row_break'>
-
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">Glibenclamide</td>
-                  <td style="border-width:1px 0px 1px 1px"><%= @glibenclamide %></td>
-                  <td style="border-width:1px 0px 1px 1px"><%= @glibenclamide_ever %></td>
-                </tr>
-
-                <tr class = 'row_break'>
-
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">Lente Insulin</td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @lente_insulin %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @lente_insulin_ever %></td>
-                </tr>
+                    <td style="text-align:left;border-width:0px 0px 1px 1px">Soluble Insulin</td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @soluble_insulin %></td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @soluble_insulin_ever %></td>
+                  </tr>
 
-                <tr class = 'row_break'>
-
-                  <td style="text-align:left;border-width:0px 0px 1px 1px">Soluble Insulin</td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @soluble_insulin %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @soluble_insulin_ever %></td>
-                </tr>
+                  <tr class = 'row_break'>
 
-                <tr class = 'row_break'>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                  </tr>
 
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
-                </tr>
+                  <tr class = 'row_break heading'>
 
-                <tr class = 'row_break heading'>
+                    <td style="text-align:center;" colspan="3">Complications Of Those Who Are Alive And On Treatment</td>
 
-                  <td style="text-align:center;" colspan="3">Complications Of Those Who Are Alive And On Treatment</td>
-                  
-                </tr>
+                  </tr>
 
-                <tr class = 'row_break'>
+                  <tr class = 'row_break'>
 
-                  <td style="text-align:left;border-width:1px 1px 0px 1px">Heart Failure</td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @heart_failure %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @heart_failure_ever %></td>
-                </tr>
-                <tr class = 'row_break'>
+                    <td style="text-align:left;border-width:1px 1px 0px 1px">Heart Failure</td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @heart_failure %></td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @heart_failure_ever %></td>
+                  </tr>
+                  <tr class = 'row_break'>
 
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">Heart Attack/M. Infraction</td>
-                  <td style="border-width:1px 0px 0px 1px"><%= @mi %></td>
-                  <td style="border-width:1px 1px 0px 1px"><%= @mi_ever %></td>
-                </tr>
-                <tr class = 'row_break'>
+                    <td style="text-align:left;border-width:0px 0px 0px 1px">Heart Attack/M. Infraction</td>
+                    <td style="border-width:1px 0px 0px 1px"><%= @mi %></td>
+                    <td style="border-width:1px 1px 0px 1px"><%= @mi_ever %></td>
+                  </tr>
+                  <tr class = 'row_break'>
 
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">Kidney Failure</td>
-                  <td style="border-width:1px 0px 0px 1px"><%= @kidney_failure %></td>
-                  <td style="border-width:1px 1px 0px 1px"><%= @kidney_failure_ever %></td>
-                </tr>
-                <tr class = 'row_break'>
+                    <td style="text-align:left;border-width:0px 0px 0px 1px">Kidney Failure</td>
+                    <td style="border-width:1px 0px 0px 1px"><%= @kidney_failure %></td>
+                    <td style="border-width:1px 1px 0px 1px"><%= @kidney_failure_ever %></td>
+                  </tr>
+                  <tr class = 'row_break'>
 
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">Stroke</td>
-                  <td style="border-width:1px 0px 0px 1px"><%= @stroke %></td>
-                  <td style="border-width:1px 1px 0px 1px"><%= @stroke_ever %></td>
-                </tr>
-                <tr class = 'row_break'>
-
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">TIA</td>
-                  <td style="border-width:1px 0px 0px 1px"><%= @tia %></td>
-                  <td style="border-width:1px 1px 0px 1px"><%= @tia_ever %></td>
-                </tr>
-                <tr class = 'row_break'>
+                    <td style="text-align:left;border-width:0px 0px 0px 1px">Stroke</td>
+                    <td style="border-width:1px 0px 0px 1px"><%= @stroke %></td>
+                    <td style="border-width:1px 1px 0px 1px"><%= @stroke_ever %></td>
+                  </tr>
+                  <tr class = 'row_break'>
 
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">Foot ulcers</td>
-                  <td style="border-width:1px 0px 0px 1px"><%= @ulcers %></td>
-                  <td style="border-width:1px 1px 0px 1px"><%= @ulcers_ever %></td>
-                </tr>
-                <tr class = 'row_break'>
-
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">Impotence</td>
-                  <td style="border-width:1px 0px 0px 1px"><%= @impotence %></td>
-                  <td style="border-width:1px 1px 0px 1px"><%= @impotence_ever %></td>
-                </tr>
-                <tr class = 'row_break'>
+                    <td style="text-align:left;border-width:0px 0px 0px 1px">TIA</td>
+                    <td style="border-width:1px 0px 0px 1px"><%= @tia %></td>
+                    <td style="border-width:1px 1px 0px 1px"><%= @tia_ever %></td>
+                  </tr>
+                  <tr class = 'row_break'>
 
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">Gangrene/Amputation</td>
-                  <td style="border-width:1px 0px 0px 1px"><%= @amputation %></td>
-                  <td style="border-width:1px 1px 0px 1px"><%= @amputation_ever  %></td>
-                </tr>
-                <tr class = 'row_break'>
+                    <td style="text-align:left;border-width:0px 0px 0px 1px">Foot ulcers</td>
+                    <td style="border-width:1px 0px 0px 1px"><%= @ulcers %></td>
+                    <td style="border-width:1px 1px 0px 1px"><%= @ulcers_ever %></td>
+                  </tr>
+                  <tr class = 'row_break'>
 
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">Diabetic Retinopathy</td>
-                  <td style="border-width:1px 0px 0px 1px"><%= @diabetic_retinopathy %></td>
-                  <td style="border-width:1px 1px 0px 1px"><%= @diabetic_retinopathy_ever %></td>
-                </tr>
-                <tr class = 'row_break'>
+                    <td style="text-align:left;border-width:0px 0px 0px 1px">Impotence</td>
+                    <td style="border-width:1px 0px 0px 1px"><%= @impotence %></td>
+                    <td style="border-width:1px 1px 0px 1px"><%= @impotence_ever %></td>
+                  </tr>
+                  <tr class = 'row_break'>
 
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">Cataracts</td>
-                  <td style="border-width:1px 0px 1px 1px"><%= @cataracts %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @cataracts_ever %></td>
-                </tr>
+                    <td style="text-align:left;border-width:0px 0px 0px 1px">Gangrene/Amputation</td>
+                    <td style="border-width:1px 0px 0px 1px"><%= @amputation %></td>
+                    <td style="border-width:1px 1px 0px 1px"><%= @amputation_ever  %></td>
+                  </tr>
+                  <tr class = 'row_break'>
 
-                <tr class = 'row_break'>
+                    <td style="text-align:left;border-width:0px 0px 0px 1px">Diabetic Retinopathy</td>
+                    <td style="border-width:1px 0px 0px 1px"><%= @diabetic_retinopathy %></td>
+                    <td style="border-width:1px 1px 0px 1px"><%= @diabetic_retinopathy_ever %></td>
+                  </tr>
+                  <tr class = 'row_break'>
 
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">Nephropathy</td>
-                  <td style="border-width:1px 0px 0px 1px"><%= @nephropathy %></td>
-                  <td style="border-width:1px 1px 0px 1px"><%= @nephropathy_ever %></td>
-                </tr>
+                    <td style="text-align:left;border-width:0px 0px 0px 1px">Cataracts</td>
+                    <td style="border-width:1px 0px 1px 1px"><%= @cataracts %></td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @cataracts_ever %></td>
+                  </tr>
 
+                  <tr class = 'row_break'>
 
-                <tr class = 'row_break'>
+                    <td style="text-align:left;border-width:0px 0px 0px 1px">Nephropathy</td>
+                    <td style="border-width:1px 0px 0px 1px"><%= @nephropathy %></td>
+                    <td style="border-width:1px 1px 0px 1px"><%= @nephropathy_ever %></td>
+                  </tr>
 
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">Neuropathy</td>
-                  <td style="border-width:1px 0px 0px 1px"><%= @neuropathy %></td>
-                  <td style="border-width:1px 1px 0px 1px"><%= @neuropathy_ever %></td>
-                </tr>
 
+                  <tr class = 'row_break'>
 
-                <tr class = 'row_break'>
+                    <td style="text-align:left;border-width:0px 0px 0px 1px">Neuropathy</td>
+                    <td style="border-width:1px 0px 0px 1px"><%= @neuropathy %></td>
+                    <td style="border-width:1px 1px 0px 1px"><%= @neuropathy_ever %></td>
+                  </tr>
 
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">Macrovascular</td>
-                  <td style="border-width:1px 0px 0px 1px"><%=  @macrovascular %></td>
-                  <td style="border-width:1px 1px 0px 1px"><%=  @macrovascular_ever %></td>
-                </tr>
 
-                <tr class = 'row_break'>
+                  <tr class = 'row_break'>
 
-                  <td style="text-align:left;border-width:0px 0px 1px 1px">No recorded complications</td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @no_complications %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @no_complications_ever %></td>
-                </tr>
+                    <td style="text-align:left;border-width:0px 0px 0px 1px">Macrovascular</td>
+                    <td style="border-width:1px 0px 0px 1px"><%=  @macrovascular %></td>
+                    <td style="border-width:1px 1px 0px 1px"><%=  @macrovascular_ever %></td>
+                  </tr>
 
-                <tr class = 'row_break'>
+                  <tr class = 'row_break'>
 
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
-                </tr>
+                    <td style="text-align:left;border-width:0px 0px 1px 1px">No recorded complications</td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @no_complications %></td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @no_complications_ever %></td>
+                  </tr>
 
-                <tr class = 'row_break heading'>
+                  <tr class = 'row_break'>
 
-                  <td  style="text-align:center;" colspan="3">TB Status Of All Patients Registered</td>
-                 
-                </tr>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                  </tr>
 
-                <tr class = 'row_break'>
+                  <tr class = 'row_break heading'>
 
-                  <td style="text-align:left;border-width:1px 0px 0px 1px">TB Status Known</td>
-                  <td style="border-width:1px 0px 0px 1px"><%= @tb_known %></td>
-                  <td style="border-width:1px 1px 0px 1px"><%= @tb_known_ever %></td>
-                </tr>
-                <tr class = 'row_break'>
+                    <td  style="text-align:center;" colspan="3">TB Status Of All Patients Registered</td>
 
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">TB Ever</td>
-                  <td style="border-width:1px 0px 0px 1px"><%= @tb %></td>
-                  <td style="border-width:1px 1px 0px 1px"><%= @tb_ever %></td>
-                </tr>
-                <tr class = 'row_break'>
+                  </tr>
 
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">TB Since Diabetes Diagnosis</td>
-                  <td style="border-width:1px 0px 0px 1px"><%= @tb_after_diabetes %></td>
-                  <td style="border-width:1px 1px 0px 1px"><%= @tb_after_diabetes_ever %></td>
-                </tr>
-                <tr class = 'row_break'>
+                  <tr class = 'row_break'>
 
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">No TB</td>
-                  <td style="border-width:1px 0px 1px 1px"><%= @no_tb %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @no_tb_ever %></td>
-                </tr>
+                    <td style="text-align:left;border-width:1px 0px 0px 1px">TB Status Known</td>
+                    <td style="border-width:1px 0px 0px 1px"><%= @tb_known %></td>
+                    <td style="border-width:1px 1px 0px 1px"><%= @tb_known_ever %></td>
+                  </tr>
+                  <tr class = 'row_break'>
 
-                <tr class = 'row_break'>
+                    <td style="text-align:left;border-width:0px 0px 0px 1px">TB Ever</td>
+                    <td style="border-width:1px 0px 0px 1px"><%= @tb %></td>
+                    <td style="border-width:1px 1px 0px 1px"><%= @tb_ever %></td>
+                  </tr>
+                  <tr class = 'row_break'>
 
-                  <td style="text-align:left;border-width:0px 0px 1px 1px">TB Status Unknown</td>
-                  <td style="border-width:1px 0px 1px 1px"><%= @tb_unknown %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @tb_unknown_ever %></td>
-                </tr>
+                    <td style="text-align:left;border-width:0px 0px 0px 1px">TB Since Diabetes Diagnosis</td>
+                    <td style="border-width:1px 0px 0px 1px"><%= @tb_after_diabetes %></td>
+                    <td style="border-width:1px 1px 0px 1px"><%= @tb_after_diabetes_ever %></td>
+                  </tr>
+                  <tr class = 'row_break'>
 
-                <tr class = 'row_break'>
+                    <td style="text-align:left;border-width:0px 0px 0px 1px">No TB</td>
+                    <td style="border-width:1px 0px 1px 1px"><%= @no_tb %></td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @no_tb_ever %></td>
+                  </tr>
 
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
-                </tr>
+                  <tr class = 'row_break'>
 
-                <tr class = 'row_break heading'>
+                    <td style="text-align:left;border-width:0px 0px 1px 1px">TB Status Unknown</td>
+                    <td style="border-width:1px 0px 1px 1px"><%= @tb_unknown %></td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @tb_unknown_ever %></td>
+                  </tr>
 
-                  <td  style="text-align:center;" colspan="3">HIV Status Of All Patients Registered</td>
-                  
-                </tr>
+                  <tr class = 'row_break'>
 
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                  </tr>
 
-                <tr class = 'row_break'>
+                  <tr class = 'row_break heading'>
 
-                  <td style="text-align:left;border-width:1px 0px 0px 1px">Reactive Not on ART</td>
-                  <td style="border-width:1px 0px 1px 1px"><%= @reactive_not_on_art %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @reactive_not_on_art_ever %></td>
-                </tr>
+                    <td  style="text-align:center;" colspan="3">HIV Status Of All Patients Registered</td>
 
+                  </tr>
 
-                <tr class = 'row_break'>
 
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">Reactive on ART</td>
-                  <td style="border-width:1px 0px 1px 1px"><%= @reactive_on_art %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @reactive_on_art_ever %></td>
-                </tr>
+                  <tr class = 'row_break'>
 
-                <tr class = 'row_break'>
+                    <td style="text-align:left;border-width:1px 0px 0px 1px">Reactive Not on ART</td>
+                    <td style="border-width:1px 0px 1px 1px"><%= @reactive_not_on_art %></td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @reactive_not_on_art_ever %></td>
+                  </tr>
 
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">Non Reactive</td>
-                  <td style="border-width:1px 0px 1px 1px"><%= @non_reactive %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @non_reactive_ever %></td>
-                </tr>
 
-                <tr class = 'row_break'>
+                  <tr class = 'row_break'>
 
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">Unknown</td>
-                  <td style="border-width:1px 0px 1px 1px"><%= @unknown %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @unknown_ever %></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                    <td style="text-align:left;border-width:0px 0px 0px 1px">Reactive on ART</td>
+                    <td style="border-width:1px 0px 1px 1px"><%= @reactive_on_art %></td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @reactive_on_art_ever %></td>
+                  </tr>
 
+                  <tr class = 'row_break'>
+
+                    <td style="text-align:left;border-width:0px 0px 0px 1px">Non Reactive</td>
+                    <td style="border-width:1px 0px 1px 1px"><%= @non_reactive %></td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @non_reactive_ever %></td>
+                  </tr>
+
+                  <tr class = 'row_break'>
+
+                    <td style="text-align:left;border-width:0px 0px 0px 1px">Unknown</td>
+                    <td style="border-width:1px 0px 1px 1px"><%= @unknown %></td>
+                    <td style="border-width:1px 1px 1px 1px"><%= @unknown_ever %></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div id="footer" class="dark">
+              <div id="buttons" class="buttons" style="top:0px">
+                <button id="finish" class="green"><span>Finish</span></button>
+              </div>
+            </div>
 
 
         </body>

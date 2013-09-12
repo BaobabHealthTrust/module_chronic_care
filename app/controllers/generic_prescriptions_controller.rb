@@ -29,7 +29,7 @@ class GenericPrescriptionsController < ApplicationController
   end
   
   def create
-
+  #raise session[:datetime].to_yaml
     @suggestions = params[:suggestion] || ['New Prescription']
     @patient = Patient.find(params[:patient_id] || session[:patient_id]) rescue nil
     if params[:location].blank?

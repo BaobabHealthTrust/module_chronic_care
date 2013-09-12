@@ -1355,7 +1355,7 @@ class CohortToolController < ApplicationController
                                   @maculopathy
 
     #render :layout => "report"
-    render :template => "/cohort_tool/cohort", :layout => "cohort"
+    render :template => "/cohort_tool/cohort", :layout => "application"
   end
 
 end

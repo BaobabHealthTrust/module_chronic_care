@@ -39,7 +39,8 @@
     :allowFreeText => "true",
     :tt_pageStyleClass => "NumbersOnlyWithDecimal"}%>
 
-  <% session_date = session[:datetime].to_date rescue nil                       
+  <% session_date = session[:datetime].to_date rescue nil
+  #raise session_date.to_yaml
     if session_date %>
 
     <p><label for="filter_provider">Staff who provided the information (Provider)</label></br>
