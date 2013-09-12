@@ -30,6 +30,13 @@ module MedicationService
 		diabetes_medication_drug_concepts
 	end
 
+  def self.epilepsy_drugs
+    epilepsy_medication_concept   = ConceptName.find_by_name("EPILEPSY MEDICATION").concept_id
+    medication_drug_concepts = ConceptName.find_by_sql("SELECT * FROM concept_set
+                               WHERE concept_set  = #{epilepsy_medication_concept}")
+
+		medication_drug_concepts
+  end
 	def self.hypertension_dm_drugs
 		hypertension_medication_concept  = ConceptName.find_by_name("HYPERTENSION MEDICATION").concept_id
 		diabetes_medication_concept  = ConceptName.find_by_name("DIABETES MEDICATION").concept_id
