@@ -22,14 +22,14 @@ class PatientsController < ApplicationController
 
     program = Program.find_by_name("chronic care program").id
     @current_state = PatientProgram.find_by_sql("
-      select p.patient_id, current_state_for_program(p.patient_id, #{program}, '#{@retrospective.to_date}') AS state, c.name as status
+      select p.patient_id, c.name as status
       from patient_program p
-      inner join patient_state ps on ps.patient_program_id = p.program_id
-      inner join program_workflow pw on pw.program_id = p.program_id
+      inner join patient_state ps on ps.patient_program_id = p.patient_program_id
+      inner join program_workflow pw on pw.program_id = #{program}
       inner join program_workflow_state pws on pws.program_workflow_id = pw.program_workflow_id
       inner join concept_name c on c.concept_id = pws.concept_id
       where p.patient_id = #{@patient.id}
-      order by ps.patient_state_id limit 1").first.status rescue ""
+      order by ps.patient_state_id").last.status rescue ""
     #raise @current_state.to_s.to_yaml
 
     @task = TaskFlow.new(params[:user_id], @patient.id)
