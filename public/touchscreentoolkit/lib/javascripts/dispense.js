@@ -1,5 +1,5 @@
 var generics = [];
-var dosages = {};
+//var dosages = {};
 var frequencies = [];
 var drugslist = {};
 var previous_clicked = null;
@@ -20,7 +20,7 @@ function __$(id){
     
 function init(){
     generics = generic_drugs;
-    dosages = drug_dosages;
+    //dosages = drug_dosages;
     drugslist = drugs;
    
     frequencies = {
@@ -48,7 +48,7 @@ function generateGenerics(patient_id){
     current_patient_id = patient_id;
     
     generics = generic_drugs;
-    dosages = drug_dosages;
+    //dosages = drug_dosages;
     drugslist = drugs;
    
     frequencies = {
