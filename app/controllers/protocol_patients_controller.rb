@@ -93,7 +93,16 @@ class ProtocolPatientsController < ApplicationController
     if params[:user_id].nil?
       redirect_to '/encounters/no_user' and return
     end
-
+      @current_state = PatientProgram.find_by_sql("
+      select p.patient_id, current_state_for_program(p.patient_id, #{program}, '#{@retrospective.to_date}') AS state, c.name as status
+      from patient_program p
+      inner join patient_state ps on ps.state = current_state_for_program(p.patient_id, #{program}, '#{@retrospective.to_date}')
+      inner join program_workflow pw on pw.program_id = p.program_id
+      inner join program_workflow_state pws on pws.program_workflow_id = pw.program_workflow_id
+      inner join concept_name c on c.concept_id = pws.concept_id
+      where p.patient_id = #{@patient.id}
+      order by ps.date_created desc limit 1").first.status rescue []
+    
     @user = User.find(params[:user_id]) rescue nil?
     @regimen_concepts = MedicationService.hypertension_dm_drugs
 
@@ -265,6 +274,15 @@ class ProtocolPatientsController < ApplicationController
     if params[:user_id].nil?
       redirect_to '/encounters/no_user' and return
     end
+      @current_state = PatientProgram.find_by_sql("
+      select p.patient_id, current_state_for_program(p.patient_id, #{program}, '#{@retrospective.to_date}') AS state, c.name as status
+      from patient_program p
+      inner join patient_state ps on ps.state = current_state_for_program(p.patient_id, #{program}, '#{@retrospective.to_date}')
+      inner join program_workflow pw on pw.program_id = p.program_id
+      inner join program_workflow_state pws on pws.program_workflow_id = pw.program_workflow_id
+      inner join concept_name c on c.concept_id = pws.concept_id
+      where p.patient_id = #{@patient.id}
+      order by ps.date_created desc limit 1").first.status rescue []
 
     @user = User.find(params[:user_id]) rescue nil?
 
@@ -376,6 +394,15 @@ class ProtocolPatientsController < ApplicationController
 	
     @current_program = current_program
     #@occupation = Vitals.occupation(@patient)
+    @current_state = PatientProgram.find_by_sql("
+      select p.patient_id, current_state_for_program(p.patient_id, #{program}, '#{@retrospective.to_date}') AS state, c.name as status
+      from patient_program p
+      inner join patient_state ps on ps.state = current_state_for_program(p.patient_id, #{program}, '#{@retrospective.to_date}')
+      inner join program_workflow pw on pw.program_id = p.program_id
+      inner join program_workflow_state pws on pws.program_workflow_id = pw.program_workflow_id
+      inner join concept_name c on c.concept_id = pws.concept_id
+      where p.patient_id = #{@patient.id}
+      order by ps.date_created desc limit 1").first.status rescue []
 
 		if @current_program == "EPILEPSY PROGRAM"
       @regimen_concepts = MedicationService.epilepsy_drugs
@@ -409,6 +436,15 @@ class ProtocolPatientsController < ApplicationController
     if params[:user_id].nil?
 			redirect_to '/encounters/no_user' and return
     end
+      @current_state = PatientProgram.find_by_sql("
+      select p.patient_id, current_state_for_program(p.patient_id, #{program}, '#{@retrospective.to_date}') AS state, c.name as status
+      from patient_program p
+      inner join patient_state ps on ps.state = current_state_for_program(p.patient_id, #{program}, '#{@retrospective.to_date}')
+      inner join program_workflow pw on pw.program_id = p.program_id
+      inner join program_workflow_state pws on pws.program_workflow_id = pw.program_workflow_id
+      inner join concept_name c on c.concept_id = pws.concept_id
+      where p.patient_id = #{@patient.id}
+      order by ps.date_created desc limit 1").first.status rescue []
 
     @user = User.find(params[:user_id]) rescue nil?
 			

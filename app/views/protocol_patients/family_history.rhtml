@@ -23,7 +23,7 @@
 	  var asthmaRisk = 0;
 
 	   if ($('family_members').value.length > 0){
-		conditions.push("Family members excluding patient: " + $('family_members').value);
+		conditions.push("Family members: " + $('family_members').value);
 	  }
 	  if ($('position').value.length > 0){
 		value = parseInt($('position').value)
@@ -152,7 +152,9 @@
 	<input type='hidden' name='encounter_type' value='FAMILY MEDICAL HISTORY ' />
 	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
 	<input type='hidden' name='user_id' value='<%= @user.id %>' />
-
+        <% if  @current_state.blank? %>
+        <input type="hidden" name="programs[][states][][state]" value="alive" id="program_id" />
+        <% end %>
 	<input type='text' id='family_members'
 	   name='concept[Number of people in household excluding patient]'
 	   helpText='Number of family members including the deceased?'

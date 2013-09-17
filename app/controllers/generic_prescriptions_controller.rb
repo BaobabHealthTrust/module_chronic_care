@@ -227,8 +227,10 @@ class GenericPrescriptionsController < ApplicationController
     @user = params[:user_id]
 		@patient = Patient.find(params[:patient_id] || session[:patient_id]) rescue []
 		@generics = MedicationService.generic
-		@frequencies = MedicationService.fully_specified_frequencies	
+		@frequencies = MedicationService.fully_specified_frequencies
+    
 		@formulations = {}
+    @combinations = {}
 		@generics.each { | generic |
 			drugs = Drug.find(:all,	:conditions => ["concept_id = ?", generic[1]])
 			drug_formulations = {}			
@@ -237,7 +239,7 @@ class GenericPrescriptionsController < ApplicationController
 			}
 			@formulations[generic[1]] = drug_formulations			
 		}
-
+    #raise @formulations.to_yaml
 		@diagnosis = @patient.current_diagnoses["DIAGNOSIS"] rescue []
 		render :layout => 'application', :template => 'prescriptions/give_drugs'
 	end

@@ -14,7 +14,10 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
       setTimeout("showNexttask()", 500);
       return;
     }
-
+    var graphArea = document.createElement("div");
+    graphArea.id = "dashboard_graph";
+    __$("content").appendChild(graphArea);
+    __$("dashboard_graph").innerHTML = "<b>Graph Area</b>"
     if(!__$("nextTask")){
       var pos = checkCtrl(__$("patient-dashboard-applicationname"));
       // [w, h, t, l]
@@ -36,9 +39,9 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
 <% end %>
 
   function addDiv(){
-	alert("here")
-	var html = "<div style='display: table-row;'><div style='display: table-cell;margin: 5px;margin-top: 0px;padding: 2px;'>Patient State</div><div style='display: table-cell;margin: 5px;margin-top: 0px;padding: 2px;'>State</div>";
-	document.getElementById('mainTopicContent').innerHTML += html;
+    alert("here")
+    var html = "<div style='display: table-row;'><div style='display: table-cell;margin: 5px;margin-top: 0px;padding: 2px;'>Patient State</div><div style='display: table-cell;margin: 5px;margin-top: 0px;padding: 2px;'>State</div>";
+    document.getElementById('mainTopicContent').innerHTML += html;
   }
 </script>
 
@@ -85,20 +88,39 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
     margin-left: auto;
     margin-right: auto;
   }
+
+  #dashboard_graph{
+    -moz-user-select: none;
+    background-color: blue;
+    border: 1px solid #CCCCCC;
+    border-radius: 50px 50px 50px 50px;
+    color: #000000;
+    font-size: 18px;
+    height: 50px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 5px;
+    opacity: 0.95;
+    text-align: center;
+    width: 260px;
+    z-index: 100;
+  }
 </style>
-<%#= raise @patient.patient_programs.in_programs("chronic care program").to_yaml %>
+
 <div id='contented'>
   <div id='description' style='color:#777;position:absolute;margin-top:-70px;'>
     <form id = 'dashboard' action='home.html' onload="addDiv()">
       <div>Patient Dashboard</div>
       <div id='project_name'>
         <div style="margin-top: 0px; color: #6281A7; font-size: 0.6em;">
-<%= @project %> <br><span style="font-size:23px;"><%=  current_program.humanize.split(" ")[0] rescue "" %><br>State: <%= @current_state.humanize %></span>
+          <%= @project %> <br><span style="font-size:23px;"><%=  current_program.humanize.split(" ")[0] rescue "" %><br>State: <%= @current_state.humanize %></span>
         </div>
       </div>
+
       <span id='patient_name'>
         <%= "#{@patient.name}" %>
       </span>
+
       <span id='patient_id'><%= "#{@patient.national_id}" %></span>
       <span id='patient_residence'><%= "#{@patient.address}" %></span>
       <span id='patient_age'><%= "#{(@patient.age > 0 ? @patient.age : "#{@patient.age_in_months} months")}" %></span>
@@ -111,14 +133,34 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
       </select>
       <select id="links">
 
-        <% @links.each do |encounter, link| %>
+        <% i = 1
+        groups = @task
+        done = []
+        @links.each do |encounter, link| %>
+          <% if  i <= 9 %>
+            <optgroup value='<%= link %>' label="<%= (!@task.labels[encounter.downcase].nil? ?
+                          @task.labels[encounter.downcase] : encounter) %>" >
+                        <% done << encounter.to_s %>
+            </optgroup>
+          <% else %>
+            <%  if i == 10 %>
+              <optgroup label="Other Tasks" >
+              <% end %>
+              <%  @links.each do |group_encounter, group_link|
+                unless done.include?(group_encounter.to_s) %>
+                  <option value='<%= group_link %>'>
+                    <%= (!@task.labels[group_encounter.downcase].nil? ? @task.labels[group_encounter.downcase] : group_encounter) %>
+                  </option>
+                <% end
+              end %>
 
-          <optgroup value='<%= link %>' label="<%= (!@task.labels[encounter.downcase].nil? ?
-                        @task.labels[encounter.downcase] : encounter) %>" >
-          </optgroup>
+              <%  if i == 10 %>
+              </optgroup>
+            <% end %>
+          <% end
+          i += 1 %>
 
         <% end %>
-
       </select>
 
       <!--select id="links">
@@ -218,17 +260,17 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
           </option>
           <option link='<%= "/patients/mastercard/#{@patient.id}?user_id=#{@user.id}"  %>' ttSize = "160px">Mastercard</option>
         <% end %>
-		  
-		<% if @disable.to_s != "true" %>
-		  <% if @task.url != "/patients/show/#{@patient.id}?user_id=#{@user.id}" %>
-			<!--- <option link="/encounter_types/show?user_id=<%=  @user["user_id"] %>&encounter_type=Appointment&id=show&patient_id=<%= @patient.id -%>" ttSize = "160px">Appointment</option> --->
-			<option link="<%= @task.url  %>" ttSize = "160px">Continue</option>
-		  <% end %>
-		<% end %>
+
+        <% if @disable.to_s != "true" %>
+          <% if @task.url != "/patients/show/#{@patient.id}?user_id=#{@user.id}" %>
+                                    <!--- <option link="/encounter_types/show?user_id=<%=  @user["user_id"] %>&encounter_type=Appointment&id=show&patient_id=<%= @patient.id -%>" ttSize = "160px">Appointment</option> --->
+            <option link="<%= @task.url  %>" ttSize = "160px">Continue</option>
+          <% end %>
+        <% end %>
 
       </select>
 
       <input type='submit' value='Finish' />
     </form>
-    </div>
+  </div>
 </div>

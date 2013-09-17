@@ -8,11 +8,14 @@
   var frequencies = <%= @frequencies.to_json rescue {} %>;
   var diagnosisList = <%= @diagnosis.to_json rescue {} %>;
   var patient_id = <%= params[:patient_id] rescue "" %>;
+  var formulations = <%= @formulations.to_json rescue {} %>
+  var generic_drugs = generics;
+  var drugs = formulations;
 
   var search_path = "/encounters/load_frequencies_and_dosages";
 
 </script>
-<script type="text/javascript" src="/touchscreentoolkit/lib/javascripts/generics.js" ></script>
+
 <script language="javascript" type="text/javascript" src="/touchscreentoolkit/lib/javascripts/dispense.js" defer></script>
 <style type="text/css">
   #space { display:inline; font-size:1.2em; }
