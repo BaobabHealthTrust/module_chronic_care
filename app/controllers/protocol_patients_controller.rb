@@ -127,6 +127,14 @@ class ProtocolPatientsController < ApplicationController
 
     redirect_to '/encounters/no_patient' and return if @user.nil?
     if current_program == "EPILEPSY PROGRAM"
+      @number = Observation.find_by_sql("SELECT * from obs
+                   WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'Number of seizure including current' LIMIT 1)
+                   AND voided = 0 AND person_id = #{@patient.id} ORDER BY obs_datetime DESC LIMIT 1").first.to_s.split(":")[1].squish.to_i rescue ""
+
+      @patient_epileptic = Observation.find_by_sql("SELECT * from obs
+                   WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'Confirm diagnosis of epilepsy' LIMIT 1)
+                   AND voided = 0 AND person_id = #{@patient.id} ORDER BY obs_datetime DESC LIMIT 1").first.to_s.split(":")[1].squish.upcase rescue "NO"
+
       render :template => "/protocol_patients/epilepsy_diagnosis"
     end
 
@@ -407,22 +415,14 @@ class ProtocolPatientsController < ApplicationController
 		if @current_program == "EPILEPSY PROGRAM"
       @regimen_concepts = MedicationService.epilepsy_drugs
       @first_visit = is_first_epilepsy_clinic_visit(@patient.id)
-      @mrdt = Vitals.current_vitals(@patient, "RDT or blood smear positive for malaria") rescue nil
+      @mrdt = Vitals.current_vitals(@patient, "RDT or blood smear positive for malaria") rescue []
       unless @mrdt.blank?
         @mrdt = @mrdt.value_text.upcase rescue ConceptName.find_by_concept_id(@mrdt.value_coded).name.upcase
       end
-      
-      if @first_visit == false
-        concept = ConceptName.find_by_name('Patient in active seizure').concept_id
-        @in_seizure  = Observation.find_by_sql("SELECT * from obs where concept_id = '#{concept}' AND person_id = '#{@patient.id}'
+       concept = ConceptName.find_by_name('Patient in active seizure').concept_id
+      @in_seizure  = Observation.find_by_sql("SELECT * from obs where concept_id = '#{concept}' AND person_id = '#{@patient.id}'
                     AND DATE(obs_datetime) = '#{current_date}' AND voided = 0
-                    ORDER BY  obs_datetime DESC, date_created DESC LIMIT 1").first rescue 0
-        
-        @in_seizure = @in_seizure.value_text.upcase rescue ConceptName.find_by_concept_id(@in_seizure.value_coded).name.upcase rescue nil
-        #raise @in_seizure.to_yaml
-        #@in_seizure = Vitals.todays_vitals(Patient.find(params[:patient_id]), "Patient in active seizure")
-        #@in_seizure = @in_seizure.value_text.upcase rescue ConceptName.find_by_concept_id(@in_seizure.value_coded).name.upcase rescue nil
-      end
+                    ORDER BY  obs_datetime DESC, date_created DESC LIMIT 1").first.to_s.upcase.split(":")[1].squish rescue []
       render :template => "/protocol_patients/epilepsy_clinic_visit" and return
 		end
 		@first_visit = is_first_hypertension_clinic_visit(@patient.id) unless current_program == "EPILEPSY PROGRAM"
