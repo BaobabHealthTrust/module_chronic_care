@@ -1,0 +1,569 @@
+<!DOCTYPE html PUBLIC"-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+      <meta content="utf-8" http-equiv="encoding">
+        <%= stylesheet_link_tag "dashboard" %>
+        <%= stylesheet_link_tag "cohort" %>
+        <%= javascript_include_tag 'jquery' %>
+        <script>
+          jQuery(document).ready(function($) {
+            document.getElementById('content').style = 'position : relative; width : 98%; margin-left : -49%;'
+            document.getElementById('description').style = 'color:#777;position:absolute;margin-top:-70px;'
+            $('#finish').click(function() {
+              window.location = '/clinic/index?user_id=<%=params[:user_id]%>&location_id=<%params[:location_id]%>'
+            })
+
+          })
+        </script>
+        <script>
+          var tt_cancel_destination = "/"
+
+          function showReport() {
+            document.forms[0].submit();
+          }
+
+          function showReportChildren() {
+            document.forms[1].submit();
+          }
+
+          function showReportWomen() {
+            document.forms[2].submit();
+          }
+        </script>
+        <style>
+
+          table {
+            border-style:none;
+            border-width:1px;
+            width:95% !important;
+            top: 10%;
+            left: 150%;
+          }
+
+          th {
+            border-style:none;
+            border-width:1px;
+          }
+
+          td {
+            text-align:center;
+            border-style:solid;
+            border-width:1px;
+          }
+
+          .row_break td {
+            border-width:0px;
+          }
+
+          div.scrollTableContainer {
+            border-style:solid;
+            height:68%;
+            width: 98%;
+            float: right;
+            position:relative;
+          }
+
+          .survival-analysis th, .survival-analysis td {
+            text-align:left;
+          }
+
+          .clinic_own_data {
+            position:relative;
+            float:left;
+            display:block;
+            padding-left:10px;
+          }
+
+          .checked_data {
+            position:relative;
+            float:right;
+            display:block;
+            padding-right:10px;
+          }
+          a{
+            text-decoration: none !important;
+            color: #E8EAF1;
+          }
+          a:hover {
+            color:black;
+          }
+          .clinic_data_value:hover {
+            color:black;
+          }
+          .checked_data_value:hover{
+            color:black;
+          }
+          td.create_button:hover{
+            color:black;
+          }
+          .clinic_data_value {
+            position:relative;
+            float:left;
+            display:block;
+            border: 0px 0px 2px 0px;
+            border-top: 1px outset black;
+            border-bottom: 1px outset black;
+            border-radius: 7px 7px 7px 7px;
+            border-left:0px;
+            margin-top:2px;
+            border-style: outset;
+            width:30%;
+            height:100%;
+            padding: 10px 16px 10px 10px;
+            text-align: center;
+            text-decoration: none !important;
+            background-color: #7784AE;
+            color: #E8EAF1;
+            display: block;
+            font-size:13px;
+          }
+          .create_button a{
+            background-color: #7784AE;
+            border-bottom: 1px outset black;
+            border-radius: 7px 7px 7px 7px;
+            border-style: outset;
+            border-top: 1px outset black;
+            color: #E8EAF1;
+            display: block;
+            padding: 10px 16px 10px 10px;
+            text-align: center;
+            text-decoration: none !important;
+            font-size:13px;
+          }
+          .heading {
+            background-color: #7784AE;
+            width: 100px;
+            height: 100%;
+            color: #E8EAF1;
+            font-size: 18px;
+          }
+
+          td.left_top_right {
+            border-width:3px 3px 0px 3px;
+          }
+
+          td.right_bottom_left {
+            border-width:1px 3px 3px 3px;
+          }
+
+          td.left_right {
+            border-width:1px 3px 0px 3px;
+          }
+
+          td.left_top_right_bottom {
+            border-width:3px 3px 3px 3px;
+          }
+
+          .regimen {
+            position:absolute;
+            top:0px;
+            left:1px;
+            border-radius:100px;
+            background:white;
+            color:black;
+            text-align:center;
+            font-size:15px;
+          }
+          td.regimen_name_top {
+            text-align:left;
+            border-width:1px 0px 0px 0px;
+            padding-left:100px;
+          }
+
+          td.regimen_name {
+            text-align:left;
+            border-width:0px 0px 0px 0px;
+            padding-left:100px;
+          }
+
+          td.regimen_name_bottom {
+            text-align:left;
+            border-width:0px 0px 1px 0px;
+            padding-left:100px;
+          }
+
+          b {
+            position:relative;
+            float:left;
+            display:block;
+            width:68px;
+            padding-left:5px;
+          }
+          tr{
+            width:100% !important;
+          }
+          td.bg {
+            background-color:lightgrey;
+            -moz-user-select:none;
+          }
+
+          .logo {
+            float:left;
+            height: 8em;
+          }
+          #range{
+            float:left;
+            height: 8em;
+          }
+          .dataTable{
+            width:6%
+          }
+
+        </style>
+
+        <title>Cohort<%= Location.current_health_center.name + "  " + @quarter %></title>
+        </head>
+        <body>
+          <%= image_tag(@logo,:class=>"logo")%>
+
+          <br /><b style="width:221px;"> <%= Location.current_health_center.name + " : " + @quarter %></b>
+          <br /> <b style="width:221px;">Start Date: <%= @specified_period[0].to_date.strftime("%A %d %B, %Y") %></b>
+          <br /> <b style="width:221px;">End Date: <%= @specified_period[1].to_date.strftime("%A %d %B, %Y") %></b>
+
+          <div class='scrollTableContainer'>
+            <table cellspacing='0' align="center" width="98%" height="95%">
+              <thead>
+                <tr>
+
+                  <th style = "text-align:left;">PATIENT'S REGISTRATION DETAILS</th>
+                  <th>NEWLY REGISTRATED IN quarter</th>
+                  <th>CUMULATED EVER REGISTRATED</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+
+                  <td style="text-align:left;">Total registrated</td>
+                  <td><%=  @total_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:1px 0px 0px 1px">Males</td>
+                  <td style="border-width:1px 1px 1px 1px"><%=  @total_men_registered %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @total_men_ever_registered %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 1px 1px">Females</td>
+                  <td style="border-width:1px 1px 1px 1px"><%=  @total_women_registered %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%=  @total_women_ever_registered %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+
+                <tr class = 'heading'>
+
+                  <td style="text-align:left;border-width:1px 0px 0px 1px"  colspan="3">Confirmed Epilepsy</td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Gemeralised Seizure</td>
+                  <td style="border-width:1px 1px 1px 1px">&nbsp;</td>
+                  <td style="border-width:1px 1px 1px 1px">&nbsp;</td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Focal/Partial Seizure</td>
+                  <td style="border-width:1px 1px 1px 1px">&nbsp;</td>
+                  <td style="border-width:1px 1px 1px 1px">&nbsp;</td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 1px 1px">Not Confrimed</td>
+                  <td style="border-width:1px 1px 1px 1px">&nbsp;</td>
+                  <td style="border-width:1px 1px 1px 1px">&nbsp;</td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+
+                <tr class = 'heading'>
+                  <td style="text-align:left;border-width:1px 0px 0px 1px"  colspan="3">Diagnosis of those epileptic</td>
+                </tr>
+
+
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:1px 0px 0px 1px">Tonic Clonic</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @on_diet %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @on_diet_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Absence</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @oral_treatments %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @oral_treatments_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Myclonic</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @insulin %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @insulin_ever %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Atomic</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @oral_and_insulin %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @oral_and_insulin_ever %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Simplex</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @metformin %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @metformin_ever %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 1px 1px">Complex</td>
+                  <td style="border-width:1px 0px 1px 1px"><%= @glibenclamide %></td>
+                  <td style="border-width:1px 0px 1px 1px"><%= @glibenclamide_ever %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+
+                <tr class = 'heading'>
+                  <td style="text-align:left;border-width:1px 0px 0px 1px"  colspan="3">Diagnosis of those non epileptic</td>
+                </tr>
+
+
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:1px 0px 0px 1px">Syncope</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @on_diet %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @on_diet_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Febrile seizure</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @oral_treatments %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @oral_treatments_ever %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 1px 1px">Psychogenic</td>
+                  <td style="border-width:1px 0px 1px 1px"><%= @glibenclamide %></td>
+                  <td style="border-width:1px 0px 1px 1px"><%= @glibenclamide_ever %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+                <tr class = 'heading'>
+
+                  <td style="text-align:left;border-width:1px 0px 0px 1px"  colspan="3">Complications Of Those Who Are Alive And On Treatment</td>
+
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:1px 1px 0px 1px">Burns</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @heart_failure %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @heart_failure_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Injuries</td>
+                  <td style="border-width:1px 0px 0px 1px"><%= @mi %></td>
+                  <td style="border-width:1px 1px 0px 1px"><%= @mi_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Psychosis</td>
+                  <td style="border-width:1px 0px 0px 1px"><%= @kidney_failure %></td>
+                  <td style="border-width:1px 1px 0px 1px"><%= @kidney_failure_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Hyperactivity</td>
+                  <td style="border-width:1px 0px 0px 1px"><%= @stroke %></td>
+                  <td style="border-width:1px 1px 0px 1px"><%= @stroke_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Status Epilepticus</td>
+                  <td style="border-width:1px 0px 0px 1px"><%= @tia %></td>
+                  <td style="border-width:1px 1px 0px 1px"><%= @tia_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 1px 1px">Drug related</td>
+                  <td style="border-width:1px 0px 1px 1px"><%= @ulcers %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @ulcers_ever %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+
+                <tr class = 'heading'>
+
+                  <td style="text-align:left;border-width:1px 0px 0px 1px"  colspan="3">TB Status Of All Patients Registered</td>
+
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:1px 0px 0px 1px">TB Status Known</td>
+                  <td style="border-width:1px 0px 0px 1px"><%= @tb_known %></td>
+                  <td style="border-width:1px 1px 0px 1px"><%= @tb_known_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">TB Ever</td>
+                  <td style="border-width:1px 0px 0px 1px"><%= @tb %></td>
+                  <td style="border-width:1px 1px 0px 1px"><%= @tb_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">TB Since Diabetes Diagnosis</td>
+                  <td style="border-width:1px 0px 0px 1px"><%= @tb_after_diabetes %></td>
+                  <td style="border-width:1px 1px 0px 1px"><%= @tb_after_diabetes_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">No TB</td>
+                  <td style="border-width:1px 0px 1px 1px"><%= @no_tb %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @no_tb_ever %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 1px 1px">TB Status Unknown</td>
+                  <td style="border-width:1px 0px 1px 1px"><%= @tb_unknown %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @tb_unknown_ever %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+
+                <tr class = 'heading'>
+
+                  <td style="text-align:left;border-width:1px 0px 0px 1px"  colspan="3">HIV Status Of All Patients Registered</td>
+
+                </tr>
+
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:1px 0px 0px 1px">Reactive Not on ART</td>
+                  <td style="border-width:1px 0px 1px 1px"><%= @reactive_not_on_art %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @reactive_not_on_art_ever %></td>
+                </tr>
+
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Reactive on ART</td>
+                  <td style="border-width:1px 0px 1px 1px"><%= @reactive_on_art %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @reactive_on_art_ever %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Non Reactive</td>
+                  <td style="border-width:1px 0px 1px 1px"><%= @non_reactive %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @non_reactive_ever %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 1px 1px">Unknown</td>
+                  <td style="border-width:1px 0px 1px 1px"><%= @unknown %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @unknown_ever %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+
+                <tr class = 'heading'>
+                  <td style="text-align:left;border-width:1px 0px 0px 1px"  colspan="3">Outcomes</td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:1px 0px 0px 1px">Alive and on treatment</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @alive %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @alive_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Dead</td>
+                  <td style="border-width:1px 1px 1px 1px"><%=@dead %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%=@dead_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Defaulters</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @defaulters %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @defaulters_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Transfer Out</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @transfer_out %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @transfer_out_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 1px 1px">Stop Treatment</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @stopped_treatment %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @stopped_treatment_ever %></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div id="footer" class="dark">
+            <div id="buttons" class="buttons" style="top:0px">
+              <button id="finish" class="green"><span>Finish</span></button>
+            </div>
+          </div>
+
+
+        </body>
+        </html>
