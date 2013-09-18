@@ -15,7 +15,7 @@
     margin-top: 0px;
     background:white;
   }
-  #stats td, #stats th {
+  #stats th {
     text-align:center;
   }
   .odd {
@@ -69,8 +69,8 @@
       <th style="text-align:left;">Task Type</th>
       <th>Me</th>
       <th>Today</th>
-      <th>This Year</th>
-      <th>Total to Date</th>
+      <!--th>This Year</th>
+      <th>Total to Date</th -->
     </tr>
 
     <% @encounter_activities.each do |enc| %>
@@ -78,18 +78,18 @@
         <td align="left">
           <%=  enc %>
         </td>
-        <td>
+        <td  style="text-align:center;">
           <%= @me[enc] %>
         </td>
-        <td>
+        <td  style="text-align:center;">
          <%= @today[enc] %>
         </td>
-        <td>
+        <!-- td>
           <%= @current_year[enc] %>
         </td>
         <td>
           <%=  @to_date[enc] %>
-        </td>
+        </td -->
       </tr>
     <% end %>
 

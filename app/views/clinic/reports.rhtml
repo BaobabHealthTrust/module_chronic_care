@@ -87,15 +87,17 @@
           </span>
         </button>
       </td>
-<!---
+    </tr>
+    <tr>
 	   <td style="height: 70px;">
-        <button class="btn" onclick="window.parent.location='/clinic/lab_results?user_id=<%= params[:user_id]
-              %>&location_id=<%= session[:location_id] || params[:location_id] %>&src=<%= @host %>'">
+        <button class="btn" onclick="window.parent.location='/report/cohort_menu?user_id=<%= params[:user_id]
+              %>&location_id=<%= session[:location_id] || params[:location_id] %>&id=epilepsy'">
           <span>
             Epilepsy Report
           </span>
         </button>
       </td>
+      <!---
 	  <td style="height: 70px;">
         <button class="btn" onclick="window.parent.location='/report/assessment?user_id=<%= params[:user_id]
               %>&location_id=<%= session[:location_id] || params[:location_id] %>&src=<%= @host %>'">

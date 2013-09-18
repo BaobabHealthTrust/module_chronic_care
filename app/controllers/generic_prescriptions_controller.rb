@@ -29,7 +29,9 @@ class GenericPrescriptionsController < ApplicationController
   end
   
   def create
-  #raise session[:datetime].to_yaml
+    unless session[:datetime].blank?
+      session[:datetime] = nil if session[:datetime].to_date == Date.today
+    end
     @suggestions = params[:suggestion] || ['New Prescription']
     @patient = Patient.find(params[:patient_id] || session[:patient_id]) rescue nil
     if params[:location].blank?
@@ -224,9 +226,11 @@ class GenericPrescriptionsController < ApplicationController
 	end
 
 	def generic_advanced_prescription
+    
     @user = params[:user_id]
 		@patient = Patient.find(params[:patient_id] || session[:patient_id]) rescue []
 		@generics = MedicationService.generic
+
 		@frequencies = MedicationService.fully_specified_frequencies
     
 		@formulations = {}
@@ -239,7 +243,7 @@ class GenericPrescriptionsController < ApplicationController
 			}
 			@formulations[generic[1]] = drug_formulations			
 		}
-    #raise @formulations.to_yaml
+   
 		@diagnosis = @patient.current_diagnoses["DIAGNOSIS"] rescue []
 		render :layout => 'application', :template => 'prescriptions/give_drugs'
 	end
