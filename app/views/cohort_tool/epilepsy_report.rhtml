@@ -213,12 +213,13 @@
 
         </style>
 
-        <title>Cohort<%= Location.current_health_center.name + "  " + @quarter %></title>
+        <title>Cohort<%= @facility + "  " + @quarter %></title>
         </head>
         <body>
           <%= image_tag(@logo,:class=>"logo")%>
 
-          <br /><b style="width:221px;"> <%= Location.current_health_center.name + " : " + @quarter %></b>
+          <br /><b style="width:221px;"> <%= @facility + " : " + @quarter %></b>
+          <br /><b style="width:221px;"> Epilepsy Report</b>
           <br /> <b style="width:221px;">Start Date: <%= @specified_period[0].to_date.strftime("%A %d %B, %Y") %></b>
           <br /> <b style="width:221px;">End Date: <%= @specified_period[1].to_date.strftime("%A %d %B, %Y") %></b>
 
@@ -275,21 +276,21 @@
                 <tr class = 'row_break'>
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Gemeralised Seizure</td>
-                  <td style="border-width:1px 1px 1px 1px">&nbsp;</td>
-                  <td style="border-width:1px 1px 1px 1px">&nbsp;</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @generalized %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @generalized_ever %></td>
                 </tr>
                 <tr class = 'row_break'>
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Focal/Partial Seizure</td>
-                  <td style="border-width:1px 1px 1px 1px">&nbsp;</td>
-                  <td style="border-width:1px 1px 1px 1px">&nbsp;</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @focal_seizure %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @focal_seizure_ever %></td>
                 </tr>
 
                 <tr class = 'row_break'>
 
                   <td style="text-align:left;border-width:0px 0px 1px 1px">Not Confrimed</td>
-                  <td style="border-width:1px 1px 1px 1px">&nbsp;</td>
-                  <td style="border-width:1px 1px 1px 1px">&nbsp;</td>
+                  <td style="border-width:1px 1px 1px 1px"><%=  @non_confirmed %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @non_confirmed_ever %></td>
                 </tr>
 
                 <tr class = 'row_break'>
@@ -308,41 +309,47 @@
                 <tr class = 'row_break'>
 
                   <td style="text-align:left;border-width:1px 0px 0px 1px">Tonic Clonic</td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @on_diet %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @on_diet_ever %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @tonic_clonic %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @tonic_clonic_ever %></td>
                 </tr>
                 <tr class = 'row_break'>
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Absence</td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @oral_treatments %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @oral_treatments_ever %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @absence %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @absence_ever %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Chlonic</td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @chlonic %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @chlonic_ever %></td>
                 </tr>
                 <tr class = 'row_break'>
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Myclonic</td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @insulin %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @insulin_ever %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @myclonic %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @myclonic_ever %></td>
                 </tr>
 
                 <tr class = 'row_break'>
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Atomic</td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @oral_and_insulin %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @oral_and_insulin_ever %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @atomic %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @atomic_ever %></td>
                 </tr>
 
                 <tr class = 'row_break'>
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Simplex</td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @metformin %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @metformin_ever %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @simplex %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @simplex_ever %></td>
                 </tr>
 
                 <tr class = 'row_break'>
 
                   <td style="text-align:left;border-width:0px 0px 1px 1px">Complex</td>
-                  <td style="border-width:1px 0px 1px 1px"><%= @glibenclamide %></td>
-                  <td style="border-width:1px 0px 1px 1px"><%= @glibenclamide_ever %></td>
+                  <td style="border-width:1px 0px 1px 1px"><%= @complex %></td>
+                  <td style="border-width:1px 0px 1px 1px"><%= @complex_ever %></td>
                 </tr>
 
                 <tr class = 'row_break'>
@@ -361,21 +368,21 @@
                 <tr class = 'row_break'>
 
                   <td style="text-align:left;border-width:1px 0px 0px 1px">Syncope</td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @on_diet %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @on_diet_ever %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @syncope %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @syncope_ever %></td>
                 </tr>
                 <tr class = 'row_break'>
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Febrile seizure</td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @oral_treatments %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @oral_treatments_ever %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @febrile_seizure %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @febrile_seizure_ever %></td>
                 </tr>
 
                 <tr class = 'row_break'>
 
                   <td style="text-align:left;border-width:0px 0px 1px 1px">Psychogenic</td>
-                  <td style="border-width:1px 0px 1px 1px"><%= @glibenclamide %></td>
-                  <td style="border-width:1px 0px 1px 1px"><%= @glibenclamide_ever %></td>
+                  <td style="border-width:1px 0px 1px 1px"><%= @psychogenic %></td>
+                  <td style="border-width:1px 0px 1px 1px"><%= @psychogenic_ever %></td>
                 </tr>
 
                 <tr class = 'row_break'>
@@ -393,38 +400,38 @@
                 <tr class = 'row_break'>
 
                   <td style="text-align:left;border-width:1px 1px 0px 1px">Burns</td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @heart_failure %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @heart_failure_ever %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @burns %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @burns_ever %></td>
                 </tr>
                 <tr class = 'row_break'>
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Injuries</td>
-                  <td style="border-width:1px 0px 0px 1px"><%= @mi %></td>
-                  <td style="border-width:1px 1px 0px 1px"><%= @mi_ever %></td>
+                  <td style="border-width:1px 0px 0px 1px"><%= @injuries %></td>
+                  <td style="border-width:1px 1px 0px 1px"><%= @injuries_ever %></td>
                 </tr>
                 <tr class = 'row_break'>
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Psychosis</td>
-                  <td style="border-width:1px 0px 0px 1px"><%= @kidney_failure %></td>
-                  <td style="border-width:1px 1px 0px 1px"><%= @kidney_failure_ever %></td>
+                  <td style="border-width:1px 0px 0px 1px"><%= @psychosis %></td>
+                  <td style="border-width:1px 1px 0px 1px"><%= @psychosis_ever %></td>
                 </tr>
                 <tr class = 'row_break'>
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Hyperactivity</td>
-                  <td style="border-width:1px 0px 0px 1px"><%= @stroke %></td>
-                  <td style="border-width:1px 1px 0px 1px"><%= @stroke_ever %></td>
+                  <td style="border-width:1px 0px 0px 1px"><%= @hyperactivity %></td>
+                  <td style="border-width:1px 1px 0px 1px"><%= @hyperactivity_ever %></td>
                 </tr>
                 <tr class = 'row_break'>
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Status Epilepticus</td>
-                  <td style="border-width:1px 0px 0px 1px"><%= @tia %></td>
-                  <td style="border-width:1px 1px 0px 1px"><%= @tia_ever %></td>
+                  <td style="border-width:1px 0px 0px 1px"><%= @confirmed %></td>
+                  <td style="border-width:1px 1px 0px 1px"><%= @confirmed_ever %></td>
                 </tr>
                 <tr class = 'row_break'>
 
                   <td style="text-align:left;border-width:0px 0px 1px 1px">Drug related</td>
-                  <td style="border-width:1px 0px 1px 1px"><%= @ulcers %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%= @ulcers_ever %></td>
+                  <td style="border-width:1px 0px 1px 1px"><%= @drug_related %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%= @drug_related_ever %></td>
                 </tr>
 
                 <tr class = 'row_break'>

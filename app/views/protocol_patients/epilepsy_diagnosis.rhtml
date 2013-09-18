@@ -22,7 +22,7 @@
       <% if @number.blank? %>
 
         <td>
-                                  Number of seizure including current
+          Number of seizure including current
         </td>
         <td>
           <input type='text'
@@ -36,19 +36,19 @@
         </td>
 
       <% else %>
-      <td>
-      <input type='hidden' id='1.1.1'
+        <td>
+          <input type='hidden' id='1.1.1'
                  name='concept[Number of seizure including current]' value='<%= @number %>' />
-      <input type='text'
-             id='number_of_seizures'
-             name='Number of seizures'
-             helpText='Number of seizures since last visit?'
-             tt_pageStyleClass = "Numeric NumbersWithUnknown"
-             field_type='number'
-             tt_onload="showCategory('Treatment')"
-             tt_onUnLoad="accumulateSeizures()"/>
-      </td>
-    <% end %>
+          <input type='text'
+                 id='number_of_seizures'
+                 name='Number of seizures'
+                 helpText='Number of seizures since last visit?'
+                 tt_pageStyleClass = "Numeric NumbersWithUnknown"
+                 field_type='number'
+                 tt_onload="showCategory('Treatment')"
+                 tt_onUnLoad="accumulateSeizures()"/>
+        </td>
+      <% end %>
     </tr>
     <tr>
       <td>
@@ -59,7 +59,8 @@
                 name='concept[Seizure frequency since last visit]'
                 helpText='Seizure frequency since last visit'
                 pos='2'
-                tt_onload="showCategory('Treatment')">
+                tt_onload="showCategory('Treatment')"
+                tt_requireNextClick = false>
           <option></option>
           <option value='Constant'>Constant</option>
           <option value='Decreased'>Decreased</option>
@@ -67,98 +68,146 @@
         </select>
       </td>
     </tr>
-    <% unless @patient_epileptic == "YES" %>
+    <% if @patient.age <= 15 and @hyperactivity.blank? %>
     <tr>
       <td>
-				Confirm diagnosis of epilepsy
+        Burns
       </td>
       <td>
-        
-        <select id='1.1.3'
-                name='concept[Confirm diagnosis of epilepsy]'
-                helpText='Confirm diagnosis of epilepsy'
-                pos='3'
-                tt_onload="showCategory('Treatment')">
+        <select id='hyperactivity'
+                name='concept[hyperactivity]'
+                helpText='Confirm attention-deficit/hyperactivity disorder?'
+                pos='13'
+                tt_onLoad = "showCategory('Clinic Visit')"
+                tt_requireNextClick = false >
           <option></option>
           <option value='No'>No</option>
           <option value='Yes'>Yes</option>
         </select>
       </td>
-    
     </tr>
+    <% end 
+    if @psychosis.blank? %>
     <tr>
       <td>
-				Type of epilepsy 
+        Burns
       </td>
       <td>
-        <select id='1.1.4'
-                name='concept[Type of epilepsy]'
-                helpText='Type of epilepsy '
-                pos='4'
-                condition='$("1.1.3").value == "Yes"'
-                tt_onload="showCategory('Treatment')">
+        <select id='psychosis'
+                name='concept[psychosis]'
+                helpText='Confirm psychosis?'
+                pos='13'
+                tt_onLoad = "showCategory('Clinic Visit')"
+                tt_requireNextClick = false >
           <option></option>
-          <option value='Generalised'>Generalised Epilepsy</option>
-          <option value='Focal seizure'>Focal epilepsy</option>
+          <option value='No'>No</option>
+          <option value='Yes'>Yes</option>
         </select>
       </td>
+    </tr>
+    <% end
+    unless @patient_epileptic == "YES" %>
+      <tr>
+        <td>
+          Confirm diagnosis of epilepsy
+        </td>
+        <td>
 
-      <td>
-        <select id='general_epilepsy'
-                name='concept[generalised]'
-                helpText='Type of generalised epilepsy '
-                pos='4'
-                condition='$("1.1.4").value == "Generalised"'
-                tt_onload="showCategory('Treatment')">
-          <option></option>
-          <option value='Atomic'>Atomic</option>
-          <option value='Chlonic'>Chlonic</option>
-          <option value='Myclonic'>Myclonic</option>
-          <option value='absence'>absence</option>
-          <option value='Tonic Clonic'>Tonic Clonic</option>
-        </select>
-      </td>
-    </tr>
-    <tr>
-      <td>
-				Partial epilepsy? 
-      </td>
-      <td>
-        <select id='1.1.5' name='concept[Focal seizure]'
-                helpText='Partial epilepsy type? '
-                pos='5'
-                condition='$("1.1.4").value == "Focal seizure"'
-                tt_onload="showCategory('Treatment')" >
-          <option></option>
-          <option value='Complex'>Complex</option>
-          <option value='Simplex'>Simplex</option>
-        </select>
-      </td>
-    </tr>
-    <tr>
-      <td>
-				Condition to treat
-      </td>
-      <td>
-        <select id='1.1.6' name='concept[Condition]' 
-                helpText='Condition to treat?' pos='6'
-                condition='$("1.1.3").value == "No"'
-                tt_onload="showCategory('Treatment')">
-          <option></option>
-          <option value='Psychogenic'>Psychogenic</option>
-          <option value='Febrile seizure'>Febrile seizure</option>
-          <option value='Syncope'>Syncope</option>
-        </select>
-      </td>
-     
-    </tr>
-     <% end %>
+          <select id='1.1.3'
+                  name='concept[Confirm diagnosis of epilepsy]'
+                  helpText='Confirm diagnosis of epilepsy'
+                  pos='3'
+                  tt_onload="showCategory('Treatment')"
+                  tt_requireNextClick = false>
+            <option></option>
+            <option value='No'>No</option>
+            <option value='Yes'>Yes</option>
+          </select>
+        </td>
+
+      </tr>
+      <tr>
+        <td>
+          Type of epilepsy
+        </td>
+        <td>
+          <select id='1.1.4'
+                  name='concept[Type of epilepsy]'
+                  helpText='Type of epilepsy '
+                  pos='4'
+                  condition='$("1.1.3").value == "Yes"'
+                  tt_onload="showCategory('Treatment')"
+                  tt_requireNextClick = false>
+            <option></option>
+            <option value='Generalised'>Generalised Epilepsy</option>
+            <option value='Focal seizure'>Focal epilepsy</option>
+          </select>
+        </td>
+
+        <td>
+          <select id='general_epilepsy'
+                  name='concept[generalised]'
+                  helpText='Type of generalised epilepsy '
+                  pos='4'
+                  condition='$("1.1.4").value == "Generalised"'
+                  tt_onload="showCategory('Treatment')"
+                  tt_requireNextClick = false>
+            <option></option>
+            <option value='Atomic'>Atomic</option>
+            <option value='Chlonic'>Chlonic</option>
+            <option value='Myclonic'>Myclonic</option>
+            <option value='absence'>absence</option>
+            <option value='Tonic Clonic'>Tonic Clonic</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Partial epilepsy?
+        </td>
+        <td>
+          <select id='1.1.5' name='concept[Focal seizure]'
+                  helpText='Partial epilepsy type? '
+                  pos='5'
+                  condition='$("1.1.4").value == "Focal seizure"'
+                  tt_onload="showCategory('Treatment')"
+                  tt_requireNextClick = false>
+            <option></option>
+            <option value='Complex'>Complex</option>
+            <option value='Simplex'>Simplex</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Condition to treat
+        </td>
+        <td>
+          <select id='1.1.6' name='concept[Condition]'
+                  helpText='Condition to treat?' pos='6'
+                  condition='$("1.1.3").value == "No"'
+                  tt_onload="showCategory('Treatment')"
+                  tt_requireNextClick = false>
+            <option></option>
+            <option value='Psychogenic'>Psychogenic</option>
+            <option value='Febrile seizure'>Febrile seizure</option>
+            <option value='Syncope'>Syncope</option>
+          </select>
+        </td>
+
+      </tr>
+    <% end %>
     <tr>
       <td>
 				Prescribe Drugs?
       </td>
       <td>
-        <select id='1.1.7' name='concept[Prescribe Drugs]' helpText='Prescribe Epilepsy Drugs? ' pos='7' tt_onload="showCategory('Treatment')">
+        <select id='1.1.7'
+                name='concept[Prescribe Drugs]'
+                helpText='Prescribe Epilepsy Drugs? '
+                pos='7'
+                tt_onload="showCategory('Treatment')"
+                tt_requireNextClick = false >
           <option></option>
           <option value='No'>No</option>
           <option value='Epilepsy Drugs'>Yes</option>

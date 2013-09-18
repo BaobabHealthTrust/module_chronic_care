@@ -398,12 +398,12 @@
      medianWeightHeight = [<%= WeightHeightForAge.median_weight_height(@patient.age_in_months, @patient.gender).join(',') rescue nil -%>];
      currentWeightPercentile = (currentWeight/(medianWeightHeight[0])*100).toFixed(0);
      currentHeightPercentile = (currentHeight/(medianWeightHeight[1])*100).toFixed(0);
-     if (('<%= @patient.age %>') > 14) {
+     //if (('<%= @patient.age %>') > 14) {
        showBMI();
-     } else {
-       showWeightHeightForAge();
-       showWeightForHeight();
-     }
+    // } else {
+      // showWeightHeightForAge();
+      // showWeightForHeight();
+    // }
    }
 
   function showWeightHeightForAge(){
