@@ -22,12 +22,21 @@ class PatientsController < ApplicationController
 
 
     program_id = Program.find_by_name('CHRONIC CARE PROGRAM').id
+    date = Date.today
+    @current_state = PatientState.find_by_sql("SELECT p.patient_id, current_state_for_program(p.patient_id, #{program_id}, '#{date}') AS state, c.name as status FROM patient p
+                      INNER JOIN  patient_program pp on pp.patient_id = p.patient_id
+                      inner join patient_state ps on ps.patient_program_id = pp.patient_program_id
+                      INNER JOIN  program_workflow_state pw ON pw.program_workflow_state_id = current_state_for_program(p.patient_id, #{program_id}, '#{date}')
+                      INNER JOIN concept_name c ON c.concept_id = pw.concept_id
+                      WHERE DATE(ps.start_date) <= '#{date}'
+                      AND p.patient_id = #{@patient.id}").first.status rescue ""
 
+    #raise @current_state.to_yaml
 
-    @current_state = PatientState.find(:all,
-				:joins => "INNER JOIN patient_program p ON p.patient_program_id = patient_state.patient_program_id",
-				:conditions =>["patient_state.voided = 0 AND p.voided = 0 AND p.program_id = ? AND start_date = ? AND p.patient_id =?",
-					program_id, Date.today,@patient.id],:order => "patient_state_id ASC").last.program_workflow_state.concept.fullname
+    #@current_state = PatientState.find(:all,
+		#		:joins => "INNER JOIN patient_program p ON p.patient_program_id = patient_state.patient_program_id",
+		#		:conditions =>["patient_state.voided = 0 AND p.voided = 0 AND p.program_id = ? AND start_date = ? AND p.patient_id =?",
+		#			program_id, Date.today,@patient.id],:order => "patient_state_id ASC").last.program_workflow_state.concept.fullname
     
     #raise patient_states.last.program_workflow_state.concept.fullname.to_yaml
 
