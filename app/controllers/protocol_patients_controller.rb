@@ -158,11 +158,16 @@ class ProtocolPatientsController < ApplicationController
                    WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'DBP' LIMIT 1)
                    AND voided = 0 AND person_id = #{@patient.id} ORDER BY obs_datetime DESC LIMIT 1").first.value_numeric rescue 0
 
+    @bmi = Observation.find_by_sql("SELECT * from obs
+                   WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'bmi' LIMIT 1)
+                   AND voided = 0 AND person_id = #{@patient.id} ORDER BY obs_datetime DESC LIMIT 1").first.to_s.split(":")[1].squish.to_f.round(2) rescue 0
+
+    @smoking = Vitals.current_vitals(@patient, "current smoker").to_s.split(":")[1].squish.upcase rescue "Unknown"
+    @drinking = Vitals.current_vitals(@patient, "Does the patient drink alcohol?").to_s.split(":")[1].squish.upcase rescue "Unknown"
+
     current_date = current_date + 2.months
     
     @previous_treatment = check_encounter(@patient, "TREATMENT", current_date)
-
-    #raise @previous_treatment.to_yaml
 
     @bp = (@sbp / @dbp).to_f rescue 0
     @previous_bp = (@previous_sbp / @previous_dbp).to_f rescue 0

@@ -49,8 +49,17 @@
 				Have you been diagnosed with TB since your LAST clinic visit? 
 			</td>
 			<td>
-<% if @first_visit != true %>
+<% if @first_visit == true %>
 <select id='1.1.1' name='concept[HAVE YOU EVER HAD TB?]' 
+        helpText='Have you been diagnosed with TB? ' pos='1'
+        tt_onload="showCategory('Clinic Visit')"
+        tt_requireNextClick = false >
+<option></option>
+<option value='No'>No</option>
+ <option value='Yes'>Yes</option>
+ </select>
+ <% else %>
+   <select id='1.1.1' name='concept[HAVE YOU EVER HAD TB?]'
         helpText='Have you been diagnosed with TB since your LAST clinic visit? ' pos='1'
         tt_onload="showCategory('Clinic Visit')"
         tt_requireNextClick = false >
@@ -58,7 +67,7 @@
 <option value='No'>No</option>
  <option value='Yes'>Yes</option>
  </select>
-			</td>
+<% end %>			</td>
 		</tr>
 		<tr>
 			<td>
@@ -74,7 +83,7 @@
                                 :absoluteMin => "1950", :min => "1940", :absoluteMax => Date.today.year,
 				:helpText => "Year(s) of TB Diagnosis",
                                 :tt_onload=> "showCategory('Clinic Visit')"} %>
-<% end %>
+
 			</td>
 		</tr>
 			<tr>

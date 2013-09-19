@@ -10,6 +10,8 @@ class Reports::CohortDm
 		@hypertensition_medication_id  = Concept.find_by_name("HYPERTENSION MEDICATION").id
 		@diabetes_id                   = Concept.find_by_name("DIABETES MEDICATION").id
 		@hypertensition_id             = Concept.find_by_name("HYPERTENSION").id
+    @asthma_id             = Concept.find_by_name("ASTHMA MEDICATION").id
+    @epilepsy_id             = Concept.find_by_name("EPILEPSY MEDICATION").id
 
 
     # Metformin And Glibenclamide
@@ -911,33 +913,40 @@ class Reports::CohortDm
                               patient.patient_id = obs.person_id WHERE concept_id = (SELECT concept_id \
                               FROM concept_name WHERE name = 'HAVE YOU EVER HAD TB?') AND value_coded IN \
                               (SELECT concept_id FROM concept_name WHERE name = 'YES') AND patient.voided = 0 AND \
-                                        DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "' ").length
+                                        DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "' AND obs.voided = 0").length
   end
 
   def tb
-    @orders = Order.find_by_sql("SELECT DISTINCT person_id FROM obs LEFT OUTER JOIN patient ON \
-                              patient.patient_id = obs.person_id WHERE concept_id = (SELECT concept_id \
-                              FROM concept_name WHERE name = 'HAVE YOU EVER HAD TB?') AND value_coded IN \
-                              (SELECT concept_id FROM concept_name WHERE name = 'YES') AND \
-                               DATE_FORMAT(patient.date_created, '%Y-%m-%d') >= '" + @start_date +
-        "' AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "' \
-                                        AND patient.voided = 0").length
+    @orders = Order.find_by_sql("SELECT DISTINCT person_id 
+                                 FROM obs LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id
+                                 WHERE concept_id = (SELECT concept_id \
+                                                     FROM concept_name WHERE name = 'HAVE YOU EVER HAD TB?')
+                                AND value_coded IN (SELECT concept_id FROM concept_name WHERE name = 'YES')
+                                AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') >= '" + @start_date + "'
+                                AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'
+                                AND patient.voided = 0
+                                AND obs.voided = 0").length
   end
 
   def tb_known_ever
-    @orders = Order.find_by_sql("SELECT DISTINCT person_id FROM obs LEFT OUTER JOIN patient ON \
-                              patient.patient_id = obs.person_id WHERE concept_id = (SELECT concept_id \
-                              FROM concept_name WHERE name = 'HAVE YOU EVER HAD TB?') AND patient.voided = 0 AND \
-                                        DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "' ").length
+    @orders = Order.find_by_sql("SELECT DISTINCT person_id 
+                                 FROM obs LEFT OUTER JOIN patient ON  patient.patient_id = obs.person_id
+                                 WHERE concept_id = (SELECT concept_id
+                                                      FROM concept_name WHERE name = 'HAVE YOU EVER HAD TB?')
+                                 AND patient.voided = 0
+                                 AND obs.voided = 0
+                                 AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "' ").length
   end
 
   def tb_known
     @orders = Order.find_by_sql("SELECT DISTINCT person_id FROM obs LEFT OUTER JOIN patient ON \
-                              patient.patient_id = obs.person_id WHERE concept_id = (SELECT concept_id \
-                              FROM concept_name WHERE name = 'HAVE YOU EVER HAD TB?') AND \
-                               DATE_FORMAT(patient.date_created, '%Y-%m-%d') >= '" + @start_date +
-        "' AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "' \
-                                        AND patient.voided = 0").length
+                              patient.patient_id = obs.person_id 
+                              WHERE concept_id = (SELECT concept_id FROM concept_name
+                                                  WHERE name = 'HAVE YOU EVER HAD TB?')
+                              AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') >= '" + @start_date +"'
+                              AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'
+                              AND patient.voided = 0
+                              AND obs.voided = 0 ").length
   end
 
   def tb_unkown_ever
@@ -1059,6 +1068,38 @@ class Reports::CohortDm
   end
 
   # Outcome
+  def discharged_ever
+    program_id = Program.find_by_name("CHRONIC CARE PROGRAM").id
+
+    patient_died = ConceptName.find_all_by_name('PATIENT DIED')
+		state = ProgramWorkflowState.find(
+		  :first,
+		  :conditions => ["concept_id IN (?)",
+        patient_died.map{|c|c.concept_id}]
+		).program_workflow_state_id
+
+    @dead = PatientState.find_by_sql("SELECT DISTINCT p.patient_id FROM patient p
+                INNER JOIN  patient_program pp on pp.patient_id = p.patient_id
+                inner join patient_state ps on ps.patient_program_id = pp.patient_program_id
+                INNER JOIN  program_workflow_state pw ON pw.program_workflow_state_id = current_state_for_program(p.patient_id, #{program_id}, '#{@end_date}')
+                INNER JOIN concept_name c ON c.concept_id = pw.concept_id
+                WHERE ps.start_date <= '#{@end_date}'
+                AND c.name = 'DISCHARGED'").length
+  end
+
+  def discharged
+    program_id = Program.find_by_name("CHRONIC CARE PROGRAM").id
+
+    @dead = PatientState.find_by_sql("SELECT DISTINCT p.patient_id FROM patient p
+                INNER JOIN  patient_program pp on pp.patient_id = p.patient_id
+                inner join patient_state ps on ps.patient_program_id = pp.patient_program_id
+                INNER JOIN  program_workflow_state pw ON pw.program_workflow_state_id = current_state_for_program(p.patient_id, #{program_id}, '#{@end_date}')
+                INNER JOIN concept_name c ON c.concept_id = pw.concept_id
+                WHERE ps.start_date <= '#{@end_date}'
+                AND ps.start_date >= '#{@start_date}'
+                AND c.name = 'DISCHARGED'").length
+  end
+
   def dead_ever
     program_id = Program.find_by_name("CHRONIC CARE PROGRAM").id
     
@@ -1069,7 +1110,14 @@ class Reports::CohortDm
         patient_died.map{|c|c.concept_id}]
 		).program_workflow_state_id
 
-   
+    @dead = PatientState.find_by_sql("SELECT DISTINCT p.patient_id FROM patient p
+                INNER JOIN  patient_program pp on pp.patient_id = p.patient_id
+                inner join patient_state ps on ps.patient_program_id = pp.patient_program_id
+                INNER JOIN  program_workflow_state pw ON pw.program_workflow_state_id = current_state_for_program(p.patient_id, #{program_id}, '#{@end_date}')
+                INNER JOIN concept_name c ON c.concept_id = pw.concept_id
+                WHERE ps.start_date <= '#{@end_date}'
+                AND c.name = 'PATIENT DIED'").length
+=begin
 		@dead = PatientState.find_by_sql("
             SELECT s.patient_program_id, patient_id,patient_state_id,start_date, n.name name,state
             FROM patient_state s
@@ -1083,6 +1131,7 @@ class Reports::CohortDm
             AND s.start_date <= '#{@end_date}'
             AND n.name = 'PATIENT DIED'
             ORDER BY patient_state_id DESC, start_date DESC").length
+=end
   end
 
   def dead
@@ -1090,21 +1139,14 @@ class Reports::CohortDm
     
     patient_died = ConceptName.find_all_by_name('PATIENT DIED')
 
-   
-		@dead = PatientState.find_by_sql("
-            SELECT s.patient_program_id, patient_id,patient_state_id,start_date, n.name name,state
-            FROM patient_state s
-            LEFT JOIN patient_program p ON p.patient_program_id = s.patient_program_id
-            LEFT JOIN program_workflow pw ON pw.program_id = p.program_id
-            LEFT JOIN program_workflow_state w ON w.program_workflow_id = pw.program_workflow_id
-            AND w.program_workflow_state_id = s.state
-            LEFT JOIN concept_name n ON w.concept_id = n.concept_id
-            WHERE p.voided = 0 AND s.voided = 0
-            AND p.program_id = #{program_id}
-            AND (s.start_date >= '#{@start_date}'
-            AND s.start_date <= '#{@end_date}')
-            AND n.name = 'PATIENT DIED'
-            ORDER BY patient_state_id DESC, start_date DESC").length
+    @dead = PatientState.find_by_sql("SELECT DISTINCT p.patient_id FROM patient p
+                INNER JOIN  patient_program pp on pp.patient_id = p.patient_id
+                inner join patient_state ps on ps.patient_program_id = pp.patient_program_id
+                INNER JOIN  program_workflow_state pw ON pw.program_workflow_state_id = current_state_for_program(p.patient_id, #{program_id}, '#{@end_date}')
+                INNER JOIN concept_name c ON c.concept_id = pw.concept_id
+                WHERE ps.start_date <= '#{@end_date}'
+                AND ps.start_date >= '#{@start_date}'
+                AND c.name = 'PATIENT DIED'").length
 
   end
 
@@ -1120,19 +1162,14 @@ class Reports::CohortDm
   def transfer_out_ever
     program_id = Program.find_by_name("CHRONIC CARE PROGRAM").id
 
-		@transferred_out_ever = PatientState.find_by_sql("
-            SELECT s.patient_program_id, patient_id,patient_state_id,start_date, n.name name,state
-            FROM patient_state s
-            LEFT JOIN patient_program p ON p.patient_program_id = s.patient_program_id
-            LEFT JOIN program_workflow pw ON pw.program_id = p.program_id
-            LEFT JOIN program_workflow_state w ON w.program_workflow_id = pw.program_workflow_id
-            AND w.program_workflow_state_id = s.state
-            LEFT JOIN concept_name n ON w.concept_id = n.concept_id
-            WHERE p.voided = 0 AND s.voided = 0
-            AND p.program_id = #{program_id}
-            AND s.start_date <= '#{@end_date}'
-            AND n.name = 'Patient transferred (External facility)'
-            ORDER BY patient_state_id DESC, start_date DESC").length
+    @dead = PatientState.find_by_sql("SELECT DISTINCT p.patient_id FROM patient p
+                INNER JOIN  patient_program pp on pp.patient_id = p.patient_id
+                inner join patient_state ps on ps.patient_program_id = pp.patient_program_id
+                INNER JOIN  program_workflow_state pw ON pw.program_workflow_state_id = current_state_for_program(p.patient_id, #{program_id}, '#{@end_date}')
+                INNER JOIN concept_name c ON c.concept_id = pw.concept_id
+                WHERE ps.start_date <= '#{@end_date}'
+                AND c.name = 'PATIENT TRANSFERRED OUT'").length
+
   end
 
   def transfer_out
@@ -1140,20 +1177,14 @@ class Reports::CohortDm
 
     patient_died = ConceptName.find_all_by_name('PATIENT DIED')
 
-		@dead = PatientState.find_by_sql("
-            SELECT s.patient_program_id, patient_id,patient_state_id,start_date, n.name name,state
-            FROM patient_state s
-            LEFT JOIN patient_program p ON p.patient_program_id = s.patient_program_id
-            LEFT JOIN program_workflow pw ON pw.program_id = p.program_id
-            LEFT JOIN program_workflow_state w ON w.program_workflow_id = pw.program_workflow_id
-            AND w.program_workflow_state_id = s.state
-            LEFT JOIN concept_name n ON w.concept_id = n.concept_id
-            WHERE p.voided = 0 AND s.voided = 0
-            AND p.program_id = #{program_id}
-            AND (s.start_date >= '#{@start_date}'
-            AND s.start_date <= '#{@end_date}')
-            AND n.name = 'Patient transferred (External facility)'
-            ORDER BY patient_state_id DESC, start_date DESC").length
+    @dead = PatientState.find_by_sql("SELECT DISTINCT p.patient_id FROM patient p
+                INNER JOIN  patient_program pp on pp.patient_id = p.patient_id
+                inner join patient_state ps on ps.patient_program_id = pp.patient_program_id
+                INNER JOIN  program_workflow_state pw ON pw.program_workflow_state_id = current_state_for_program(p.patient_id, #{program_id}, '#{@end_date}')
+                INNER JOIN concept_name c ON c.concept_id = pw.concept_id
+                WHERE ps.start_date <= '#{@end_date}'
+                AND ps.start_date >= '#{@start_date}'
+                AND c.name = 'PATIENT TRANSFERRED OUT'").length
   end
 
   def stopped_treatment_ever
@@ -1161,19 +1192,13 @@ class Reports::CohortDm
 
     patient_died = ConceptName.find_all_by_name('PATIENT DIED')
 
-		@dead = PatientState.find_by_sql("
-            SELECT s.patient_program_id, patient_id,patient_state_id,start_date, n.name name,state
-            FROM patient_state s
-            LEFT JOIN patient_program p ON p.patient_program_id = s.patient_program_id
-            LEFT JOIN program_workflow pw ON pw.program_id = p.program_id
-            LEFT JOIN program_workflow_state w ON w.program_workflow_id = pw.program_workflow_id
-            AND w.program_workflow_state_id = s.state
-            LEFT JOIN concept_name n ON w.concept_id = n.concept_id
-            WHERE p.voided = 0 AND s.voided = 0
-            AND p.program_id = #{program_id}
-            AND s.start_date <= '#{@end_date}'
-            AND n.name = 'Discharged'
-            ORDER BY patient_state_id DESC, start_date DESC").length
+    @dead = PatientState.find_by_sql("SELECT DISTINCT p.patient_id FROM patient p
+                INNER JOIN  patient_program pp on pp.patient_id = p.patient_id
+                inner join patient_state ps on ps.patient_program_id = pp.patient_program_id
+                INNER JOIN  program_workflow_state pw ON pw.program_workflow_state_id = current_state_for_program(p.patient_id, #{program_id}, '#{@end_date}')
+                INNER JOIN concept_name c ON c.concept_id = pw.concept_id
+                WHERE ps.start_date <= '#{@end_date}'
+                AND c.name = 'TREATMENT STOPPED'").length
   end
 
   def stopped_treatment
@@ -1181,20 +1206,14 @@ class Reports::CohortDm
 
     patient_died = ConceptName.find_all_by_name('PATIENT DIED')
 
-		@dead = PatientState.find_by_sql("
-            SELECT s.patient_program_id, patient_id,patient_state_id,start_date, n.name name,state
-            FROM patient_state s
-            LEFT JOIN patient_program p ON p.patient_program_id = s.patient_program_id
-            LEFT JOIN program_workflow pw ON pw.program_id = p.program_id
-            LEFT JOIN program_workflow_state w ON w.program_workflow_id = pw.program_workflow_id
-            AND w.program_workflow_state_id = s.state
-            LEFT JOIN concept_name n ON w.concept_id = n.concept_id
-            WHERE p.voided = 0 AND s.voided = 0
-            AND p.program_id = #{program_id}
-            AND (s.start_date >= '#{@start_date}'
-            AND s.start_date <= '#{@end_date}')
-            AND n.name = 'Discharged'
-            ORDER BY patient_state_id DESC, start_date DESC").length
+    @dead = PatientState.find_by_sql("SELECT DISTINCT p.patient_id FROM patient p
+                INNER JOIN  patient_program pp on pp.patient_id = p.patient_id
+                inner join patient_state ps on ps.patient_program_id = pp.patient_program_id
+                INNER JOIN  program_workflow_state pw ON pw.program_workflow_state_id = current_state_for_program(p.patient_id, #{program_id}, '#{@end_date}')
+                INNER JOIN concept_name c ON c.concept_id = pw.concept_id
+                WHERE ps.start_date <= '#{@end_date}'
+                AND ps.start_date >= '#{@start_date}'
+                AND c.name = 'TREATMENT STOPPED'").length
   end
 
   # Treatment (Alive and Even Defaulters)
@@ -1230,7 +1249,7 @@ class Reports::CohortDm
                                       AND patient.voided = 0 AND \
                                       DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
 																			AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
-																			concept_set IN (#{@diabetes_id}, #{@hypertensition_id}, #{@hypertensition_medication_id})) \
+																			concept_set IN (#{@asthma_id}, #{@epilepsy_id}, #{@diabetes_id}, #{@hypertensition_id}, #{@hypertensition_medication_id})) \
                                       GROUP BY patient_id").length
   end
 
@@ -1241,7 +1260,7 @@ class Reports::CohortDm
         @start_date + "' AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'
                                         AND patient.voided = 0 
                                         AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE 
-                                        concept_set IN (#{@diabetes_id}, #{@hypertensition_id}, #{@hypertensition_medication_id})) 
+                                        concept_set IN (#{@asthma_id}, #{@epilepsy_id}, #{@diabetes_id}, #{@hypertensition_id}, #{@hypertensition_medication_id}))
                                         GROUP BY patient_id").length
   end
 

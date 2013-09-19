@@ -64,7 +64,8 @@
                   condition='__$("1.1.1").value.toLowerCase() == "mild"'
                   multiple='true'
                   tt_onload="showCategory('Treatment')"
-                  helpText='Recommended Treatment for category : <%= @category %>'>
+                  helpText='Recommended Treatment for category : <%= @category %>'
+                  optional='true'>
                     <% if @bp < @normal_bp %>
               <option value="Aspirin">Aspirin (75mg tablet)</option>
 
@@ -100,7 +101,8 @@
                   tt_onload="showCategory('Treatment')"
                   tt_pageStyleClass = "MultiSelectList"
                    
-                  helpText='Recommended Treatment for category : <%= @category %>'>
+                  helpText='Recommended Treatment for category : <%= @category %>'
+                  optional='true'>
             <option></option>
             
               <option value="Hydrochlorothiazide">Hydrochlorthiazide</option>
@@ -130,7 +132,11 @@
           Advise on Life Changes
         </td>
         <td>
-          <% @changes_list = ["Avoid heavy drinking", "Loose weight", "Regular exercises", "Stop Smoking"] %>
+          <% @changes_list = ["Regular exercises"]
+            @changes_list += ["Lose weight"] if @bmi < 25
+            @changes_list += ["Stop Smoking"] if @smoking == "YES"
+            @changes_list += ["Avoid heavy drinking"] if @drinking == "YES"
+        %>
           <%= select_tag "You receive helpful advice on important things in your life", options_for_select(@changes_list),
             { :field_type => 'text',
             :helpText => "Advise on Life Changes",

@@ -1515,6 +1515,9 @@ class CohortToolController < ApplicationController
 
     @dead = report.dead
 
+    @discharged_ever = report.discharged_ever
+    @discharged =report.discharged
+
     @transfer_out_ever = report.transfer_out_ever
 
     @transfer_out = report.transfer_out
@@ -1523,44 +1526,23 @@ class CohortToolController < ApplicationController
 
     @stopped_treatment = report.stopped_treatment
 
-    @alive_ever = @total_ever_registered.to_i - report.defaulters_ever.to_i - report.transfer_out_ever.to_i - report.stopped_treatment_ever.to_i
+    @defaulters_ever = report.defaulters_ever - report.transfer_out_ever.to_i - report.stopped_treatment_ever.to_i - @discharged_ever.to_i
 
-    @alive = @total_registered.to_i - report.defaulters.to_i - report.transfer_out.to_i - report.stopped_treatment.to_i
+    @defaulters = report.defaulters - report.transfer_out.to_i - report.stopped_treatment.to_i - @discharged.to_i
+
+    @defaulters_ever = 0 if @defaulters_ever.to_i < 0
+    @defaulters = 0 if @defaulters.to_i < 0
+
+    @alive_ever = @total_ever_registered.to_i - @defaulters_ever.to_i - report.transfer_out_ever.to_i - report.stopped_treatment_ever.to_i - @discharged_ever.to_i
+
+    @alive = @total_registered.to_i - @defaulters.to_i - report.transfer_out.to_i - report.stopped_treatment.to_i - @discharged.to_i
 
     @on_diet_ever = @alive_ever.to_i - @oral_treatments_ever.to_i - @insulin_ever.to_i - @oral_and_insulin_ever.to_i
 
     @on_diet = @alive.to_i - @oral_treatments.to_i - @insulin.to_i - @oral_and_insulin.to_i
 
-    @defaulters_ever = report.defaulters_ever
 
-    @defaulters = report.defaulters
-
-    @background_retinapathy_ever = report.background_retinapathy_ever
-
-    @background_retinapathy = report.background_retinapathy
-
-    @ploriferative_retinapathy_ever = report.ploriferative_retinapathy_ever
-
-    @ploriferative_retinapathy = report.ploriferative_retinapathy
-
-    @end_stage_retinapathy_ever = report.end_stage_retinapathy_ever
-
-    @end_stage_retinapathy = report.end_stage_retinapathy
-
-    @maculopathy_ever = report.maculopathy_ever
-
-    @maculopathy = report.maculopathy
-
-    @diabetic_retinopathy_ever = @background_retinapathy_ever +
-      @ploriferative_retinapathy_ever +
-      @end_stage_retinapathy_ever +
-      @maculopathy_ever
-
-    @diabetic_retinopathy = @background_retinapathy +
-      @ploriferative_retinapathy +
-      @end_stage_retinapathy +
-      @maculopathy
-
+   
     #render :layout => "report"
     render :layout => "application"
   end
