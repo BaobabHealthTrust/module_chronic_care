@@ -39,7 +39,6 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
 <% end %>
 
   function addDiv(){
-    alert("here")
     var html = "<div style='display: table-row;'><div style='display: table-cell;margin: 5px;margin-top: 0px;padding: 2px;'>Patient State</div><div style='display: table-cell;margin: 5px;margin-top: 0px;padding: 2px;'>State</div>";
     document.getElementById('mainTopicContent').innerHTML += html;
   }
@@ -63,13 +62,13 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
     display += '<legend>Choose a program:</legend>'
     display += '<table cellspacing="10"><tr>'
 
-    display += '<td align="left"><a href="/clinic/programs?user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>&program=ASTHMA">Asthma program</a></td></tr>'
+    display += '<td align="left"><a href="/clinic/programs?patient_id=<%= params[:id] %>&user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>&program=ASTHMA">Asthma program</a></td></tr>'
 
     display += '<tr>'
-    display += '<td align="left"><a href="/clinic/programs?user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>&program=HYPERTENSION">Hypertension and Diabetes Program</a></td></tr>'
+    display += '<td align="left"><a href="/clinic/programs?patient_id=<%= params[:id] %>&user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>&program=HYPERTENSION">Hypertension and Diabetes Program</a></td></tr>'
 
     display += '<tr>'
-    display += '<td align="left"><a href="/clinic/programs?user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>&program=EPILEPSY">Epilepsy program</a></td></tr></table>'
+    display += '<td align="left"><a href="/clinic/programs?patient_id=<%= params[:id] %>&user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>&program=EPILEPSY">Epilepsy program</a></td></tr></table>'
 
     display += '</fieldset>'
     display += '</div>'
@@ -288,18 +287,18 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
         <option value='/patients/printouts/<%= @patient.id %>?user_id=<%= @user.id %>'>Printouts</option>		
       </select>
       <select id="links">
-
+        <optgroup value="javascript:selectProgram()" label="Change Workflow"></optgroup>
         <% i = 1
         groups = @task
         done = []
         @links.each do |encounter, link| %>
-          <% if  i <= 9 %>
+          <% if  i <= 7 %>
             <optgroup value='<%= link %>' label="<%= (!@task.labels[encounter.downcase].nil? ?
                           @task.labels[encounter.downcase] : encounter) %>" >
                         <% done << encounter.to_s %>
             </optgroup>
           <% else %>
-            <%  if i == 10 %>
+            <%  if i == 8 %>
               <optgroup label="Other Tasks" >
               <% end %>
               <%  @links.each do |group_encounter, group_link|
@@ -310,7 +309,7 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
                 <% end
               end %>
 
-              <%  if i == 10 %>
+              <%  if i == 8 %>
               </optgroup>
             <% end %>
           <% end
@@ -423,7 +422,7 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
             <option link="<%= @task.url  %>" ttSize = "160px">Continue</option>
           <% end %>
         <% end %>
-        <option ttSize="200px"on ="javascript:selectProgram()">Change Program</option>
+        
       </select>
 
       <input type='submit' value='Finish' />

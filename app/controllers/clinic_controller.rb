@@ -42,7 +42,11 @@ class ClinicController < ApplicationController
     session[:selected_program] = params[:program] + " PROGRAM"
     @user_id = params[:user_id]
     @location_id = params[:location_id]
-    redirect_to "/clinic/index?user_id=#{params[:user_id]}&location_id=#{params[:location_id]}"
+    if params[:patient_id]
+      redirect_to "/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}"
+    else
+      redirect_to "/clinic/index?user_id=#{params[:user_id]}&location_id=#{params[:location_id]}"
+    end
 	end
 
   def user_login

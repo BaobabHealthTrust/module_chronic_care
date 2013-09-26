@@ -198,7 +198,7 @@ function showSelectedConditions() {
 	  tabledAnalysis = "<table  id='charttable'  width='100%' valign='top'><tr><th>Asthma Measure</th><th>Family History</th><th>Asthma Test</th></tr>";
 	  tabledAnalysis += "<tr><td valign='top' width= '30%'>" + html + "</td><td valign='top' width= '30%'>" + family + "</td><td valign='top' width= '40%'>" + vitals + "</td></tr>";
 	  tabledAnalysis += "<tr><td colspan='3' valign ='top'><hr></td></tr>";
-	  tabledAnalysis += "<tr class = 'create_button'  valign='top'><td width= '50%' valign='top'>Patient risk value is at <blink><i style='color: #B8002E'>" + totalRisk + " %</i></blink> </td><td colspan='2' valign='top'><blink>" + comment + "</blink></td></tr></table>"
+	  tabledAnalysis += "<tr class = 'create_button'  valign='top'><td width= '50%' valign='top'>Patient risk value is at <i style='color: #B8002E'>" + totalRisk + " %</i></td><td colspan='2' valign='top'>" + comment + "</td></tr></table>"
 	  $('inputFrame'+tstCurrentPage).innerHTML = '<div id="summary">' + tabledAnalysis + '</div>' ;
 	  $("clearButton").style.display = "none";
   }

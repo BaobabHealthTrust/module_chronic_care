@@ -44,7 +44,10 @@ class ApplicationController < ActionController::Base
 	end
 
 	def current_program
-		return session[:selected_program] rescue "HYPERTENSION PROGRAM"
+    if session[:selected_program].blank?
+      return "HYPERTENSION PROGRAM"
+    end
+		return session[:selected_program] 
 	end
 
   def present_date
