@@ -1440,78 +1440,78 @@ class CohortToolController < ApplicationController
     @psychosis = report.epilepsy_type("psychosis", "yes")
     @psychosis_ever = report.epilepsy_type_ever("psychosis", "yes")
 
-    @total_adults_registered = report.total_adults_registered(ids)
+    @total_adults_registered = report.total_adults_registered(ids) rescue ""
 
-    @total_adults_ever_registered = report.total_adults_ever_registered(ids_ever)
+    @total_adults_ever_registered = report.total_adults_ever_registered(ids_ever) rescue ""
 
-    @total_children_registered = report.total_children_registered(ids)
+    @total_children_registered = report.total_children_registered(ids) rescue ""
 
-    @total_children_ever_registered = report.total_children_ever_registered(ids_ever)
+    @total_children_ever_registered = report.total_children_ever_registered(ids_ever) rescue ""
 
-    @total_men_registered = report.total_men_registered(ids)
-    @total_men_ever_registered = report.total_men_ever_registered(ids_ever)
-
-
-    @total_adult_men_registered = report.total_adult_men_registered(ids)
-
-    @total_adult_men_ever_registered = report.total_adult_men_ever_registered(ids_ever)
+    @total_men_registered = report.total_men_registered(ids) rescue ""
+    @total_men_ever_registered = report.total_men_ever_registered(ids_ever) rescue ""
 
 
-    @total_boy_children_registered = report.total_boy_children_registered(ids)
+    @total_adult_men_registered = report.total_adult_men_registered(ids) rescue ""
 
-    @total_boy_children_ever_registered = report.total_boy_children_ever_registered(ids_ever)
-
-
-    @total_women_registered = report.total_women_registered(ids)
-
-    @total_women_ever_registered = report.total_women_ever_registered(ids_ever)
+    @total_adult_men_ever_registered = report.total_adult_men_ever_registered(ids_ever) rescue ""
 
 
-    @total_adult_women_registered = report.total_adult_women_registered(ids)
+    @total_boy_children_registered = report.total_boy_children_registered(ids) rescue ""
 
-    @total_adult_women_ever_registered = report.total_adult_women_ever_registered(ids_ever)
-
-
-    @total_girl_children_registered = report.total_girl_children_registered(ids)
-
-    @total_girl_children_ever_registered = report.total_girl_children_ever_registered(ids_ever)
+    @total_boy_children_ever_registered = report.total_boy_children_ever_registered(ids_ever)  rescue ""
 
 
-    @tb_known_ever = report.tb_known_ever(ids_ever)
+    @total_women_registered = report.total_women_registered(ids) rescue ""
 
-    @tb_known = report.tb_known(ids)
+    @total_women_ever_registered = report.total_women_ever_registered(ids_ever) rescue ""
 
-    @tb_after_diabetes_ever = report.tb_after_diabetes_ever(ids_ever)
 
-    @tb_after_diabetes = report.tb_after_diabetes(ids)
+    @total_adult_women_registered = report.total_adult_women_registered(ids) rescue ""
 
-    @tb_before_diabetes_ever = report.tb_before_diabetes_ever(ids_ever)
+    @total_adult_women_ever_registered = report.total_adult_women_ever_registered(ids_ever) rescue ""
 
-    @tb_before_diabetes = report.tb_before_diabetes(ids)
 
-    @tb_unknown_ever = report.tb_unkown_ever(ids_ever)
+    @total_girl_children_registered = report.total_girl_children_registered(ids) rescue ""
 
-    @tb_unknown = report.tb_unkown(ids)
+    @total_girl_children_ever_registered = report.total_girl_children_ever_registered(ids_ever) rescue ""
 
-    @no_tb_ever = report.no_tb_ever(ids_ever)
 
-    @no_tb = report.no_tb(ids)
+    @tb_known_ever = report.tb_known_ever(ids_ever) rescue ""
 
-    @tb_ever = report.tb_ever(ids_ever)
+    @tb_known = report.tb_known(ids) rescue ""
 
-    @tb = report.tb(ids)
+    @tb_after_diabetes_ever = report.tb_after_diabetes_ever(ids_ever) rescue ""
 
-    @reactive_not_on_art_ever = report.reactive_not_on_art_ever(ids_ever)
+    @tb_after_diabetes = report.tb_after_diabetes(ids) rescue ""
 
-    @reactive_not_on_art = report.reactive_not_on_art(ids)
+    @tb_before_diabetes_ever = report.tb_before_diabetes_ever(ids_ever) rescue ""
 
-    @reactive_on_art_ever = report.reactive_on_art_ever(ids_ever)
+    @tb_before_diabetes = report.tb_before_diabetes(ids) rescue ""
 
-    @reactive_on_art = report.reactive_on_art(ids)
+    @tb_unknown_ever = report.tb_unkown_ever(ids_ever) rescue ""
 
-    @non_reactive_ever = report.non_reactive_ever(ids_ever)
+    @tb_unknown = report.tb_unkown(ids) rescue ""
 
-    @non_reactive = report.non_reactive(ids)
+    @no_tb_ever = report.no_tb_ever(ids_ever) rescue ""
+
+    @no_tb = report.no_tb(ids) rescue ""
+
+    @tb_ever = report.tb_ever(ids_ever) rescue ""
+
+    @tb = report.tb(ids) rescue ""
+
+    @reactive_not_on_art_ever = report.reactive_not_on_art_ever(ids_ever) rescue ""
+
+    @reactive_not_on_art = report.reactive_not_on_art(ids) rescue ""
+
+    @reactive_on_art_ever = report.reactive_on_art_ever(ids_ever) rescue ""
+
+    @reactive_on_art = report.reactive_on_art(ids) rescue ""
+
+    @non_reactive_ever = report.non_reactive_ever(ids_ever) rescue ""
+
+    @non_reactive = report.non_reactive(ids) rescue ""
 
     @unknown_ever = (@total_ever_registered.to_i - @non_reactive_ever.to_i -
         @reactive_on_art_ever.to_i - @reactive_not_on_art_ever.to_i)
@@ -1519,24 +1519,26 @@ class CohortToolController < ApplicationController
     @unknown = (@total_registered.to_i - @non_reactive.to_i -
         @reactive_on_art.to_i - @reactive_not_on_art.to_i)
 
-    @dead_ever = report.dead_ever(ids_ever)
+    @dead_ever = report.dead_ever(ids_ever) rescue ""
 
-    @dead = report.dead(ids)
+    @dead = report.dead(ids) rescue ""
 
-    @discharged_ever = report.discharged_ever(ids_ever)
-    @discharged =report.discharged(ids)
+    @discharged_ever = report.discharged_ever(ids_ever) rescue ""
+    @discharged =report.discharged(ids) rescue ""
 
-    @transfer_out_ever = report.transfer_out_ever(ids_ever)
+    @transfer_out_ever = report.transfer_out_ever(ids_ever) rescue ""
 
-    @transfer_out = report.transfer_out(ids)
+    @transfer_out = report.transfer_out(ids) rescue ""
 
-    @stopped_treatment_ever = report.stopped_treatment_ever(ids_ever)
+    @stopped_treatment_ever = report.stopped_treatment_ever(ids_ever) rescue ""
 
-    @stopped_treatment = report.stopped_treatment(ids)
+    @stopped_treatment = report.stopped_treatment(ids) rescue ""
 
-    @defaulters_ever = report.defaulters_ever(ids_ever) - @transfer_out_ever.to_i - @stopped_treatment_ever.to_i - @discharged_ever.to_i
+    @defaulters_ever = report.defaulters_ever(ids_ever) rescue 0
+    @defaulters_ever = @defaulters_ever - @transfer_out_ever.to_i - @stopped_treatment_ever.to_i - @discharged_ever.to_i
 
-    @defaulters = report.defaulters(ids) - @transfer_out.to_i - @stopped_treatment.to_i - @discharged.to_i
+    @defaulters = report.defaulters(ids) rescue 0
+    @defaulters = @defaulters - @transfer_out.to_i - @stopped_treatment.to_i - @discharged.to_i
 
     @defaulters_ever = 0 if @defaulters_ever.to_i < 0
     @defaulters = 0 if @defaulters.to_i < 0

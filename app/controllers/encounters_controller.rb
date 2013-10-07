@@ -895,5 +895,14 @@ class EncountersController < ApplicationController
     end
     return set_date
   end
-	
+
+  def is_holiday(suggest_date, holidays)
+		holiday = false;
+		holidays.each do |h|
+			if (h.to_date.strftime('%B %d') == suggest_date.strftime('%B %d'))
+				holiday = true;
+			end
+		end
+		return holiday
+	end
 end

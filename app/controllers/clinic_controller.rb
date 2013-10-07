@@ -2,7 +2,7 @@
 class ClinicController < ApplicationController
 
   def index
-		#raise session[:selected_program].to_yaml
+		#raise Location.current_health_center.name.to_yaml
     User.current = User.find(@user["user_id"]) rescue nil
 
     Location.current = Location.find(params[:location_id] || session[:location_id]) rescue nil
@@ -21,7 +21,7 @@ class ClinicController < ApplicationController
 
     @project = get_global_property_value("project.name") rescue "Unknown"
 
-    @facility = get_global_property_value("facility.name") rescue "Unknown"
+    @facility = Location.current_health_center.name rescue get_global_property_value("facility.name") rescue "Unknown"
 
     @patient_registration = get_global_property_value("patient.registration.url") rescue ""
 
@@ -255,7 +255,7 @@ class ClinicController < ApplicationController
     @encounter_activities = UserProperty.find(:first, :conditions => ["property = '#{@project}.activities' AND user_id = ?", @user['user_id']]).property_value.split(",") rescue []
 		@encounter_activities.push("APPOINTMENT")
 		@to_date = Clinic.overview(@encounter_activities)
-		@current_year = Clinic.overview_thiy_year(@encounter_activities)
+		@current_year = Clinic.overview_this_year(@encounter_activities)
 		@today = Clinic.overview_today(@encounter_activities)
 		@me = Clinic.overview_me(@encounter_activities, @user['user_id'])
 

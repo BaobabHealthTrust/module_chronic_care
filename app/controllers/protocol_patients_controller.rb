@@ -93,6 +93,8 @@ class ProtocolPatientsController < ApplicationController
     if params[:user_id].nil?
       redirect_to '/encounters/no_user' and return
     end
+
+    @current_program = current_program
        program_id = Program.find_by_name('CHRONIC CARE PROGRAM').id
     date = Date.today
          @current_state = PatientState.find_by_sql("SELECT p.patient_id, current_state_for_program(p.patient_id, #{program_id}, '#{date}') AS state, c.name as status FROM patient p

@@ -31,14 +31,6 @@ class PatientsController < ApplicationController
                       WHERE DATE(ps.start_date) <= '#{date}'
                       AND p.patient_id = #{@patient.id}").first.status rescue ""
 
-    #raise @current_state.to_yaml
-
-    #@current_state = PatientState.find(:all,
-		#		:joins => "INNER JOIN patient_program p ON p.patient_program_id = patient_state.patient_program_id",
-		#		:conditions =>["patient_state.voided = 0 AND p.voided = 0 AND p.program_id = ? AND start_date = ? AND p.patient_id =?",
-		#			program_id, Date.today,@patient.id],:order => "patient_state_id ASC").last.program_workflow_state.concept.fullname
-    
-    #raise patient_states.last.program_workflow_state.concept.fullname.to_yaml
 
     @task = TaskFlow.new(params[:user_id], @patient.id)
 		
@@ -152,7 +144,7 @@ class PatientsController < ApplicationController
           [
             e.encounter_id, e.encounter.type.name,
             (e.encounter.encounter_datetime.strftime("%H:%M") rescue []),
-            e.encounter.creator
+            (e.encounter.creator rescue "")
           ]
         },
         p.date_time.strftime("%d-%b-%Y")
@@ -303,8 +295,8 @@ class PatientsController < ApplicationController
         p.program_encounter_types.collect{|e|
           [
             e.encounter_id, e.encounter.type.name,
-            e.encounter.encounter_datetime.strftime("%H:%M"),
-            e.encounter.creator
+            (e.encounter.encounter_datetime.strftime("%H:%M") rescue ""),
+            (e.encounter.creator rescue "")
           ]
         },
         p.date_time.strftime("%d-%b-%Y")
@@ -378,6 +370,7 @@ class PatientsController < ApplicationController
     else
       @source = nil
     end
+    @current_program = current_program
 
     render :layout => "application"
 
@@ -700,6 +693,83 @@ class PatientsController < ApplicationController
     visits.diagnosis_dm = current_vitals(patient_obj, "Patient has Diabetes").to_s.match(/yes/i) rescue nil
     ! visits.diagnosis_dm.blank? ? visits.diagnosis_dm = "Y" : visits.diagnosis_dm = "N"
 
+     visits.pork = current_vitals(patient_obj, "Food package provided").to_s.match(/Eats pork/i) rescue nil
+    ! visits.pork.blank? ? visits.pork = "Y" : visits.pork = "N"
+
+    visits.epilepsy = current_vitals(patient_obj, "Epilepsy").to_s.match(/yes/i) rescue nil
+    ! visits.epilepsy.blank? ? visits.epilepsy = "Y" : visits.epilepsy = "N"
+
+    visits.psychosis = current_vitals(patient_obj, "psychosis").to_s.match(/yes/i) rescue nil
+    ! visits.psychosis.blank? ? visits.psychosis = "Y" : visits.psychosis = "N"
+
+    visits.hyperactivity = current_vitals(patient_obj, "hyperactivity").to_s.match(/yes/i) rescue nil
+    ! visits.hyperactivity.blank? ? visits.hyperactivity = "Y" : visits.hyperactivity = "N"
+
+    visits.drug_related = current_encounter(patient_obj, "EPILEPSY CLINIC VISIT", "Cause of Seizure").to_s.match(/alcohol withdrawal/i) rescue nil
+    ! visits.drug_related .blank? ? visits.drug_related  = "Y" : visits.drug_related  = "N"
+
+    visits.known_seizure = current_vitals(patient_obj, "Seizures known epileptic").to_s.match(/yes/i) rescue nil
+    ! visits.known_seizure.blank? ? visits.known_seizure = "Y" : visits.known_seizure = "N"
+
+    visits.seizure_history = current_vitals(patient_obj, "Seizures").to_s.match(/yes/i) rescue nil
+    ! visits.seizure_history.blank? ? visits.seizure_history = "Y" : visits.seizure_history = "N"
+
+    visits.cysticercosis = current_vitals(patient_obj, "Cysticercosis").to_s.match(/yes/i) rescue nil
+    ! visits.cysticercosis.blank? ? visits.cysticercosis = "Y" : visits.cysticercosis = "N"
+
+    visits.cerebral_maralia = current_vitals(patient_obj, "Cysticercosis").to_s.match(/yes/i) rescue nil
+    ! visits.cerebral_maralia.blank? ? visits.cerebral_maralia = "Y" : visits.cerebral_maralia = "N"
+
+    visits.meningitis = current_vitals(patient_obj, "Meningitis").to_s.match(/yes/i) rescue nil
+    ! visits.meningitis.blank? ? visits.meningitis = "Y" : visits.meningitis = "N"
+
+    visits.burns = current_vitals(patient_obj, "Burns").to_s.match(/yes/i) rescue nil
+    ! visits.burns.blank? ? visits.burns = "Y" : visits.burns = "N"
+
+
+    visits.injuries = current_encounter(patient_obj, "EPILEPSY CLINIC VISIT", "Head injury").to_s.match(/yes/i) rescue nil
+   # visits.injuries = current_vitals(patient_obj, "Head injury").to_s.match(/yes/i) rescue nil
+    ! visits.injuries.blank? ? visits.injuries = "Y" : visits.injuries = "N"
+
+     visits.head_trauma = current_encounter(patient_obj, "MEDICAL HISTORY", "Head injury").to_s.match(/yes/i) rescue nil
+   # visits.injuries = current_vitals(patient_obj, "Head injury").to_s.match(/yes/i) rescue nil
+    ! visits.head_trauma.blank? ? visits.head_trauma = "Y" : visits.head_trauma = "N"
+
+    visits.atomic = current_vitals(patient_obj, "generalised").to_s.match(/Atomic/i) rescue nil
+    ! visits.atomic.blank? ? visits.atomic = "Y" : visits.atomic = "N"
+
+    visits.tonic = current_vitals(patient_obj, "generalised").to_s.match(/ Tonic/i) rescue nil
+    ! visits.tonic.blank? ? visits.tonic = "Y" : visits.tonic = "N"
+
+    visits.clonic = current_vitals(patient_obj, "generalised").to_s.match(/ Clonic/i) rescue nil
+    ! visits.clonic.blank? ? visits.clonic = "Y" : visits.clonic = "N"
+
+    visits.myclonic = current_vitals(patient_obj, "generalised").to_s.match(/ Myclonic/i) rescue nil
+    ! visits.myclonic.blank? ? visits.myclonic = "Y" : visits.myclonic = "N"
+
+    visits.absence = current_vitals(patient_obj, "generalised").to_s.match(/ Absence/i) rescue nil
+    ! visits.absence.blank? ? visits.absence = "Y" : visits.absence = "N"
+
+    visits.tonic_clonic = current_vitals(patient_obj, "generalised").to_s.match(/ Tonic Clonic/i) rescue nil
+    ! visits.tonic_clonic.blank? ? visits.tonic_clonic = "Y" : visits.tonic_clonic = "N"
+
+    visits.complex = current_vitals(patient_obj, "Focal seizure").to_s.match(/ Complex/i) rescue nil
+    ! visits.complex.blank? ? visits.complex = "Y" : visits.complex = "N"
+
+    visits.simplex = current_vitals(patient_obj, "Focal seizure").to_s.match(/ Simplex/i) rescue nil
+    ! visits.simplex.blank? ? visits.simplex = "Y" : visits.simplex = "N"
+
+    visits.unclassified = "N"
+    if visits.atomic == "N" and visits.tonic == "N" and visits.clonic == "N" and visits.myclonic == "N" and visits.absence == "N" and visits.tonic_clonic == "N" and visits.complex == "N" and visits.simplex == "N"
+      visits.unclassified = "Y"
+    end
+
+    visits.status_epileptus = current_vitals(patient_obj, "Confirm diagnosis of epilepsy").to_s.match(/yes/i) rescue nil
+    ! visits.status_epileptus.blank? ? visits.status_epileptus = "Y" : visits.status_epileptus = "N"
+
+    visits.mental_illness = current_vitals(patient_obj, "Mental Disorders").to_s.match(/yes/i) rescue nil
+    ! visits.mental_illness.blank? ? visits.mental_illness = "Y" : visits.mental_illness = "N"
+
     visits.diagnosis_htn = current_vitals(patient_obj, "cardiovascular system diagnosis").to_s.match(/Hypertension /i) rescue nil
 
     ! visits.diagnosis_htn.blank? ? visits.diagnosis_htn = "Y" : visits.diagnosis_htn = "N"
@@ -783,20 +853,18 @@ class PatientsController < ApplicationController
     return "#{systolic}/#{diastolic}"
   end
 
-  def number_of_booked_patients
-    date = params[:date].to_date
-    encounter_type = EncounterType.find_by_name('Kangaroo review visit') rescue nil
-    concept_id = ConceptName.find_by_name('APPOINTMENT DATE').concept_id
+  def past_seizure(patient_id, visit_date, type = "")
 
-    count = Observation.count(:all,
-      :joins => "INNER JOIN encounter e USING(encounter_id)",:group => "value_datetime",
-      :conditions =>["concept_id = ? AND encounter_type = ? AND value_datetime >= ? AND value_datetime <= ?",
-        concept_id,encounter_type.id,date.strftime('%Y-%m-%d 00:00:00'),date.strftime('%Y-%m-%d 23:59:59')]) rescue nil
-
-    count = count.values unless count.blank?
-    count = '0' if count.blank?
-
-    render :text => (count.first.to_i > 0 ? {params[:date] => count}.to_json : 0)
+    past_date = visit_date - 30.days
+    concept = ConceptName.find_by_sql("select concept_id from concept_name where name = 'date of seizure' and voided = 0").first.concept_id
+    obs = Observation.find_by_sql("SELECT * from obs where concept_id = '#{concept}' AND person_id = '#{patient_id}'
+                    AND DATE(obs_datetime) < '#{visit_date}' AND DATE(obs_datetime) >= '#{past_date}' AND voided = 0
+                    ORDER BY  obs_datetime DESC, date_created DESC LIMIT 1").first.value_datetime.to_date rescue []
+    
+    return obs if type == "date"
+    return "N" if obs.blank?
+    return "Y" if obs.to_date >= past_date
+    return "N"
   end
 
 	def confirm
@@ -840,7 +908,7 @@ class PatientsController < ApplicationController
 
       risk = Vitals.current_encounter(@person.patient, "assessment", "assessment comments") rescue "Previous Hypetension Assessment : Not Available"
       @conditions.push("Expected Appointment date: #{Vitals.get_patient_attribute_value(@person.patient, 'appointment date').to_date.strftime('%d/%m/%Y') rescue 'None'}") if  is_first_hypertension_clinic_visit(@person.id) != true
-      @conditions.push("#{risk} ")
+      @conditions.push("#{risk} ") if not risk.blank?
       @conditions.push("Asthma Expected Peak Flow Rate  : #{Vitals.expectect_flow_rate(@person.patient)} Litres/Minute") if  is_first_hypertension_clinic_visit(@person.id) != true
 		end
 		render :layout => 'menu'
@@ -968,8 +1036,8 @@ class PatientsController < ApplicationController
         p.program_encounter_types.collect{|e|
           [
             e.encounter_id, e.encounter.type.name,
-            e.encounter.encounter_datetime.strftime("%H:%M"),
-            e.encounter.creator
+            (e.encounter.encounter_datetime.strftime("%H:%M") rescue ""),
+            (e.encounter.creator rescue "")
           ]
         },
         p.date_time.strftime("%d-%b-%Y")
@@ -1013,9 +1081,13 @@ class PatientsController < ApplicationController
 
     start_date = date.strftime('%Y-%m-%d 00:00:00')
     end_date = date.strftime('%Y-%m-%d 23:59:59')
+    program_id = Program.find_by_name('CHRONIC CARE PROGRAM').id
 
     appointments = Observation.find_by_sql("SELECT count(*) AS count FROM obs
-      INNER JOIN encounter e USING(encounter_id) WHERE concept_id = #{concept_id}
+      INNER JOIN encounter e USING(encounter_id) 
+      INNER JOIN program_encounter pe ON e.patient_id = pe.patient_id
+      WHERE concept_id = #{concept_id}
+      AND pe.program_id = #{program_id}
       AND encounter_type = #{encounter_type.id} AND value_datetime >= '#{start_date}'
       AND value_datetime <= '#{end_date}' AND obs.voided = 0 GROUP BY value_datetime")
     count = appointments.first.count unless appointments.blank?
@@ -1186,7 +1258,6 @@ class PatientsController < ApplicationController
   end
 
 	def visits(patient_obj, encounter_date = nil)
-    
     patient_visits = {}
     yes = ConceptName.find_by_name("YES")
     concept_names = ["APPOINTMENT DATE", "HEIGHT (CM)", 'WEIGHT (KG)',
@@ -1209,21 +1280,24 @@ class PatientsController < ApplicationController
           patient_obj.patient_id,encounter_date.to_date, concept_ids],
         :order =>"obs_datetime").map{|obs| obs if !obs.concept.nil?}
     end
-		#raise observations.last.concept_id.to_s.to_yaml
+		
 		gave_hash = Hash.new(0)
 		observations.map do |obs|
 			drug = Drug.find(obs.order.drug_order.drug_inventory_id) rescue nil
-			#if !drug.blank?
-      #tb_medical = MedicationService.tb_medication(drug)
-      #next if tb_medical == true
-			#end
 			encounter_name = obs.encounter.name rescue []
 			next if encounter_name.blank?
-			next if encounter_name.match(/REGISTRATION/i)
-			next if encounter_name.match(/HIV STAGING/i)
 			visit_date = obs.obs_datetime.to_date
 			patient_visits[visit_date] = Mastercard.new() if patient_visits[visit_date].blank?
 
+      patient_visits[visit_date].last_seizures = past_seizure(patient_obj.id, visit_date)
+      patient_visits[visit_date].last_seizure_date = past_seizure(patient_obj.id, visit_date, "date")
+
+      patient_visits[visit_date].triggers = "Y"
+      concept = ConceptName.find_by_sql("select concept_id from concept_name where name = 'Cause of Seizure' and voided = 0").first.concept_id
+      triggers = Observation.find(:all, :order => "obs_datetime DESC,date_created DESC", :conditions => ["DATE(obs_datetime) = ? AND concept_id = ? AND person_id = ?", visit_date, concept, patient_obj.id]) rescue nil
+      patient_visits[visit_date].triggers = "N" if triggers.blank?
+
+      patient_visits[visit_date].last_seizure_date = visit_date if patient_visits[visit_date].last_seizure_date.blank?
 
       patient_visits[visit_date].bp = calculate_bp(patient_obj, visit_date)
       patient_visits[visit_date].smoker = current_vitals(patient_obj,"current smoker", visit_date).to_s.match(/yes/i) rescue nil
@@ -1231,6 +1305,8 @@ class PatientsController < ApplicationController
      
       patient_visits[visit_date].alcohol = current_vitals(patient_obj,"Does the patient drink alcohol?", visit_date).to_s.match(/yes/i) rescue nil
       ! patient_visits[visit_date].alcohol.blank? ? patient_visits[visit_date].alcohol = "Y" : patient_visits[visit_date].alcohol = "N"
+
+      patient_visits[visit_date].number = current_vitals(patient_obj,"Number of seizure including current", visit_date).value_numeric.to_i rescue "Unknown"
 
       patient_visits[visit_date].cva_risk = current_vitals(patient_obj, "assessment comments", visit_date).to_s.split(":")[1] rescue "Unknown"
 
