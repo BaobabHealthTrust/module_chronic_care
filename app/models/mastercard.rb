@@ -18,6 +18,9 @@ class Mastercard
    :first_positive_hiv_test_type, :months_on_art, :transferred_out_to, :transferred_out_date, :art_start_date, :current_drugs_given,
    :diagnosis_dm, :diagnosis_htn, :diagnosis_dm_htn, :diagnosis_asthma, :diagnosis_stroke, :diagnosis_other,
    :zone, :district, :clinic, :smoker, :alcohol, :cva_risk, :fbs, :urine, :history_asthma, :acuity, :pork, :head_banging,
-   :other_drugs, :known_seizure, :head_trauma, :cysticercosis, :meningitis, :cerebral_malaria
+   :other_drugs, :known_seizure, :head_trauma, :cysticercosis, :meningitis, :cerebral_maralia, :epilepsy, :mental_illness,
+   :mental_retardation, :burns,:injuries, :psychosis, :status_epileptus, :drug_related, :hyperactivity, :tonic_clonic, :absence,
+   :myclonic, :clonic, :simplex, :tonic, :atomic, :complex, :unclassified, :last_seizures, :last_seizure_date, :number, :triggers,
+   :seizure_history
 
 end 

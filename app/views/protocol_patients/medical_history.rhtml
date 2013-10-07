@@ -117,6 +117,81 @@ function showSelectedConditions() {
 	<input type='hidden' name='user_id' value='<%= @user.id %>' />
 	<table>
 		<tr>
+
+                  <% if @current_program == "EPILEPSY PROGRAM" %>
+                  <td>
+                    <select id='cysticercosis'
+        name='concept[Cysticercosis]'
+        helpText='Ever had cysticercosis?'
+        pos='2'
+        tt_requireNextClick = false
+        tt_onLoad = "showCategory('Medical History')" >
+<option></option>
+<option value='NO'>No</option>
+ <option value='YES'>Yes</option>
+ </select>
+
+                  </td>
+
+                  <td>
+                    <select id='head_injury'
+        name='concept[Head Injury]'
+        helpText='Previous head trauma?'
+        pos='2'
+        tt_requireNextClick = false
+        tt_onLoad = "showCategory('Medical History')" >
+<option></option>
+<option value='NO'>No</option>
+ <option value='YES'>Yes</option>
+ </select>
+
+                  </td>
+
+                   <td>
+        <select id='meningitis'
+        name='concept[Meningitis]'
+        helpText='Ever had meningitis?'
+        pos='2'
+        tt_requireNextClick = false
+        tt_onLoad = "showCategory('Medical History')" >
+<option></option>
+<option value='NO'>No</option>
+ <option value='YES'>Yes</option>
+ </select>
+
+                  </td>
+
+                  <td>
+        <select id='malaria'
+        name='concept[Malaria cerebral]'
+        helpText='Ever had cerebral malaria?'
+        pos='2'
+        tt_requireNextClick = false
+        tt_onLoad = "showCategory('Medical History')" >
+<option></option>
+<option value='NO'>No</option>
+ <option value='YES'>Yes</option>
+ </select>
+
+                  </td>
+
+        <td>
+        <select id='seizure_history'
+        name='concept[Seizures known epileptic]'
+        helpText='Any known history of seizure?'
+        pos='2'
+        tt_requireNextClick = false
+        tt_onLoad = "showCategory('Medical History')" >
+<option></option>
+<option value='NO'>No</option>
+ <option value='YES'>Yes</option>
+ </select>
+
+                  </td>
+
+<% else %>
+
+
 			<td>
 				History of TB in the past two years 
 			</td>
@@ -226,6 +301,7 @@ function showSelectedConditions() {
 	  :optional => "true",
 	  :tt_pageStyleClass => "NoControls" } %>
 			</td>
+                        <% end %>
 		</tr>
 	</table>
 </form>

@@ -153,10 +153,10 @@ background-position: 0% -30px;
       <td><%= data.bp || '&nbsp;'%></td>
       <td><%= data.smoker || '&nbsp;'%></td>
       <td><%= data.alcohol || '&nbsp;'%></td>
-      <td><%= data.cva_risk || '&nbsp;'%></td>
-      <td><%= data.acuity || '&nbsp;'%></td>
-      <td><%= data.fbs || '&nbsp;'%></td>
-      <td><%= data.urine || '&nbsp;'%></td>
+      <td><%= data.last_seizures || '&nbsp;'%></td>
+      <td><%= data.number || '&nbsp;'%></td>
+      <td><%= data.last_seizure_date || '&nbsp;'%></td>
+      <td><%= data.triggers || '&nbsp;'%></td>
 
       <% side_effects = nil
       (data.s_eff.split("<br/>").compact.reject(&:blank?) || []).each do | side_effect |

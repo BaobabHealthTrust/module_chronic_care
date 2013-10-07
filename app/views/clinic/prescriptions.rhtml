@@ -21,6 +21,6 @@
 	  :tt_onLoad => "showCategory('Set Prescription Types')"
     }) %>
 
-  <% @treatements_list = ["Generic DM Prescription", "Standard OPD Prescription", "Advanced Prescription"] %>
+  <% @treatements_list = ["Standard OPD Prescription", "Advanced Prescription"] %>
   <%= select_tag("prescription",options_for_select(@treatements_list),options)%>
 </form>

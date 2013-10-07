@@ -62,7 +62,7 @@
             <div style="display: table-cell; width: 50%;">
 
               <% current_day = session[:datetime].strftime('%Y-%m-%d') rescue 'Today'%>
-              <h2><%=current_day%>'s Treatment (possibly filtered)</h2>
+              <h2><%=current_day%>'s Prescription (possibly filtered)</h2>
               <div style="height:220px;">
               <% if not @prescriptions.blank? %>
               <table id = 'dispensation' style = "width:100%;">

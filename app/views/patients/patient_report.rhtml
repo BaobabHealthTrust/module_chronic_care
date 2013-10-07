@@ -141,12 +141,12 @@
 		  <td style="text-align:left;" colspan="2">Treatment</td>
         </tr>
         <% 
-                  i = 0
+                  i = 1
 		  @prescriptions.each do |comp |
 		   %>
-		<tr><td width="10%"><%= (i + 1) %></td><td width="90%"> <%= comp %></td>
+		<tr><td width="10%"><%= i %></td><td width="90%"> <%= comp %></td>
 		</tr>
-		<%
+		<% i += 1
 		end
               end %>
 

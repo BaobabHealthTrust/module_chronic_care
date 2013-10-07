@@ -62,13 +62,13 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
     display += '<legend>Choose a program:</legend>'
     display += '<table cellspacing="10"><tr>'
 
-    display += '<td align="left"><a href="/clinic/programs?patient_id=<%= params[:id] %>&user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>&program=ASTHMA">Asthma program</a></td></tr>'
+    display += '<td align="left"><a href="/clinic/programs?patient_id=<%= params[:patient_id] %>&user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>&program=ASTHMA">Asthma program</a></td></tr>'
 
     display += '<tr>'
-    display += '<td align="left"><a href="/clinic/programs?patient_id=<%= params[:id] %>&user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>&program=HYPERTENSION">Hypertension and Diabetes Program</a></td></tr>'
+    display += '<td align="left"><a href="/clinic/programs?patient_id=<%= params[:patient_id] %>&user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>&program=HYPERTENSION">Hypertension and Diabetes Program</a></td></tr>'
 
     display += '<tr>'
-    display += '<td align="left"><a href="/clinic/programs?patient_id=<%= params[:id] %>&user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>&program=EPILEPSY">Epilepsy program</a></td></tr></table>'
+    display += '<td align="left"><a href="/clinic/programs?patient_id=<%= params[:patient_id] %>&user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>&program=EPILEPSY">Epilepsy program</a></td></tr></table>'
 
     display += '</fieldset>'
     display += '</div>'
@@ -415,7 +415,7 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
           </option>
           <option link='<%= "/patients/mastercard/#{@patient.id}?user_id=#{@user.id}"  %>' ttSize = "160px">Mastercard</option>
         <% end %>
-
+<%#= raise @task.to_yaml %>
         <% if @disable.to_s != "true" %>
           <% if @task.url != "/patients/show/#{@patient.id}?user_id=#{@user.id}" %>
                                         <!--- <option link="/encounter_types/show?user_id=<%=  @user["user_id"] %>&encounter_type=Appointment&id=show&patient_id=<%= @patient.id -%>" ttSize = "160px">Appointment</option> --->
