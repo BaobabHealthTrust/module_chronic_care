@@ -142,7 +142,7 @@ class TaskFlow
       # If user does not have this activity, goto the patient dashboard
 
 			encounters =  [
-                      'VITALS','FAMILY HISTORY','SOCIAL HISTORY', 'GENERAL HEALTH','LAB RESULTS',
+                      'VITALS','FAMILY HISTORY','SOCIAL HISTORY','MEDICAL HISTORY', 'GENERAL HEALTH','LAB RESULTS',
 											'CLINIC VISIT', 'TREATMENT', 'OUTCOME'
                      ]
 		observation = Observation.find(:all,
