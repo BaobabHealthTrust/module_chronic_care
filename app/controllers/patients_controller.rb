@@ -67,7 +67,7 @@ class PatientsController < ApplicationController
 
   def dashboard_graph
     session_date = session[:datetime].to_date rescue Date.today
-    @patient      = Patient.find(params[:id] || session[:patient_id]) rescue nil
+    @patient      = Patient.find(params[:id] || session[:patient_id] || params[:patient_id]) rescue nil
 
     patient_bean = PatientService.get_patient(@patient.person)
 
