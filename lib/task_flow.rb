@@ -164,9 +164,7 @@ class TaskFlow
 			case tsk
 				when "CLINIC VISIT"
 					next if ! self.current_user_activities.include?(tsk.downcase)
-          visit = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name("EPILEPSY CLINIC VISIT").id])
+          visit = Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "EPILEPSY CLINIC VISIT", "module")
 
 					next if !visit.blank?
 
@@ -176,9 +174,7 @@ class TaskFlow
 
         when "VITALS"
 					next if ! self.current_user_activities.include?(tsk.downcase)
-          vitals = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
+          vitals = Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "VITALS", "module")
 
 					next if !vitals.blank?
 					self.encounter_type = 'VITALS'
@@ -195,9 +191,7 @@ class TaskFlow
 					 found = true if enc.name.upcase == "FAMILY MEDICAL HISTORY"
 					end
 					next if found == true
-          history = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name('FAMILY MEDICAL HISTORY').id])
+          history = Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "FAMILY MEDICAL HISTORY", "module")
 
 					next if !history.blank?
 					self.encounter_type = 'FAMILY MEDICAL HISTORY'
@@ -215,10 +209,7 @@ class TaskFlow
 					 found = true if enc.name.upcase == "SOCIAL HISTORY"
 					end
 					next if found == true
-
-          history = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
+          history = Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "SOCIAL HISTORY", "module")
 
 					next if !history.blank?
 					self.encounter_type = 'SOCIAL HISTORY'
@@ -235,9 +226,7 @@ class TaskFlow
 					 found = true if enc.name.upcase == "MEDICAL HISTORY"
 					end
 					next if found == true
-          history = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
+          history = Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "MEDICAL HISTORY", "module")
 
 					next if !history.blank?
 					self.encounter_type = 'MEDICAL HISTORY'
@@ -255,10 +244,9 @@ class TaskFlow
 					end
 					next if found == true
 
+
 					next if @patient.person.observations.to_s.match(/hiv status/i)
-          hiv_status = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
+          hiv_status = Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "UPDATE HIV STATUS", "module")
 
 
 
@@ -278,9 +266,7 @@ class TaskFlow
 					 found = true if enc.name.upcase == "GENERAL HEALTH"
 					end
 					next if found == true
-          history = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
+          history = Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "GENERAL HEALTH", "module")
 
 					next if !history.blank?
 					self.encounter_type = 'GENERAL HEALTH'
@@ -293,9 +279,8 @@ class TaskFlow
 
 				when "COMPLICATIONS"
 					next if ! self.current_user_activities.include?(tsk.downcase)
-					assessment = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
+          assessment = Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "COMPLICATIONS", "module")
+					
 					next if !assessment.blank?
 					self.encounter_type = "COMPLICATIONS"
 					self.url = "/protocol_patients/complications?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
@@ -307,9 +292,7 @@ class TaskFlow
 
 				when "TREATMENT"
 					next if ! self.current_user_activities.include?(tsk.downcase)
-					assessment = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
+          assessment = Vitals.done_already_treatment(self.patient.id, 10, self.current_date.to_date.to_date, "TREATMENT", "module")
 
 					next if !assessment.blank?
 					self.encounter_type = "TREATMENT"
@@ -325,9 +308,7 @@ class TaskFlow
 					 found = true if enc.name.upcase == "LAB RESULTS"
 					end
 					next if found == true
-					assessment = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
+					assessment = Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "LAB RESULTS", "module")
 					next if !assessment.blank?
 					self.encounter_type = "LAB RESULTS"
 					self.url = "/protocol_patients/lab_results?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
@@ -420,21 +401,27 @@ class TaskFlow
 			case tsk
 				when "CLINIC VISIT"
 					next if ! self.current_user_activities.include?(tsk.downcase)
-          visit = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name("DIABETES HYPERTENSION INITIAL VISIT").id])
+          visit =  Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "DIABETES HYPERTENSION INITIAL VISIT", "module")
 
 					next if !visit.blank?
 
 					self.encounter_type = 'CLINIC VISIT'
 					self.url = "/protocol_patients/clinic_visit?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					return self
-
+        when "ASSESSMENT"
+					next if ! self.current_user_activities.include?(tsk.downcase)
+					assessment =  Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "ASSESSMENT", "module")
+					next if !assessment.blank?
+					self.encounter_type = "ASSESSMENT"
+					self.url = "/protocol_patients/assessment?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+					if ! my_activities.include?(tsk)
+						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
+					else
+						return self
+					end
         when "VITALS"
 					next if ! self.current_user_activities.include?(tsk.downcase)
-          vitals = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
+          vitals =  Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "VITALS", "module")
 
 					next if !vitals.blank?
 					self.encounter_type = 'VITALS'
@@ -451,10 +438,8 @@ class TaskFlow
 					 found = true if enc.name.upcase == "FAMILY MEDICAL HISTORY"
 					end
 					next if found == true
-          history = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name('FAMILY MEDICAL HISTORY').id])
-
+          history =  Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "FAMILY MEDICAL HISTORY", "module")
+          
 					next if !history.blank?
 					self.encounter_type = 'FAMILY MEDICAL HISTORY'
 					self.url = "/protocol_patients/family_history?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
@@ -471,10 +456,7 @@ class TaskFlow
 					 found = true if enc.name.upcase == "SOCIAL HISTORY"
 					end
 					next if found == true
-
-          history = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
+          history =  Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "SOCIAL HISTORY", "module")
 
 					next if !history.blank?
 					self.encounter_type = 'SOCIAL HISTORY'
@@ -491,9 +473,8 @@ class TaskFlow
 					 found = true if enc.name.upcase == "MEDICAL HISTORY"
 					end
 					next if found == true
-          history = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
+           history =  Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "MEDICAL HISTORY", "module")
+          
 
 					next if !history.blank?
 					self.encounter_type = 'MEDICAL HISTORY'
@@ -512,11 +493,7 @@ class TaskFlow
 					next if found == true
 
 					next if @patient.person.observations.to_s.match(/hiv status/i)
-          hiv_status = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
-
-
+           hiv_status =  Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "UPDATE HIV STATUS", "module")
 
 					if hiv_status.observations.map{|s|s.to_s.split(':').last.strip}.include?('Positive')
             next
@@ -531,9 +508,7 @@ class TaskFlow
 
 				when "ASTHMA MEASURE"
 					next if ! self.current_user_activities.include?(tsk.downcase)
-					assessment = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
+          assessment =  Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "ASTHMA MEASURE", "module")
 
 					next if !assessment.blank?
 					self.encounter_type = "ASTHMA MEASURE"
@@ -546,9 +521,8 @@ class TaskFlow
 
 				when "COMPLICATIONS"
 					next if ! self.current_user_activities.include?(tsk.downcase)
-					assessment = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
+          assessment =  Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "COMPLICATIONS", "module")
+					
 					next if !assessment.blank?
 					self.encounter_type = "COMPLICATIONS"
 					self.url = "/protocol_patients/complications?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
@@ -560,9 +534,7 @@ class TaskFlow
 
 				when "TREATMENT"
 					next if ! self.current_user_activities.include?(tsk.downcase)
-					assessment = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
+          assessment =  Vitals.done_already_treatment(self.patient.id, 10, self.current_date.to_date.to_date, "TREATMENT", "module")
 
 					next if !assessment.blank?
 					self.encounter_type = "TREATMENT"
@@ -667,9 +639,7 @@ class TaskFlow
 			case tsk
 				when "CLINIC VISIT"
 					next if ! self.current_user_activities.include?(tsk.downcase)
-          visit = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name("DIABETES HYPERTENSION INITIAL VISIT").id])
+          visit = Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "DIABETES HYPERTENSION INITIAL VISIT", "module")
 
 					next if !visit.blank?
 					
@@ -679,9 +649,8 @@ class TaskFlow
 
         when "VITALS"
 					next if ! self.current_user_activities.include?(tsk.downcase)
-          vitals = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
+           vitals = Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "VITALS", "module")
+          
 
 					next if !vitals.blank?
 					self.encounter_type = 'VITALS'
@@ -698,9 +667,7 @@ class TaskFlow
 					 found = true if enc.name.upcase == "FAMILY MEDICAL HISTORY"
 					end
 					next if found == true
-          history = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name('FAMILY MEDICAL HISTORY').id])
+          history = Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "FAMILY MEDICAL HISTORY", "module")
 
 					next if !history.blank?
 					self.encounter_type = 'FAMILY MEDICAL HISTORY'
@@ -718,10 +685,8 @@ class TaskFlow
 					 found = true if enc.name.upcase == "SOCIAL HISTORY"
 					end
 					next if found == true
-
-          history = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
+          history = Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "SOCIAL HISTORY", "module")
+          
 
 					next if !history.blank?
 					self.encounter_type = 'SOCIAL HISTORY'
@@ -738,9 +703,7 @@ class TaskFlow
 					 found = true if enc.name.upcase == "GENERAL HEALTH"
 					end
 					next if found == true
-          history = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
+          history = Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "GENERAL HEALTH", "module")
 
 					next if !history.blank?
 					self.encounter_type = 'GENERAL HEALTH'
@@ -759,11 +722,7 @@ class TaskFlow
 					next if found == true
 
 					next if @patient.person.observations.to_s.match(/hiv status/i)
-          hiv_status = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
-					
-					
+          hiv_status = Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "UPDATE HIV STATUS", "module")
 
 					if hiv_status.observations.map{|s|s.to_s.split(':').last.strip}.include?('Positive')
             next
@@ -778,10 +737,7 @@ class TaskFlow
 
 				when "ASSESSMENT"
 					next if ! self.current_user_activities.include?(tsk.downcase)
-					assessment = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
-					
+					assessment =  Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "ASSESSMENT", "module")
 					next if !assessment.blank?
 					self.encounter_type = "ASSESSMENT"
 					self.url = "/protocol_patients/assessment?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
@@ -807,9 +763,7 @@ class TaskFlow
 
 				when "TREATMENT"
 					next if ! self.current_user_activities.include?(tsk.downcase)
-					assessment = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
+					assessment =  Vitals.done_already_treatment(self.patient.id, 10, self.current_date.to_date.to_date, "TREATMENT", "module")
 
 					next if !assessment.blank?
 					self.encounter_type = "TREATMENT"
@@ -825,9 +779,7 @@ class TaskFlow
 					 found = true if enc.name.upcase == "LAB RESULTS"
 					end
 					next if found == true
-					assessment = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
-                                  self.current_date.to_date.to_date,self.patient.id,EncounterType.find_by_name(tsk).id])
+					assessment =  Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "LAB RESULTS", "module")
 					next if !assessment.blank?
 					self.encounter_type = "LAB RESULTS"
 					self.url = "/protocol_patients/lab_results?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
