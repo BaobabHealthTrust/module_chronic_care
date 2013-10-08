@@ -1328,7 +1328,7 @@ class PatientsController < ApplicationController
 			elsif concept_name.upcase == 'WEIGHT (KG)'
 				patient_visits[visit_date].weight = obs.answer_string
 			elsif concept_name.upcase == 'BODY MASS INDEX, MEASURED'
-				patient_visits[visit_date].bmi = obs.answer_string
+				patient_visits[visit_date].bmi = obs.to_s.split(':')[1].squish rescue ""
 			elsif concept_name == 'RESPONSIBLE PERSON PRESENT' or concept_name == 'PATIENT PRESENT FOR CONSULTATION'
 				patient_visits[visit_date].visit_by = '' if patient_visits[visit_date].visit_by.blank?
 				patient_visits[visit_date].visit_by+= "P" if obs.to_s.squish.match(/Patient present for consultation: Yes/i)
