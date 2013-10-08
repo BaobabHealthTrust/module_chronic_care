@@ -117,7 +117,7 @@
   tt_cancel_destination = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
   var currentBmi;
   var currentWeight;
-  var currentHeight = '<%= @current_hieght %>'
+  var currentHeight;
   var currentHeightPercentile;
   var currentWeightPercentile;
   var displayText;
@@ -244,6 +244,7 @@
   /* starts */
 
    function showSelectedConditions() {
+     currentHeight = '<%= @current_hieght.to_i %>';
       conditions = [];
 	  sex = '<%= @patient.gender.downcase  rescue "" %>'
 	  if (sex == "female")
@@ -259,6 +260,7 @@
         conditions.push("Weight: " + $('weight').value);
 	  }
 		   try {
+                      
 				 if ($('height').value.length > 0){
 				  currentHeight = $('height').value;
 				  conditions.push("Height: " + $('height').value);
@@ -268,9 +270,10 @@
 		   }
 
 	 currentBmi = (currentWeight/(currentHeight*currentHeight)*10000).toFixed(1);
-	 //console.log(currentHeight)
+	 console.log(currentHeight)
+         
 	  conditions.push("BMI : " + currentBmi + "<br>");
-	  growthIndicators()
+	  //growthIndicators()
 	  $('bmi').value = currentBmi;
 	  var col = "<i>"
 
@@ -452,7 +455,7 @@
     displayText += "</div>";
   }
 
-  function showBMI() {
+  function showBMI() { 
     currentBmi = (currentWeight/(currentHeight*currentHeight)*10000).toFixed(1);
     document.getElementById('bmi_value').value = currentBmi;
 
