@@ -420,7 +420,6 @@ class TaskFlow
 						return self
 					end
         when "VITALS"
-					next if ! self.current_user_activities.include?(tsk.downcase)
           vitals =  Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "VITALS", "module")
 
 					next if !vitals.blank?
