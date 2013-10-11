@@ -218,11 +218,15 @@
         <body>
           <%= image_tag(@logo,:class=>"logo")%>
 
-          <br /><b style="width:221px;"> <%= @facility + " : " + @quarter %></b>
-          <br /><b style="width:221px;"> Epilepsy Report</b>
-          <br /> <b style="width:221px;">Start Date: <%= @specified_period[0].to_date.strftime("%A %d %B, %Y") %></b>
-          <br /> <b style="width:221px;">End Date: <%= @specified_period[1].to_date.strftime("%A %d %B, %Y") %></b>
-
+          <table cellspacing="0" cellpadding="0">
+            <tr><td style="border-style:solid;text-align:justify;border-width:0;">
+                <%= Location.current_health_center.name + " : " + @quarter %>
+              </td></tr>
+            <tr><td style="border-style:solid;text-align:justify;border-width:0;">Start Date: <%= @specified_period[0].to_date.strftime("%A %d %B, %Y") %>
+              </td></tr>
+            <tr><td  style="border-style:solid;text-align:justify;border-width:0;"> End Date: <%= @specified_period[1].to_date.strftime("%A %d %B, %Y") %>
+              </td></tr>
+          </table>
           <div class='scrollTableContainer'>
             <table cellspacing='0' align="center" width="98%" height="95%">
               <thead>

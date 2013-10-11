@@ -39,7 +39,7 @@ class ProtocolPatientsController < ApplicationController
     observation = Observation.find(:all,
       :conditions => ["encounter_id = ?", Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
           :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
-            current_date, @patient.id,EncounterType.find_by_name("Vitals").id]).encounter_id])
+            current_date, @patient.id,EncounterType.find_by_name("Vitals").id]).encounter_id]) rescue []
     #raise observation.to_s.to_yaml
     observation.each {|obs|
       value = ConceptName.find_by_concept_id(obs.value_coded).name if !obs.value_coded.blank?
@@ -64,7 +64,7 @@ class ProtocolPatientsController < ApplicationController
     observation = Observation.find(:all,
       :conditions => ["encounter_id = ?", Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
           :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
-            current_date, @patient.id,EncounterType.find_by_name("FAMILY MEDICAL HISTORY").id]).encounter_id])
+            current_date, @patient.id,EncounterType.find_by_name("FAMILY MEDICAL HISTORY").id]).encounter_id]) rescue []
 	
     @estimatedvalue = []
     @familyvalue = 0

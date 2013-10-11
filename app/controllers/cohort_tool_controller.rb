@@ -1523,16 +1523,16 @@ class CohortToolController < ApplicationController
 
     @dead = report.dead(ids) rescue ""
 
-    @discharged_ever = report.discharged_ever(ids_ever) rescue ""
-    @discharged =report.discharged(ids) rescue ""
+    @discharged_ever = report.discharged_ever(ids_ever) rescue 0
+    @discharged =report.discharged(ids) rescue 0
 
-    @transfer_out_ever = report.transfer_out_ever(ids_ever) rescue ""
+    @transfer_out_ever = report.transfer_out_ever(ids_ever) rescue 0
 
-    @transfer_out = report.transfer_out(ids) rescue ""
+    @transfer_out = report.transfer_out(ids) rescue 0
 
-    @stopped_treatment_ever = report.stopped_treatment_ever(ids_ever) rescue ""
+    @stopped_treatment_ever = report.stopped_treatment_ever(ids_ever) rescue 0
 
-    @stopped_treatment = report.stopped_treatment(ids) rescue ""
+    @stopped_treatment = report.stopped_treatment(ids) rescue 0
 
     @defaulters_ever = report.defaulters_ever(ids_ever) rescue 0
     @defaulters_ever = @defaulters_ever - @transfer_out_ever.to_i - @stopped_treatment_ever.to_i - @discharged_ever.to_i

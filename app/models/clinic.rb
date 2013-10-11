@@ -28,8 +28,9 @@ class Clinic < ActiveRecord::Base
 				current_year = Date.today
 				activities.each do |activity|
 
-						total = Encounter.find_by_sql("SELECT DISTINCT(count(patient_id)) as patient_id FROM encounter
-																		WHERE DATE(encounter_datetime) = '#{current_year}' AND encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = '#{self.check_activity(activity)}')").first.patient_id rescue 0
+						total = Encounter.find_by_sql("SELECT DISTINCT(count(e.patient_id)) as patient_id FROM encounter e
+                                    INNER JOIN program_encounter_details p on e.encounter_id = p.encounter_id
+																		WHERE DATE(e.encounter_datetime) = '#{current_year}' AND e.encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = '#{self.check_activity(activity)}')").first.patient_id  rescue 0
 						
             tasks[activity] = total
 				end
@@ -40,8 +41,9 @@ class Clinic < ActiveRecord::Base
 		tasks = {}
 		current_year = Date.today
 		activities.each do |activity|
-				total = Encounter.find_by_sql("SELECT DISTINCT(count(patient_id)) as patient_id FROM encounter
-													WHERE DATE(encounter_datetime) = '#{current_year}' AND provider_id = '#{user}' AND encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = '#{self.check_activity(activity)}')").first.patient_id rescue 0
+				total = Encounter.find_by_sql("SELECT DISTINCT(count(e.patient_id)) as patient_id FROM encounter e
+                           INNER JOIN program_encounter_details p on e.encounter_id = p.encounter_id
+													WHERE DATE(e.encounter_datetime) = '#{current_year}' AND e.provider_id = '#{user}' AND encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = '#{self.check_activity(activity)}')").first.patient_id rescue 0
 			
         tasks[activity] = total
 		end
