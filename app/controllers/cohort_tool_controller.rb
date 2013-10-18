@@ -1111,77 +1111,76 @@ class CohortToolController < ApplicationController
 
     @specified_period = report.specified_period
 
-    @mi = report.mi
+    @total_registered = report.total_registered("DIABETES HYPERTENSION INITIAL VISIT").length
+    ids = report.total_registered("DIABETES HYPERTENSION INITIAL VISIT").map{|patient|patient.patient_id.to_s}.join(',') rescue ""
+    @total_ever_registered = report.total_ever_registered("DIABETES HYPERTENSION INITIAL VISIT").length
+     ids_ever = report.total_ever_registered("DIABETES HYPERTENSION INITIAL VISIT").map{|patient|patient.patient_id.to_s}.join(',') rescue ""
 
-    @kidney_failure = report.kidney_failure
+    @mi = report.mi(ids)
 
-    @heart_failure = report.heart_failure
+    @kidney_failure = report.kidney_failure(ids)
 
-
-    @stroke = report.stroke
-
-    @stroke_ever = report.stroke_ever
-
-    @ulcers = report.ulcers
-
-    @ulcers_ever = report.ulcers_ever
-
-    @impotence = report.impotence
-
-    @impotence_ever = report.impotence_ever
-
-    @tia = report.tia
-
-    @tia_ever = report.tia_ever
-
-    @mi_ever = report.mi_ever
-
-    @kidney_failure_ever = report.kidney_failure_ever
-
-    @heart_failure_ever = report.heart_failure_ever
-
-    @total_adults_registered = report.total_adults_registered
-
-    @total_adults_ever_registered = report.total_adults_ever_registered
-
-    @total_children_registered = report.total_children_registered
-
-    @total_children_ever_registered = report.total_children_ever_registered
-
-    @total_registered = report.total_registered
-
-    @total_ever_registered = report.total_ever_registered
-
-    #raise report.total_women_registered.to_yaml
-
-    @total_men_registered = report.total_men_registered
-
-    @total_men_ever_registered = report.total_men_ever_registered
+    @heart_failure = report.heart_failure(ids)
 
 
-    @total_adult_men_registered = report.total_adult_men_registered
+    @stroke = report.stroke(ids)
 
-    @total_adult_men_ever_registered = report.total_adult_men_ever_registered
+    @stroke_ever = report.stroke_ever(ids_ever)
+
+    @ulcers = report.ulcers(ids)
+
+    @ulcers_ever = report.ulcers_ever(ids_ever)
+
+    @impotence = report.impotence(ids)
+
+    @impotence_ever = report.impotence_ever(ids_ever)
+
+    @tia = report.tia(ids)
+
+    @tia_ever = report.tia_ever(ids_ever)
+
+    @mi_ever = report.mi_ever(ids_ever)
+
+    @kidney_failure_ever = report.kidney_failure_ever(ids_ever)
+
+    @heart_failure_ever = report.heart_failure_ever(ids_ever)
+
+    #Filter only htn dn asthma patients
+    @total_adults_registered = report.total_adults_registered(ids)
+
+    @total_adults_ever_registered = report.total_adults_ever_registered(ids_ever)
+
+    @total_children_registered = report.total_children_registered(ids)
+
+    @total_children_ever_registered = report.total_children_ever_registered(ids_ever)
+
+    @total_men_registered = report.total_men_registered(ids)
+    @total_men_ever_registered = report.total_men_ever_registered(ids_ever)
 
 
-    @total_boy_children_registered = report.total_boy_children_registered
+    @total_adult_men_registered = report.total_adult_men_registered(ids)
 
-    @total_boy_children_ever_registered = report.total_boy_children_ever_registered
-
-
-    @total_women_registered = report.total_women_registered
-
-    @total_women_ever_registered = report.total_women_ever_registered
+    @total_adult_men_ever_registered = report.total_adult_men_ever_registered(ids_ever)
 
 
-    @total_adult_women_registered = report.total_adult_women_registered
+    @total_boy_children_registered = report.total_boy_children_registered(ids)
 
-    @total_adult_women_ever_registered = report.total_adult_women_ever_registered
+    @total_boy_children_ever_registered = report.total_boy_children_ever_registered(ids_ever)
 
 
-    @total_girl_children_registered = report.total_girl_children_registered
+    @total_women_registered = report.total_women_registered(ids)
 
-    @total_girl_children_ever_registered = report.total_girl_children_ever_registered
+    @total_women_ever_registered = report.total_women_ever_registered(ids_ever)
+
+
+    @total_adult_women_registered = report.total_adult_women_registered(ids)
+
+    @total_adult_women_ever_registered = report.total_adult_women_ever_registered(ids_ever)
+
+
+    @total_girl_children_registered = report.total_girl_children_registered(ids)
+
+    @total_girl_children_ever_registered = report.total_girl_children_ever_registered(ids_ever)
 
 
 
@@ -1227,9 +1226,9 @@ class CohortToolController < ApplicationController
     @nephropathy = @urine_protein + @creatinine
 
 
-    @numbness_symptoms_ever = report.numbness_symptoms_ever
+    @numbness_symptoms_ever = report.numbness_symptoms_ever(ids_ever)
 
-    @numbness_symptoms = report.numbness_symptoms
+    @numbness_symptoms = report.numbness_symptoms(ids)
 
 
     @neuropathy_ever = @numbness_symptoms_ever
@@ -1244,17 +1243,17 @@ class CohortToolController < ApplicationController
 
     @macrovascular = report.macrovascular
 
-    @no_complications_ever = report.no_complications_ever
+    @no_complications_ever = report.no_complications_ever(ids_ever)
 
-    @no_complications = report.no_complications
+    @no_complications = report.no_complications(ids)
 
-    @amputation_ever = report.amputation_ever
+    @amputation_ever = report.amputation_ever(ids_ever)
 
-    @amputation = report.amputation
+    @amputation = report.amputation(ids)
 
-    @current_foot_ulceration_ever = report.current_foot_ulceration_ever
+    @current_foot_ulceration_ever = report.current_foot_ulceration_ever(ids_ever)
 
-    @current_foot_ulceration = report.current_foot_ulceration
+    @current_foot_ulceration = report.current_foot_ulceration(ids)
 
 
     @amputations_or_ulcers_ever = @amputation_ever + @current_foot_ulceration_ever
@@ -1262,71 +1261,79 @@ class CohortToolController < ApplicationController
     @amputations_or_ulcers = @amputation + @current_foot_ulceration
 
 
-    @tb_known_ever = report.tb_known_ever
+    @tb_known_ever = report.tb_known_ever(ids_ever)
 
-    @tb_known = report.tb_known
+    @tb_known = report.tb_known(ids)
 
-    @tb_after_diabetes_ever = report.tb_after_diabetes_ever
+    @tb_after_diabetes_ever = report.tb_after_diabetes_ever(ids_ever)
 
-    @tb_after_diabetes = report.tb_after_diabetes
+    @tb_after_diabetes = report.tb_after_diabetes(ids)
 
-    @tb_before_diabetes_ever = report.tb_before_diabetes_ever
+    @tb_before_diabetes_ever = report.tb_before_diabetes_ever(ids_ever)
 
-    @tb_before_diabetes = report.tb_before_diabetes
+    @tb_before_diabetes = report.tb_before_diabetes(ids)
 
-    @tb_unknown_ever = report.tb_unkown_ever
+    @tb_unknown_ever = report.tb_unkown_ever(ids_ever)
 
-    @tb_unknown = report.tb_unkown
+    @tb_unknown = report.tb_unkown(ids)
 
-    @no_tb_ever = report.no_tb_ever
+    @no_tb_ever = report.no_tb_ever(ids_ever)
 
-    @no_tb = report.no_tb
+    @no_tb = report.no_tb(ids)
 
-    @tb_ever = report.tb_ever
+    @tb_ever = report.tb_ever(ids_ever)
 
-    @tb = report.tb
+    @tb = report.tb(ids)
 
-    @reactive_not_on_art_ever = report.reactive_not_on_art_ever
+    @reactive_not_on_art_ever = report.reactive_not_on_art_ever(ids_ever)
 
-    @reactive_not_on_art = report.reactive_not_on_art
+    @reactive_not_on_art = report.reactive_not_on_art(ids)
 
-    @reactive_on_art_ever = report.reactive_on_art_ever
+    @reactive_on_art_ever = report.reactive_on_art_ever(ids_ever)
 
-    @reactive_on_art = report.reactive_on_art
+    @reactive_on_art = report.reactive_on_art(ids)
 
-    @non_reactive_ever = report.non_reactive_ever
+    @non_reactive_ever = report.non_reactive_ever(ids_ever)
 
-    @non_reactive = report.non_reactive
+    @non_reactive = report.non_reactive(ids)
 
-    @unknown_ever = (report.total_ever_registered.to_i - report.non_reactive_ever.to_i -
-        report.reactive_on_art_ever.to_i - report.reactive_not_on_art_ever.to_i)
+    @unknown_ever = (@total_ever_registered.to_i - @non_reactive_ever.to_i -
+        @reactive_on_art_ever.to_i - @reactive_not_on_art_ever.to_i)
 
-    @unknown = (report.total_registered.to_i - report.non_reactive.to_i -
-        report.reactive_on_art.to_i - report.reactive_not_on_art.to_i)
+    @unknown = (@total_registered.to_i - @non_reactive.to_i -
+        @reactive_on_art.to_i - @reactive_not_on_art.to_i)
 
-    @dead_ever = report.dead_ever
+    @dead_ever = report.dead_ever(ids_ever)
 
-    @dead = report.dead
+    @dead = report.dead(ids)
 
-    @transfer_out_ever = report.transfer_out_ever
+    @discharged_ever = report.discharged_ever(ids_ever)
+    @discharged =report.discharged(ids)
 
-    @transfer_out = report.transfer_out
+    @transfer_out_ever = report.transfer_out_ever(ids_ever)
 
-    @stopped_treatment_ever = report.stopped_treatment_ever
+    @transfer_out = report.transfer_out(ids)
 
-    @stopped_treatment = report.stopped_treatment
+    @stopped_treatment_ever = report.stopped_treatment_ever(ids_ever)
 
-    @alive_ever = @total_ever_registered.to_i - report.defaulters_ever.to_i - report.transfer_out_ever.to_i - report.stopped_treatment_ever.to_i
+    @stopped_treatment = report.stopped_treatment(ids)
 
-    @alive = @total_registered.to_i - report.defaulters.to_i - report.transfer_out.to_i - report.stopped_treatment.to_i
+    @defaulters_ever = report.defaulters_ever(ids_ever) - @transfer_out_ever.to_i - @stopped_treatment_ever.to_i - @discharged_ever.to_i
+
+    @defaulters = report.defaulters(ids) - @transfer_out.to_i - @stopped_treatment.to_i - @discharged.to_i
+
+    @defaulters_ever = 0 if @defaulters_ever.to_i < 0
+    @defaulters = 0 if @defaulters.to_i < 0
+
+    @alive_ever = @total_ever_registered.to_i - @defaulters_ever.to_i - @transfer_out_ever.to_i - @stopped_treatment_ever.to_i - @discharged_ever.to_i
+
+    @alive = @total_registered.to_i - @defaulters.to_i - @transfer_out.to_i - @stopped_treatment.to_i - @discharged.to_i
 
     @on_diet_ever = @alive_ever.to_i - @oral_treatments_ever.to_i - @insulin_ever.to_i - @oral_and_insulin_ever.to_i
 
     @on_diet = @alive.to_i - @oral_treatments.to_i - @insulin.to_i - @oral_and_insulin.to_i
 
-    @defaulters_ever = report.defaulters_ever
-
-    @defaulters = report.defaulters
+    
 
     @background_retinapathy_ever = report.background_retinapathy_ever
 
@@ -1370,8 +1377,11 @@ class CohortToolController < ApplicationController
 
     @specified_period = report.specified_period
 
-    @total_registered = report.total_registered
-    @total_ever_registered = report.total_ever_registered
+#Making sure we report only patients gone through epilepsy program
+    @total_registered = report.total_registered("EPILEPSY CLINIC VISIT").length
+    ids = report.total_registered("EPILEPSY CLINIC VISIT").map{|patient|patient.patient_id.to_s}.join(',') rescue ""
+    @total_ever_registered = report.total_ever_registered("EPILEPSY CLINIC VISIT").length
+     ids_ever = report.total_ever_registered("EPILEPSY CLINIC VISIT").map{|patient|patient.patient_id.to_s}.join(',') rescue ""
 
     @confirmed = report.epilepsy_type("Confirm diagnosis of epilepsy", "yes")
     @confirmed_ever = report.epilepsy_type_ever("Confirm diagnosis of epilepsy", "yes")
@@ -1430,120 +1440,111 @@ class CohortToolController < ApplicationController
     @psychosis = report.epilepsy_type("psychosis", "yes")
     @psychosis_ever = report.epilepsy_type_ever("psychosis", "yes")
 
-      #raise @generalized_ever.to_yaml
+    @total_adults_registered = report.total_adults_registered(ids)
 
-    @total_adults_registered = report.total_adults_registered
+    @total_adults_ever_registered = report.total_adults_ever_registered(ids_ever)
 
-    @total_adults_ever_registered = report.total_adults_ever_registered
+    @total_children_registered = report.total_children_registered(ids)
 
-    @total_children_registered = report.total_children_registered
+    @total_children_ever_registered = report.total_children_ever_registered(ids_ever)
 
-    @total_children_ever_registered = report.total_children_ever_registered
-
-    @total_men_registered = report.total_men_registered
-    @total_men_ever_registered = report.total_men_ever_registered
+    @total_men_registered = report.total_men_registered(ids)
+    @total_men_ever_registered = report.total_men_ever_registered(ids_ever)
 
 
-    @total_adult_men_registered = report.total_adult_men_registered
+    @total_adult_men_registered = report.total_adult_men_registered(ids)
 
-    @total_adult_men_ever_registered = report.total_adult_men_ever_registered
-
-
-    @total_boy_children_registered = report.total_boy_children_registered
-
-    @total_boy_children_ever_registered = report.total_boy_children_ever_registered
+    @total_adult_men_ever_registered = report.total_adult_men_ever_registered(ids_ever)
 
 
-    @total_women_registered = report.total_women_registered
+    @total_boy_children_registered = report.total_boy_children_registered(ids)
 
-    @total_women_ever_registered = report.total_women_ever_registered
-
-
-    @total_adult_women_registered = report.total_adult_women_registered
-
-    @total_adult_women_ever_registered = report.total_adult_women_ever_registered
+    @total_boy_children_ever_registered = report.total_boy_children_ever_registered(ids_ever)
 
 
-    @total_girl_children_registered = report.total_girl_children_registered
+    @total_women_registered = report.total_women_registered(ids)
 
-    @total_girl_children_ever_registered = report.total_girl_children_ever_registered
+    @total_women_ever_registered = report.total_women_ever_registered(ids_ever)
 
 
-    @tb_known_ever = report.tb_known_ever
+    @total_adult_women_registered = report.total_adult_women_registered(ids)
 
-    @tb_known = report.tb_known
+    @total_adult_women_ever_registered = report.total_adult_women_ever_registered(ids_ever)
 
-    @tb_after_diabetes_ever = report.tb_after_diabetes_ever
 
-    @tb_after_diabetes = report.tb_after_diabetes
+    @total_girl_children_registered = report.total_girl_children_registered(ids)
 
-    @tb_before_diabetes_ever = report.tb_before_diabetes_ever
+    @total_girl_children_ever_registered = report.total_girl_children_ever_registered(ids_ever)
 
-    @tb_before_diabetes = report.tb_before_diabetes
 
-    @tb_unknown_ever = report.tb_unkown_ever
+    @tb_known_ever = report.tb_known_ever(ids_ever)
 
-    @tb_unknown = report.tb_unkown
+    @tb_known = report.tb_known(ids)
 
-    @no_tb_ever = report.no_tb_ever
+    @tb_after_diabetes_ever = report.tb_after_diabetes_ever(ids_ever)
 
-    @no_tb = report.no_tb
+    @tb_after_diabetes = report.tb_after_diabetes(ids)
 
-    @tb_ever = report.tb_ever
+    @tb_before_diabetes_ever = report.tb_before_diabetes_ever(ids_ever)
 
-    @tb = report.tb
+    @tb_before_diabetes = report.tb_before_diabetes(ids)
 
-    @reactive_not_on_art_ever = report.reactive_not_on_art_ever
+    @tb_unknown_ever = report.tb_unkown_ever(ids_ever)
 
-    @reactive_not_on_art = report.reactive_not_on_art
+    @tb_unknown = report.tb_unkown(ids)
 
-    @reactive_on_art_ever = report.reactive_on_art_ever
+    @no_tb_ever = report.no_tb_ever(ids_ever)
 
-    @reactive_on_art = report.reactive_on_art
+    @no_tb = report.no_tb(ids)
 
-    @non_reactive_ever = report.non_reactive_ever
+    @tb_ever = report.tb_ever(ids_ever)
 
-    @non_reactive = report.non_reactive
+    @tb = report.tb(ids)
 
-    @unknown_ever = (report.total_ever_registered.to_i - report.non_reactive_ever.to_i -
-        report.reactive_on_art_ever.to_i - report.reactive_not_on_art_ever.to_i)
+    @reactive_not_on_art_ever = report.reactive_not_on_art_ever(ids_ever)
 
-    @unknown = (report.total_registered.to_i - report.non_reactive.to_i -
-        report.reactive_on_art.to_i - report.reactive_not_on_art.to_i)
+    @reactive_not_on_art = report.reactive_not_on_art(ids)
 
-    @dead_ever = report.dead_ever
+    @reactive_on_art_ever = report.reactive_on_art_ever(ids_ever)
 
-    @dead = report.dead
+    @reactive_on_art = report.reactive_on_art(ids)
 
-    @discharged_ever = report.discharged_ever
-    @discharged =report.discharged
+    @non_reactive_ever = report.non_reactive_ever(ids_ever)
 
-    @transfer_out_ever = report.transfer_out_ever
+    @non_reactive = report.non_reactive(ids)
 
-    @transfer_out = report.transfer_out
+    @unknown_ever = (@total_ever_registered.to_i - @non_reactive_ever.to_i -
+        @reactive_on_art_ever.to_i - @reactive_not_on_art_ever.to_i)
 
-    @stopped_treatment_ever = report.stopped_treatment_ever
+    @unknown = (@total_registered.to_i - @non_reactive.to_i -
+        @reactive_on_art.to_i - @reactive_not_on_art.to_i)
 
-    @stopped_treatment = report.stopped_treatment
+    @dead_ever = report.dead_ever(ids_ever)
 
-    @defaulters_ever = report.defaulters_ever - report.transfer_out_ever.to_i - report.stopped_treatment_ever.to_i - @discharged_ever.to_i
+    @dead = report.dead(ids)
 
-    @defaulters = report.defaulters - report.transfer_out.to_i - report.stopped_treatment.to_i - @discharged.to_i
+    @discharged_ever = report.discharged_ever(ids_ever)
+    @discharged =report.discharged(ids)
+
+    @transfer_out_ever = report.transfer_out_ever(ids_ever)
+
+    @transfer_out = report.transfer_out(ids)
+
+    @stopped_treatment_ever = report.stopped_treatment_ever(ids_ever)
+
+    @stopped_treatment = report.stopped_treatment(ids)
+
+    @defaulters_ever = report.defaulters_ever(ids_ever) - @transfer_out_ever.to_i - @stopped_treatment_ever.to_i - @discharged_ever.to_i
+
+    @defaulters = report.defaulters(ids) - @transfer_out.to_i - @stopped_treatment.to_i - @discharged.to_i
 
     @defaulters_ever = 0 if @defaulters_ever.to_i < 0
     @defaulters = 0 if @defaulters.to_i < 0
 
-    @alive_ever = @total_ever_registered.to_i - @defaulters_ever.to_i - report.transfer_out_ever.to_i - report.stopped_treatment_ever.to_i - @discharged_ever.to_i
+    @alive_ever = @total_ever_registered.to_i - @defaulters_ever.to_i - @transfer_out_ever.to_i - @stopped_treatment_ever.to_i - @discharged_ever.to_i
 
-    @alive = @total_registered.to_i - @defaulters.to_i - report.transfer_out.to_i - report.stopped_treatment.to_i - @discharged.to_i
+    @alive = @total_registered.to_i - @defaulters.to_i - @transfer_out.to_i - @stopped_treatment.to_i - @discharged.to_i
 
-    @on_diet_ever = @alive_ever.to_i - @oral_treatments_ever.to_i - @insulin_ever.to_i - @oral_and_insulin_ever.to_i
-
-    @on_diet = @alive.to_i - @oral_treatments.to_i - @insulin.to_i - @oral_and_insulin.to_i
-
-
-   
-    #render :layout => "report"
     render :layout => "application"
   end
 
