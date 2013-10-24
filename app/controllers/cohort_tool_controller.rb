@@ -1110,115 +1110,176 @@ class CohortToolController < ApplicationController
     @facility = Location.current_health_center.name rescue ''
 
     @specified_period = report.specified_period
+    #raise params[:type].to_yaml
+    if params[:type] == "ccc"
+              @total_registered = report.total_registered.length rescue 0
+              ids = report.total_registered.map{|patient|patient.patient_id.to_s}.join(',') rescue ""
+              @total_ever_registered = report.total_ever_registered.length rescue 0
+              ids_ever = report.total_ever_registered.map{|patient|patient.patient_id.to_s}.join(',') rescue ""
+    else
+              @total_registered = report.total_registered("DIABETES HYPERTENSION INITIAL VISIT").length rescue 0
+              ids = report.total_registered("DIABETES HYPERTENSION INITIAL VISIT").map{|patient|patient.patient_id.to_s}.join(',') rescue ""
+              @total_ever_registered = report.total_ever_registered("DIABETES HYPERTENSION INITIAL VISIT").length rescue 0
+              ids_ever = report.total_ever_registered("DIABETES HYPERTENSION INITIAL VISIT").map{|patient|patient.patient_id.to_s}.join(',') rescue ""
+    end
+    
 
-    @total_registered = report.total_registered("DIABETES HYPERTENSION INITIAL VISIT").length
-    ids = report.total_registered("DIABETES HYPERTENSION INITIAL VISIT").map{|patient|patient.patient_id.to_s}.join(',') rescue ""
-    @total_ever_registered = report.total_ever_registered("DIABETES HYPERTENSION INITIAL VISIT").length
-     ids_ever = report.total_ever_registered("DIABETES HYPERTENSION INITIAL VISIT").map{|patient|patient.patient_id.to_s}.join(',') rescue ""
+    @mi = report.mi(ids) rescue 0
 
-    @mi = report.mi(ids)
+    @kidney_failure = report.kidney_failure(ids) rescue 0
 
-    @kidney_failure = report.kidney_failure(ids)
-
-    @heart_failure = report.heart_failure(ids)
+    @heart_failure = report.heart_failure(ids) rescue 0
 
 
-    @stroke = report.stroke(ids)
+    @stroke = report.stroke(ids) rescue 0
 
-    @stroke_ever = report.stroke_ever(ids_ever)
+    @stroke_ever = report.stroke_ever(ids_ever) rescue 0
 
-    @ulcers = report.ulcers(ids)
+    @ulcers = report.ulcers(ids) rescue 0
 
-    @ulcers_ever = report.ulcers_ever(ids_ever)
+    @ulcers_ever = report.ulcers_ever(ids_ever) rescue 0
 
-    @impotence = report.impotence(ids)
+    @impotence = report.impotence(ids) rescue 0
 
-    @impotence_ever = report.impotence_ever(ids_ever)
+    @impotence_ever = report.impotence_ever(ids_ever) rescue 0
 
-    @tia = report.tia(ids)
+    @tia = report.tia(ids) rescue 0
 
-    @tia_ever = report.tia_ever(ids_ever)
+    @tia_ever = report.tia_ever(ids_ever) rescue 0
 
-    @mi_ever = report.mi_ever(ids_ever)
+    @mi_ever = report.mi_ever(ids_ever) rescue 0
 
-    @kidney_failure_ever = report.kidney_failure_ever(ids_ever)
+    @kidney_failure_ever = report.kidney_failure_ever(ids_ever) rescue 0
 
-    @heart_failure_ever = report.heart_failure_ever(ids_ever)
+    @heart_failure_ever = report.heart_failure_ever(ids_ever) rescue 0
 
     #Filter only htn dn asthma patients
-    @total_adults_registered = report.total_adults_registered(ids)
+    @total_adults_registered_male = report.total_children_registered(ids, "male", 14)# rescue 0
+    @total_adults_registered_female = report.total_children_registered(ids, "female", 14)# rescue 0
 
-    @total_adults_ever_registered = report.total_adults_ever_registered(ids_ever)
+    @older_persons_registered_male = report.total_children_registered(ids, "male", 54)
+    @older_persons_registered_female = report.total_children_registered(ids, "female", 54)
 
-    @total_children_registered = report.total_children_registered(ids)
+    @older_persons_ever_registered_male = report.total_children_ever_registered(ids_ever, "male", 54)
+    @older_persons_ever_registered_female = report.total_children_ever_registered(ids_ever, "female", 54)
 
-    @total_children_ever_registered = report.total_children_ever_registered(ids_ever)
+    @total_adults_ever_registered_male = report.total_children_ever_registered(ids_ever, "male", 14)# rescue 0
+    @total_adults_ever_registered_female = report.total_children_ever_registered(ids_ever, "female", 14)# rescue 0
 
-    @total_men_registered = report.total_men_registered(ids)
-    @total_men_ever_registered = report.total_men_ever_registered(ids_ever)
+    @total_children_registered_male = report.total_children_registered(ids, "male", 0) #rescue 0
+    @total_children_registered_female = report.total_children_registered(ids, "female", 0)# rescue 0
+
+    @total_children_ever_registered_male = report.total_children_ever_registered(ids_ever, "male", 0) # rescue 0
+    @total_children_ever_registered_female = report.total_children_ever_registered(ids_ever, "female", 0)
+
+    #raise ids.length.to_yaml
+    @disease_availabe_dm_male = report.disease_availabe(ids, "DM", "male")
+    @disease_availabe_dm_female = report.disease_availabe(ids, "DM", "female")
+    @disease_ever_availabe_dm_male = report.disease_ever_availabe(ids_ever, "DM", "male")
+    @disease_ever_availabe_dm_female = report.disease_ever_availabe(ids_ever, "DM", "female")
+
+    @disease_availabe_ht_male = report.disease_availabe(ids, "HT", "male")
+    @disease_availabe_ht_female = report.disease_availabe(ids, "HT", "female")
+    @disease_ever_availabe_ht_male = report.disease_ever_availabe(ids_ever, "HT", "male")
+    @disease_ever_availabe_ht_female = report.disease_ever_availabe(ids_ever, "HT", "female")
+
+    @disease_availabe_asthma_male = report.disease_availabe(ids, "asthma", "male")
+    @disease_availabe_asthma_female = report.disease_availabe(ids, "asthma", "female")
+    @disease_ever_availabe_asthma_male = report.disease_ever_availabe(ids_ever, "asthma", "male")
+    @disease_ever_availabe_asthma_female = report.disease_ever_availabe(ids_ever, "asthma", "female")
+
+    @disease_availabe_epilepsy_male = report.disease_availabe(ids, "epilepsy", "male")
+    @disease_availabe_epilepsy_female = report.disease_availabe(ids, "epilepsy", "female")
+    @disease_ever_availabe_epilepsy_male = report.disease_ever_availabe(ids_ever, "epilepsy", "male")
+    @disease_ever_availabe_epilepsy_female = report.disease_ever_availabe(ids_ever, "epilepsy", "female")
+
+    @disease_availabe_dmht_male = report.disease_availabe(ids, "dm ht", "male").to_i
+    @disease_availabe_dmht_female = report.disease_availabe(ids, "dm ht", "female").to_i
+    @disease_ever_availabe_dmht_male = report.disease_ever_availabe(ids_ever, "dm ht", "male").to_i
+    @disease_ever_availabe_dmht_female = report.disease_ever_availabe(ids_ever, "dm ht", "female").to_i
 
 
-    @total_adult_men_registered = report.total_adult_men_registered(ids)
+    total_male = @total_children_registered_male + @total_adults_registered_male + @older_persons_registered_male
+    total_female = @total_children_registered_female + @total_adults_registered_female + @older_persons_registered_female
+    total_disease_male = @disease_availabe_dmht_male + @disease_availabe_dm_male + @disease_availabe_ht_male + @disease_availabe_asthma_male + @disease_availabe_epilepsy_male
+    total_disease_female = @disease_availabe_dmht_female + @disease_availabe_dm_female + @disease_availabe_ht_female + @disease_availabe_asthma_female + @disease_availabe_epilepsy_female
 
-    @total_adult_men_ever_registered = report.total_adult_men_ever_registered(ids_ever)
-
-
-    @total_boy_children_registered = report.total_boy_children_registered(ids)
-
-    @total_boy_children_ever_registered = report.total_boy_children_ever_registered(ids_ever)
-
-
-    @total_women_registered = report.total_women_registered(ids)
-
-    @total_women_ever_registered = report.total_women_ever_registered(ids_ever)
-
-
-    @total_adult_women_registered = report.total_adult_women_registered(ids)
-
-    @total_adult_women_ever_registered = report.total_adult_women_ever_registered(ids_ever)
+    total_ever_male = @total_children_ever_registered_male + @total_adults_ever_registered_male + @older_persons_ever_registered_male
+    total_ever_female = @total_children_ever_registered_female + @total_adults_ever_registered_female + @older_persons_ever_registered_female
+    total_disease_ever_male = @disease_ever_availabe_dmht_male + @disease_ever_availabe_dm_male + @disease_ever_availabe_ht_male + @disease_ever_availabe_asthma_male + @disease_ever_availabe_epilepsy_male
+    total_disease_ever_female = @disease_ever_availabe_dmht_female + @disease_ever_availabe_dm_female + @disease_ever_availabe_ht_female + @disease_ever_availabe_asthma_female + @disease_ever_availabe_epilepsy_female
+    
+    @disease_availabe_other_male = total_male - total_disease_male
+    @disease_availabe_other_female = total_female - total_disease_female
+    @disease_ever_availabe_other_male = total_ever_male - total_disease_ever_male
+    @disease_ever_availabe_other_female = total_ever_female - total_disease_ever_female
 
 
-    @total_girl_children_registered = report.total_girl_children_registered(ids)
-
-    @total_girl_children_ever_registered = report.total_girl_children_ever_registered(ids_ever)
-
+    @total_men_registered = report.total_men_registered(ids) rescue 0
+    @total_men_ever_registered = report.total_men_ever_registered(ids_ever) rescue 0
 
 
-    @oral_treatments_ever = report.oral_treatments_ever
+    @total_adult_men_registered = report.total_adult_men_registered(ids) rescue 0
 
-    @oral_treatments = report.oral_treatments
+    @total_adult_men_ever_registered = report.total_adult_men_ever_registered(ids_ever) rescue 0
 
-    @insulin_ever = report.insulin_ever
 
-    @insulin = report.insulin
+    @total_boy_children_registered = report.total_boy_children_registered(ids) rescue 0
 
-    @oral_and_insulin_ever = report.oral_and_insulin_ever
+    @total_boy_children_ever_registered = report.total_boy_children_ever_registered(ids_ever) rescue 0
 
-    @oral_and_insulin = report.oral_and_insulin
 
-    @metformin_ever = report.metformin_ever
+    @total_women_registered = report.total_women_registered(ids) rescue 0
 
-    @metformin = report.metformin
+    @total_women_ever_registered = report.total_women_ever_registered(ids_ever) rescue 0
 
-    @glibenclamide = report.glibenclamide
 
-    @glibenclamide_ever = report.glibenclamide_ever
+    @total_adult_women_registered = report.total_adult_women_registered(ids) rescue 0
 
-    @lente_insulin_ever = report.lente_insulin_ever
+    @total_adult_women_ever_registered = report.total_adult_women_ever_registered(ids_ever) rescue 0
 
-    @lente_insulin = report.lente_insulin
 
-    @soluble_insulin_ever = report.soluble_insulin_ever
+    @total_girl_children_registered = report.total_girl_children_registered(ids) rescue 0
 
-    @soluble_insulin = report.soluble_insulin
+    @total_girl_children_ever_registered = report.total_girl_children_ever_registered(ids_ever) rescue 0
 
-    @urine_protein_ever = report.urine_protein_ever
 
-    @urine_protein = report.urine_protein
 
-    @creatinine_ever = report.creatinine_ever
+    @oral_treatments_ever = report.oral_treatments_ever rescue 0
 
-    @creatinine = report.creatinine
+    @oral_treatments = report.oral_treatments rescue 0
+
+    @insulin_ever = report.insulin_ever rescue 0
+
+    @insulin = report.insulin rescue 0
+
+    @oral_and_insulin_ever = report.oral_and_insulin_ever rescue 0
+
+    @oral_and_insulin = report.oral_and_insulin rescue 0
+
+    @metformin_ever = report.metformin_ever rescue 0
+
+    @metformin = report.metformin rescue 0
+
+    @glibenclamide = report.glibenclamide rescue 0
+
+    @glibenclamide_ever = report.glibenclamide_ever rescue 0
+
+    @lente_insulin_ever = report.lente_insulin_ever rescue 0
+
+    @lente_insulin = report.lente_insulin rescue 0
+
+    @soluble_insulin_ever = report.soluble_insulin_ever rescue 0
+
+    @soluble_insulin = report.soluble_insulin rescue 0
+
+    @urine_protein_ever = report.urine_protein_ever rescue 0
+
+    @urine_protein = report.urine_protein rescue 0
+
+    @creatinine_ever = report.creatinine_ever rescue 0
+
+    @creatinine = report.creatinine rescue 0
 
 
     @nephropathy_ever = @urine_protein_ever + @creatinine_ever
@@ -1226,34 +1287,34 @@ class CohortToolController < ApplicationController
     @nephropathy = @urine_protein + @creatinine
 
 
-    @numbness_symptoms_ever = report.numbness_symptoms_ever(ids_ever)
+    @numbness_symptoms_ever = report.numbness_symptoms_ever(ids_ever) rescue 0
 
-    @numbness_symptoms = report.numbness_symptoms(ids)
+    @numbness_symptoms = report.numbness_symptoms(ids) rescue 0
 
 
     @neuropathy_ever = @numbness_symptoms_ever
 
     @neuropathy = @numbness_symptoms
 
-    @cataracts_ever = report.cataracts_ever
+    @cataracts_ever = report.cataracts_ever rescue 0
 
-    @cataracts = report.cataracts
+    @cataracts = report.cataracts rescue 0
 
-    @macrovascular_ever = report.macrovascular_ever
+    @macrovascular_ever = report.macrovascular_ever rescue 0
 
-    @macrovascular = report.macrovascular
+    @macrovascular = report.macrovascular rescue 0
 
-    @no_complications_ever = report.no_complications_ever(ids_ever)
+    @no_complications_ever = report.no_complications_ever(ids_ever) rescue 0
 
-    @no_complications = report.no_complications(ids)
+    @no_complications = report.no_complications(ids) rescue 0
 
-    @amputation_ever = report.amputation_ever(ids_ever)
+    @amputation_ever = report.amputation_ever(ids_ever) rescue 0
 
-    @amputation = report.amputation(ids)
+    @amputation = report.amputation(ids) rescue 0
 
-    @current_foot_ulceration_ever = report.current_foot_ulceration_ever(ids_ever)
+    @current_foot_ulceration_ever = report.current_foot_ulceration_ever(ids_ever) rescue 0
 
-    @current_foot_ulceration = report.current_foot_ulceration(ids)
+    @current_foot_ulceration = report.current_foot_ulceration(ids) rescue 0
 
 
     @amputations_or_ulcers_ever = @amputation_ever + @current_foot_ulceration_ever
@@ -1261,41 +1322,41 @@ class CohortToolController < ApplicationController
     @amputations_or_ulcers = @amputation + @current_foot_ulceration
 
 
-    @tb_known_ever = report.tb_known_ever(ids_ever)
+    @tb_known_ever = report.tb_known_ever(ids_ever) rescue 0
 
-    @tb_known = report.tb_known(ids)
+    @tb_known = report.tb_known(ids) rescue 0
 
-    @tb_after_diabetes_ever = report.tb_after_diabetes_ever(ids_ever)
+    @tb_after_diabetes_ever = report.tb_after_diabetes_ever(ids_ever) rescue 0
 
-    @tb_after_diabetes = report.tb_after_diabetes(ids)
+    @tb_after_diabetes = report.tb_after_diabetes(ids) rescue 0
 
-    @tb_before_diabetes_ever = report.tb_before_diabetes_ever(ids_ever)
+    @tb_before_diabetes_ever = report.tb_before_diabetes_ever(ids_ever) rescue 0
 
-    @tb_before_diabetes = report.tb_before_diabetes(ids)
+    @tb_before_diabetes = report.tb_before_diabetes(ids) rescue 0
 
-    @tb_unknown_ever = report.tb_unkown_ever(ids_ever)
+    @tb_unknown_ever = report.tb_unkown_ever(ids_ever) rescue 0
 
-    @tb_unknown = report.tb_unkown(ids)
+    @tb_unknown = report.tb_unkown(ids) rescue 0
 
-    @no_tb_ever = report.no_tb_ever(ids_ever)
+    @no_tb_ever = report.no_tb_ever(ids_ever) rescue 0
 
-    @no_tb = report.no_tb(ids)
+    @no_tb = report.no_tb(ids) rescue 0
 
-    @tb_ever = report.tb_ever(ids_ever)
+    @tb_ever = report.tb_ever(ids_ever) rescue 0
 
-    @tb = report.tb(ids)
+    @tb = report.tb(ids) rescue 0
 
-    @reactive_not_on_art_ever = report.reactive_not_on_art_ever(ids_ever)
+    @reactive_not_on_art_ever = report.reactive_not_on_art_ever(ids_ever) rescue 0
 
-    @reactive_not_on_art = report.reactive_not_on_art(ids)
+    @reactive_not_on_art = report.reactive_not_on_art(ids) rescue 0
 
-    @reactive_on_art_ever = report.reactive_on_art_ever(ids_ever)
+    @reactive_on_art_ever = report.reactive_on_art_ever(ids_ever) rescue 0
 
-    @reactive_on_art = report.reactive_on_art(ids)
+    @reactive_on_art = report.reactive_on_art(ids) rescue 0
 
-    @non_reactive_ever = report.non_reactive_ever(ids_ever)
+    @non_reactive_ever = report.non_reactive_ever(ids_ever) rescue 0
 
-    @non_reactive = report.non_reactive(ids)
+    @non_reactive = report.non_reactive(ids) rescue 0
 
     @unknown_ever = (@total_ever_registered.to_i - @non_reactive_ever.to_i -
         @reactive_on_art_ever.to_i - @reactive_not_on_art_ever.to_i)
@@ -1303,24 +1364,35 @@ class CohortToolController < ApplicationController
     @unknown = (@total_registered.to_i - @non_reactive.to_i -
         @reactive_on_art.to_i - @reactive_not_on_art.to_i)
 
-    @dead_ever = report.dead_ever(ids_ever)
+    @dead_ever_male = report.dead_ever(ids_ever, "male")# rescue 0
+    @dead_ever_female = report.dead_ever(ids_ever, "female")# rescue 0
 
-    @dead = report.dead(ids)
+    @dead_female = report.dead(ids, "female")# rescue 0
+    @dead_male = report.dead(ids, "male")# rescue 0
 
-    @discharged_ever = report.discharged_ever(ids_ever)
-    @discharged =report.discharged(ids)
+    @discharged_ever = report.discharged_ever(ids_ever) rescue 0
+    @discharged = report.discharged(ids) rescue 0
 
-    @transfer_out_ever = report.transfer_out_ever(ids_ever)
+    @transfer_out_ever_male = report.transfer_out_ever(ids_ever, "male") rescue 0
+    @transfer_out_ever_female = report.transfer_out_ever(ids_ever, "female")
+    @transfer_out_male = report.transfer_out(ids_ever, "male")
+    @transfer_out_female = report.transfer_out(ids_ever, "female")
 
-    @transfer_out = report.transfer_out(ids)
+    @stopped_treatment_ever_male = report.stopped_treatment_ever(ids_ever, "male") #rescue 0
+    @stopped_treatment_ever_female = report.stopped_treatment_ever(ids_ever, "female")
+    @stopped_treatment_male = report.stopped_treatment(ids, "male")
+    @stopped_treatment_female = report.stopped_treatment(ids, "female")
 
-    @stopped_treatment_ever = report.stopped_treatment_ever(ids_ever)
+    #raise report.attending_ever(ids, "female").to_yaml
 
-    @stopped_treatment = report.stopped_treatment(ids)
+    @attending_male = report.attending_ever(ids, "male") #- @dead_ever_male - @transfer_out_ever_male - @stopped_treatment_ever_male
+    @attending_female = report.attending_ever(ids, "female") #- @dead_ever_female - @transfer_out_ever_female - @stopped_treatment_ever_female
+    
+    @defaulters_ever = report.defaulters_ever(ids_ever) rescue 0
+    @defaulters_ever = @defaulters_ever - @transfer_out_ever.to_i - @stopped_treatment_ever.to_i - @discharged_ever.to_i
 
-    @defaulters_ever = report.defaulters_ever(ids_ever) - @transfer_out_ever.to_i - @stopped_treatment_ever.to_i - @discharged_ever.to_i
-
-    @defaulters = report.defaulters(ids) - @transfer_out.to_i - @stopped_treatment.to_i - @discharged.to_i
+    @defaulters = report.defaulters(ids) rescue 0
+    @defaulters = @defaulters - @transfer_out.to_i - @stopped_treatment.to_i - @discharged.to_i
 
     @defaulters_ever = 0 if @defaulters_ever.to_i < 0
     @defaulters = 0 if @defaulters.to_i < 0
@@ -1335,21 +1407,21 @@ class CohortToolController < ApplicationController
 
     
 
-    @background_retinapathy_ever = report.background_retinapathy_ever
+    @background_retinapathy_ever = report.background_retinapathy_ever rescue 0
 
-    @background_retinapathy = report.background_retinapathy
+    @background_retinapathy = report.background_retinapathy rescue 0
 
-    @ploriferative_retinapathy_ever = report.ploriferative_retinapathy_ever
+    @ploriferative_retinapathy_ever = report.ploriferative_retinapathy_ever rescue 0
 
-    @ploriferative_retinapathy = report.ploriferative_retinapathy
+    @ploriferative_retinapathy = report.ploriferative_retinapathy rescue 0
 
-    @end_stage_retinapathy_ever = report.end_stage_retinapathy_ever
+    @end_stage_retinapathy_ever = report.end_stage_retinapathy_ever rescue 0
 
-    @end_stage_retinapathy = report.end_stage_retinapathy
+    @end_stage_retinapathy = report.end_stage_retinapathy rescue 0
 
-    @maculopathy_ever = report.maculopathy_ever
+    @maculopathy_ever = report.maculopathy_ever rescue 0
 
-    @maculopathy = report.maculopathy
+    @maculopathy = report.maculopathy rescue 0
 
     @diabetic_retinopathy_ever = @background_retinapathy_ever +
       @ploriferative_retinapathy_ever +
@@ -1361,7 +1433,7 @@ class CohortToolController < ApplicationController
       @end_stage_retinapathy +
       @maculopathy
 
-    #render :layout => "report"
+    render :template => "/cohort_tool/ccc_cohort", :layout => "application" and return if params[:type] == "ccc"
     render :template => "/cohort_tool/cohort", :layout => "application"
   end
 
@@ -1378,16 +1450,16 @@ class CohortToolController < ApplicationController
     @specified_period = report.specified_period
 
 #Making sure we report only patients gone through epilepsy program
-    @total_registered = report.total_registered("EPILEPSY CLINIC VISIT").length
+    @total_registered = report.total_registered("EPILEPSY CLINIC VISIT").length rescue 0
     ids = report.total_registered("EPILEPSY CLINIC VISIT").map{|patient|patient.patient_id.to_s}.join(',') rescue ""
-    @total_ever_registered = report.total_ever_registered("EPILEPSY CLINIC VISIT").length
+    @total_ever_registered = report.total_ever_registered("EPILEPSY CLINIC VISIT").length rescue 0
      ids_ever = report.total_ever_registered("EPILEPSY CLINIC VISIT").map{|patient|patient.patient_id.to_s}.join(',') rescue ""
 
-    @confirmed = report.epilepsy_type("Confirm diagnosis of epilepsy", "yes")
-    @confirmed_ever = report.epilepsy_type_ever("Confirm diagnosis of epilepsy", "yes")
+    @confirmed = report.epilepsy_type("Confirm diagnosis of epilepsy", "yes") rescue 0
+    @confirmed_ever = report.epilepsy_type_ever("Confirm diagnosis of epilepsy", "yes") rescue 0
 
-    @generalized = report.epilepsy_type("Type of epilepsy", "Generalised")
-    @generalized_ever = report.epilepsy_type_ever("Type of epilepsy", "Generalised")
+    @generalized = report.epilepsy_type("Type of epilepsy", "Generalised") rescue 0
+    @generalized_ever = report.epilepsy_type_ever("Type of epilepsy", "Generalised") rescue 0
 
     @non_confirmed = @total_registered - @confirmed
     @non_confirmed_ever = @total_ever_registered - @confirmed_ever
@@ -1395,123 +1467,123 @@ class CohortToolController < ApplicationController
     @focal_seizure = @confirmed - @generalized
     @focal_seizure_ever = @confirmed_ever - @generalized_ever
 
-    @atomic = report.epilepsy_type("Generalised", "atomic")
-    @atomic_ever = report.epilepsy_type_ever("Generalised", "atomic")
+    @atomic = report.epilepsy_type("Generalised", "atomic") rescue 0
+    @atomic_ever = report.epilepsy_type_ever("Generalised", "atomic") rescue 0
 
-    @chlonic = report.epilepsy_type("Generalised", "chlonic")
-    @chlonic_ever = report.epilepsy_type_ever("Generalised", "chlonic")
+    @chlonic = report.epilepsy_type("Generalised", "chlonic") rescue 0
+    @chlonic_ever = report.epilepsy_type_ever("Generalised", "chlonic") rescue 0
 
-    @myclonic = report.epilepsy_type("Generalised", "myclonic")
-    @myclonic_ever = report.epilepsy_type_ever("Generalised", "myclonic")
+    @myclonic = report.epilepsy_type("Generalised", "myclonic") rescue 0
+    @myclonic_ever = report.epilepsy_type_ever("Generalised", "myclonic") rescue 0
 
-    @absence = report.epilepsy_type("Generalised", "absence")
-    @absence_ever = report.epilepsy_type_ever("Generalised", "absence")
+    @absence = report.epilepsy_type("Generalised", "absence") rescue 0
+    @absence_ever = report.epilepsy_type_ever("Generalised", "absence") rescue 0
 
-    @tonic_clonic = report.epilepsy_type("Generalised", "Tonic Clonic")
-    @tonic_clonic_ever = report.epilepsy_type_ever("Generalised", "Tonic Clonic")
+    @tonic_clonic = report.epilepsy_type("Generalised", "Tonic Clonic") rescue 0
+    @tonic_clonic_ever = report.epilepsy_type_ever("Generalised", "Tonic Clonic") rescue 0
 
-    @simplex = report.epilepsy_type("Focal seizure", "Simplex")
-    @simplex_ever = report.epilepsy_type_ever("Focal seizure", "Simplex")
+    @simplex = report.epilepsy_type("Focal seizure", "Simplex") rescue 0
+    @simplex_ever = report.epilepsy_type_ever("Focal seizure", "Simplex") rescue 0
 
-    @complex = report.epilepsy_type("Focal seizure", "Complex")
-    @complex_ever = report.epilepsy_type_ever("Focal seizure", "Complex")
+    @complex = report.epilepsy_type("Focal seizure", "Complex") rescue 0
+    @complex_ever = report.epilepsy_type_ever("Focal seizure", "Complex") rescue 0
 
-    @psychogenic = report.non_epileptic("Condition", "Psychogenic")
-    @psychogenic_ever = report.non_epileptic_ever("Condition", "Psychogenic")
+    @psychogenic = report.non_epileptic("Condition", "Psychogenic") rescue 0
+    @psychogenic_ever = report.non_epileptic_ever("Condition", "Psychogenic") rescue 0
 
-    @febrile_seizure = report.non_epileptic("Condition", "Febrile seizure")
-    @febrile_seizure_ever = report.non_epileptic_ever("Condition", "Febrile seizure")
+    @febrile_seizure = report.non_epileptic("Condition", "Febrile seizure") rescue 0
+    @febrile_seizure_ever = report.non_epileptic_ever("Condition", "Febrile seizure") rescue 0
 
-    @syncope = report.non_epileptic("Condition", "Syncope")
-    @syncope_ever = report.non_epileptic_ever("Condition", "Syncope")
+    @syncope = report.non_epileptic("Condition", "Syncope") rescue 0
+    @syncope_ever = report.non_epileptic_ever("Condition", "Syncope") rescue 0
 
-    @burns = report.epilepsy_type("Burns", "yes")
-    @burns_ever = report.epilepsy_type_ever("Burns", "yes")
+    @burns = report.epilepsy_type("Burns", "yes") rescue 0
+    @burns_ever = report.epilepsy_type_ever("Burns", "yes") rescue 0
 
-    @injuries = report.epilepsy_type("Head injury", "Yes")
-    @injuries_ever = report.epilepsy_type_ever("Head injury", "Yes")
+    @injuries = report.epilepsy_type("Head injury", "Yes") rescue 0
+    @injuries_ever = report.epilepsy_type_ever("Head injury", "Yes") rescue 0
 
-    @drug_related = report.epilepsy_type("Cause of Seizure", "drug/alcohol withdrawal")
-    @drug_related_ever = report.epilepsy_type_ever("Cause of Seizure", "drug/alcohol withdrawal")
+    @drug_related = report.epilepsy_type("Cause of Seizure", "drug/alcohol withdrawal") rescue 0
+    @drug_related_ever = report.epilepsy_type_ever("Cause of Seizure", "drug/alcohol withdrawal") rescue 0
 
-    @hyperactivity = report.epilepsy_type("hyperactivity", "yes")
-    @hyperactivity_ever = report.epilepsy_type_ever("hyperactivity", "yes")
+    @hyperactivity = report.epilepsy_type("hyperactivity", "yes") rescue 0
+    @hyperactivity_ever = report.epilepsy_type_ever("hyperactivity", "yes") rescue 0
 
-    @psychosis = report.epilepsy_type("psychosis", "yes")
-    @psychosis_ever = report.epilepsy_type_ever("psychosis", "yes")
+    @psychosis = report.epilepsy_type("psychosis", "yes") rescue 0
+    @psychosis_ever = report.epilepsy_type_ever("psychosis", "yes") rescue 0
 
-    @total_adults_registered = report.total_adults_registered(ids) rescue ""
+    @total_adults_registered = report.total_adults_registered(ids) rescue 0
 
-    @total_adults_ever_registered = report.total_adults_ever_registered(ids_ever) rescue ""
+    @total_adults_ever_registered = report.total_adults_ever_registered(ids_ever) rescue 0
 
-    @total_children_registered = report.total_children_registered(ids) rescue ""
+    @total_children_registered = report.total_children_registered(ids) rescue 0
 
-    @total_children_ever_registered = report.total_children_ever_registered(ids_ever) rescue ""
+    @total_children_ever_registered = report.total_children_ever_registered(ids_ever) rescue 0
 
-    @total_men_registered = report.total_men_registered(ids) rescue ""
-    @total_men_ever_registered = report.total_men_ever_registered(ids_ever) rescue ""
-
-
-    @total_adult_men_registered = report.total_adult_men_registered(ids) rescue ""
-
-    @total_adult_men_ever_registered = report.total_adult_men_ever_registered(ids_ever) rescue ""
+    @total_men_registered = report.total_men_registered(ids) rescue 0
+    @total_men_ever_registered = report.total_men_ever_registered(ids_ever) rescue 0
 
 
-    @total_boy_children_registered = report.total_boy_children_registered(ids) rescue ""
+    @total_adult_men_registered = report.total_adult_men_registered(ids) rescue 0
 
-    @total_boy_children_ever_registered = report.total_boy_children_ever_registered(ids_ever)  rescue ""
-
-
-    @total_women_registered = report.total_women_registered(ids) rescue ""
-
-    @total_women_ever_registered = report.total_women_ever_registered(ids_ever) rescue ""
+    @total_adult_men_ever_registered = report.total_adult_men_ever_registered(ids_ever) rescue 0
 
 
-    @total_adult_women_registered = report.total_adult_women_registered(ids) rescue ""
+    @total_boy_children_registered = report.total_boy_children_registered(ids) rescue 0
 
-    @total_adult_women_ever_registered = report.total_adult_women_ever_registered(ids_ever) rescue ""
-
-
-    @total_girl_children_registered = report.total_girl_children_registered(ids) rescue ""
-
-    @total_girl_children_ever_registered = report.total_girl_children_ever_registered(ids_ever) rescue ""
+    @total_boy_children_ever_registered = report.total_boy_children_ever_registered(ids_ever)  rescue 0
 
 
-    @tb_known_ever = report.tb_known_ever(ids_ever) rescue ""
+    @total_women_registered = report.total_women_registered(ids) rescue 0
 
-    @tb_known = report.tb_known(ids) rescue ""
+    @total_women_ever_registered = report.total_women_ever_registered(ids_ever) rescue 0
 
-    @tb_after_diabetes_ever = report.tb_after_diabetes_ever(ids_ever) rescue ""
 
-    @tb_after_diabetes = report.tb_after_diabetes(ids) rescue ""
+    @total_adult_women_registered = report.total_adult_women_registered(ids) rescue 0
 
-    @tb_before_diabetes_ever = report.tb_before_diabetes_ever(ids_ever) rescue ""
+    @total_adult_women_ever_registered = report.total_adult_women_ever_registered(ids_ever) rescue 0
 
-    @tb_before_diabetes = report.tb_before_diabetes(ids) rescue ""
 
-    @tb_unknown_ever = report.tb_unkown_ever(ids_ever) rescue ""
+    @total_girl_children_registered = report.total_girl_children_registered(ids) rescue 0
 
-    @tb_unknown = report.tb_unkown(ids) rescue ""
+    @total_girl_children_ever_registered = report.total_girl_children_ever_registered(ids_ever) rescue 0
 
-    @no_tb_ever = report.no_tb_ever(ids_ever) rescue ""
 
-    @no_tb = report.no_tb(ids) rescue ""
+    @tb_known_ever = report.tb_known_ever(ids_ever) rescue 0
 
-    @tb_ever = report.tb_ever(ids_ever) rescue ""
+    @tb_known = report.tb_known(ids) rescue 0
 
-    @tb = report.tb(ids) rescue ""
+    @tb_after_diabetes_ever = report.tb_after_diabetes_ever(ids_ever) rescue 0
 
-    @reactive_not_on_art_ever = report.reactive_not_on_art_ever(ids_ever) rescue ""
+    @tb_after_diabetes = report.tb_after_diabetes(ids) rescue 0
 
-    @reactive_not_on_art = report.reactive_not_on_art(ids) rescue ""
+    @tb_before_diabetes_ever = report.tb_before_diabetes_ever(ids_ever) rescue 0
 
-    @reactive_on_art_ever = report.reactive_on_art_ever(ids_ever) rescue ""
+    @tb_before_diabetes = report.tb_before_diabetes(ids) rescue 0
 
-    @reactive_on_art = report.reactive_on_art(ids) rescue ""
+    @tb_unknown_ever = report.tb_unkown_ever(ids_ever) rescue 0
 
-    @non_reactive_ever = report.non_reactive_ever(ids_ever) rescue ""
+    @tb_unknown = report.tb_unkown(ids) rescue 0
 
-    @non_reactive = report.non_reactive(ids) rescue ""
+    @no_tb_ever = report.no_tb_ever(ids_ever) rescue 0
+
+    @no_tb = report.no_tb(ids) rescue 0
+
+    @tb_ever = report.tb_ever(ids_ever) rescue 0
+
+    @tb = report.tb(ids) rescue 0
+
+    @reactive_not_on_art_ever = report.reactive_not_on_art_ever(ids_ever) rescue 0
+
+    @reactive_not_on_art = report.reactive_not_on_art(ids) rescue 0
+
+    @reactive_on_art_ever = report.reactive_on_art_ever(ids_ever) rescue 0
+
+    @reactive_on_art = report.reactive_on_art(ids) rescue 0
+
+    @non_reactive_ever = report.non_reactive_ever(ids_ever) rescue 0
+
+    @non_reactive = report.non_reactive(ids) rescue 0
 
     @unknown_ever = (@total_ever_registered.to_i - @non_reactive_ever.to_i -
         @reactive_on_art_ever.to_i - @reactive_not_on_art_ever.to_i)
@@ -1519,9 +1591,9 @@ class CohortToolController < ApplicationController
     @unknown = (@total_registered.to_i - @non_reactive.to_i -
         @reactive_on_art.to_i - @reactive_not_on_art.to_i)
 
-    @dead_ever = report.dead_ever(ids_ever) rescue ""
+    @dead_ever = report.dead_ever(ids_ever) rescue 0
 
-    @dead = report.dead(ids) rescue ""
+    @dead = report.dead(ids) rescue 0
 
     @discharged_ever = report.discharged_ever(ids_ever) rescue 0
     @discharged =report.discharged(ids) rescue 0

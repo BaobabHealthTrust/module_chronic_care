@@ -1018,9 +1018,9 @@ class PatientsController < ApplicationController
 				@transfer_out_site = obs.to_s if obs.to_s.include?('Transfer out to')
 			end
     end
-		@sbp = current_vitals(@patient, "systolic blood pressure").value_numeric rescue 0
-		@dbp = current_vitals(@patient, "diastolic blood pressure").value_numeric rescue 0
-
+		@sbp = current_vitals(@patient, "systolic blood pressure").value_numeric #rescue 0
+		@dbp = current_vitals(@patient, "diastolic blood pressure").value_numeric #rescue 0
+    #raise @dbp.to_yaml
 		@complications = Vitals.current_encounter(@patient, "complications", "complications") rescue []
 								
 		@diabetic = ConceptName.find_by_concept_id(Vitals.get_patient_attribute_value(@patient, "Patient has Diabetes")).name rescue []
@@ -1213,14 +1213,14 @@ class PatientsController < ApplicationController
 	end
 
   def current_vitals(patient, vital_sign, session_date = Date.today)
-    concept = ConceptName.find_by_sql("select concept_id from concept_name where name = '#{vital_sign}' and voided = 0").first.concept_id
-    Observation.find_by_sql("SELECT * from obs where concept_id = '#{concept}' AND person_id = '#{patient.id}'
+    concept = ConceptName.find_by_name("#{vital_sign}").concept_id
+    Observation.find_by_sql("SELECT * from obs where concept_id = #{concept} AND person_id = #{patient.id}
                     AND DATE(obs_datetime) <= '#{session_date}' AND voided = 0
-                    ORDER BY  obs_datetime DESC, date_created DESC LIMIT 1").first rescue nil
+                    ORDER BY  obs_datetime DESC, date_created DESC LIMIT 1").first #rescue nil
 	end
 
   def specific_vitals(patient, vital_sign, session_date = Date.today)
-    concept = ConceptName.find_by_sql("select concept_id from concept_name where name = '#{vital_sign}' and voided = 0").first.concept_id
+    concept = ConceptName.find_by_name("#{vital_sign}").concept_id
     Observation.find_by_sql("SELECT * from obs where concept_id = '#{concept}' AND person_id = '#{patient.id}'
                     AND DATE(obs_datetime) = '#{session_date}' AND voided = 0
                     ORDER BY  obs_datetime DESC, date_created DESC LIMIT 1").first rescue nil

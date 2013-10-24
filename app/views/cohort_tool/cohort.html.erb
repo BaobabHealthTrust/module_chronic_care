@@ -217,22 +217,18 @@
         </head>
         <body>
           <%= image_tag(@logo,:class=>"logo")%>
-          <table cellspacing="0" cellpadding="0">
-            <tr><td style="border-style:solid;text-align:justify;border-width:0;">
-                <%= Location.current_health_center.name + " : " + @quarter %>
-              </td></tr>
-            <tr><td style="border-style:solid;text-align:justify;border-width:0;">Start Date: <%= @specified_period[0].to_date.strftime("%A %d %B, %Y") %>
-              </td></tr>
-            <tr><td  style="border-style:solid;text-align:justify;border-width:0;"> End Date: <%= @specified_period[1].to_date.strftime("%A %d %B, %Y") %>
-              </td></tr>
-          </table>
+          <br />
+
+	<h1><%= Location.current_health_center.name + " : " + @quarter %></h1>
+	<br />
+
           <div class='scrollTableContainer'>
             <table cellspacing='0' align="center" width="98%" height="95%">
               <thead>
                 <tr>
 
-                  <th style = "text-align:left;">PATIENT'S REGISTRATION DETAILS</th>
-                  <th>NEWLY REGISTRATED IN quarter</th>
+                  <th style = "text-align:left;">DETAILS</th>
+                  <th>NEWLY REGISTRATED IN QUARTER</th>
                   <th>CUMULATED EVER REGISTRATED</th>
                 </tr>
               </thead>

@@ -10,13 +10,17 @@
 	height:550px ! important;
   }
 </style>
-<% unless params[:id] == "epilepsy" %>
+<% if params[:id].blank? or params[:id] == "cohort" %>
 <form id='quarter' action="/cohort_tool/dm_cohort" method='post'>
+  <% if params[:id] == "cohort"  %>
+     <input type='hidden' name='type' value='ccc' />
+  <% end %>
   <% else %>
   <form id='quarter' action="/cohort_tool/epilepsy_report" method='post'>
   <% end %>
 	<input type='hidden' name='location_id' value='<%= params[:location_id] %>' />
 	<input type='hidden' name='user_id' value='<%= params[:user_id] %>' />
+
   <%
     qtrs = ['']
     current_qtr = ""
