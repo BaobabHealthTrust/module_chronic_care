@@ -1,0 +1,740 @@
+<!DOCTYPE html PUBLIC"-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+      <meta content="utf-8" http-equiv="encoding">
+        <%= stylesheet_link_tag "dashboard" %>
+        <%= stylesheet_link_tag "cohort" %>
+        <%= javascript_include_tag 'jquery' %>
+        <script>
+          jQuery(document).ready(function($) {
+            document.getElementById('content').style = 'position : relative; width : 98%; margin-left : -49%;'
+            document.getElementById('description').style = 'color:#777;position:absolute;margin-top:-70px;'
+            $('#finish').click(function() {
+              window.location = '/clinic/index?user_id=<%=params[:user_id]%>&location_id=<%params[:location_id]%>'
+            })
+
+          })
+        </script>
+        <script>
+          var tt_cancel_destination = "/"
+
+          function showReport() {
+            document.forms[0].submit();
+          }
+
+          function showReportChildren() {
+            document.forms[1].submit();
+          }
+
+          function showReportWomen() {
+            document.forms[2].submit();
+          }
+        </script>
+        <style>
+
+          table {
+            border-style:none;
+            border-width:1px;
+            width:95% !important;
+            top: 10%;
+            left: 150%;
+          }
+
+          th {
+            border-style:none;
+            border-width:1px;
+          }
+
+          td {
+            text-align:center;
+            border-style:solid;
+            border-width:1px;
+            font-weight:bold;
+            font-size:medium;
+          }
+
+          .row_break td {
+            border-width:0px;
+          }
+
+          div.scrollTableContainer {
+            border-style:solid;
+            height:68%;
+            width: 98%;
+            float: right;
+            position:relative;
+          }
+
+          .survival-analysis th, .survival-analysis td {
+            text-align:left;
+          }
+
+          .clinic_own_data {
+            position:relative;
+            float:left;
+            display:block;
+            padding-left:10px;
+          }
+
+          .checked_data {
+            position:relative;
+            float:right;
+            display:block;
+            padding-right:10px;
+          }
+          a{
+            text-decoration: none !important;
+            color: #E8EAF1;
+          }
+          a:hover {
+            color:black;
+          }
+          .clinic_data_value:hover {
+            color:black;
+          }
+          .checked_data_value:hover{
+            color:black;
+          }
+          td.create_button:hover{
+            color:black;
+          }
+          .clinic_data_value {
+            position:relative;
+            float:left;
+            display:block;
+            border: 0px 0px 2px 0px;
+            border-top: 1px outset black;
+            border-bottom: 1px outset black;
+            border-radius: 7px 7px 7px 7px;
+            border-left:0px;
+            margin-top:2px;
+            border-style: outset;
+            width:30%;
+            height:100%;
+            padding: 10px 16px 10px 10px;
+            text-align: center;
+            text-decoration: none !important;
+            background-color: #7784AE;
+            color: #E8EAF1;
+            display: block;
+            font-size:13px;
+          }
+          .create_button a{
+            background-color: #7784AE;
+            border-bottom: 1px outset black;
+            border-radius: 7px 7px 7px 7px;
+            border-style: outset;
+            border-top: 1px outset black;
+            color: #E8EAF1;
+            display: block;
+            padding: 10px 16px 10px 10px;
+            text-align: center;
+            text-decoration: none !important;
+            font-size:13px;
+          }
+          .heading {
+            background-color: #7784AE;
+            width: 100px;
+            color: #E8EAF1;
+            font-size: 15px;
+          }
+
+          td.left_top_right {
+            border-width:3px 3px 0px 3px;
+          }
+
+          td.right_bottom_left {
+            border-width:1px 3px 3px 3px;
+          }
+
+          td.left_right {
+            border-width:1px 3px 0px 3px;
+          }
+
+          td.left_top_right_bottom {
+            border-width:3px 3px 3px 3px;
+          }
+
+          .regimen {
+            position:absolute;
+            top:0px;
+            left:1px;
+            border-radius:100px;
+            background:white;
+            color:black;
+            text-align:center;
+            font-size:15px;
+          }
+          td.regimen_name_top {
+            text-align:left;
+            border-width:1px 0px 0px 0px;
+            padding-left:100px;
+          }
+
+          td.regimen_name {
+            text-align:left;
+            border-width:0px 0px 0px 0px;
+            padding-left:100px;
+          }
+
+          td.regimen_name_bottom {
+            text-align:left;
+            border-width:0px 0px 1px 0px;
+            padding-left:100px;
+          }
+
+          b {
+            position:relative;
+            float:left;
+            display:block;
+            width:68px;
+            padding-left:5px;
+          }
+          tr{
+            width:100% !important;
+          }
+          td.bg {
+            background-color:lightgrey;
+            -moz-user-select:none;
+          }
+
+          .logo {
+            float:left;
+            height: 8em;
+          }
+          #range{
+            float:left;
+            height: 8em;
+          }
+          .dataTable{
+            width:6%
+          }
+
+        </style>
+
+        <title>Cohort<%= Location.current_health_center.name + "  " + @quarter %></title>
+        </head>
+        <body>
+          <%= image_tag(@logo,:class=>"logo")%>
+          <br />
+
+	<h1><%= Location.current_health_center.name + " : " + @quarter %></h1>
+	<br />
+
+          <div class='scrollTableContainer'>
+            <table cellspacing='0' align="center" width="98%" height="95%">
+              <thead>
+                <tr>
+
+                  <th style = "text-align:left;">&nbsp;</th>
+                  <th colspan="3">New</th>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <th colspan="3">Cumulative</th>
+                  
+                </tr>
+                <tr>
+
+                  <th style = "text-align:left;">&nbsp;</th>
+                  <th>Male</th>
+                  <th>Female</th>
+                  <th>Total</th>
+                  <td  style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <th>Male</th>
+                  <th>Female</th>
+                  <th>Total</th>
+                </tr>
+
+              </thead>
+              <tbody>
+                <tr class = 'row_break heading'>
+                  <td colspan="8" style="text-align:left;border-width:0px 0px 0px 0px">Total registrated</td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;">0-14</td>
+                  <td><%=  @total_children_registered_male %></td>
+                  <td><%=  @total_children_registered_female %></td>
+                  <td><%=  (@total_children_registered_male + @total_children_registered_female) %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @total_children_ever_registered_male %></td>
+                  <td><%=  @total_children_ever_registered_female %></td>
+                  <td><%=  (@total_children_ever_registered_male + @total_children_ever_registered_female) %></td>
+                </tr>
+
+                <tr>
+
+                  <td style="text-align:left;">15-54</td>
+                  <td><%=  @total_adults_registered_male %></td>
+                  <td><%=  @total_adults_registered_female %></td>
+                  <td><%=  (@total_adults_registered_male + @total_adults_registered_female) %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @total_adults_ever_registered_male %></td>
+                  <td><%=  @total_adults_ever_registered_female %></td>
+                  <td><%=  (@total_adults_ever_registered_male + @total_adults_ever_registered_female) %></td>
+                </tr>
+
+                <tr>
+
+                  <td style="text-align:left;">54 +</td>
+                  <td><%=  @older_persons_registered_male %></td>
+                  <td><%=  @older_persons_registered_female %></td>
+                  <td><%=  (@older_persons_registered_male + @older_persons_registered_female) %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @older_persons_ever_registered_male %></td>
+                  <td><%=  @older_persons_ever_registered_female %></td>
+                  <td><%=  (@older_persons_ever_registered_male + @older_persons_ever_registered_female) %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+
+                <tr class = 'row_break heading'>
+                  <td colspan="8" style="text-align:left;border-width:0px 0px 0px 0px">Disease</td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;">DM</td>
+                  <td><%=  @disease_availabe_dm_male %></td>
+                  <td><%=  @disease_availabe_dm_female %></td>
+                  <td><%=  (@disease_availabe_dm_male + @disease_availabe_dm_female) %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @disease_ever_availabe_dm_male %></td>
+                  <td><%=  @disease_ever_availabe_dm_female %></td>
+                  <td><%=  (@disease_ever_availabe_dm_male + @disease_ever_availabe_dm_female) %></td>
+                </tr>
+
+                <tr>
+
+                  <td style="text-align:left;">HT</td>
+                  <td><%=  @disease_availabe_ht_male %></td>
+                  <td><%=  @disease_availabe_ht_female %></td>
+                  <td><%=  (@disease_availabe_ht_male + @disease_availabe_ht_female) %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @disease_ever_availabe_ht_male %></td>
+                  <td><%=  @disease_ever_availabe_ht_female %></td>
+                  <td><%=  (@disease_ever_availabe_ht_male.to_i + @disease_ever_availabe_ht_female.to_i) %></td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;">DM + HT</td>
+                  <td><%=  @disease_availabe_dmht_male %></td>
+                  <td><%=  @disease_availabe_dmht_male %></td>
+                  <td><%=  (@disease_availabe_dmht_female.to_i + @disease_availabe_dmht_male.to_i) %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @disease_ever_availabe_dmht_male %></td>
+                  <td><%=  @disease_ever_availabe_dmht_female %></td>
+                  <td><%=  (@disease_ever_availabe_dmht_male.to_i + @disease_ever_availabe_dmht_female.to_i) %></td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;">Asthma</td>
+                  <td><%=  @disease_availabe_asthma_male %></td>
+                  <td><%=  @disease_availabe_asthma_female %></td>
+                  <td><%=  (@disease_availabe_asthma_male + @disease_availabe_asthma_female) %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @disease_ever_availabe_asthma_male %></td>
+                  <td><%=  @disease_ever_availabe_asthma_female %></td>
+                  <td><%=  (@disease_ever_availabe_asthma_male + @disease_ever_availabe_asthma_female) %></td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;">Epilepsy</td>
+                  <td><%=  @disease_availabe_epilepsy_male %></td>
+                  <td><%=  @disease_availabe_epilepsy_female %></td>
+                  <td><%=  (@disease_availabe_epilepsy_male + @disease_availabe_epilepsy_female) %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @disease_ever_availabe_epilepsy_male %></td>
+                  <td><%=  @disease_ever_availabe_epilepsy_female %></td>
+                  <td><%=  (@disease_ever_availabe_epilepsy_male.to_i + @disease_ever_availabe_epilepsy_female.to_i) %></td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;">Other</td>
+                  <td><%=  @disease_availabe_other_male.to_i %></td>
+                  <td><%=  @disease_availabe_other_female.to_i %></td>
+                  <td><%=  (@disease_availabe_other_male.to_i + @disease_availabe_other_female.to_i) %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @disease_ever_availabe_other_male.to_i %></td>
+                  <td><%=  @disease_ever_availabe_other_female.to_i %></td>
+                  <td><%=  (@disease_ever_availabe_other_male.to_i + @disease_ever_availabe_other_female.to_i) %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+                <tr class = 'row_break heading'>
+                  <td colspan="8" style="text-align:left;border-width:0px 0px 0px 0px">Status</td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;" colspan="5">Attending</td>
+                  <td><%=  @attending_male %></td>
+                  <td><%=  @attending_female %></td>
+                  <td><%=  (@attending_male + @attending_female) %></td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;" colspan="5">Did not attend</td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;" colspan="5">Dead</td>
+                  <td><%=  @dead_ever_male %></td>
+                  <td><%=  @dead_ever_female %></td>
+                  <td><%=  (@dead_ever_male + @dead_ever_female) %></td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;" colspan="5">Stopped</td>
+                 
+                  <td><%=  @stopped_treatment_ever_male %></td>
+                  <td><%=  @stopped_treatment_ever_female %></td>
+                  <td><%=  (@stopped_treatment_ever_female + @stopped_treatment_male) %></td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;" colspan="5">Transferred Out</td>
+                  
+                  <td><%=  @transfer_out_ever_male %></td>
+                  <td><%=  @transfer_out_ever_female %></td>
+                  <td><%=  (@transfer_out_ever_female + @transfer_out_ever_male) %></td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;" colspan="5">Lost to follow-up</td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+                <tr class = 'row_break heading'>
+                  <td colspan="8" style="text-align:left;border-width:0px 0px 0px 0px">Comorbidity</td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;">BMI >= 30</td>
+                  <td><%=  @total_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;">Smoking</td>
+                  <td><%=  @total_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;">Alcohol</td>
+                  <td><%=  @total_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+
+                <tr class = 'row_break heading'>
+                  <td colspan="8" style="text-align:left;border-width:0px 0px 0px 0px">Drugs</td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;">Metformin</td>
+                  <td><%=  @total_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;">Glibenclamide</td>
+                  <td><%=  @total_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
+
+                <tr>
+
+                  <td style="text-align:left;">Insuline</td>
+                  <td><%=  @total_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;">HTC</td>
+                  <td><%=  @total_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;">Amlodipine</td>
+                  <td><%=  @total_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
+                 <tr>
+
+                  <td style="text-align:left;">Captopril</td>
+                  <td><%=  @total_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
+
+                 <tr>
+
+                  <td style="text-align:left;">Phenobarbitone</td>
+                  <td><%=  @total_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
+
+                <tr>
+
+                  <td style="text-align:left;">Diazepam</td>
+                  <td><%=  @total_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
+              
+                <tr class = 'row_break'>
+
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+                <tr class = 'row_break heading'>
+                  <td colspan="8" style="text-align:left;border-width:0px 0px 0px 0px">Performance</td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;">Bp down</td>
+                  <td><%=  @total_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;">Bp < 140/90 </td>
+                  <td><%=  @total_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;">Glucose down </td>
+                  <td><%=  @total_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
+
+                <tr>
+
+                  <td style="text-align:left;">Asthmatic</td>
+                  <td><%=  @total_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
+
+                <tr>
+
+                  <td style="text-align:left;">Not Asthmatic</td>
+                  <td><%=  @total_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;">Epileptic </td>
+                  <td><%=  @total_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;">No seizure</td>
+                  <td><%=  @total_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;">Number of patients controlled</td>
+                  <td><%=  @total_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
+             
+
+                <tr class = 'row_break'>
+
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+
+             <tr class = 'row_break heading'>
+                  <td colspan="8" style="text-align:left;border-width:0px 0px 0px 0px">Complications</td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;">Blind</td>
+                  <td><%=  @total_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;">MI</td>
+                  <td><%=  @total_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;">Cardiovascular Disease</td>
+                  <td><%=  @total_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;">Amputation</td>
+                  <td><%=  @total_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;">Burns</td>
+                  <td><%=  @total_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @total_ever_registered %></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div id="footer" class="dark">
+            <div id="buttons" class="buttons" style="top:0px">
+              <button id="finish" class="green"><span>Finish</span></button>
+            </div>
+          </div>
+
+
+        </body>
+        </html>
