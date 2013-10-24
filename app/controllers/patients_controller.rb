@@ -1018,8 +1018,8 @@ class PatientsController < ApplicationController
 				@transfer_out_site = obs.to_s if obs.to_s.include?('Transfer out to')
 			end
     end
-		@sbp = current_vitals(@patient, "systolic blood pressure").value_numeric #rescue 0
-		@dbp = current_vitals(@patient, "diastolic blood pressure").value_numeric #rescue 0
+		@sbp = current_vitals(@patient, "systolic blood pressure").to_s.split(':')[1].squish rescue 0
+		@dbp = current_vitals(@patient, "diastolic blood pressure").to_s.split(':')[1].squish rescue 0
     #raise @dbp.to_yaml
 		@complications = Vitals.current_encounter(@patient, "complications", "complications") rescue []
 								
