@@ -847,8 +847,8 @@ class PatientsController < ApplicationController
 
   
   def calculate_bp(patient, visit_date)
-    systolic = Vitals.todays_vitals(patient, "Systolic blood pressure", visit_date).value_numeric.to_i rescue 0
-    diastolic = Vitals.todays_vitals(patient, "Diastolic blood pressure", visit_date).value_numeric.to_i rescue 0
+    systolic = Vitals.todays_vitals(patient, "Systolic blood pressure", visit_date).to_s.split(':')[1].squish rescue 0
+    diastolic = Vitals.todays_vitals(patient, "Diastolic blood pressure", visit_date).to_s.split(':')[1].squish rescue 0
     
     return "#{systolic}/#{diastolic}"
   end
@@ -1020,7 +1020,7 @@ class PatientsController < ApplicationController
     end
 		@sbp = current_vitals(@patient, "systolic blood pressure").to_s.split(':')[1].squish rescue 0
 		@dbp = current_vitals(@patient, "diastolic blood pressure").to_s.split(':')[1].squish rescue 0
-    #raise @dbp.to_yaml
+    
 		@complications = Vitals.current_encounter(@patient, "complications", "complications") rescue []
 								
 		@diabetic = ConceptName.find_by_concept_id(Vitals.get_patient_attribute_value(@patient, "Patient has Diabetes")).name rescue []
