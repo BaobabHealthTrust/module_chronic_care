@@ -523,7 +523,7 @@ class PatientsController < ApplicationController
     visits.clinic = get_global_property_value("facility.name") rescue "Unknown"
     visits.district = get_global_property_value("facility.district") rescue "Unknown"
     visits.patient_id = patient_obj.id
-    visits.arv_number = patient_obj.arv_number rescue nil
+    visits.arv_number = patient_obj.arv_number rescue ""
     visits.address = patient_obj.address
     visits.national_id = patient_obj.national_id
     visits.name = patient_obj.name rescue nil
@@ -1122,7 +1122,7 @@ class PatientsController < ApplicationController
     # label.draw_text("#{arv_number}",565,30,0,3,1,1,true)
     label.draw_text("#{patient.name}(#{patient.gender})",25,60,0,3,1,1,false)
     #label.draw_text("#{'(' + visit.visit_by + ')' unless visit.visit_by.blank?}",255,30,0,2,1,1,false)
-    label.draw_text("#{visit.height + 'cm' if !visit.height.blank?}  #{visit.weight + 'kg' if !visit.weight.blank?}  #{'BMI:' + visit.bmi if !visit.bmi.blank?}  #{'BP :' + visit_data['bp'] }",25,95,0,2,1,1,false)
+    label.draw_text("#{visit.height + 'cm' if !visit.height.blank?}  #{visit.weight + 'kg' if !visit.weight.blank?}  #{'BMI:' + visit.bmi if !visit.bmi.blank?}  #{'BP :' + visit_data['bp'] }",25,95,0,2,1,1,false) rescue ""
     #label.draw_text("SE",25,130,0,3,1,1,false)
     label.draw_text("TB",110,130,0,3,1,1,false)
     #label.draw_text("BP",185,130,0,3,1,1,false)

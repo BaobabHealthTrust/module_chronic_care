@@ -207,12 +207,16 @@ class ProtocolPatientsController < ApplicationController
       @cholesterol = ["FASTING BLOOD SUGAR", "RANDOM BLOOD SUGAR", "CREATININE", "HbA1c"]
 
       @sugar = ["CHOLESTEROL FASTING", "CHOLESTEROL NOT FASTING", "CREATININE"]
+      if treatments_list.blank?
+        flash[:notice] = "No lab orders specified to collect!"
+        redirect_to "/patients/show/#{@patient.id}?user_id=#{params[:user_id]}" and return
+      end
 
-      @cholesterol = treatments_list - @cholesterol
+      @cholesterol = (treatments_list - @cholesterol rescue [])
 
-      @sugar = treatments_list - @sugar
+      @sugar = treatments_list - @sugar  rescue []
 
-      @generic = treatments_list - (@sugar + @cholesterol)
+      @generic = treatments_list - (@sugar + @cholesterol)  rescue []
     end
 
     @current_program = current_program
@@ -238,7 +242,8 @@ class ProtocolPatientsController < ApplicationController
 
     @current_hieght  = Observation.find_by_sql("SELECT * from obs where concept_id = '#{concept}' AND person_id = '#{@patient.id}'
                     AND DATE(obs_datetime) <= '#{current_date}' AND voided = 0
-                    ORDER BY  obs_datetime DESC, date_created DESC LIMIT 1").first rescue 0
+                    ORDER BY  obs_datetime DESC, date_created DESC LIMIT 1").first.to_s.split(':')[1].squish rescue 0
+    #raise @current_hieght.to_s.split(':')[1].squish.to_yaml
 
    @current_hieght = @current_hieght.value_numeric.to_i rescue @current_hieght.value_text.to_i rescue nil
     @treatements_list = get_global_property_value("vitals").split(";") rescue ""

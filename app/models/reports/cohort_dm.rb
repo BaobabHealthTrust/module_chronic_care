@@ -252,6 +252,87 @@ class Reports::CohortDm
     )
   end
 
+  def alcohol(ids, sex)
+     @orders = Order.find_by_sql("SELECT DISTINCT obs.person_id FROM obs
+                                  INNER JOIN person on person .person_id = obs.person_id
+                                      LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
+                                    WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'DOES THE PATIENT DRINK ALCOHOL?')
+                                      AND value_coded = (SELECT concept_id FROM concept_name WHERE name = 'YES') AND
+                                       DATE(patient.date_created) >= '#{@start_date}' AND DATE(patient.date_created) <= '#{@end_date}' \
+                                        AND patient.voided = 0
+                                      AND patient.patient_id IN (#{ids})
+                                      AND person.gender LIKE '#{sex}%'
+                                      AND obs.voided = 0").length rescue 0
+  end
+
+  def alcohol_ever(ids, sex)
+     @orders = Order.find_by_sql("SELECT DISTINCT obs.person_id FROM obs
+                                  INNER JOIN person on person .person_id = obs.person_id
+                                      LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
+                                    WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'DOES THE PATIENT DRINK ALCOHOL?')
+                                      AND value_coded = (SELECT concept_id FROM concept_name WHERE name = 'YES') AND
+                                      DATE(patient.date_created) <= '#{@end_date}' \
+                                        AND patient.voided = 0
+                                      AND patient.patient_id IN (#{ids})
+                                      AND person.gender LIKE '#{sex}%'
+                                      AND obs.voided = 0").length rescue 0
+  end
+
+  def smoking(ids, sex)
+     @orders = Order.find_by_sql("SELECT DISTINCT obs.person_id FROM obs
+                                  INNER JOIN person on person .person_id = obs.person_id
+                                      LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
+                                    WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'CURRENT SMOKER')
+                                      AND value_coded = (SELECT concept_id FROM concept_name WHERE name = 'YES') AND
+                                       DATE(patient.date_created) >= '#{@start_date}' AND DATE(patient.date_created) <= '#{@end_date}' \
+                                        AND patient.voided = 0
+                                      AND patient.patient_id IN (#{ids})
+                                      AND person.gender LIKE '#{sex}%'
+                                      AND obs.voided = 0").length rescue 0
+  end
+
+  def smoking_ever(ids, sex)
+     @orders = Order.find_by_sql("SELECT DISTINCT obs.person_id FROM obs
+                                  INNER JOIN person on person .person_id = obs.person_id
+                                      LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
+                                    WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'CURRENT SMOKER')
+                                      AND value_coded = (SELECT concept_id FROM concept_name WHERE name = 'YES') AND
+                                      DATE(patient.date_created) <= '#{@end_date}' \
+                                        AND patient.voided = 0
+                                      AND patient.patient_id IN (#{ids})
+                                      AND person.gender LIKE '#{sex}%'
+                                      AND obs.voided = 0").length rescue 0
+  end
+
+  def bmi(ids, sex)
+     @orders = Order.find_by_sql("SELECT DISTINCT obs.person_id FROM obs
+                                  INNER JOIN person on person .person_id = obs.person_id
+                                      LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
+                                    WHERE concept_id = (SELECT concept_id FROM concept_name \
+                                      WHERE name = 'BODY MASS INDEX, MEASURED')
+                                      AND (value_numeric >= 30 OR value_text >= 30 ) AND
+                                       DATE(patient.date_created) >= '#{@start_date}' AND DATE(patient.date_created) <= '#{@end_date}' \
+                                        AND patient.voided = 0
+                                      AND patient.patient_id IN (#{ids})
+                                      AND person.gender LIKE '#{sex}%'
+                                      AND obs.voided = 0").length rescue 0
+  end
+
+  def bmi_ever(ids, sex)
+     @orders = Order.find_by_sql("SELECT DISTINCT obs.person_id FROM obs
+                                  INNER JOIN person on person .person_id = obs.person_id
+                                      LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
+                                    WHERE concept_id = (SELECT concept_id FROM concept_name \
+                                      WHERE name = 'BODY MASS INDEX, MEASURED')
+                                      AND (value_numeric >= 30 OR value_text >= 30 ) AND
+                                      DATE(patient.date_created) <= '#{@end_date}' \
+                                        AND patient.voided = 0
+                                      AND patient.patient_id IN (#{ids})
+                                      AND person.gender LIKE '#{sex}%'
+                                      AND obs.voided = 0").length rescue 0
+  end
+
+
   def total_adult_men_registered(ids)
 		Patient.count(:all,
       :include => {:person =>{}},
@@ -1718,6 +1799,100 @@ class Reports::CohortDm
                                 AND patient.voided = 0
                                 AND obs.voided = 0)").length rescue 0
   end
+
+ def patient_on_drugs(ids, sex, drug)
+	  @orders = Patient.find_by_sql("
+              SELECT DISTINCT(p.patient_id) FROM patient p
+              INNER JOIN person pe ON pe.person_id = p.patient_id
+              INNER JOIN encounter e ON e.patient_id = p.patient_id
+              INNER JOIN orders o ON o.encounter_id = e.encounter_id
+              INNER JOIN concept_name c ON c.concept_id = o.concept_id
+              WHERE c.name LIKE '%#{drug}%'
+              AND e.voided = 0
+              AND p.date_created >= '" + @start_date + "'
+              AND p.date_created <= '" + @end_date + "'
+              AND p.patient_id IN (#{ids})
+              AND pe.gender LIKE '#{sex}%'").length rescue 0
+  end
+
+  def patient_ever_on_drugs(ids, sex, drug)
+	  @orders = Patient.find_by_sql("
+              SELECT DISTINCT(p.patient_id) FROM patient p
+              INNER JOIN person pe ON pe.person_id = p.patient_id
+              INNER JOIN encounter e ON e.patient_id = p.patient_id
+              INNER JOIN orders o ON o.encounter_id = e.encounter_id
+              INNER JOIN concept_name c ON c.concept_id = o.concept_id
+              WHERE c.name LIKE '%#{drug}%'
+              AND e.voided = 0
+              AND p.date_created <= '" + @end_date + "'
+              AND p.patient_id IN (#{ids})
+              AND pe.gender LIKE '#{sex}%'").length rescue 0
+  end
+
+  def decrease_in_bp(ids, sex, reason=nil)
+    total = 0
+    Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
+      WHERE person_id IN (#{ids})
+      AND gender LIKE '#{sex}%'").each { |patient|
+      if reason == "compare"
+        total += 1 if compare_bp(patient.person_id.to_i) == true
+      else
+        total += 1 if low_bp(patient.person_id.to_i) == true
+      end
+    }
+   
+    return total
+  end
+  def compare_bp(patient_id)
+    sys_concept = ConceptName.find_by_sql("select concept_id from concept_name where name = 'Systolic blood pressure' and voided = 0").first.concept_id
+    dys_concept = ConceptName.find_by_sql("select concept_id from concept_name where name = 'Diastolic blood pressure' and voided = 0").first.concept_id
+
+    sys_obs = Observation.find_by_sql("SELECT * from obs where concept_id = '#{sys_concept}' AND person_id = #{patient_id}
+                    AND DATE(obs_datetime) <= '#{@end_date}' AND voided = 0
+                    ORDER BY  obs_datetime DESC, date_created DESC") rescue []
+    if sys_obs.length >= 2
+         first_sys = sys_obs.first.to_s.split(':')[1].to_f
+          #raise sys_obs.first.obs_datetime.to_yaml
+         dys_obs = Observation.find_by_sql("SELECT * from obs where concept_id = '#{dys_concept}' AND person_id = #{patient_id}
+                    AND DATE(obs_datetime) = '#{sys_obs.first.obs_datetime.to_date}' AND voided = 0
+                    ORDER BY  obs_datetime DESC, date_created DESC").first.to_s.split(':')[1].to_f rescue []
+         current_bp = first_sys / dys_obs
+         
+        second_sys = Observation.find_by_sql("SELECT * from obs where concept_id = '#{sys_concept}' AND person_id = #{patient_id}
+                    AND DATE(obs_datetime) < '#{sys_obs.first.obs_datetime.to_date}' AND voided = 0
+                    ORDER BY  obs_datetime DESC, date_created DESC").first.to_s.split(':')[1].to_f rescue []
+      
+        second_dys = Observation.find_by_sql("SELECT * from obs where concept_id = '#{dys_concept}' AND person_id = #{patient_id}
+                    AND DATE(obs_datetime) < '#{sys_obs.first.obs_datetime.to_date}' AND voided = 0
+                    ORDER BY  obs_datetime DESC, date_created DESC").first.to_s.split(':')[1].to_f rescue []
+        previous_bp  = second_sys / second_dys
+        
+       return true if current_bp < previous_bp
+    end
+    return false
+  end
+
+  def low_bp(patient_id)
+    sys_concept = ConceptName.find_by_sql("select concept_id from concept_name where name = 'Systolic blood pressure' and voided = 0").first.concept_id
+    dys_concept = ConceptName.find_by_sql("select concept_id from concept_name where name = 'Diastolic blood pressure' and voided = 0").first.concept_id
+
+    sys_obs = Observation.find_by_sql("SELECT * from obs where concept_id = '#{sys_concept}' AND person_id = #{patient_id}
+                    AND DATE(obs_datetime) <= '#{@end_date}' AND voided = 0
+                    ORDER BY  obs_datetime DESC, date_created DESC") rescue []
+    if sys_obs.length >= 1
+         first_sys = sys_obs.first.to_s.split(':')[1].to_f
+          #raise sys_obs.first.obs_datetime.to_yaml
+         dys_obs = Observation.find_by_sql("SELECT * from obs where concept_id = '#{dys_concept}' AND person_id = #{patient_id}
+                    AND DATE(obs_datetime) = '#{sys_obs.first.obs_datetime.to_date}' AND voided = 0
+                    ORDER BY  obs_datetime DESC, date_created DESC").first.to_s.split(':')[1].to_f rescue []
+         current_bp = first_sys / dys_obs
+         threshod = 140 / 90
+
+       return true if current_bp < threshod
+    end
+    return false
+  end
+
 
   def non_epileptic_ever(type, answer)
     #Epilepsy can only be confirmed once

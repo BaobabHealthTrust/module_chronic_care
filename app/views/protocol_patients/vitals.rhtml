@@ -244,7 +244,8 @@
   /* starts */
 
    function showSelectedConditions() {
-     currentHeight = '<%= @current_hieght.to_i %>';
+      currentHeight = '<%= @current_hieght.to_i %>';
+      console.log(currentHeight)
       conditions = [];
 	  sex = '<%= @patient.gender.downcase  rescue "" %>'
 	  if (sex == "female")
@@ -590,7 +591,7 @@
 	 tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"
 	 tt_onLoad ="showCategory('Vitals')"/>
 <%#= raise @current_hieght.to_yaml %>
-<% if @current_hieght.blank? || @patient.age.to_i < 14 %>
+<% if @current_hieght.blank? || @current_hieght == 0 || @patient.age.to_i < 14 %>
 	<input type='text' id='height'
 	name='concept[Height (cm)]'
 	helpText='Height (cm)'

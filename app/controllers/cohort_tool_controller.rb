@@ -1214,6 +1214,92 @@ class CohortToolController < ApplicationController
     @disease_ever_availabe_other_male = total_ever_male - total_disease_ever_male
     @disease_ever_availabe_other_female = total_ever_female - total_disease_ever_female
 
+   # raise ids.to_yaml
+    @bmi_greater_female = report.bmi(ids, 'F')
+    @bmi_greater_male = report.bmi(ids, 'M')
+
+    @bmi_greater_ever_female = report.bmi_ever(ids_ever, 'F')
+    @bmi_greater_ever_male = report.bmi_ever(ids_ever, 'M')
+
+    @smoking_female = report.smoking(ids, 'F')
+    @smoking_male = report.smoking(ids, 'M')
+
+    @smoking_ever_female = report.smoking_ever(ids_ever, 'F')
+    @smoking_ever_male = report.smoking_ever(ids_ever, 'M')
+
+    @alcohol_female = report.alcohol(ids, 'F')
+    @alcohol_male = report.alcohol(ids, 'M')
+
+    @alcohol_ever_female = report.alcohol_ever(ids_ever, 'F')
+    @alcohol_ever_male = report.alcohol_ever(ids_ever, 'M')
+
+    @insulin_female = report.patient_on_drugs(ids, "F", 'Insulin')
+    @insulin_male = report.patient_on_drugs(ids, "M", 'Insulin')
+    @insulin_ever_female = report.patient_ever_on_drugs(ids_ever, "F", 'Insulin')
+    @insulin_ever_male = report.patient_ever_on_drugs(ids_ever, "M", 'Insulin')
+
+    @glibenclamide_female = report.patient_on_drugs(ids, "F", 'Glibenclamide')
+    @glibenclamide_male = report.patient_on_drugs(ids, "M", 'Glibenclamide')
+    @glibenclamide_ever_female = report.patient_ever_on_drugs(ids_ever, "F", 'Glibenclamide')
+    @glibenclamide_ever_male = report.patient_ever_on_drugs(ids_ever, "M", 'Glibenclamide')
+
+    @metformin_female = report.patient_on_drugs(ids, "F", 'Metformin')
+    @metformin_male = report.patient_on_drugs(ids, "M", 'Metformin')
+    @metformin_ever_female = report.patient_ever_on_drugs(ids_ever, "F", 'Metformin')
+    @metformin_ever_male = report.patient_ever_on_drugs(ids_ever, "M", 'Metformin')
+
+    @amlodipine_female = report.patient_on_drugs(ids, "F", 'Amlodipine')
+    @amlodipine_male = report.patient_on_drugs(ids, "M", 'Amlodipine')
+    @amlodipine_ever_female = report.patient_ever_on_drugs(ids_ever, "F", 'Amlodipine')
+    @amlodipine_ever_male = report.patient_ever_on_drugs(ids_ever, "M", 'Amlodipine')
+
+    @captopril_female = report.patient_on_drugs(ids, "F", 'captopril')
+    @captopril_male = report.patient_on_drugs(ids, "M", 'captopril')
+    @captopril_ever_female = report.patient_ever_on_drugs(ids_ever, "F", 'captopril')
+    @captopril_ever_male = report.patient_ever_on_drugs(ids_ever, "M", 'captopril')
+
+    @hct_female = report.patient_on_drugs(ids, "F", 'hct')
+    @hct_male = report.patient_on_drugs(ids, "M", 'hct')
+    @hct_ever_female = report.patient_ever_on_drugs(ids_ever, "F", 'hct')
+    @hct_ever_male = report.patient_ever_on_drugs(ids_ever, "M", 'hct')
+
+    @phenobarbitone_female = report.patient_on_drugs(ids, "F", 'phenobarbitone')
+    @phenobarbitone_male = report.patient_on_drugs(ids, "M", 'phenobarbitone')
+    @phenobarbitone_ever_female = report.patient_ever_on_drugs(ids_ever, "F", 'phenobarbitone')
+    @phenobarbitone_ever_male = report.patient_ever_on_drugs(ids_ever, "M", 'phenobarbitone')
+
+    @diazepam_female = report.patient_on_drugs(ids, "F", 'Diazepam')
+    @diazepam_male = report.patient_on_drugs(ids, "M", 'Diazepam')
+    @diazepam_ever_female = report.patient_ever_on_drugs(ids_ever, "F", 'Diazepam')
+    @diazepam_ever_male = report.patient_ever_on_drugs(ids_ever, "M", 'Diazepam')
+
+    @bp_female = report.decrease_in_bp(ids, 'F', 'compare')
+    @bp_male = report.decrease_in_bp(ids, 'M', 'compare')
+    @bp_ever_female = report.decrease_in_bp(ids_ever, 'F', 'compare')
+    @bp_ever_male = report.decrease_in_bp(ids_ever, 'M', 'compare')
+
+    @low_bp_female = report.decrease_in_bp(ids, 'F', 'low')
+    @low_bp_male = report.decrease_in_bp(ids, 'M', 'low')
+    @low_bp_ever_female = report.decrease_in_bp(ids_ever, 'F', 'low')
+    @low_bp_ever_male = report.decrease_in_bp(ids_ever, 'M', 'low')
+
+    @oral_treatments_ever = report.oral_treatments_ever rescue 0
+    @oral_treatments = report.oral_treatments rescue 0
+    @insulin_ever = report.insulin_ever rescue 0
+    @insulin = report.insulin rescue 0
+    @oral_and_insulin_ever = report.oral_and_insulin_ever rescue 0
+    @oral_and_insulin = report.oral_and_insulin rescue 0
+    @metformin_ever = report.metformin_ever rescue 0
+    @metformin = report.metformin rescue 0
+    @glibenclamide = report.glibenclamide rescue 0
+    @glibenclamide_ever = report.glibenclamide_ever rescue 0
+    @lente_insulin_ever = report.lente_insulin_ever rescue 0
+
+
+
+
+
+
 
     @total_men_registered = report.total_men_registered(ids) rescue 0
     @total_men_ever_registered = report.total_men_ever_registered(ids_ever) rescue 0
@@ -1242,30 +1328,6 @@ class CohortToolController < ApplicationController
     @total_girl_children_registered = report.total_girl_children_registered(ids) rescue 0
 
     @total_girl_children_ever_registered = report.total_girl_children_ever_registered(ids_ever) rescue 0
-
-
-
-    @oral_treatments_ever = report.oral_treatments_ever rescue 0
-
-    @oral_treatments = report.oral_treatments rescue 0
-
-    @insulin_ever = report.insulin_ever rescue 0
-
-    @insulin = report.insulin rescue 0
-
-    @oral_and_insulin_ever = report.oral_and_insulin_ever rescue 0
-
-    @oral_and_insulin = report.oral_and_insulin rescue 0
-
-    @metformin_ever = report.metformin_ever rescue 0
-
-    @metformin = report.metformin rescue 0
-
-    @glibenclamide = report.glibenclamide rescue 0
-
-    @glibenclamide_ever = report.glibenclamide_ever rescue 0
-
-    @lente_insulin_ever = report.lente_insulin_ever rescue 0
 
     @lente_insulin = report.lente_insulin rescue 0
 
