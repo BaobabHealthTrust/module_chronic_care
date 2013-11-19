@@ -1283,6 +1283,62 @@ class CohortToolController < ApplicationController
     @low_bp_ever_female = report.decrease_in_bp(ids_ever, 'F', 'low')
     @low_bp_ever_male = report.decrease_in_bp(ids_ever, 'M', 'low')
 
+    @glucose_female = report.decrease_in_sugar(ids, 'F')
+    @glucose_male = report.decrease_in_sugar(ids, 'M')
+    @glucose_ever_female = report.decrease_in_sugar(ids_ever, 'F')
+    @glucose_ever_male = report.decrease_in_sugar(ids_ever, 'M')
+
+    @asthma_female = report.asthma_ever(ids, 'F')
+    @asthma_male = report.asthma_ever(ids, 'M')
+    @asthma_ever_female = report.asthma_ever(ids_ever, 'F')
+    @asthma_ever_male = report.asthma_ever(ids_ever, 'M')
+
+    @non_asthmatic_male = total_male - @asthma_male
+    @non_asthmatic_female = total_female - @asthma_female
+    @non_asthmatic_ever_male = total_ever_male - @asthma_ever_male
+    @non_asthmatic_ever_female = total_ever_female - @asthma_ever_female
+
+    @epilepsy_female = report.epilepsy_ever(ids, 'F')
+    @epilepsy_male = report.epilepsy_ever(ids, 'M')
+    @epilepsy_ever_female = report.epilepsy_ever(ids_ever, 'F')
+    @epilepsy_ever_male = report.epilepsy_ever(ids_ever, 'M')
+
+    @non_epilepsy_male = total_male - @epilepsy_male
+    @non_epilepsy_female = total_female - @epilepsy_female
+    @non_epilepsy_ever_male = total_ever_male - @epilepsy_ever_male
+    @non_epilepsy_ever_female = total_ever_female - @epilepsy_ever_female
+
+    @controlled_male = report.controlled(ids, 'M')
+    @controlled_female = report.controlled(ids, 'F')
+    @controlled_ever_male = report.controlled(ids_ever, 'M')
+    @controlled_ever_female = report.controlled(ids_ever, 'F')
+
+    @comp_burns_male = report.burns_ever(ids, 'M')
+    @comp_burns_female = report.burns_ever(ids, 'F')
+    @comp_burns_ever_male = report.burns_ever(ids_ever, 'M')
+    @comp_burns_ever_female = report.burns_ever(ids_ever, 'F')
+
+    @comp_amputation_male = report.comp_amputation_ever(ids, 'M')
+    @comp_amputation_female = report.comp_amputation_ever(ids, 'F')
+    @comp_amputation_ever_male = report.comp_amputation_ever(ids_ever, 'M')
+    @comp_amputation_ever_female = report.comp_amputation_ever(ids_ever, 'F')
+
+    @comp_mi_male = report.comp_mi_ever(ids, 'M')
+    @comp_mi_female = report.comp_mi_ever(ids, 'F')
+    @comp_mi_ever_male = report.comp_mi_ever(ids_ever, 'M')
+    @comp_mi_ever_female = report.comp_mi_ever(ids_ever, 'F')
+
+    @comp_cardiovascular_male = report.cardiovascular_ever(ids, 'M')
+    @comp_cardiovascular_female = report.cardiovascular_ever(ids, 'F')
+    @comp_cardiovascular_ever_male = report.cardiovascular_ever(ids_ever, 'M')
+    @comp_cardiovascular_ever_female = report.cardiovascular_ever(ids_ever, 'F')
+
+    @comp_blind_male = report.blind_ever(ids, 'M')
+    @comp_blind_female = report.blind_ever(ids, 'F')
+    @comp_blind_ever_male = report.blind_ever(ids_ever, 'M')
+    @comp_blind_ever_female = report.blind_ever(ids_ever, 'F')
+
+
     @oral_treatments_ever = report.oral_treatments_ever rescue 0
     @oral_treatments = report.oral_treatments rescue 0
     @insulin_ever = report.insulin_ever rescue 0
@@ -1294,7 +1350,6 @@ class CohortToolController < ApplicationController
     @glibenclamide = report.glibenclamide rescue 0
     @glibenclamide_ever = report.glibenclamide_ever rescue 0
     @lente_insulin_ever = report.lente_insulin_ever rescue 0
-
 
 
 

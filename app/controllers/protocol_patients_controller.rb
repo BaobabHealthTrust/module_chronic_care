@@ -367,7 +367,7 @@ class ProtocolPatientsController < ApplicationController
 
     redirect_to '/encounters/no_patient' and return if @user.nil?
 
-    @diabetic = ConceptName.find_by_concept_id(Vitals.get_patient_attribute_value(@patient, "Patient has Diabetes")).name rescue []
+    @diabetic = ConceptName.find_by_concept_id(Vitals.get_patient_attribute_value(@patient, "Patient has Diabetes")).name rescue ""
 
     @status = Observation.find_by_sql("SELECT * from obs
           WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'current smoker' LIMIT 1)
