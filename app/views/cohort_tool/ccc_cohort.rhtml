@@ -594,70 +594,70 @@
                 <tr>
 
                   <td style="text-align:left;">Glucose down </td>
-                  <td><%=  @total_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
+                  <td><%= @glucose_male %></td>
+                  <td><%= @glucose_female %></td>
+                  <td><%=  @glucose_female + @glucose_male %></td>
                   <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @glucose_ever_male %></td>
+                  <td><%=  @glucose_ever_female %></td>
+                  <td><%=  @glucose_ever_female + @glucose_ever_male %></td>
                 </tr>
 
                 <tr>
 
                   <td style="text-align:left;">Asthmatic</td>
-                  <td><%=  @total_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @asthma_male %></td>
+                  <td><%=  @asthma_female %></td>
+                  <td><%=  (@asthma_male + @asthma_female) %></td>
                   <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @asthma_ever_male  %></td>
+                  <td><%=  @asthma_ever_female  %></td>
+                  <td><%=  (@asthma_ever_male + @asthma_ever_female)  %></td>
                 </tr>
 
                 <tr>
 
                   <td style="text-align:left;">Not Asthmatic</td>
-                  <td><%=  @total_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @non_asthmatic_male %></td>
+                  <td><%=  @non_asthmatic_female %></td>
+                  <td><%=  (@non_asthmatic_male + @non_asthmatic_female) %></td>
                   <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @non_asthmatic_ever_male  %></td>
+                  <td><%=  @non_asthmatic_ever_female  %></td>
+                  <td><%=  (@non_asthmatic_ever_male + @non_asthmatic_ever_female)  %></td>
                 </tr>
                 <tr>
 
                   <td style="text-align:left;">Epileptic </td>
-                  <td><%=  @total_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @epilepsy_male %></td>
+                  <td><%=  @epilepsy_female %></td>
+                  <td><%=  (@epilepsy_female + @epilepsy_male) %></td>
                   <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
+                  <td><%= @epilepsy_ever_male %></td>
+                  <td><%=  @epilepsy_ever_female %></td>
+                  <td><%=  (@epilepsy_ever_female + @epilepsy_ever_male) %></td>
                 </tr>
                 <tr>
 
                   <td style="text-align:left;">No seizure</td>
-                  <td><%=  @total_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @non_epilepsy_male %></td>
+                  <td><%=  @non_epilepsy_female %></td>
+                  <td><%=  (@non_epilepsy_male + @non_epilepsy_female) %></td>
                   <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @non_epilepsy_ever_male  %></td>
+                  <td><%=  @non_epilepsy_ever_female  %></td>
+                  <td><%=  (@non_epilepsy_ever_male + @non_epilepsy_ever_female)  %></td>
                 </tr>
                 <tr>
 
                   <td style="text-align:left;">Number of patients controlled</td>
-                  <td><%=  @total_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @controlled_male %></td>
+                  <td><%=  @controlled_female %></td>
+                  <td><%=  (@controlled_male + @controlled_female) %></td>
                   <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @controlled_ever_male %></td>
+                  <td><%=  @controlled_ever_female %></td>
+                  <td><%=  (@controlled_ever_male + @controlled_ever_female) %></td>
                 </tr>
              
 
@@ -674,57 +674,57 @@
                 <tr>
 
                   <td style="text-align:left;">Blind</td>
-                  <td><%=  @total_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @comp_blind_male %></td>
+                  <td><%=  @comp_blind_female %></td>
+                  <td><%=  (@comp_blind_male + @comp_blind_female) %></td>
                   <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @comp_blind_ever_male %></td>
+                  <td><%=  @comp_blind_ever_female %></td>
+                  <td><%=  (@comp_blind_ever_male + @comp_blind_ever_female)%></td>
                 </tr>
                 <tr>
 
                   <td style="text-align:left;">MI</td>
-                  <td><%=  @total_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @comp_mi_male %></td>
+                  <td><%=  @comp_mi_female %></td>
+                  <td><%=  (@comp_mi_male + @comp_mi_female) %></td>
                   <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @comp_mi_ever_male %></td>
+                  <td><%=  @comp_mi_ever_female %></td>
+                  <td><%=  @comp_mi_ever_male + @comp_mi_ever_female %></td>
                 </tr>
                 <tr>
 
                   <td style="text-align:left;">Cardiovascular Disease</td>
-                  <td><%=  @total_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @comp_cardiovascular_male %></td>
+                  <td><%=  @comp_cardiovascular_female %></td>
+                  <td><%=  @comp_cardiovascular_male + @comp_cardiovascular_female %></td>
                   <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @comp_cardiovascular_ever_male %></td>
+                  <td><%=  @comp_cardiovascular_ever_female %></td>
+                  <td><%=  (@comp_cardiovascular_ever_male + @comp_cardiovascular_ever_female) %></td>
                 </tr>
                 <tr>
 
                   <td style="text-align:left;">Amputation</td>
-                  <td><%=  @total_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @comp_amputation_male %></td>
+                  <td><%=  @comp_amputation_male %></td>
+                  <td><%=  (@comp_amputation_female + @comp_amputation_male) %></td>
                   <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @comp_amputation_ever_male %></td>
+                  <td><%=  @comp_amputation_ever_female %></td>
+                  <td><%=  (@comp_amputation_ever_male + @comp_amputation_ever_female) %></td>
                 </tr>
                 <tr>
 
                   <td style="text-align:left;">Burns</td>
-                  <td><%=  @total_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @comp_burns_male %></td>
+                  <td><%=  @comp_burns_female %></td>
+                  <td><%=  (@comp_burns_female + @comp_burns_male) %></td>
                   <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @comp_burns_ever_male %></td>
+                  <td><%=  @comp_burns_ever_female %></td>
+                  <td><%=  (@comp_burns_ever_male + @comp_burns_ever_female) %></td>
                 </tr>
               </tbody>
             </table>
