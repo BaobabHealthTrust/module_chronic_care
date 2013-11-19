@@ -1030,29 +1030,6 @@ class Reports::CohortDm
                                      AND patient.patient_id IN (#{ids}) AND patient.voided = 0").length
   end
 
-  # Neuropathy: Amputation
-  def amputation_ever(ids)
-    @orders = Order.find_by_sql("SELECT DISTINCT person_id FROM obs \
-                                      LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
-                                    WHERE value_coded = \
-                                    (SELECT concept_id FROM concept_name where name = 'AMPUTATION') \
-                                      AND concept_id IN (SELECT concept_id FROM concept_name where name IN \
-                                        ('LEFT FOOT/LEG', 'RIGHT FOOT/LEG')) AND \
-                                        DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "' \
-                                         AND patient.patient_id IN (#{ids}) AND patient.voided = 0").length
-  end
-
-  def amputation(ids)
-    @orders = Order.find_by_sql("SELECT DISTINCT person_id FROM obs
-                                   LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id WHERE value_coded = \
-                                    (SELECT concept_id FROM concept_name where name = 'AMPUTATION') \
-                                      AND concept_id IN (SELECT concept_id FROM concept_name where name IN \
-                                        ('LEFT FOOT/LEG', 'RIGHT FOOT/LEG')) \
-                                      AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') >= '" + @start_date +
-        "' AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "' \
-                                     AND patient.patient_id IN (#{ids}) AND patient.voided = 0").length
-  end
-
   # Neuropathy: Current Foot Ulceration
   def current_foot_ulceration_ever(ids)
     @orders = Order.find_by_sql("SELECT DISTINCT person_id FROM obs \
@@ -1843,6 +1820,138 @@ class Reports::CohortDm
    
     return total
   end
+
+  def controlled(ids, sex)
+    total = 0
+    Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
+      WHERE person_id IN (#{ids})
+      AND gender LIKE '#{sex}%'").each { |patient|
+        bp_down = compare_bp(patient.person_id.to_i)
+        bp_low = low_bp(patient.person_id.to_i)
+        low_sugar = compare_sugar(patient.person_id.to_i)
+        if bp_down == true || bp_low == true || low_sugar == true
+          total += 1
+        end
+    }
+
+    return total
+  end
+  
+  def epilepsy_ever(ids, sex)
+    total = 0
+    Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
+      WHERE person_id IN (#{ids})
+      AND gender LIKE '#{sex}%'").each { |patient|
+        epilepsy = Vitals.current_vitals(Patient.find(patient.person_id), "Epilepsy", @end_date) rescue []
+        total += 1 if ! epilepsy.blank?
+    }
+
+    return total
+  end
+
+   def burns_ever(ids, sex)
+    total = 0
+    Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
+      WHERE person_id IN (#{ids})
+      AND gender LIKE '#{sex}%'").each { |patient|
+        burns = Vitals.current_vitals(Patient.find(patient.person_id), "Burns", @end_date).to_s.match(/yes/i) rescue []
+        total += 1 if ! burns.blank?
+    }
+
+    return total
+  end
+
+ def comp_amputation_ever(ids, sex)
+    total = 0
+    Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
+      WHERE person_id IN (#{ids})
+      AND gender LIKE '#{sex}%'").each { |patient|
+        amputation = Vitals.current_encounter(Patient.find(patient.person_id), "COMPLICATIONS", "COMPLICATIONS", @end_date).to_s.match(/Complications:  Amputation/i) rescue []
+        total += 1 if ! amputation.blank?
+    }
+
+    return total
+ end
+ def comp_mi_ever(ids, sex)
+    total = 0
+    Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
+      WHERE person_id IN (#{ids})
+      AND gender LIKE '#{sex}%'").each { |patient|
+        mi = Vitals.current_encounter(Patient.find(patient.person_id), "COMPLICATIONS", "myocardial injactia", @end_date) rescue []
+        total += 1 if ! mi.blank?
+    }
+
+    return total
+ end
+
+ def cardiovascular_ever(ids, sex)
+       total = 0
+    Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
+      WHERE person_id IN (#{ids})
+      AND gender LIKE '#{sex}%'").each { |patient|
+        cardiac = Vitals.current_encounter(Patient.find(patient.person_id), "COMPLICATIONS", "Cardiac", @end_date) rescue []
+        total += 1 if ! cardiac.blank?
+    }
+
+    return total
+ end
+
+ def blind_ever(ids, sex)
+      total = 0
+    Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
+      WHERE person_id IN (#{ids})
+      AND gender LIKE '#{sex}%'").each { |patient|
+        cardiac = Vitals.current_encounter(Patient.find(patient.person_id), "COMPLICATIONS", "Visual Blindness", @end_date) rescue []
+        total += 1 if ! cardiac.blank?
+    }
+
+    return total
+ end
+
+  def asthma_ever(ids, sex)
+    total = 0
+    Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
+      WHERE person_id IN (#{ids})
+      AND gender LIKE '#{sex}%'").each { |patient|
+        asthma = Vitals.current_encounter(Patient.find(patient.person_id), "ASTHMA MEASURE", "ASTHMA", @end_date).to_s.split(":")[1].match(/yes/i) rescue []
+        total += 1 if ! asthma.blank?
+    }
+
+    return total
+  end
+
+  def decrease_in_sugar(ids, sex)
+    total = 0
+    Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
+      WHERE person_id IN (#{ids})
+      AND gender LIKE '#{sex}%'").each { |patient|
+        total += 1 if compare_sugar(patient.person_id.to_i) == true
+      
+    }
+   
+    return total
+  end
+
+  def compare_sugar(patient_id)
+    fasting = ConceptName.find_by_sql("select concept_id from concept_name where name = 'Fasting' and voided = 0").first.concept_id
+    random = ConceptName.find_by_sql("select concept_id from concept_name where name = 'Random' and voided = 0").first.concept_id
+
+    sys_obs = Observation.find_by_sql("SELECT * from obs where concept_id IN ('#{fasting}, #{random}') AND person_id = #{patient_id}
+                    AND DATE(obs_datetime) <= '#{@end_date}' AND voided = 0
+                    ORDER BY  obs_datetime DESC, date_created DESC") rescue []
+
+    if sys_obs.length > 1
+        first_sys = sys_obs.first.to_s.split(':')[1].to_i
+          #raise sys_obs.first.obs_datetime.to_yaml
+         previous_obs = Observation.find_by_sql("SELECT * from obs where concept_id IN ('#{fasting}, #{random}') AND person_id = #{patient_id}
+                    AND DATE(obs_datetime) < '#{sys_obs.first.obs_datetime.to_date}' AND voided = 0
+                    ORDER BY  obs_datetime DESC, date_created DESC").first.to_s.split(':')[1].to_i rescue 0
+         return true if first_sys < previous_obs
+
+    end
+    return false
+  end
+
   def compare_bp(patient_id)
     sys_concept = ConceptName.find_by_sql("select concept_id from concept_name where name = 'Systolic blood pressure' and voided = 0").first.concept_id
     dys_concept = ConceptName.find_by_sql("select concept_id from concept_name where name = 'Diastolic blood pressure' and voided = 0").first.concept_id
