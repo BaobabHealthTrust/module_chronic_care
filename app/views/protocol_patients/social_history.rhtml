@@ -67,6 +67,7 @@
         conditions.push("Smoke Cigarettes: <b>" + $('smoking').value + "</b>");
 
       if ($('number_of_cigarettes').value.length > 0){
+                cigaretesPerminute = (60 * 24) / $('number_of_cigarettes').value
 		if ($('smoking').value.toLowerCase() == "yes")
 		  conditions.push("Number of cigarettes per day: <b>" + $('number_of_cigarettes').value + " Cigarettes : 1 per every " + parseInt(cigaretesPerminute) + " Minutes </b>");
 	  }
@@ -132,8 +133,6 @@
 	<input type='hidden' name='user_id' value='<%= @user.id %>' />
 	<input type='hidden' name='concept[Alcoholism]' id="alcoholism">
 	<input type='hidden' name='concept[refer to clinician]' id="refer_to_clinician">
-	<input type='hidden' name='concept[current smoker]' id="current_smoker" value="No">
-	<input type='hidden' name='concept[smoking duration]' id="duration" value="Passive Smoker">
 	<input type='hidden' name='concept[Family health seeking behavior construct]' id="smoke_history" value="No">
 	<%#= raise @patient.gender.to_yaml   %>
 	<%#= raise @patient.age.to_yaml   %>
@@ -210,13 +209,11 @@
 	   tt_onLoad ="showCategory('Social History')"/>
 			</td>
 		</tr>
-<!--  tt_onLoad = "timedEvent = setTimeout('calculateBP(1)', 100);" tt_onUnLoad = "clearTimeout(timedEvent);" -->
 		<tr>
 			<td>
 				How long Have been smoking?
 			</td>
 			<td>
-<% if @current_program == "ASTHMA PROGRAM"  %>
 	   <select id='duration'
 			   name='concept[smoking duration]'
 			   helpText='How long Have been smoking? <%= @person_attribute %> '
@@ -227,7 +224,6 @@
 			  <option value='Less than five years'>Less than five years</option>
 			  <option value='Five years or more'>Five years or more</option>
 	   </select>
-<% end %>
 			</td>
 		</tr>
 
