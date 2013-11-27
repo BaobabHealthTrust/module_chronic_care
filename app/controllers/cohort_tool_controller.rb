@@ -1562,7 +1562,7 @@ class CohortToolController < ApplicationController
     @logo = CoreService.get_global_property_value('logo').to_s
 
     report = Reports::CohortDm.new(@start_date, @end_date)
-    @facility = Location.current_health_center.name rescue get_global_property_value("facility.name") rescue ""
+    @facility = get_global_property_value("facility.name") rescue ""
 
     @specified_period = report.specified_period
 
