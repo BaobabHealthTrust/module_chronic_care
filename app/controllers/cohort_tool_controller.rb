@@ -1337,7 +1337,7 @@ class CohortToolController < ApplicationController
     @comp_blind_female = report.blind_ever(ids, 'F')
     @comp_blind_ever_male = report.blind_ever(ids_ever, 'M')
     @comp_blind_ever_female = report.blind_ever(ids_ever, 'F')
-
+    
 
     @oral_treatments_ever = report.oral_treatments_ever rescue 0
     @oral_treatments = report.oral_treatments rescue 0
@@ -1518,9 +1518,9 @@ class CohortToolController < ApplicationController
 
     @alive = @total_registered.to_i - @defaulters.to_i - @transfer_out.to_i - @stopped_treatment.to_i - @discharged.to_i
 
-    @on_diet_ever = @alive_ever.to_i - @oral_treatments_ever.to_i - @insulin_ever.to_i - @oral_and_insulin_ever.to_i
+    @on_diet_ever = report.diet_only(ids_ever, "cumulative")
 
-    @on_diet = @alive.to_i - @oral_treatments.to_i - @insulin.to_i - @oral_and_insulin.to_i
+    @on_diet = report.diet_only(ids)
 
     
 

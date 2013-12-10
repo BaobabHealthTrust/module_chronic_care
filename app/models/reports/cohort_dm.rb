@@ -523,6 +523,24 @@ class Reports::CohortDm
     (@ids_for_patients_on_metformin_and_glibenclamide -@ids_for_patients_on_insulin).size
   end
 
+  def diet_only(ids, cumulative=nil)
+    if cumulative.blank?
+      oral = @ids_for_patients_on_metformin_and_glibenclamide -@ids_for_patients_on_insulin
+      insulin = @ids_for_patients_on_insulin - @ids_for_patients_on_metformin_and_glibenclamide
+      oral_insulin = @ids_for_patients_on_insulin & @ids_for_patients_on_metformin_and_glibenclamide
+    else
+      oral = @ids_for_patients_on_metformin_and_glibenclamide_ever -@ids_for_patients_on_insulin_ever
+      insulin = @ids_for_patients_on_insulin_ever - @ids_for_patients_on_metformin_and_glibenclamide_ever
+      oral_insulin = @ids_for_patients_on_insulin_ever & @ids_for_patients_on_metformin_and_glibenclamide_ever
+    end
+    total = (oral + insulin + oral_insulin).uniq.join(",")
+    Patient.count(:all,
+      :include => {:person =>{}},
+      :conditions => ["patient.voided = 0
+                                  AND patient.patient_id IN (#{ids})
+                                  AND patient.patient_id NOT IN (#{total})"]
+    )
+  end
   # Insulin
   def insulin_ever                                        
     (@ids_for_patients_on_insulin_ever - @ids_for_patients_on_metformin_and_glibenclamide_ever).size
@@ -1816,7 +1834,7 @@ class Reports::CohortDm
       else
         total += 1 if low_bp(patient.person_id.to_i) == true
       end
-    }
+    } rescue []
    
     return total
   end
@@ -1832,7 +1850,7 @@ class Reports::CohortDm
         if bp_down == true || bp_low == true || low_sugar == true
           total += 1
         end
-    }
+    } rescue []
 
     return total
   end
@@ -1844,7 +1862,7 @@ class Reports::CohortDm
       AND gender LIKE '#{sex}%'").each { |patient|
         epilepsy = Vitals.current_vitals(Patient.find(patient.person_id), "Epilepsy", @end_date) rescue []
         total += 1 if ! epilepsy.blank?
-    }
+    } rescue []
 
     return total
   end
@@ -1856,7 +1874,7 @@ class Reports::CohortDm
       AND gender LIKE '#{sex}%'").each { |patient|
         burns = Vitals.current_vitals(Patient.find(patient.person_id), "Burns", @end_date).to_s.match(/yes/i) rescue []
         total += 1 if ! burns.blank?
-    }
+    } rescue []
 
     return total
   end
@@ -1868,7 +1886,7 @@ class Reports::CohortDm
       AND gender LIKE '#{sex}%'").each { |patient|
         amputation = Vitals.current_encounter(Patient.find(patient.person_id), "COMPLICATIONS", "COMPLICATIONS", @end_date).to_s.match(/Complications:  Amputation/i) rescue []
         total += 1 if ! amputation.blank?
-    }
+    } rescue []
 
     return total
  end
@@ -1879,7 +1897,7 @@ class Reports::CohortDm
       AND gender LIKE '#{sex}%'").each { |patient|
         mi = Vitals.current_encounter(Patient.find(patient.person_id), "COMPLICATIONS", "myocardial injactia", @end_date) rescue []
         total += 1 if ! mi.blank?
-    }
+    } rescue []
 
     return total
  end
@@ -1891,7 +1909,7 @@ class Reports::CohortDm
       AND gender LIKE '#{sex}%'").each { |patient|
         cardiac = Vitals.current_encounter(Patient.find(patient.person_id), "COMPLICATIONS", "Cardiac", @end_date) rescue []
         total += 1 if ! cardiac.blank?
-    }
+    } rescue []
 
     return total
  end
@@ -1903,7 +1921,7 @@ class Reports::CohortDm
       AND gender LIKE '#{sex}%'").each { |patient|
         cardiac = Vitals.current_encounter(Patient.find(patient.person_id), "COMPLICATIONS", "Visual Blindness", @end_date) rescue []
         total += 1 if ! cardiac.blank?
-    }
+    } rescue []
 
     return total
  end
@@ -1915,7 +1933,7 @@ class Reports::CohortDm
       AND gender LIKE '#{sex}%'").each { |patient|
         asthma = Vitals.current_encounter(Patient.find(patient.person_id), "ASTHMA MEASURE", "ASTHMA", @end_date).to_s.split(":")[1].match(/yes/i) rescue []
         total += 1 if ! asthma.blank?
-    }
+    } rescue []
 
     return total
   end
@@ -1927,7 +1945,7 @@ class Reports::CohortDm
       AND gender LIKE '#{sex}%'").each { |patient|
         total += 1 if compare_sugar(patient.person_id.to_i) == true
       
-    }
+    } rescue []
    
     return total
   end

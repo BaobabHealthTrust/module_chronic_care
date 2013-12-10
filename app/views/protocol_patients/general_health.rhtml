@@ -190,9 +190,10 @@
       $('refer_to_clinician').value = "Yes"
     }
     html += "</ul>"
-    $('inputFrame'+tstCurrentPage).innerHTML = '<div id="summary" style="width:98%;overflow:scroll;hieght:500px ! important;">' + html + '</div>' ;
+    $('inputFrame'+tstCurrentPage).innerHTML = '<div id="summary" style="width:98%;overflow:auto;hieght:500px ! important;">' + html + '</div>' ;
     $("clearButton").style.display = "none";
   }
+
 
 </script>
 <%	@concept = []
