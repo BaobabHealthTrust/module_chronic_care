@@ -425,6 +425,159 @@ class PatientsController < ApplicationController
     render :layout => false
   end
 
+  def print_demographics
+    #raise params[:user_id]
+    print_and_redirect("/patients/patient_demographics_label/#{@patient.id}?user_id=#{params[:user_id]}", "/patients/show?id=#{@patient.id}&user_id=#{params[:user_id]}")
+  end
+
+  def patient_demographics_label
+    print_string = demographics_label(params[:id])
+    send_data(print_string,:type=>"application/label; charset=utf-8", :stream=> false, :filename=>"#{params[:id]}#{rand(10000)}.lbl", :disposition => "inline")
+  end
+
+
+   def demographics_label(patient_id)
+    patient = Patient.find(patient_id)
+    #patient_bean = PatientService.get_patient(patient.person)
+    #raise patient_bean.to_yaml
+    demographics = mastercard_demographics(patient)
+    hiv_staging = Encounter.find(:last,:conditions =>["encounter_type = ? and patient_id = ?",
+        EncounterType.find_by_name("HIV Staging").id,patient.id])
+=begin
+    tb_within_last_two_yrs = "tb within last 2 yrs" unless demographics.tb_within_last_two_yrs.blank?
+    eptb = "eptb" unless demographics.eptb.blank?
+    pulmonary_tb = "Pulmonary tb" unless demographics.pulmonary_tb.blank?
+
+    cd4_count_date = nil ; cd4_count = nil ; pregnant = 'N/A'
+
+    (hiv_staging.observations).map do | obs |
+      concept_name = obs.to_s.split(':')[0].strip rescue nil
+      next if concept_name.blank?
+      case concept_name
+      when 'CD4 COUNT DATETIME'
+        cd4_count_date = obs.value_datetime.to_date
+      when 'CD4 COUNT'
+        cd4_count = obs.value_numeric
+      when 'IS PATIENT PREGNANT?'
+        pregnant = obs.to_s.split(':')[1] rescue nil
+      end
+    end rescue []
+=end
+    office_phone_number = PatientService.get_attribute(patient.person, 'Office phone number')
+    home_phone_number = PatientService.get_attribute(patient.person, 'Home phone number')
+    cell_phone_number = PatientService.get_attribute(patient.person, 'Cell phone number')
+
+    phone_number = office_phone_number if not office_phone_number.downcase == "not available" and not office_phone_number.downcase == "unknown" rescue nil
+    phone_number= home_phone_number if not home_phone_number.downcase == "not available" and not home_phone_number.downcase == "unknown" rescue nil
+    phone_number = cell_phone_number if not cell_phone_number.downcase == "not available" and not cell_phone_number.downcase == "unknown" rescue nil
+
+    initial_height = PatientService.get_patient_attribute_value(patient, "initial_height")
+    initial_weight = PatientService.get_patient_attribute_value(patient, "initial_weight")
+
+    label = ZebraPrinter::StandardLabel.new
+    label.draw_text("Printed on: #{Date.today.strftime('%A, %d-%b-%Y')}",450,300,0,1,1,1,false)
+    label.draw_text("#{demographics.arv_number}",575,30,0,3,1,1,false)
+    label.draw_text("PATIENT DETAILS",25,30,0,3,1,1,false)
+    label.draw_text("Name:   #{demographics.name} (#{demographics.sex})",25,60,0,3,1,1,false)
+    label.draw_text("DOB:    #{PatientService.birthdate_formatted(patient.person)}",25,90,0,3,1,1,false)
+    label.draw_text("Phone: #{phone_number}",25,120,0,3,1,1,false)
+    if demographics.address.length > 48
+      label.draw_text("Addr:  #{demographics.address[0..47]}",25,150,0,3,1,1,false)
+      label.draw_text("    :  #{demographics.address[48..-1]}",25,180,0,3,1,1,false)
+      last_line = 180
+    else
+      label.draw_text("Addr:  #{demographics.address}",25,150,0,3,1,1,false)
+      last_line = 150
+    end
+
+    if !demographics.guardian.nil?
+      if last_line == 180 and demographics.guardian.length < 48
+        label.draw_text("Guard: #{demographics.guardian}",25,210,0,3,1,1,false)
+        last_line = 210
+      elsif last_line == 180 and demographics.guardian.length > 48
+        label.draw_text("Guard: #{demographics.guardian[0..47]}",25,210,0,3,1,1,false)
+        label.draw_text("     : #{demographics.guardian[48..-1]}",25,240,0,3,1,1,false)
+        last_line = 240
+      elsif last_line == 150 and demographics.guardian.length > 48
+        label.draw_text("Guard: #{demographics.guardian[0..47]}",25,180,0,3,1,1,false)
+        label.draw_text("     : #{demographics.guardian[48..-1]}",25,210,0,3,1,1,false)
+        last_line = 210
+      elsif last_line == 150 and demographics.guardian.length < 48
+        label.draw_text("Guard: #{demographics.guardian}",25,180,0,3,1,1,false)
+        last_line = 180
+      end
+    else
+      if last_line == 180
+        label.draw_text("Guard: None",25,210,0,3,1,1,false)
+        last_line = 210
+      elsif last_line == 180
+        label.draw_text("Guard: None}",25,210,0,3,1,1,false)
+        last_line = 240
+      elsif last_line == 150
+        label.draw_text("Guard: None",25,180,0,3,1,1,false)
+        last_line = 210
+      elsif last_line == 150
+        label.draw_text("Guard: None",25,180,0,3,1,1,false)
+        last_line = 180
+      end
+    end
+
+    label.draw_text("TI:    #{demographics.transfer_in ||= 'No'}",25,last_line+=30,0,3,1,1,false)
+   # label.draw_text("FUP:   (#{demographics.agrees_to_followup})",25,last_line+=30,0,3,1,1,false)
+
+=begin
+    label2 = ZebraPrinter::StandardLabel.new
+    #Vertical lines
+    label2.draw_line(25,170,795,3)
+    #label data
+    label2.draw_text("STATUS AT ART INITIATION",25,30,0,3,1,1,false)
+    label2.draw_text("(DSA:#{patient.date_started_art.strftime('%d-%b-%Y') rescue 'N/A'})",370,30,0,2,1,1,false)
+    label2.draw_text("#{demographics.arv_number}",580,20,0,3,1,1,false)
+    label2.draw_text("Printed on: #{Date.today.strftime('%A, %d-%b-%Y')}",25,300,0,1,1,1,false)
+
+    label2.draw_text("RFS: #{demographics.reason_for_art_eligibility}",25,70,0,2,1,1,false)
+    label2.draw_text("#{cd4_count} #{cd4_count_date}",25,110,0,2,1,1,false)
+    label2.draw_text("1st + Test: #{demographics.hiv_test_date}",25,150,0,2,1,1,false)
+
+    label2.draw_text("TB: #{tb_within_last_two_yrs} #{eptb} #{pulmonary_tb}",380,70,0,2,1,1,false)
+    label2.draw_text("KS:#{demographics.ks rescue nil}",380,110,0,2,1,1,false)
+    label2.draw_text("Preg:#{pregnant}",380,150,0,2,1,1,false)
+    label2.draw_text("#{demographics.first_line_drugs.join(',')[0..32] rescue nil}",25,190,0,2,1,1,false)
+    label2.draw_text("#{demographics.alt_first_line_drugs.join(',')[0..32] rescue nil}",25,230,0,2,1,1,false)
+    label2.draw_text("#{demographics.second_line_drugs.join(',')[0..32] rescue nil}",25,270,0,2,1,1,false)
+
+    label2.draw_text("HEIGHT: #{initial_height}",570,70,0,2,1,1,false)
+    label2.draw_text("WEIGHT: #{initial_weight}",570,110,0,2,1,1,false)
+    label2.draw_text("Init Age: #{PatientService.patient_age_at_initiation(patient, demographics.date_of_first_line_regimen) rescue nil}",570,150,0,2,1,1,false)
+
+    line = 190
+    extra_lines = []
+    label2.draw_text("STAGE DEFINING CONDITIONS",450,190,0,3,1,1,false)
+
+    (demographics.who_clinical_conditions.split(';') || []).each{|condition|
+      line+=25
+      if line <= 290
+        label2.draw_text(condition[0..35],450,line,0,1,1,1,false)
+      end
+      extra_lines << condition[0..79] if line > 290
+    } rescue []
+
+    if line > 310 and !extra_lines.blank?
+      line = 30
+      label3 = ZebraPrinter::StandardLabel.new
+      label3.draw_text("STAGE DEFINING CONDITIONS",25,line,0,3,1,1,false)
+      label3.draw_text("#{PatientService.get_patient_identifier(patient, 'ARV Number')}",370,line,0,2,1,1,false)
+      label3.draw_text("Printed on: #{Date.today.strftime('%A, %d-%b-%Y')}",450,300,0,1,1,1,false)
+      extra_lines.each{|condition|
+        label3.draw_text(condition,25,line+=30,0,2,1,1,false)
+      } rescue []
+    end
+=end
+    #return "#{label.print(1)} #{label2.print(1)} #{label3.print(1)}" if !extra_lines.blank?
+    return "#{label.print(1)}"
+  end
+
+
   def print_patient_mastercard
     #the parameter are used to re-construct the url when the mastercard is called from a Data cleaning report
     @quarter = params[:quarter]
@@ -513,6 +666,48 @@ class PatientsController < ApplicationController
     else
       print(file_name)
     end
+  end
+
+  def dashboard_print_national_id
+   # raise params.to_yaml
+   # unless params[:redirect].blank?
+   #   redirect = "/#{params[:redirect]}/#{params[:id]}"
+   # else
+   #   redirect = "/patients/show/#{params[:id]}"
+   # end
+   # print_and_redirect("/patients/visit_label/?patient_id=#{params[:id]}&user_id=#{params[:user_id]}", "/patients/show/#{params[:id]}&user_id=#{params[:user_id]}")
+    print_and_redirect("/patients/national_id_label?patient_id=#{params[:patient_id]}&user_id=#{params[:user_id]}", "/patients/show?patient_id=#{params[:patient_id]}&user_id=#{params[:user_id]}")
+  end
+
+  def patient_national_id_label(patient)
+	  patient_bean = patient.person
+    national_id = get_patient_identifier(patient, "National ID")
+    sex =  patient_bean.sex.match(/F/i) ? "(F)" : "(M)"
+    address = patient.person.address.strip[0..24].humanize rescue ""
+    label = ZebraPrinter::StandardLabel.new
+    label.font_size = 2
+    label.font_horizontal_multiplier = 2
+    label.font_vertical_multiplier = 2
+    label.left_margin = 50
+    label.draw_barcode(50,180,0,1,5,15,120,false,"#{national_id}")
+    label.draw_multi_text("#{patient_bean.name.titleize}")
+    label.draw_multi_text("#{patient_bean.national_id_with_dashes} #{patient_bean.birth_date}#{sex}")
+    label.draw_multi_text("#{patient_bean.address}")
+    label.print(1)
+  end
+
+  def get_patient_identifier(patient, identifier_type)
+    patient_identifier_type_id = PatientIdentifierType.find_by_name(identifier_type).patient_identifier_type_id rescue nil
+    patient_identifier = PatientIdentifier.find(:first, :select => "identifier",
+      :conditions  =>["patient_id = ? and identifier_type = ?", patient.id, patient_identifier_type_id],
+      :order => "date_created DESC" ).identifier rescue nil
+      return patient_identifier
+  end
+
+
+  def national_id_label
+    print_string = patient_national_id_label(@patient)# rescue (raise "Unable to find patient (#{params[:patient_id]}) or generate a national id label for that patient")
+    send_data(print_string,:type=>"application/label; charset=utf-8", :stream=> false, :filename=>"#{params[:patient_id]}#{rand(10000)}.lbl", :disposition => "inline")
   end
 
   def mastercard_demographics(patient_obj)
@@ -693,7 +888,7 @@ class PatientsController < ApplicationController
     visits.diagnosis_dm = current_vitals(patient_obj, "Patient has Diabetes").to_s.match(/yes/i) rescue nil
     ! visits.diagnosis_dm.blank? ? visits.diagnosis_dm = "Y" : visits.diagnosis_dm = "N"
 
-     visits.pork = current_vitals(patient_obj, "Food package provided").to_s.match(/Eats pork/i) rescue nil
+    visits.pork = current_vitals(patient_obj, "Food package provided").to_s.match(/Eats pork/i) rescue nil
     ! visits.pork.blank? ? visits.pork = "Y" : visits.pork = "N"
 
     visits.epilepsy = current_vitals(patient_obj, "Epilepsy").to_s.match(/yes/i) rescue nil
@@ -728,11 +923,11 @@ class PatientsController < ApplicationController
 
 
     visits.injuries = current_encounter(patient_obj, "EPILEPSY CLINIC VISIT", "Head injury").to_s.match(/yes/i) rescue nil
-   # visits.injuries = current_vitals(patient_obj, "Head injury").to_s.match(/yes/i) rescue nil
+    # visits.injuries = current_vitals(patient_obj, "Head injury").to_s.match(/yes/i) rescue nil
     ! visits.injuries.blank? ? visits.injuries = "Y" : visits.injuries = "N"
 
-     visits.head_trauma = current_encounter(patient_obj, "MEDICAL HISTORY", "Head injury").to_s.match(/yes/i) rescue nil
-   # visits.injuries = current_vitals(patient_obj, "Head injury").to_s.match(/yes/i) rescue nil
+    visits.head_trauma = current_encounter(patient_obj, "MEDICAL HISTORY", "Head injury").to_s.match(/yes/i) rescue nil
+    # visits.injuries = current_vitals(patient_obj, "Head injury").to_s.match(/yes/i) rescue nil
     ! visits.head_trauma.blank? ? visits.head_trauma = "Y" : visits.head_trauma = "N"
 
     visits.atomic = current_vitals(patient_obj, "generalised").to_s.match(/Atomic/i) rescue nil
