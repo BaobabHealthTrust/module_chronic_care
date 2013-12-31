@@ -126,7 +126,7 @@ module ApplicationHelper
 
   def current_program
     if session[:selected_program].blank?
-      return "HYPERTENSION PROGRAM"
+      return ""
     end
 		return session[:selected_program] 
 	end
