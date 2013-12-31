@@ -227,9 +227,11 @@
 
   <select id="links">
     <option value='' link='/logout?user_id=<%= params[:user_id] %>'>Logout</option>
+    <% if ! current_program.blank? %>
     <option value='javascript:document.forms[0].submit()' ttSize="290px">
       Find / Register Patient
     </option>
+    <% end %>
     <option value='<%= (!session[:datetime].nil? ?
         "/reset_datetime?user_id=#{ params[:user_id] }&location_id=#{ params[:location_id] }" :
                 "/set_datetime?user_id=#{ params[:user_id] }&location_id=#{ session[:location_id] || params[:location_id] }") %>'
