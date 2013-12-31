@@ -1111,50 +1111,129 @@ class CohortToolController < ApplicationController
 
     @specified_period = report.specified_period
     #raise params[:type].to_yaml
-    if params[:type] == "ccc"
+   # if params[:type] == "ccc"
               @total_registered = report.total_registered.length rescue 0
               ids = report.total_registered.map{|patient|patient.patient_id.to_s}.join(',') rescue ""
               @total_ever_registered = report.total_ever_registered.length rescue 0
               ids_ever = report.total_ever_registered.map{|patient|patient.patient_id.to_s}.join(',') rescue ""
-    else
-              @total_registered = report.total_registered("DIABETES HYPERTENSION INITIAL VISIT").length rescue 0
-              ids = report.total_registered("DIABETES HYPERTENSION INITIAL VISIT").map{|patient|patient.patient_id.to_s}.join(',') rescue ""
-              @total_ever_registered = report.total_ever_registered("DIABETES HYPERTENSION INITIAL VISIT").length rescue 0
-              ids_ever = report.total_ever_registered("DIABETES HYPERTENSION INITIAL VISIT").map{|patient|patient.patient_id.to_s}.join(',') rescue ""
-    end
-    
-
+    #else
+     #         @total_registered = report.total_registered("DIABETES HYPERTENSION INITIAL VISIT").length rescue 0
+     #         ids = report.total_registered("DIABETES HYPERTENSION INITIAL VISIT").map{|patient|patient.patient_id.to_s}.join(',') rescue ""
+     #         @total_ever_registered = report.total_ever_registered("DIABETES HYPERTENSION INITIAL VISIT").length rescue 0
+    #          ids_ever = report.total_ever_registered("DIABETES HYPERTENSION INITIAL VISIT").map{|patient|patient.patient_id.to_s}.join(',') rescue ""
+   # end
+ if params[:type] != "ccc"
     @mi = report.mi(ids) rescue 0
-
     @kidney_failure = report.kidney_failure(ids) rescue 0
-
     @heart_failure = report.heart_failure(ids) rescue 0
-
-
     @stroke = report.stroke(ids) rescue 0
-
     @stroke_ever = report.stroke_ever(ids_ever) rescue 0
-
     @ulcers = report.ulcers(ids) rescue 0
-
     @ulcers_ever = report.ulcers_ever(ids_ever) rescue 0
-
     @impotence = report.impotence(ids) rescue 0
-
     @impotence_ever = report.impotence_ever(ids_ever) rescue 0
-
     @tia = report.tia(ids) rescue 0
-
     @tia_ever = report.tia_ever(ids_ever) rescue 0
-
     @mi_ever = report.mi_ever(ids_ever) rescue 0
-
     @kidney_failure_ever = report.kidney_failure_ever(ids_ever) rescue 0
-
     @heart_failure_ever = report.heart_failure_ever(ids_ever) rescue 0
 
+    @oral_treatments_ever = report.oral_treatments_ever rescue 0
+    @oral_treatments = report.oral_treatments #rescue 0
+    @insulin_ever = report.insulin_ever rescue 0
+    @insulin = report.insulin rescue 0
+    @oral_and_insulin_ever = report.oral_and_insulin_ever rescue 0
+    @oral_and_insulin = report.oral_and_insulin rescue 0
+    @metformin_ever = report.metformin_ever rescue 0
+    @metformin = report.metformin rescue 0
+    @glibenclamide = report.glibenclamide rescue 0
+    @glibenclamide_ever = report.glibenclamide_ever rescue 0
+    @lente_insulin_ever = report.lente_insulin_ever rescue 0
+
+    @lente_insulin = report.lente_insulin rescue 0
+
+    @soluble_insulin_ever = report.soluble_insulin_ever rescue 0
+
+    @soluble_insulin = report.soluble_insulin rescue 0
+
+    @urine_protein_ever = report.urine_protein_ever rescue 0
+
+    @urine_protein = report.urine_protein rescue 0
+
+    @creatinine_ever = report.creatinine_ever rescue 0
+
+    @creatinine = report.creatinine rescue 0
+
+
+    @nephropathy_ever = @urine_protein_ever + @creatinine_ever
+
+    @nephropathy = @urine_protein + @creatinine
+
+
+    @numbness_symptoms_ever = report.numbness_symptoms_ever(ids_ever) rescue 0
+
+    @numbness_symptoms = report.numbness_symptoms(ids) rescue 0
+
+
+    @neuropathy_ever = @numbness_symptoms_ever
+
+    @neuropathy = @numbness_symptoms
+
+    @cataracts_ever = report.cataracts_ever rescue 0
+
+    @cataracts = report.cataracts rescue 0
+
+    @macrovascular_ever = report.macrovascular_ever rescue 0
+
+    @macrovascular = report.macrovascular rescue 0
+
+    @no_complications_ever = report.no_complications_ever(ids_ever) rescue 0
+
+    @no_complications = report.no_complications(ids) rescue 0
+
+    @amputation_ever = report.amputation_ever(ids_ever) rescue 0
+
+    @amputation = report.amputation(ids) rescue 0
+
+    @current_foot_ulceration_ever = report.current_foot_ulceration_ever(ids_ever) rescue 0
+
+    @current_foot_ulceration = report.current_foot_ulceration(ids) rescue 0
+    @amputations_or_ulcers_ever = @amputation_ever + @current_foot_ulceration_ever
+    @amputations_or_ulcers = @amputation + @current_foot_ulceration
+    @tb_known_ever = report.tb_known_ever(ids_ever) #rescue 0
+    @tb_known = report.tb_known(ids) #rescue 0
+    @tb_after_diabetes_ever = report.tb_after_diabetes_ever(ids_ever) rescue 0
+    @tb_after_diabetes = report.tb_after_diabetes(ids) rescue 0
+    @tb_before_diabetes_ever = report.tb_before_diabetes_ever(ids_ever) rescue 0
+    @tb_before_diabetes = report.tb_before_diabetes(ids) rescue 0
+    @tb_unknown_ever = report.tb_unkown_ever(ids_ever) rescue 0
+    @tb_unknown = report.tb_unkown(ids) rescue 0
+    @no_tb_ever = report.no_tb_ever(ids_ever) rescue 0
+    @no_tb = report.no_tb(ids) rescue 0
+    @tb_ever = report.tb_ever(ids_ever) rescue 0
+    @tb = report.tb(ids) rescue 0
+    @reactive_not_on_art_ever = report.reactive_not_on_art_ever(ids_ever) rescue 0
+    @reactive_not_on_art = report.reactive_not_on_art(ids) rescue 0
+    @reactive_on_art_ever = report.reactive_on_art_ever(ids_ever) rescue 0
+    @reactive_on_art = report.reactive_on_art(ids) rescue 0
+    @non_reactive_ever = report.non_reactive_ever(ids_ever) rescue 0
+    @non_reactive = report.non_reactive(ids) rescue 0
+    @unknown_ever = (@total_ever_registered.to_i - @non_reactive_ever.to_i -
+        @reactive_on_art_ever.to_i - @reactive_not_on_art_ever.to_i)
+
+    @unknown = (@total_registered.to_i - @non_reactive.to_i -
+        @reactive_on_art.to_i - @reactive_not_on_art.to_i)
+
+   end
+
+
+    if params[:type] == "ccc"
     #Filter only htn dn asthma patients
-    @total_adults_registered_male = report.total_children_registered(ids, "male", 14)# rescue 0
+    #raise ids.length.to_yaml
+   # raise ids.to_yaml
+
+
+          @total_adults_registered_male = report.total_children_registered(ids, "male", 14)# rescue 0
     @total_adults_registered_female = report.total_children_registered(ids, "female", 14)# rescue 0
 
     @older_persons_registered_male = report.total_children_registered(ids, "male", 54)
@@ -1171,8 +1250,6 @@ class CohortToolController < ApplicationController
 
     @total_children_ever_registered_male = report.total_children_ever_registered(ids_ever, "male", 0) # rescue 0
     @total_children_ever_registered_female = report.total_children_ever_registered(ids_ever, "female", 0)
-
-    #raise ids.length.to_yaml
     @disease_availabe_dm_male = report.disease_availabe(ids, "DM", "male")
     @disease_availabe_dm_female = report.disease_availabe(ids, "DM", "female")
     @disease_ever_availabe_dm_male = report.disease_ever_availabe(ids_ever, "DM", "male")
@@ -1208,13 +1285,12 @@ class CohortToolController < ApplicationController
     total_ever_female = @total_children_ever_registered_female + @total_adults_ever_registered_female + @older_persons_ever_registered_female
     total_disease_ever_male = @disease_ever_availabe_dmht_male + @disease_ever_availabe_dm_male + @disease_ever_availabe_ht_male + @disease_ever_availabe_asthma_male + @disease_ever_availabe_epilepsy_male
     total_disease_ever_female = @disease_ever_availabe_dmht_female + @disease_ever_availabe_dm_female + @disease_ever_availabe_ht_female + @disease_ever_availabe_asthma_female + @disease_ever_availabe_epilepsy_female
-    
+
     @disease_availabe_other_male = total_male - total_disease_male
     @disease_availabe_other_female = total_female - total_disease_female
     @disease_ever_availabe_other_male = total_ever_male - total_disease_ever_male
     @disease_ever_availabe_other_female = total_ever_female - total_disease_ever_female
 
-   # raise ids.to_yaml
     @bmi_greater_female = report.bmi(ids, 'F')
     @bmi_greater_male = report.bmi(ids, 'M')
 
@@ -1337,163 +1413,28 @@ class CohortToolController < ApplicationController
     @comp_blind_female = report.blind_ever(ids, 'F')
     @comp_blind_ever_male = report.blind_ever(ids_ever, 'M')
     @comp_blind_ever_female = report.blind_ever(ids_ever, 'F')
-    
-
-    @oral_treatments_ever = report.oral_treatments_ever rescue 0
-    @oral_treatments = report.oral_treatments rescue 0
-    @insulin_ever = report.insulin_ever rescue 0
-    @insulin = report.insulin rescue 0
-    @oral_and_insulin_ever = report.oral_and_insulin_ever rescue 0
-    @oral_and_insulin = report.oral_and_insulin rescue 0
-    @metformin_ever = report.metformin_ever rescue 0
-    @metformin = report.metformin rescue 0
-    @glibenclamide = report.glibenclamide rescue 0
-    @glibenclamide_ever = report.glibenclamide_ever rescue 0
-    @lente_insulin_ever = report.lente_insulin_ever rescue 0
-
-
-
-
-
-
-    @total_men_registered = report.total_men_registered(ids) rescue 0
-    @total_men_ever_registered = report.total_men_ever_registered(ids_ever) rescue 0
-
-
-    @total_adult_men_registered = report.total_adult_men_registered(ids) rescue 0
-
-    @total_adult_men_ever_registered = report.total_adult_men_ever_registered(ids_ever) rescue 0
-
-
-    @total_boy_children_registered = report.total_boy_children_registered(ids) rescue 0
-
-    @total_boy_children_ever_registered = report.total_boy_children_ever_registered(ids_ever) rescue 0
-
-
-    @total_women_registered = report.total_women_registered(ids) rescue 0
-
-    @total_women_ever_registered = report.total_women_ever_registered(ids_ever) rescue 0
-
-
-    @total_adult_women_registered = report.total_adult_women_registered(ids) rescue 0
-
-    @total_adult_women_ever_registered = report.total_adult_women_ever_registered(ids_ever) rescue 0
-
-
-    @total_girl_children_registered = report.total_girl_children_registered(ids) rescue 0
-
-    @total_girl_children_ever_registered = report.total_girl_children_ever_registered(ids_ever) rescue 0
-
-    @lente_insulin = report.lente_insulin rescue 0
-
-    @soluble_insulin_ever = report.soluble_insulin_ever rescue 0
-
-    @soluble_insulin = report.soluble_insulin rescue 0
-
-    @urine_protein_ever = report.urine_protein_ever rescue 0
-
-    @urine_protein = report.urine_protein rescue 0
-
-    @creatinine_ever = report.creatinine_ever rescue 0
-
-    @creatinine = report.creatinine rescue 0
-
-
-    @nephropathy_ever = @urine_protein_ever + @creatinine_ever
-
-    @nephropathy = @urine_protein + @creatinine
-
-
-    @numbness_symptoms_ever = report.numbness_symptoms_ever(ids_ever) rescue 0
-
-    @numbness_symptoms = report.numbness_symptoms(ids) rescue 0
-
-
-    @neuropathy_ever = @numbness_symptoms_ever
-
-    @neuropathy = @numbness_symptoms
-
-    @cataracts_ever = report.cataracts_ever rescue 0
-
-    @cataracts = report.cataracts rescue 0
-
-    @macrovascular_ever = report.macrovascular_ever rescue 0
-
-    @macrovascular = report.macrovascular rescue 0
-
-    @no_complications_ever = report.no_complications_ever(ids_ever) rescue 0
-
-    @no_complications = report.no_complications(ids) rescue 0
-
-    @amputation_ever = report.amputation_ever(ids_ever) rescue 0
-
-    @amputation = report.amputation(ids) rescue 0
-
-    @current_foot_ulceration_ever = report.current_foot_ulceration_ever(ids_ever) rescue 0
-
-    @current_foot_ulceration = report.current_foot_ulceration(ids) rescue 0
-
-
-    @amputations_or_ulcers_ever = @amputation_ever + @current_foot_ulceration_ever
-
-    @amputations_or_ulcers = @amputation + @current_foot_ulceration
-
-
-    @tb_known_ever = report.tb_known_ever(ids_ever) rescue 0
-
-    @tb_known = report.tb_known(ids) rescue 0
-
-    @tb_after_diabetes_ever = report.tb_after_diabetes_ever(ids_ever) rescue 0
-
-    @tb_after_diabetes = report.tb_after_diabetes(ids) rescue 0
-
-    @tb_before_diabetes_ever = report.tb_before_diabetes_ever(ids_ever) rescue 0
-
-    @tb_before_diabetes = report.tb_before_diabetes(ids) rescue 0
-
-    @tb_unknown_ever = report.tb_unkown_ever(ids_ever) rescue 0
-
-    @tb_unknown = report.tb_unkown(ids) rescue 0
-
-    @no_tb_ever = report.no_tb_ever(ids_ever) rescue 0
-
-    @no_tb = report.no_tb(ids) rescue 0
-
-    @tb_ever = report.tb_ever(ids_ever) rescue 0
-
-    @tb = report.tb(ids) rescue 0
-
-    @reactive_not_on_art_ever = report.reactive_not_on_art_ever(ids_ever) rescue 0
-
-    @reactive_not_on_art = report.reactive_not_on_art(ids) rescue 0
-
-    @reactive_on_art_ever = report.reactive_on_art_ever(ids_ever) rescue 0
-
-    @reactive_on_art = report.reactive_on_art(ids) rescue 0
-
-    @non_reactive_ever = report.non_reactive_ever(ids_ever) rescue 0
-
-    @non_reactive = report.non_reactive(ids) rescue 0
-
-    @unknown_ever = (@total_ever_registered.to_i - @non_reactive_ever.to_i -
-        @reactive_on_art_ever.to_i - @reactive_not_on_art_ever.to_i)
-
-    @unknown = (@total_registered.to_i - @non_reactive.to_i -
-        @reactive_on_art.to_i - @reactive_not_on_art.to_i)
-
+   end
+ 
     @dead_ever_male = report.dead_ever(ids_ever, "male")# rescue 0
     @dead_ever_female = report.dead_ever(ids_ever, "female")# rescue 0
 
-    @dead_female = report.dead(ids, "female")# rescue 0
-    @dead_male = report.dead(ids, "male")# rescue 0
-
-    @discharged_ever = report.discharged_ever(ids_ever) rescue 0
-    @discharged = report.discharged(ids) rescue 0
+     if params[:type] != "ccc"
+      @dead_ever = @dead_ever_male + @dead_ever_female
+      @dead_female = report.dead(ids, "female")# rescue 0
+      @dead_male = report.dead(ids, "male")# rescue 0
+      @dead = @dead_male + @dead_female
+      @discharged_ever = report.discharged_ever(ids_ever) rescue 0
+      @discharged = report.discharged(ids) rescue 0
+     end
 
     @transfer_out_ever_male = report.transfer_out_ever(ids_ever, "male") rescue 0
-    @transfer_out_ever_female = report.transfer_out_ever(ids_ever, "female")
+    @transfer_out_ever_female = report.transfer_out_ever(ids_ever, "female") rescue 0
+
+    @transfer_out_ever = @transfer_out_ever_male + @transfer_out_ever_female
+    
     @transfer_out_male = report.transfer_out(ids_ever, "male")
     @transfer_out_female = report.transfer_out(ids_ever, "female")
+    @transfer_out = @transfer_out_male + @transfer_out_female
 
     @stopped_treatment_ever_male = report.stopped_treatment_ever(ids_ever, "male") #rescue 0
     @stopped_treatment_ever_female = report.stopped_treatment_ever(ids_ever, "female")
@@ -1502,17 +1443,26 @@ class CohortToolController < ApplicationController
 
     #raise report.attending_ever(ids, "female").to_yaml
 
-    @attending_male = report.attending_ever(ids, "male") #- @dead_ever_male - @transfer_out_ever_male - @stopped_treatment_ever_male
-    @attending_female = report.attending_ever(ids, "female") #- @dead_ever_female - @transfer_out_ever_female - @stopped_treatment_ever_female
-    
+    @attending_male = report.attending_ever(ids_ever, "male") #- @dead_ever_male - @transfer_out_ever_male - @stopped_treatment_ever_male
+    @attending_female = report.attending_ever(ids_ever, "female") #- @dead_ever_female - @transfer_out_ever_female - @stopped_treatment_ever_female
+
+    @not_attend_male = report.not_attending_ever(ids_ever, "male")
+    @not_attend_female = report.not_attending_ever(ids_ever, "female")
+    @lost_followup_male = report.lost_followup_ever(ids_ever, "male")
+    @lost_followup_female = report.lost_followup_ever(ids_ever, "female")
+
+
+    if params[:type] != "ccc"
+    @stopped_treatment_ever = report.stopped_treatment_ever(ids_ever).length rescue 0
+    @stopped_treatment = report.stopped_treatment(ids).length  rescue 0
+   
     @defaulters_ever = report.defaulters_ever(ids_ever) rescue 0
-    @defaulters_ever = @defaulters_ever - @transfer_out_ever.to_i - @stopped_treatment_ever.to_i - @discharged_ever.to_i
-
+    #@defaulters_ever = @defaulters_ever - @transfer_out_ever.to_i - @stopped_treatment_ever.to_i - @discharged_ever.to_i
     @defaulters = report.defaulters(ids) rescue 0
-    @defaulters = @defaulters - @transfer_out.to_i - @stopped_treatment.to_i - @discharged.to_i
+    #@defaulters = @defaulters - @transfer_out.to_i - @stopped_treatment.to_i - @discharged.to_i
 
-    @defaulters_ever = 0 if @defaulters_ever.to_i < 0
-    @defaulters = 0 if @defaulters.to_i < 0
+    #@defaulters_ever = 0 if @defaulters_ever.to_i < 0
+    #@defaulters = 0 if @defaulters.to_i < 0
 
     @alive_ever = @total_ever_registered.to_i - @defaulters_ever.to_i - @transfer_out_ever.to_i - @stopped_treatment_ever.to_i - @discharged_ever.to_i
 
@@ -1521,8 +1471,12 @@ class CohortToolController < ApplicationController
     @on_diet_ever = report.diet_only(ids_ever, "cumulative")
 
     @on_diet = report.diet_only(ids)
+    @total_women_registered = report.total_women_registered(ids) rescue 0
 
-    
+    @total_women_ever_registered = report.total_women_ever_registered(ids_ever) rescue 0
+
+    @total_men_registered = report.total_men_registered(ids) rescue 0
+    @total_men_ever_registered = report.total_men_ever_registered(ids_ever) rescue 0
 
     @background_retinapathy_ever = report.background_retinapathy_ever rescue 0
 
@@ -1549,7 +1503,7 @@ class CohortToolController < ApplicationController
       @ploriferative_retinapathy +
       @end_stage_retinapathy +
       @maculopathy
-
+   end
     render :template => "/cohort_tool/ccc_cohort", :layout => "application" and return if params[:type] == "ccc"
     render :template => "/cohort_tool/cohort", :layout => "application"
   end
@@ -1708,9 +1662,10 @@ class CohortToolController < ApplicationController
     @unknown = (@total_registered.to_i - @non_reactive.to_i -
         @reactive_on_art.to_i - @reactive_not_on_art.to_i)
 
-    @dead_ever = report.dead_ever(ids_ever) rescue 0
+    @dead_ever = report.dead_ever(ids_ever) #rescue 0
 
-    @dead = report.dead(ids) rescue 0
+    #raise report.dead(ids).to_yaml
+    @dead = report.dead(ids) #rescue 0
 
     @discharged_ever = report.discharged_ever(ids_ever) rescue 0
     @discharged =report.discharged(ids) rescue 0
@@ -1719,9 +1674,10 @@ class CohortToolController < ApplicationController
 
     @transfer_out = report.transfer_out(ids) rescue 0
 
-    @stopped_treatment_ever = report.stopped_treatment_ever(ids_ever) rescue 0
+    @stopped_treatment_ever = report.stopped_treatment_ever(ids_ever)# rescue 0
 
-    @stopped_treatment = report.stopped_treatment(ids) rescue 0
+    @stopped_treatment = report.stopped_treatment(ids) # rescue 0
+  
 
     @defaulters_ever = report.defaulters_ever(ids_ever) rescue 0
     @defaulters_ever = @defaulters_ever - @transfer_out_ever.to_i - @stopped_treatment_ever.to_i - @discharged_ever.to_i
