@@ -13,6 +13,15 @@
     -moz-user-select:none;
   }
 
+  #program{
+    color: #6281A7;
+    font-size: 49px;
+    margin-top: 0;
+    position: absolute;
+    right: 116px;
+    top: 50px;
+  }
+  
   #inform{
     width: 80%;
     background-color:white;
@@ -163,6 +172,9 @@ while (@first <= @last) do -%>
           <th>Next task : </th><td><%= @next_task.titleize rescue "None"%></td>
         </tr>
       </table>
+    </div>
+    <div id="program">
+       <%=  current_program.humanize.split(" ")[0] rescue "" %>
     </div>
   </div>
 
