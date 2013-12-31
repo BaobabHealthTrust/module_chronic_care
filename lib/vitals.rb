@@ -100,8 +100,8 @@
         
 				encounter = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
                                   :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
-                                  session_date ,patient.id, EncounterType.find_by_name(enc).id]).encounter_id rescue nil
-				Observation.find(:all, :order => "obs_datetime DESC,date_created DESC", :conditions => ["encounter_id = ? AND concept_id = ?", encounter, concept]) rescue nil
+                                  session_date ,patient.id, EncounterType.find_by_name(enc).id]).encounter_id #rescue nil
+				Observation.find(:all, :order => "obs_datetime DESC,date_created DESC", :conditions => ["encounter_id = ? AND concept_id = ?", encounter, concept]) #rescue nil
 			end
 
 	def self.drugs_given_on(patient, date = Date.today)
