@@ -382,9 +382,9 @@
                 <tr>
 
                   <td style="text-align:left;" colspan="5">Did not attend</td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @not_attend_male %></td>
+                  <td><%=  @not_attend_female %></td>
+                  <td><%=  (@not_attend_male + @not_attend_female) %></td>
                 </tr>
                 <tr>
 
@@ -412,9 +412,9 @@
                 <tr>
 
                   <td style="text-align:left;" colspan="5">Lost to follow-up</td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
-                  <td><%=  @total_ever_registered %></td>
+                  <td><%=  @lost_followup_male %></td>
+                  <td><%=  @lost_followup_female %></td>
+                  <td><%=  (@lost_followup_female + @lost_followup_male) %></td>
                 </tr>
                 <tr class = 'row_break'>
 
