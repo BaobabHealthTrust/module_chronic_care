@@ -77,6 +77,16 @@
             Visit Summary
           </span>
         </button>
+          <button class="btn" onclick="window.parent.location='/patients/dashboard_print_national_id?patient_id=<%=@patient.id%>&user_id=<%=  params[:user_id] %>'">
+          <span>
+            National ID (Print)
+          </span>
+        </button>
+          <button class="btn" onclick="window.parent.location='/patients/print_demographics?patient_id=<%=@patient.id%>&user_id=<%=  params[:user_id] %>'">
+          <span>
+            Demographics
+          </span>
+        </button>
       </td>
       
     </tr>
