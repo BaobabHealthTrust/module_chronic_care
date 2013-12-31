@@ -682,7 +682,9 @@ class PatientsController < ApplicationController
   def patient_national_id_label(patient)
 	  patient_bean = patient.person
     national_id = get_patient_identifier(patient, "National ID")
-    sex =  patient_bean.sex.match(/F/i) ? "(F)" : "(M)"
+    
+    sex =  patient_bean.gender.match(/F/i) ? "(F)" : "(M)"
+    #raise sex.to_yaml
     address = patient.person.address.strip[0..24].humanize rescue ""
     label = ZebraPrinter::StandardLabel.new
     label.font_size = 2
@@ -690,9 +692,9 @@ class PatientsController < ApplicationController
     label.font_vertical_multiplier = 2
     label.left_margin = 50
     label.draw_barcode(50,180,0,1,5,15,120,false,"#{national_id}")
-    label.draw_multi_text("#{patient_bean.name.titleize}")
-    label.draw_multi_text("#{patient_bean.national_id_with_dashes} #{patient_bean.birth_date}#{sex}")
-    label.draw_multi_text("#{patient_bean.address}")
+    label.draw_multi_text("#{patient.name.titleize}")
+    label.draw_multi_text("#{national_id} #{patient_bean.birthdate}#{sex}")
+    label.draw_multi_text("#{address}")
     label.print(1)
   end
 
