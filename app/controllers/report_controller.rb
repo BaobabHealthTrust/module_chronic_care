@@ -30,6 +30,7 @@ class ReportController < ApplicationController
 			(@location[pat.address].nil?) ? @location[pat.address] = 1 : @location[pat.address] += 1
 			@total << [pat.name, sex, pat.age, pat.address]
 		end
+    @total =  @total.sort
 		render :layout => 'application'
 	end
 

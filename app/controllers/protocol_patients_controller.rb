@@ -319,7 +319,7 @@ class ProtocolPatientsController < ApplicationController
                    AND voided = 0 AND person_id = #{@patient.id} ORDER BY obs_datetime DESC LIMIT 1")
     @bmi = @bmi.first.value_text.to_i rescue @bmi.first.value_numeric rescue 0
 
-    @treatements_list = ["Heart disease", "Stroke", "TIA", "Diabetes", "Kidney Disease"]
+    @treatements_list = ["Heart disease", "Stroke", "TIA", "Diabetes", "Kidney Disease", "Head Injury", "Unknown"]
 
       @treatements_list.delete_if {|var| var == "Diabetes"} if @diabetic.upcase == "YES"
     @current_program = current_program
@@ -341,7 +341,7 @@ class ProtocolPatientsController < ApplicationController
     end
 
     @user = User.find(params[:user_id]) rescue nil?
-     @treatements_list = ["Amputation", "Stroke", "Myocardial injactia(MI)", "Creatinine", "Funduscopy","Shortness of breath","Oedema","CVA", "Peripheral nueropathy", "Foot ulcers", "Impotence", "Others"]
+     @treatements_list = ["Amputation", "Stroke", "Myocardial injactia(MI)", "Creatinine", "Funduscopy","Shortness of breath","Oedema","CVA", "Peripheral nueropathy", "Foot ulcers", "Visual Blindness", "Impotence", "Others"]
 
     redirect_to '/encounters/no_patient' and return if @user.nil?
     current_date = (!session[:datetime].nil? ? session[:datetime].to_date : Date.today)

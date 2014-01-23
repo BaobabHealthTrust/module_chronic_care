@@ -152,8 +152,11 @@ function selectedOptions(selected){
    
 	 var x = 1
       for (i = 0; i < selected.options.length; i++) {
-
+        
         if (selected.options[i].selected) {
+            if (selected.options[i].value == 'Visual Blindness'){
+              $('blind').value = selected.options[i].value
+            }
             conditions.push( x + " : <i>" + selected.options[i].value) + "</i>";
 			x += 1
         }
@@ -165,7 +168,7 @@ function selectedOptions(selected){
 
    function showSelectedConditions() {
       conditions = [];
-	  //alert($('choice').options.length)
+
 	   if ($('choice').value.length > 0){
 		conditions.push("Complications: ");
 		selectedOptions($('choice'))
@@ -213,6 +216,7 @@ function selectedOptions(selected){
 	<input type='hidden' name='encounter_type' value='COMPLICATIONS ' />
 	<input type='hidden' name='patient_id' value='<%= @patient.id %>' />
 	<input type='hidden' name='user_id' value='<%= @user.id %>' />
+        <input type='hidden' name='concept[Visual Blindness]' id="blind" />
 
 	
 

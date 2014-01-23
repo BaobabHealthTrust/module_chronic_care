@@ -278,8 +278,8 @@
                 <tr class = 'row_break'>
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Dead</td>
-                  <td style="border-width:1px 1px 1px 1px"><%=  @dead.length %></td>
-                  <td style="border-width:1px 1px 1px 1px"><%=  @dead_ever.length %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%=  @dead.length rescue 0 %></td>
+                  <td style="border-width:1px 1px 1px 1px"><%=  @dead_ever.length rescue 0 %></td>
                 </tr>
                 <tr class = 'row_break'>
 

@@ -20,12 +20,12 @@ class Reports::CohortDm
 
 
     names = ["PATIENT DIED", "PATIENT TRANSFERRED OUT", "TREATMENT STOPPED"]
-        @states = []
-        names.each { |name|
-          concept_name = ConceptName.find_all_by_name(name)
-          @states << ProgramWorkflowState.find(:first, :conditions => ["concept_id IN (?)",concept_name.map{|c|c.concept_id}] ).program_workflow_state_id
-        }
-        @states = @states.join(',')
+    @states = []
+    names.each { |name|
+      concept_name = ConceptName.find_all_by_name(name)
+      @states << ProgramWorkflowState.find(:first, :conditions => ["concept_id IN (?)",concept_name.map{|c|c.concept_id}] ).program_workflow_state_id
+    }
+    @states = @states.join(',')
         
 
   	@ids_for_patients_on_metformin_and_glibenclamide_ever = Patient.find(:all,
@@ -116,16 +116,17 @@ class Reports::CohortDm
       categorise = "AND (UCASE(p.gender) = '#{sex.upcase}'
                                     OR UCASE(p.gender) = '#{patient_initial}')"
     end
-       if type.upcase == "HT"
-       patient = @hypertensition_id
-     elsif type.upcase == "DM"
-       patient = @diabetes_id
-     elsif type.upcase == "ASTHMA"
-       patient = @asthma_id
-     elsif type.upcase == "EPILEPSY"
-       patient = @epilepsy_id
-     elsif type.upcase == "DM HT"
-        @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
+  
+    if type.upcase == "HT"
+      patient = @hypertensition_id
+    elsif type.upcase == "DM"
+      patient = @diabetes_id
+    elsif type.upcase == "ASTHMA"
+      patient = @asthma_id
+    elsif type.upcase == "EPILEPSY"
+      patient = @epilepsy_id
+    elsif type.upcase == "DM HT"
+      @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
                                       INNER JOIN person p ON p.person_id = orders.patient_id
                                       LEFT OUTER JOIN patient ON patient.patient_id = orders.patient_id \
                                       WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
@@ -142,8 +143,8 @@ class Reports::CohortDm
 																			concept_set IN (#{@diabetes_id})))
                                       GROUP BY patient_id").length rescue 0
       return
-     elsif type.upcase == "OTHER"
-       @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
+    elsif type.upcase == "OTHER"
+      @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
                                       INNER JOIN person p ON p.person_id = orders.patient_id
                                       LEFT OUTER JOIN patient ON patient.patient_id = orders.patient_id \
                                       WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
@@ -153,9 +154,9 @@ class Reports::CohortDm
 																			concept_set NOT IN (#{@hypertensition_id}, #{@asthma_id},#{@diabetes_id}, #{@epilepsy_id})) \
                                       GROUP BY patient_id").length rescue 0
       return
-     end
+    end
        
-        @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
+    @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
                                       INNER JOIN person p ON p.person_id = orders.patient_id
                                       LEFT OUTER JOIN patient ON patient.patient_id = orders.patient_id \
                                       WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
@@ -163,26 +164,26 @@ class Reports::CohortDm
                                       #{categorise} AND  DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @start_date + "'  \
 																			AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
 																			concept_set IN (#{patient})) \
-                                      GROUP BY patient_id").length rescue 0
+                                      GROUP BY patient_id").length #rescue 0
     # raise @orders.to_yaml
   end
 
   def disease_ever_availabe(ids, type, sex)
-     if ! sex.blank?
+    if ! sex.blank?
       patient_initial = sex.split(//).first.upcase
       categorise = "AND (UCASE(p.gender) = '#{sex.upcase}'
                                     OR UCASE(p.gender) = '#{patient_initial}')"
-     end
-     if type.upcase == "HT"
-       patient = @hypertensition_id
-     elsif type.upcase == "DM"
-       patient = @diabetes_id
-     elsif type.upcase == "ASTHMA"
-       patient = @asthma_id
-     elsif type.upcase == "EPILEPSY"
-       patient = @epilepsy_id
-     elsif type.upcase == "DM HT"
-        @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
+    end
+    if type.upcase == "HT"
+      patient = @hypertensition_id
+    elsif type.upcase == "DM"
+      patient = @diabetes_id
+    elsif type.upcase == "ASTHMA"
+      patient = @asthma_id
+    elsif type.upcase == "EPILEPSY"
+      patient = @epilepsy_id
+    elsif type.upcase == "DM HT"
+      @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
                                       INNER JOIN person p ON p.person_id = orders.patient_id
                                       LEFT OUTER JOIN patient ON patient.patient_id = orders.patient_id \
                                       WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
@@ -197,9 +198,9 @@ class Reports::CohortDm
 																			concept_set IN (#{@diabetes_id})))
                                       GROUP BY patient_id").length rescue 0
 
-        return
-     elsif type.upcase == "OTHER"
-        @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
+      return
+    elsif type.upcase == "OTHER"
+      @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
                                       INNER JOIN person p ON p.person_id = orders.patient_id
                                       LEFT OUTER JOIN patient ON patient.patient_id = orders.patient_id \
                                       WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
@@ -207,9 +208,11 @@ class Reports::CohortDm
 																			 #{categorise} AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
 																			concept_set NOT IN (#{@hypertensition_id}, #{@asthma_id},#{@diabetes_id}, #{@epilepsy_id})) \
                                       GROUP BY patient_id").length rescue 0
-        return
-     end
-        @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
+       raise "here"
+      return
+    end
+   
+    @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
                                       INNER JOIN person p ON p.person_id = orders.patient_id
                                       LEFT OUTER JOIN patient ON patient.patient_id = orders.patient_id \
                                       WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
@@ -228,7 +231,7 @@ class Reports::CohortDm
     end
     if ! age.blank?
       if age == 14
-      range = "AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) > 14
+        range = "AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) > 14
                 AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) <= 54"
       elsif age == 54
         range = "AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) > 54"
@@ -262,7 +265,7 @@ class Reports::CohortDm
   end
 
   def alcohol(ids, sex)
-     @orders = Order.find_by_sql("SELECT DISTINCT obs.person_id FROM obs
+    @orders = Order.find_by_sql("SELECT DISTINCT obs.person_id FROM obs
                                   INNER JOIN person on person .person_id = obs.person_id
                                       LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
                                     WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'DOES THE PATIENT DRINK ALCOHOL?')
@@ -275,7 +278,7 @@ class Reports::CohortDm
   end
 
   def alcohol_ever(ids, sex)
-     @orders = Order.find_by_sql("SELECT DISTINCT obs.person_id FROM obs
+    @orders = Order.find_by_sql("SELECT DISTINCT obs.person_id FROM obs
                                   INNER JOIN person on person .person_id = obs.person_id
                                       LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
                                     WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'DOES THE PATIENT DRINK ALCOHOL?')
@@ -288,7 +291,7 @@ class Reports::CohortDm
   end
 
   def smoking(ids, sex)
-     @orders = Order.find_by_sql("SELECT DISTINCT obs.person_id FROM obs
+    @orders = Order.find_by_sql("SELECT DISTINCT obs.person_id FROM obs
                                   INNER JOIN person on person .person_id = obs.person_id
                                       LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
                                     WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'CURRENT SMOKER')
@@ -301,7 +304,7 @@ class Reports::CohortDm
   end
 
   def smoking_ever(ids, sex)
-     @orders = Order.find_by_sql("SELECT DISTINCT obs.person_id FROM obs
+    @orders = Order.find_by_sql("SELECT DISTINCT obs.person_id FROM obs
                                   INNER JOIN person on person .person_id = obs.person_id
                                       LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
                                     WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'CURRENT SMOKER')
@@ -314,7 +317,7 @@ class Reports::CohortDm
   end
 
   def bmi(ids, sex)
-     @orders = Order.find_by_sql("SELECT DISTINCT obs.person_id FROM obs
+    @orders = Order.find_by_sql("SELECT DISTINCT obs.person_id FROM obs
                                   INNER JOIN person on person .person_id = obs.person_id
                                       LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
                                     WHERE concept_id = (SELECT concept_id FROM concept_name \
@@ -328,7 +331,7 @@ class Reports::CohortDm
   end
 
   def bmi_ever(ids, sex)
-     @orders = Order.find_by_sql("SELECT DISTINCT obs.person_id FROM obs
+    @orders = Order.find_by_sql("SELECT DISTINCT obs.person_id FROM obs
                                   INNER JOIN person on person .person_id = obs.person_id
                                       LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
                                     WHERE concept_id = (SELECT concept_id FROM concept_name \
@@ -414,7 +417,7 @@ class Reports::CohortDm
   # Get all patients ever registered
   def total_ever_registered(encounter_type=nil)
     
-				Patient.find_by_sql("
+    Patient.find_by_sql("
                           SELECT DISTINCT p.patient_id FROM patient p
                           WHERE p.voided = 0
                           AND p.date_created <= '#{@end_date}'")
@@ -1108,7 +1111,7 @@ class Reports::CohortDm
 
   # TB After Diabetes
   def tb_before_diabetes_ever(ids)
-   #raise ids.to_yaml
+    #raise ids.to_yaml
     @orders = Order.find_by_sql("SELECT DISTINCT v1.person_id FROM \
                                     (SELECT person_id, value_datetime FROM obs \
                                       LEFT OUTER JOIN patient ON patient.patient_id = obs.person_id \
@@ -1324,7 +1327,7 @@ class Reports::CohortDm
       categorise = "AND (UCASE(pe.gender) = '#{sex.upcase}'
                                     OR UCASE(pe.gender) = '#{patient_initial}')"
       joined = "INNER JOIN person pe ON pe.person_id = p.patient_id"
-   end
+    end
 
     @dead = PatientState.find_by_sql("SELECT DISTINCT p.patient_id FROM patient p
                 INNER JOIN  patient_program pp on pp.patient_id = p.patient_id #{joined}
@@ -1342,7 +1345,7 @@ class Reports::CohortDm
       categorise = "AND (UCASE(pe.gender) = '#{sex.upcase}'
                                     OR UCASE(pe.gender) = '#{patient_initial}')"
       joined = "INNER JOIN person pe ON pe.person_id = p.patient_id"
-   end
+    end
     program_id = Program.find_by_name("CHRONIC CARE PROGRAM").id
 
     @dead = PatientState.find_by_sql("SELECT DISTINCT p.patient_id FROM patient p
@@ -1362,8 +1365,8 @@ class Reports::CohortDm
       categorise = "AND (UCASE(pe.gender) = '#{sex.upcase}'
                                     OR UCASE(pe.gender) = '#{patient_initial}')"
       joined = "INNER JOIN person pe ON pe.person_id = p.patient_id"
-   end
-   @dead = PatientState.find_by_sql("SELECT DISTINCT p.patient_id FROM patient p
+    end
+    @dead = PatientState.find_by_sql("SELECT DISTINCT p.patient_id FROM patient p
                 INNER JOIN  patient_program pp on pp.patient_id = p.patient_id #{joined}
                 inner join patient_state ps on ps.patient_program_id = pp.patient_program_id
                 INNER JOIN  program_workflow_state pw ON pw.program_workflow_state_id = current_state_for_program(p.patient_id, #{@program_id}, '#{@end_date}')
@@ -1379,7 +1382,7 @@ class Reports::CohortDm
       categorise = "AND (UCASE(pe.gender) = '#{sex.upcase}'
                                     OR UCASE(pe.gender) = '#{patient_initial}')"
       joined = "INNER JOIN person pe ON pe.person_id = p.patient_id"
-   end
+    end
     @dead = PatientState.find_by_sql("SELECT DISTINCT p.patient_id FROM patient p
                 INNER JOIN  patient_program pp on pp.patient_id = p.patient_id #{joined}
                 inner join patient_state ps on ps.patient_program_id = pp.patient_program_id
@@ -1398,7 +1401,7 @@ class Reports::CohortDm
       categorise = "AND (UCASE(pe.gender) = '#{sex.upcase}'
                                     OR UCASE(pe.gender) = '#{patient_initial}')"
       joined = "INNER JOIN person pe ON pe.person_id = p.patient_id"
-   end
+    end
   	Person.find(:all, :conditions => ["person_id IN (SELECT patient_id FROM patient WHERE patient.patient_id IN (#{ids})) AND dead = 0 AND DATE(date_created) <= DATE('#{@end_date}')"]).length
   end
 
@@ -1409,7 +1412,7 @@ class Reports::CohortDm
       categorise = "AND (UCASE(pe.gender) = '#{sex.upcase}'
                                     OR UCASE(pe.gender) = '#{patient_initial}')"
       joined = "INNER JOIN person pe ON pe.person_id = p.patient_id"
-   end
+    end
   	Person.find(:all,
       :conditions => ["person_id IN (SELECT patient_id FROM patient WHERE patient.patient_id IN (#{ids})) AND dead = 0 AND DATE(date_created) >= DATE('#{@start_date}') AND DATE(date_created) <= DATE('#{@end_date}')"]).length
   end
@@ -1420,7 +1423,7 @@ class Reports::CohortDm
       categorise = "AND (UCASE(pe.gender) = '#{sex.upcase}'
                                     OR UCASE(pe.gender) = '#{patient_initial}')"
       joined = "INNER JOIN person pe ON pe.person_id = p.patient_id"
-   end
+    end
     @dead = PatientState.find_by_sql("SELECT DISTINCT p.patient_id FROM patient p
                 INNER JOIN  patient_program pp on pp.patient_id = p.patient_id #{joined}
                 inner join patient_state ps on ps.patient_program_id = pp.patient_program_id
@@ -1438,7 +1441,7 @@ class Reports::CohortDm
       categorise = "AND (UCASE(pe.gender) = '#{sex.upcase}'
                                     OR UCASE(pe.gender) = '#{patient_initial}')"
       joined = "INNER JOIN person pe ON pe.person_id = p.patient_id"
-   end
+    end
     @dead = PatientState.find_by_sql("SELECT DISTINCT p.patient_id FROM patient p
                 INNER JOIN  patient_program pp on pp.patient_id = p.patient_id #{joined}
                 inner join patient_state ps on ps.patient_program_id = pp.patient_program_id
@@ -1451,13 +1454,13 @@ class Reports::CohortDm
   end
 
   def stopped_treatment_ever(ids, sex=nil)
-     if ! sex.blank?
+    if ! sex.blank?
       patient_initial = sex.split(//).first.upcase
       categorise = "AND (UCASE(pe.gender) = '#{sex.upcase}'
                                     OR UCASE(pe.gender) = '#{patient_initial}')"
       joined = "INNER JOIN person pe ON pe.person_id = p.patient_id"
-     end
-     @dead = PatientState.find_by_sql("SELECT DISTINCT p.patient_id FROM patient p
+    end
+    @dead = PatientState.find_by_sql("SELECT DISTINCT p.patient_id FROM patient p
                 INNER JOIN  patient_program pp on pp.patient_id = p.patient_id #{joined}
                 inner join patient_state ps on ps.patient_program_id = pp.patient_program_id
                 INNER JOIN  program_workflow_state pw ON pw.program_workflow_state_id = current_state_for_program(p.patient_id, #{@program_id}, '#{@end_date}')
@@ -1473,7 +1476,7 @@ class Reports::CohortDm
       categorise = "AND (UCASE(pe.gender) = '#{sex.upcase}'
                                     OR UCASE(pe.gender) = '#{patient_initial}')"
       joined = "INNER JOIN person pe ON pe.person_id = p.patient_id"
-   end
+    end
     @dead = PatientState.find_by_sql("SELECT DISTINCT p.patient_id FROM patient p
                 INNER JOIN  patient_program pp on pp.patient_id = p.patient_id #{joined}
                 inner join patient_state ps on ps.patient_program_id = pp.patient_program_id
@@ -1512,19 +1515,19 @@ class Reports::CohortDm
 
   # Outcome: Defaulters
   def defaulters_ever(ids, sex)
-   if ! sex.blank?
+    if ! sex.blank?
       patient_initial = sex.split(//).first.upcase
       categorise = "AND (UCASE(pe.gender) = '#{sex.upcase}'
                                     OR UCASE(pe.gender) = '#{patient_initial}')"
       joined = "INNER JOIN person pe ON pe.person_id = patient.patient_id"
-   end
-        names = ["PATIENT DIED", "PATIENT TRANSFERRED OUT", "TREATMENT STOPPED"]
-        states = []
-        names.each { |name|
-          concept_name = ConceptName.find_all_by_name(name)
-          states += ProgramWorkflowState.find(:first, :conditions => ["concept_id IN (?)",concept_name.map{|c|c.concept_id}] ).program_workflow_state_id
-        }
-        states = states.join(',')
+    end
+    names = ["PATIENT DIED", "PATIENT TRANSFERRED OUT", "TREATMENT STOPPED"]
+    states = []
+    names.each { |name|
+      concept_name = ConceptName.find_all_by_name(name)
+      states += ProgramWorkflowState.find(:first, :conditions => ["concept_id IN (?)",concept_name.map{|c|c.concept_id}] ).program_workflow_state_id
+    }
+    states = states.join(',')
     @orders = Order.find_by_sql("SELECT orders.patient_id, current_state_for_program(orders.patient_id, #{@program_id}, '#{@end_date}') AS state FROM orders
                                       LEFT OUTER JOIN patient ON patient.patient_id = orders.patient_id #{joined} \
                                       WHERE DATEDIFF('#{@end_date}', auto_expire_date)/30 > 2 \
@@ -1543,7 +1546,7 @@ class Reports::CohortDm
       categorise = "AND (UCASE(pe.gender) = '#{sex.upcase}'
                                     OR UCASE(pe.gender) = '#{patient_initial}')"
       joined = "INNER JOIN person pe ON pe.person_id = patient.patient_id"
-   end
+    end
     
     @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
                                       LEFT OUTER JOIN patient ON patient.patient_id = orders.patient_id  #{joined}\
@@ -1563,7 +1566,7 @@ class Reports::CohortDm
       categorise = "AND (UCASE(pe.gender) = '#{sex.upcase}'
                                     OR UCASE(pe.gender) = '#{patient_initial}')"
       joined = "INNER JOIN person pe ON pe.person_id = patient.patient_id"
-   end
+    end
 
     @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
                                       LEFT OUTER JOIN patient ON patient.patient_id = orders.patient_id  #{joined}\
@@ -1584,7 +1587,7 @@ class Reports::CohortDm
       categorise = "AND (UCASE(pe.gender) = '#{sex.upcase}'
                                     OR UCASE(pe.gender) = '#{patient_initial}')"
       joined = "INNER JOIN person pe ON pe.person_id = patient.patient_id"
-   end
+    end
 
     @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
                                       LEFT OUTER JOIN patient ON patient.patient_id = orders.patient_id  #{joined}\
@@ -1604,7 +1607,7 @@ class Reports::CohortDm
       categorise = "AND (UCASE(pe.gender) = '#{sex.upcase}'
                                     OR UCASE(pe.gender) = '#{patient_initial}')"
       joined = "INNER JOIN person pe ON pe.person_id = patient.patient_id"
-   end
+    end
     @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders LEFT OUTER JOIN patient ON
                                         patient.patient_id = orders.patient_id #{joined}
                                          WHERE DATEDIFF('#{@end_date}', auto_expire_date)/30 <= 3
@@ -1617,13 +1620,13 @@ class Reports::CohortDm
   end
 
   def defaulters(ids)
-      names = ["PATIENT DIED", "PATIENT TRANSFERRED OUT", "TREATMENT STOPPED"]
-        states = []
-        names.each { |name|
-          concept_name = ConceptName.find_all_by_name(name)
-          states += ProgramWorkflowState.find(:first, :conditions => ["concept_id IN (?)",concept_name.map{|c|c.concept_id}] ).program_workflow_state_id
-        }
-        states = states.join(',')
+    names = ["PATIENT DIED", "PATIENT TRANSFERRED OUT", "TREATMENT STOPPED"]
+    states = []
+    names.each { |name|
+      concept_name = ConceptName.find_all_by_name(name)
+      states += ProgramWorkflowState.find(:first, :conditions => ["concept_id IN (?)",concept_name.map{|c|c.concept_id}] ).program_workflow_state_id
+    }
+    states = states.join(',')
 
     @orders = Order.find_by_sql("SELECT orders.patient_id  current_state_for_program(orders.patient_id, #{@program_id}, '#{@end_date}') AS state FROM orders LEFT OUTER JOIN patient ON
                                         patient.patient_id = orders.patient_id WHERE DATEDIFF('#{@end_date}', auto_expire_date)/30 > 2
@@ -1865,7 +1868,7 @@ class Reports::CohortDm
                                 AND obs.voided = 0)").length rescue 0
   end
 
- def patient_on_drugs(ids, sex, drug)
+  def patient_on_drugs(ids, sex, drug)
 	  @orders = Patient.find_by_sql("
               SELECT DISTINCT(p.patient_id) FROM patient p
               INNER JOIN person pe ON pe.person_id = p.patient_id
@@ -1914,12 +1917,12 @@ class Reports::CohortDm
     Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
       WHERE person_id IN (#{ids})
       AND gender LIKE '#{sex}%'").each { |patient|
-        bp_down = compare_bp(patient.person_id.to_i)
-        bp_low = low_bp(patient.person_id.to_i)
-        low_sugar = compare_sugar(patient.person_id.to_i)
-        if bp_down == true || bp_low == true || low_sugar == true
-          total += 1
-        end
+      bp_down = compare_bp(patient.person_id.to_i)
+      bp_low = low_bp(patient.person_id.to_i)
+      low_sugar = compare_sugar(patient.person_id.to_i)
+      if bp_down == true || bp_low == true || low_sugar == true
+        total += 1
+      end
     } rescue []
 
     return total
@@ -1930,88 +1933,95 @@ class Reports::CohortDm
     Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
       WHERE person_id IN (#{ids})
       AND gender LIKE '#{sex}%'").each { |patient|
-        epilepsy = current_vitals(Patient.find(patient.person_id), "Epilepsy", @end_date) rescue []
-        total += 1 if ! epilepsy.blank?
+      epilepsy = current_vitals(Patient.find(patient.person_id), "Epilepsy", @end_date) rescue []
+      total += 1 if ! epilepsy.blank?
     } rescue []
 
     return total
   end
 
-   def burns_ever(ids, sex)
+  def burns_ever(ids, sex)
     total = 0
     Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
       WHERE person_id IN (#{ids})
       AND gender LIKE '#{sex}%'").each { |patient|
-        burns = current_vitals(Patient.find(patient.person_id), "Burns", @end_date).to_s.match(/yes/i) rescue []
-        total += 1 if ! burns.blank?
+      burns = current_vitals(Patient.find(patient.person_id), "Burns", @end_date).to_s.match(/yes/i) rescue []
+      total += 1 if ! burns.blank?
     } rescue []
 
     return total
   end
 
- def comp_amputation_ever(ids, sex)
+  def comp_amputation_ever(ids, sex)
     total = 0
     Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
       WHERE person_id IN (#{ids})
       AND gender LIKE '#{sex}%'").each { |patient|
-        amputation = current_encounter(Patient.find(patient.person_id), "COMPLICATIONS", "COMPLICATIONS", @end_date).to_s.match(/Complications:  Amputation/i) rescue []
-        total += 1 if ! amputation.blank?
+      amputation = current_encounter(Patient.find(patient.person_id), "COMPLICATIONS", "COMPLICATIONS", @end_date).to_s.match(/Complications:  Amputation/i) rescue []
+      total += 1 if ! amputation.blank?
     } rescue []
 
     return total
- end
- def comp_mi_ever(ids, sex)
+  end
+  def comp_mi_ever(ids, sex)
     total = 0
     Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
       WHERE person_id IN (#{ids})
       AND gender LIKE '#{sex}%'").each { |patient|
-        mi = current_encounter(Patient.find(patient.person_id), "COMPLICATIONS", "myocardial injactia", @end_date) rescue []
-        total += 1 if ! mi.blank?
+      mi = current_encounter(Patient.find(patient.person_id), "COMPLICATIONS", "myocardial injactia", @end_date) rescue []
+      total += 1 if ! mi.blank?
     } rescue []
 
     return total
- end
+  end
 
- def cardiovascular_ever(ids, sex)
-       total = 0
+  def cardiovascular_ever(ids, sex)
+    total = 0
     Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
       WHERE person_id IN (#{ids})
       AND gender LIKE '#{sex}%'").each { |patient|
-        cardiac = current_encounter(Patient.find(patient.person_id), "COMPLICATIONS", "Cardiac", @end_date) #rescue []
-        total += 1 if ! cardiac.blank?
+      cardiac = current_encounter(Patient.find(patient.person_id), "COMPLICATIONS", "Cardiac", @end_date) #rescue []
+      total += 1 if ! cardiac.blank?
     } rescue []
 
     return total
- end
+  end
 
- def blind_ever(ids, sex)
-      total = 0
+  def blind_ever(ids, sex)
+    total = 0
     Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
       WHERE person_id IN (#{ids})
       AND gender LIKE '#{sex}%'").each { |patient|
-        cardiac = current_encounter(Patient.find(patient.person_id), "COMPLICATIONS", "Visual Blindness", @end_date) #rescue []
-        total += 1 if ! cardiac.blank?
+      cardiac = current_encounter(Patient.find(patient.person_id), "COMPLICATIONS", "Visual Blindness", @end_date) #rescue []
+      total += 1 if ! cardiac.blank?
     } rescue []
 
     return total
- end
+  end
 
- def current_encounter(patient, enc, concept, session_date = Date.today)
-				concept = ConceptName.find_by_name(concept).concept_id
+  def current_encounter(patient, enc, concept, session_date = Date.today)
+    concept = ConceptName.find_by_name(concept).concept_id
 
-				encounter = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
-                                  session_date ,patient.id, EncounterType.find_by_name(enc).id]).encounter_id rescue nil
-				Observation.find(:all, :order => "obs_datetime DESC,date_created DESC", :conditions => ["encounter_id = ? AND concept_id = ?", encounter, concept]) rescue nil
-end
+    encounter = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
+      :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
+        session_date ,patient.id, EncounterType.find_by_name(enc).id]).encounter_id rescue nil
+    Observation.find(:all, :order => "obs_datetime DESC,date_created DESC", :conditions => ["encounter_id = ? AND concept_id = ?", encounter, concept]) rescue nil
+  end
+
+  def current_vitals(patient, vital_sign, session_date = Time.now())
+    concept = ConceptName.find_by_sql("select concept_id from concept_name where name = '#{vital_sign}' and voided = 0").first.concept_id
+    Observation.find_by_sql("SELECT * from obs where concept_id = '#{concept}' AND person_id = '#{patient.id}'
+                    AND DATE(obs_datetime) <= '#{session_date}' AND voided = 0
+                    ORDER BY  obs_datetime DESC, date_created DESC LIMIT 1").first rescue nil
+  end
 
   def asthma_ever(ids, sex)
     total = 0
     Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
       WHERE person_id IN (#{ids})
       AND gender LIKE '#{sex}%'").each { |patient|
-        asthma = current_encounter(Patient.find(patient.person_id), "ASTHMA MEASURE", "ASTHMA", @end_date).to_s.split(":")[1].match(/yes/i) rescue []
-        total += 1 if ! asthma.blank?
+      asthma = current_encounter(Patient.find(patient.person_id), "ASTHMA MEASURE", "ASTHMA", @end_date).to_s.split(":")[1].match(/yes/i) rescue []
+      total += 1 if ! asthma.blank?
     } rescue []
 
     return total
@@ -2022,7 +2032,7 @@ end
     Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
       WHERE person_id IN (#{ids})
       AND gender LIKE '#{sex}%'").each { |patient|
-        total += 1 if compare_sugar(patient.person_id.to_i) == true
+      total += 1 if compare_sugar(patient.person_id.to_i) == true
       
     } rescue []
    
@@ -2038,12 +2048,12 @@ end
                     ORDER BY  obs_datetime DESC, date_created DESC") rescue []
 
     if sys_obs.length > 1
-        first_sys = sys_obs.first.to_s.split(':')[1].to_i
-          #raise sys_obs.first.obs_datetime.to_yaml
-         previous_obs = Observation.find_by_sql("SELECT * from obs where concept_id IN ('#{fasting}, #{random}') AND person_id = #{patient_id}
+      first_sys = sys_obs.first.to_s.split(':')[1].to_i
+      #raise sys_obs.first.obs_datetime.to_yaml
+      previous_obs = Observation.find_by_sql("SELECT * from obs where concept_id IN ('#{fasting}, #{random}') AND person_id = #{patient_id}
                     AND DATE(obs_datetime) < '#{sys_obs.first.obs_datetime.to_date}' AND voided = 0
                     ORDER BY  obs_datetime DESC, date_created DESC").first.to_s.split(':')[1].to_i rescue 0
-         return true if first_sys < previous_obs
+      return true if first_sys < previous_obs
 
     end
     return false
@@ -2057,23 +2067,23 @@ end
                     AND DATE(obs_datetime) <= '#{@end_date}' AND voided = 0
                     ORDER BY  obs_datetime DESC, date_created DESC") rescue []
     if sys_obs.length >= 2
-         first_sys = sys_obs.first.to_s.split(':')[1].to_f
-          #raise sys_obs.first.obs_datetime.to_yaml
-         dys_obs = Observation.find_by_sql("SELECT * from obs where concept_id = '#{dys_concept}' AND person_id = #{patient_id}
+      first_sys = sys_obs.first.to_s.split(':')[1].to_f
+      #raise sys_obs.first.obs_datetime.to_yaml
+      dys_obs = Observation.find_by_sql("SELECT * from obs where concept_id = '#{dys_concept}' AND person_id = #{patient_id}
                     AND DATE(obs_datetime) = '#{sys_obs.first.obs_datetime.to_date}' AND voided = 0
                     ORDER BY  obs_datetime DESC, date_created DESC").first.to_s.split(':')[1].to_f rescue []
-         current_bp = first_sys / dys_obs
+      current_bp = first_sys / dys_obs
          
-        second_sys = Observation.find_by_sql("SELECT * from obs where concept_id = '#{sys_concept}' AND person_id = #{patient_id}
+      second_sys = Observation.find_by_sql("SELECT * from obs where concept_id = '#{sys_concept}' AND person_id = #{patient_id}
                     AND DATE(obs_datetime) < '#{sys_obs.first.obs_datetime.to_date}' AND voided = 0
                     ORDER BY  obs_datetime DESC, date_created DESC").first.to_s.split(':')[1].to_f rescue []
       
-        second_dys = Observation.find_by_sql("SELECT * from obs where concept_id = '#{dys_concept}' AND person_id = #{patient_id}
+      second_dys = Observation.find_by_sql("SELECT * from obs where concept_id = '#{dys_concept}' AND person_id = #{patient_id}
                     AND DATE(obs_datetime) < '#{sys_obs.first.obs_datetime.to_date}' AND voided = 0
                     ORDER BY  obs_datetime DESC, date_created DESC").first.to_s.split(':')[1].to_f rescue []
-        previous_bp  = second_sys / second_dys
+      previous_bp  = second_sys / second_dys
         
-       return true if current_bp < previous_bp
+      return true if current_bp < previous_bp
     end
     return false
   end
@@ -2086,15 +2096,15 @@ end
                     AND DATE(obs_datetime) <= '#{@end_date}' AND voided = 0
                     ORDER BY  obs_datetime DESC, date_created DESC") rescue []
     if sys_obs.length >= 1
-         first_sys = sys_obs.first.to_s.split(':')[1].to_f
-          #raise sys_obs.first.obs_datetime.to_yaml
-         dys_obs = Observation.find_by_sql("SELECT * from obs where concept_id = '#{dys_concept}' AND person_id = #{patient_id}
+      first_sys = sys_obs.first.to_s.split(':')[1].to_f
+      #raise sys_obs.first.obs_datetime.to_yaml
+      dys_obs = Observation.find_by_sql("SELECT * from obs where concept_id = '#{dys_concept}' AND person_id = #{patient_id}
                     AND DATE(obs_datetime) = '#{sys_obs.first.obs_datetime.to_date}' AND voided = 0
                     ORDER BY  obs_datetime DESC, date_created DESC").first.to_s.split(':')[1].to_f rescue []
-         current_bp = first_sys / dys_obs
-         threshod = 140 / 90
+      current_bp = first_sys / dys_obs
+      threshod = 140 / 90
 
-       return true if current_bp < threshod
+      return true if current_bp < threshod
     end
     return false
   end

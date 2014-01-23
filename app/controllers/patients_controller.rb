@@ -124,7 +124,15 @@ class PatientsController < ApplicationController
     @patient_medication_period = DiabetesService.patient_diabetes_medication_duration(@patient.patient_id)
     render :layout => false
   end
-  
+  def chart
+    @bps = []
+    if params[:type] == "bp"
+
+      @bps << ["#{Date.today.to_s.gsub("-","/")}",678]
+     
+      render :partial => 'bp_chart'
+    end
+  end
   def current_visit
     @retrospective = session[:datetime]
 		@retrospective = Time.now if session[:datetime].blank?
