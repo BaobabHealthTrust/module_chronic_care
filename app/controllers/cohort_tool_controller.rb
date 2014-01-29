@@ -1272,11 +1272,10 @@ class CohortToolController < ApplicationController
     @disease_ever_availabe_epilepsy_male = report.disease_ever_availabe(ids_ever, "epilepsy", "male")
     @disease_ever_availabe_epilepsy_female = report.disease_ever_availabe(ids_ever, "epilepsy", "female")
 
-    @disease_availabe_dmht_male = report.disease_availabe(ids, "dm ht", "male").to_i
-    @disease_availabe_dmht_female = report.disease_availabe(ids, "dm ht", "female").to_i
-    @disease_ever_availabe_dmht_male = report.disease_ever_availabe(ids_ever, "dm ht", "male").to_i
-    @disease_ever_availabe_dmht_female = report.disease_ever_availabe(ids_ever, "dm ht", "female").to_i
-
+    @disease_availabe_dmht_male = report.disease_availabe(ids, "dm ht", "male")
+    @disease_availabe_dmht_female = report.disease_availabe(ids, "dm ht", "female")
+    @disease_ever_availabe_dmht_male = report.disease_ever_availabe(ids_ever, "dm ht", "male")  
+    @disease_ever_availabe_dmht_female = report.disease_ever_availabe(ids_ever, "dm ht", "female")
 
     total_male = @total_children_registered_male + @total_adults_registered_male + @older_persons_registered_male
     total_female = @total_children_registered_female + @total_adults_registered_female + @older_persons_registered_female
