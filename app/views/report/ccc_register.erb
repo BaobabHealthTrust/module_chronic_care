@@ -2,8 +2,27 @@
   <head>
     <%= stylesheet_link_tag "dashboard" %>
     <%= javascript_include_tag 'jquery' %>
+    <%#= javascript_include_tag "prototype" %>
+    <%= stylesheet_link_tag 'extra_buttons' %>
+    <%= javascript_include_tag 'jquery_data_table.js' %>
+    <%= stylesheet_link_tag 'jquery.dataTables' %>
+    <script type="text/javascript" charset="utf8" src="/javascripts/jquery.dataTables.min.js"></script>
+	<script src="/javascripts/jquery.table2CSV.min.js" type="text/javascript"></script>
     <script>
       jQuery(document).ready(function($) {
+
+        $('#table_id').dataTable({
+		"bAutoWidth": false,
+		"sScrollY": "374px",
+		"bPaginate": true,
+		"bFilter": true,
+		"bProcessing": true,
+		//"sPaginationType": "full_numbers",
+		"sPageButton": "paginate_button"
+
+		//"bInfo":false
+     	});
+        
         document.getElementById('content').style = 'position : relative; width : 98%; margin-left : -49%;'
         document.getElementById('description').style = 'color:#777;position:absolute;margin-top:-70px;'
         $('#finish').click(function() {
@@ -72,41 +91,40 @@
         background-color: #fff;
       }
 
-      #table_id {
-        width: 100%;
-      }
 
-      #table_id_filter{
-        position:absolute;
-        top:0px;
-        right:1%;
-        margin-top:-40px;
-      }
-
-      #table_id_filter input{
-        padding:0.5em;
-      }
-
-
-      .dataTables_length select {
-        font-size: 25px;
-      }
       .horizontal_line hr{
         position:absolute;
         bottom:104px;
       }
-      #table_id_info{
-        left: 10px;
-        position: absolute;
-        top: 476px;
-        font-weight:bold;
-      }
-      #table_id_length{
-        display:none;
-      }
-      #table_id_paginate{
-        display:none;
-      }
+	#table_id {
+    	width: 100%;
+    }
+
+    #table_id_filter{
+		position:absolute;
+		top:0px;
+		right:1%;
+		margin-top:-40px;
+    }
+
+    #table_id_filter input{
+    	padding:0.5em;
+    }
+
+
+    .dataTables_length select {
+   		font-size: 25px;
+	}
+	.horizontal_line hr{
+	 	position:absolute;
+	 	bottom:94px;
+	}
+	#table_id_info{
+	 	position:fixed;
+	 	left:700px;
+	 	font-weight:bold;
+	 	top:675px;
+	}
       #num{ display:none; }
       #char{ display:none; }
 
@@ -162,16 +180,16 @@
 		  </td>
 		</tr>
       </table-->
-      <table width="100%">
+      <table width="100%" id="table_id">
         <thead>
-          <tr style="color: #fff; background-color: #6281a7;">
-            <th align="left">Name<p />
+          <tr style="color: #fff; background-color: #6281a7;" width="100%">
+            <th align="left"  width="20%">Name<p />
             </th>
-            <th>Gender  <p />
+            <th  width="5%">Gender  <p />
             </th>
-            <th>Age  <p />
+            <th  width="20%">Age  <p />
             </th>
-            <th>Residence <p />
+            <th  width="20%">Residence <p />
             </th>
         </thead>
         <tbody>
