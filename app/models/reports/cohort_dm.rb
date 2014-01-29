@@ -9,7 +9,6 @@ class Reports::CohortDm
   	@diabetes_program_id = Program.find_by_name('DIABETES PROGRAM').id
 		@hypertensition_medication_id  = Concept.find_by_name("HYPERTENSION MEDICATION").id
 		@diabetes_id                   = Concept.find_by_name("DIABETES MEDICATION").id
-		@hypertensition_id             = Concept.find_by_name("HYPERTENSION").id
     @asthma_id             = Concept.find_by_name("ASTHMA MEDICATION").id
     @epilepsy_id             = Concept.find_by_name("EPILEPSY MEDICATION").id
     @program_id = Program.find_by_name('CHRONIC CARE PROGRAM').id
@@ -116,56 +115,85 @@ class Reports::CohortDm
       categorise = "AND (UCASE(p.gender) = '#{sex.upcase}'
                                     OR UCASE(p.gender) = '#{patient_initial}')"
     end
-  
+   
+    encounter = EncounterType.find_by_name("Vitals").id
     if type.upcase == "HT"
-      patient = @hypertensition_id
+      concept = ConceptName.find_by_name("cardiovascular system diagnosis").concept_id
+      @orders = Order.find_by_sql("SELECT DISTINCT(o.person_id) FROM obs o
+                                  INNER JOIN person p ON p.person_id = o.person_id
+                                  INNER JOIN patient ON patient.patient_id = o.person_id
+                                  INNER JOIN encounter e ON e.encounter_id = o.encounter_id\
+                                  WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
+                                  DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
+                                  #{categorise} AND  DATE_FORMAT(patient.date_created, '%Y-%m-%d') >= '" + @start_date + "'  \
+                                  AND o.concept_id = #{concept}
+                                 AND e.encounter_type = #{encounter}
+                                 AND o.value_coded != (SELECT concept_id FROM concept_name WHERE name = 'Normal')
+                                 GROUP BY patient.patient_id").length #rescue 0
+
     elsif type.upcase == "DM"
-      patient = @diabetes_id
+      concept = ConceptName.find_by_name("Patient has Diabetes").concept_id
+      @orders = Order.find_by_sql("SELECT DISTINCT(o.person_id) FROM obs o
+                                  INNER JOIN person p ON p.person_id = o.person_id
+                                  INNER JOIN patient ON patient.patient_id = o.person_id
+                                  INNER JOIN encounter e ON e.encounter_id = o.encounter_id\
+                                  WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
+                                  DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
+                                  #{categorise} AND  DATE_FORMAT(patient.date_created, '%Y-%m-%d') >= '" + @start_date + "'  \
+                                  AND o.concept_id = #{concept}
+                                 AND o.value_coded = (SELECT concept_id FROM concept_name WHERE name = 'YES')
+                                 GROUP BY patient.patient_id").length #rescue 0
     elsif type.upcase == "ASTHMA"
-      patient = @asthma_id
-    elsif type.upcase == "EPILEPSY"
-      patient = @epilepsy_id
-    elsif type.upcase == "DM HT"
       @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
-                                      INNER JOIN person p ON p.person_id = orders.patient_id
-                                      LEFT OUTER JOIN patient ON patient.patient_id = orders.patient_id \
-                                      WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
-                                      DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
-                                      #{categorise} AND  DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @start_date + "'  \
-																			AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
-																			concept_set IN (#{@hypertensition_id})) \
-                                      AND orders.patient_id IN (SELECT DISTINCT(orders.patient_id) FROM orders
-                                      LEFT OUTER JOIN patient ON patient.patient_id = orders.patient_id \
-                                      WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
-                                      DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
-                                      AND  DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @start_date + "'  \
-																			AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
-																			concept_set IN (#{@diabetes_id})))
-                                      GROUP BY patient_id").length rescue 0
-      return
+                                INNER JOIN person p ON p.person_id = orders.patient_id
+                                INNER JOIN patient ON patient.patient_id = orders.patient_id \
+                                WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
+                                DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
+                                #{categorise} AND  DATE_FORMAT(patient.date_created, '%Y-%m-%d') >= '" + @start_date + "'  \
+                                AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+                                concept_set = #{@asthma_id})
+                                GROUP BY patient_id").length rescue 0
+    elsif type.upcase == "EPILEPSY"
+      @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
+                                INNER JOIN person p ON p.person_id = orders.patient_id
+                                INNER JOIN patient ON patient.patient_id = orders.patient_id \
+                                WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
+                                DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
+                                #{categorise} AND  DATE_FORMAT(patient.date_created, '%Y-%m-%d') >= '" + @start_date + "'  \
+                                AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+                                concept_set = #{@epilepsy_id})
+                                GROUP BY patient_id").length rescue 0
+    elsif type.upcase == "DM HT"
+      ht_concept = ConceptName.find_by_name("cardiovascular system diagnosis").concept_id
+      dm_concept = ConceptName.find_by_name("Patient has Diabetes").concept_id
+      @orders = Order.find_by_sql("SELECT o.person_id FROM obs o
+                                  INNER JOIN person p ON p.person_id = o.person_id
+                                  INNER JOIN patient ON patient.patient_id = o.person_id
+                                  WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
+                                  DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
+                                  #{categorise} AND o.concept_id = #{dm_concept}
+                                  AND o.value_coded = (SELECT concept_id FROM concept_name WHERE name = 'YES')
+                                  AND o.person_id IN (SELECT DISTINCT(o.person_id) FROM obs o
+                                  INNER JOIN person p ON p.person_id = o.person_id
+                                  INNER JOIN patient ON patient.patient_id = o.person_id
+                                  WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
+                                  DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
+                                  AND  DATE_FORMAT(patient.date_created, '%Y-%m-%d') >= '" + @start_date + "'  \
+                                  AND o.concept_id = #{ht_concept}
+                                  AND o.value_coded != (SELECT concept_id FROM concept_name WHERE name = 'Normal'))
+                                  GROUP BY patient_id").length #rescue 0
     elsif type.upcase == "OTHER"
       @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
                                       INNER JOIN person p ON p.person_id = orders.patient_id
-                                      LEFT OUTER JOIN patient ON patient.patient_id = orders.patient_id \
+                                      INNER JOIN patient ON patient.patient_id = orders.patient_id \
                                       WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
                                       DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
-                                      #{categorise} AND  DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @start_date + "'  \
+                                      #{categorise} AND  DATE_FORMAT(patient.date_created, '%Y-%m-%d') >= '" + @start_date + "'  \
 																			AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
-																			concept_set NOT IN (#{@hypertensition_id}, #{@asthma_id},#{@diabetes_id}, #{@epilepsy_id})) \
+																			concept_set NOT IN (#{@hypertensition_medication_id}, #{@asthma_id},#{@diabetes_id}, #{@epilepsy_id})) \
                                       GROUP BY patient_id").length rescue 0
-      return
     end
-       
-    @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
-                                      INNER JOIN person p ON p.person_id = orders.patient_id
-                                      LEFT OUTER JOIN patient ON patient.patient_id = orders.patient_id \
-                                      WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
-                                      DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
-                                      #{categorise} AND  DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @start_date + "'  \
-																			AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
-																			concept_set IN (#{patient})) \
-                                      GROUP BY patient_id").length #rescue 0
-    # raise @orders.to_yaml
+    return @orders
   end
 
   def disease_ever_availabe(ids, type, sex)
@@ -174,53 +202,82 @@ class Reports::CohortDm
       categorise = "AND (UCASE(p.gender) = '#{sex.upcase}'
                                     OR UCASE(p.gender) = '#{patient_initial}')"
     end
+    
     if type.upcase == "HT"
-      patient = @hypertensition_id
-    elsif type.upcase == "DM"
-      patient = @diabetes_id
-    elsif type.upcase == "ASTHMA"
-      patient = @asthma_id
-    elsif type.upcase == "EPILEPSY"
-      patient = @epilepsy_id
-    elsif type.upcase == "DM HT"
-      @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
-                                      INNER JOIN person p ON p.person_id = orders.patient_id
-                                      LEFT OUTER JOIN patient ON patient.patient_id = orders.patient_id \
-                                      WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
-                                      DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
-																			 #{categorise} AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
-																			concept_set IN (#{@hypertensition_id})) \
-                                      AND orders.patient_id = (SELECT DISTINCT(orders.patient_id) FROM orders
-                                      LEFT OUTER JOIN patient ON patient.patient_id = orders.patient_id \
-                                      WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
-                                      DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
-																			AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
-																			concept_set IN (#{@diabetes_id})))
-                                      GROUP BY patient_id").length rescue 0
+      concept = ConceptName.find_by_name("cardiovascular system diagnosis").concept_id
+      encounter = EncounterType.find_by_name("Vitals").id
 
-      return
+      @orders = Observation.find_by_sql("SELECT o.person_id FROM obs o
+                                      INNER JOIN person p ON p.person_id = o.person_id
+                                      INNER JOIN patient ON patient.patient_id = o.person_id
+                                      INNER JOIN encounter e ON e.encounter_id = o.encounter_id\
+                                      WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
+                                      DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
+																			 #{categorise} AND o.concept_id = #{concept}
+                                       AND e.encounter_type = #{encounter}
+                                       AND o.value_coded != (SELECT concept_id FROM concept_name WHERE name = 'Normal')
+                                      GROUP BY patient.patient_id").length #rescue 0
+      # raise @orders.to_yaml
+    elsif type.upcase == "DM"
+      concept = ConceptName.find_by_name("Patient has Diabetes").concept_id
+      @orders = Order.find_by_sql("SELECT o.person_id FROM obs o
+                                  INNER JOIN person p ON p.person_id = o.person_id
+                                  INNER JOIN patient ON patient.patient_id = o.person_id
+                                  INNER JOIN encounter e ON e.encounter_id = o.encounter_id\
+                                  WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
+                                  DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
+                                  #{categorise} AND o.concept_id = #{concept}
+                                  AND o.value_coded = (SELECT concept_id FROM concept_name WHERE name = 'YES')
+                                  GROUP BY patient.patient_id").length #rescue 0
+    elsif type.upcase == "ASTHMA"
+      @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
+                                  INNER JOIN person p ON p.person_id = orders.patient_id
+                                  INNER JOIN patient ON patient.patient_id = orders.patient_id \
+                                  WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
+                                  DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
+                                  #{categorise} AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+                                  concept_set = #{@asthma_id})
+                                  GROUP BY patient_id").length rescue 0
+    elsif type.upcase == "EPILEPSY"
+      @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
+                                  INNER JOIN person p ON p.person_id = orders.patient_id
+                                  INNER JOIN patient ON patient.patient_id = orders.patient_id \
+                                  WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
+                                  DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
+                                  #{categorise} AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+                                  concept_set = #{@epilepsy_id})
+                                  GROUP BY patient_id").length rescue 0
+    elsif type.upcase == "DM HT"
+      ht_concept = ConceptName.find_by_name("cardiovascular system diagnosis").concept_id
+      dm_concept = ConceptName.find_by_name("Patient has Diabetes").concept_id
+      @orders = Order.find_by_sql("SELECT o.person_id FROM obs o
+                                  INNER JOIN person p ON p.person_id = o.person_id
+                                  INNER JOIN patient ON patient.patient_id = o.person_id
+                                  WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
+                                  DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
+                                  #{categorise} AND o.concept_id = #{dm_concept}
+                                  AND o.value_coded = (SELECT concept_id FROM concept_name WHERE name = 'YES')
+                                  AND o.person_id IN (SELECT DISTINCT(o.person_id) FROM obs o
+                                  INNER JOIN person p ON p.person_id = o.person_id
+                                  INNER JOIN patient ON patient.patient_id = o.person_id
+                                  WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
+                                  DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
+                                  AND o.concept_id = #{ht_concept}
+                                  AND o.value_coded != (SELECT concept_id FROM concept_name WHERE name = 'Normal'))
+                                  GROUP BY patient_id").length #rescue 0
+      
     elsif type.upcase == "OTHER"
       @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
-                                      INNER JOIN person p ON p.person_id = orders.patient_id
-                                      LEFT OUTER JOIN patient ON patient.patient_id = orders.patient_id \
-                                      WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
-                                      DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
-																			 #{categorise} AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
-																			concept_set NOT IN (#{@hypertensition_id}, #{@asthma_id},#{@diabetes_id}, #{@epilepsy_id})) \
-                                      GROUP BY patient_id").length rescue 0
-       raise "here"
-      return
-    end
-   
-    @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
-                                      INNER JOIN person p ON p.person_id = orders.patient_id
-                                      LEFT OUTER JOIN patient ON patient.patient_id = orders.patient_id \
-                                      WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
-                                      DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
-																			 #{categorise} AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
-																			concept_set IN (#{patient})) \
-                                     GROUP BY patient_id").length rescue 0
-   
+                                  INNER JOIN person p ON p.person_id = orders.patient_id
+                                  INNER JOIN patient ON patient.patient_id = orders.patient_id \
+                                  WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
+                                  DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
+                                  #{categorise} AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+                                  concept_set NOT IN (#{@hypertensition_medication_id}, #{@asthma_id},#{@diabetes_id}, #{@epilepsy_id})) \
+                                  GROUP BY patient_id").length rescue 0
+      
+    end 
+    return @orders
   end
 
   def total_children_registered(ids, sex=nil, age=nil )
@@ -1536,7 +1593,7 @@ class Reports::CohortDm
                                       AND patient.patient_id IN (#{ids}) AND \
                                       DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
 																			#{categorise} AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
-																			concept_set IN (#{@asthma_id}, #{@epilepsy_id}, #{@diabetes_id}, #{@hypertensition_id}, #{@hypertensition_medication_id})) \
+																			concept_set IN (#{@asthma_id}, #{@epilepsy_id}, #{@diabetes_id}, #{@hypertensition_medication_id})) \
                                       GROUP BY patient_id").length rescue 0
   end
   
@@ -1556,7 +1613,7 @@ class Reports::CohortDm
                                       AND current_state_for_program(orders.patient_id, #{@program_id}, '#{@end_date}') NOT IN (#{@states}) AND \
                                       DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
 																			#{categorise} AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
-																			concept_set IN (#{@asthma_id}, #{@epilepsy_id}, #{@diabetes_id}, #{@hypertensition_id}, #{@hypertensition_medication_id})) \
+																			concept_set IN (#{@asthma_id}, #{@epilepsy_id}, #{@diabetes_id}, #{@hypertensition_medication_id})) \
                                       GROUP BY patient_id").length rescue 0
   end
 
@@ -1577,7 +1634,7 @@ class Reports::CohortDm
                                       AND current_state_for_program(orders.patient_id, #{@program_id}, '#{@end_date}') NOT IN (#{@states}) AND \
                                       DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
 																			#{categorise} AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
-																			concept_set IN (#{@asthma_id}, #{@epilepsy_id}, #{@diabetes_id}, #{@hypertensition_id}, #{@hypertensition_medication_id})) \
+																			concept_set IN (#{@asthma_id}, #{@epilepsy_id}, #{@diabetes_id}, #{@hypertensition_medication_id})) \
                                       GROUP BY patient_id").length rescue 0
   end
 
@@ -1597,7 +1654,7 @@ class Reports::CohortDm
                                       AND patient.patient_id IN (#{ids}) AND \
                                       DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
 																			#{categorise} AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
-																			concept_set IN (#{@asthma_id}, #{@epilepsy_id}, #{@diabetes_id}, #{@hypertensition_id}, #{@hypertensition_medication_id})) \
+																			concept_set IN (#{@asthma_id}, #{@epilepsy_id}, #{@diabetes_id}, #{@hypertensition_medication_id})) \
                                       GROUP BY patient_id").length rescue 0
   end
 
@@ -1615,7 +1672,7 @@ class Reports::CohortDm
         @start_date + "' AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'
                                         AND patient.voided = 0 AND patient.patient_id IN (#{ids})
                                         #{categorise} AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE
-                                        concept_set IN (#{@asthma_id}, #{@epilepsy_id}, #{@diabetes_id}, #{@hypertensition_id}, #{@hypertensition_medication_id}))
+                                        concept_set IN (#{@asthma_id}, #{@epilepsy_id}, #{@diabetes_id}, #{@hypertensition_medication_id}))
                                         GROUP BY patient_id").length rescue 0
   end
 
@@ -1636,7 +1693,7 @@ class Reports::CohortDm
                                         AND state NOT IN (#{states})
                                         AND patient.patient_id IN (#{ids})
                                         AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE 
-                                        concept_set IN (#{@asthma_id}, #{@epilepsy_id}, #{@diabetes_id}, #{@hypertensition_id}, #{@hypertensition_medication_id}))
+                                        concept_set IN (#{@asthma_id}, #{@epilepsy_id}, #{@diabetes_id}, #{@hypertensition_medication_id}))
                                         GROUP BY patient_id").length rescue 0
   end
 
