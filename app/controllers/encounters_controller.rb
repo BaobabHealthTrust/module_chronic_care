@@ -773,7 +773,7 @@ class EncountersController < ApplicationController
 
 		treatment_encounter = orders_made.first
 
-		treatment_encounter = treatment_encounter.encounter.id rescue treatment_encounter.encounter_id
+		treatment_encounter = treatment_encounter.encounter.id rescue treatment_encounter.encounter_id rescue []
 		#raise treatment_encounter.to_yaml
     arv_regimen_obs = Observation.find_by_sql("SELECT * FROM obs
       WHERE concept_id = #{regimen_type_concept}
@@ -801,15 +801,15 @@ class EncountersController < ApplicationController
       AND drug_order.drug_inventory_id = #{order.drug_order.drug_inventory_id}
       AND obs.obs_datetime >= '#{session_date.to_date}'
       AND obs.obs_datetime <= '#{session_date.to_date.strftime('%Y-%m-%d 23:59:59')}'
-      AND person_id = #{patient.id}")
+      AND person_id = #{patient.id}") rescue []
 
     total_brought_to_clinic = amounts_brought_to_clinic.sum{|amount| amount.value_numeric}
 
     total_brought_to_clinic = total_brought_to_clinic + amounts_brought_to_clinic.sum{|amount| (amount.value_text.to_f rescue 0)}
 
-    hanging_pills_duration = ((total_brought_to_clinic)/order.drug_order.equivalent_daily_dose).to_i
+    hanging_pills_duration = ((total_brought_to_clinic)/order.drug_order.equivalent_daily_dose).to_i rescue 0
 
-    expire_date = order.auto_expire_date + hanging_pills_duration.days
+    expire_date = (order.auto_expire_date + hanging_pills_duration.days) rescue Date.today
 
     calculated_expire_date = expire_date.to_date if expire_date.to_date > calculated_expire_date
 
