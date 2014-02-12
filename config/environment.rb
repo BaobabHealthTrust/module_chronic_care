@@ -20,5 +20,12 @@ Rails::Initializer.run do |config|
   }
 end
 
+paralleluser = YAML.load(File.open(File.join(RAILS_ROOT, "config/database.yml"), "r"))['parallel']
+OtherUser.establish_connection(paralleluser)
+OpenmrsPerson.establish_connection(paralleluser)
+OpenmrsPersonName.establish_connection(paralleluser)
+OpenmrsUserProperty.establish_connection(paralleluser)
+OpenmrsUserRole.establish_connection(paralleluser)
+
 require 'composite_primary_keys'
 require 'rest-client'
