@@ -182,7 +182,7 @@
 	{:field_type => 'number',
 	:helpText => 'HIV test day',
 	:condition => '($("hiv_test_year").value != "Unknown") && ($("hiv_test_month").value != "Unknown") && ($("status").value.toLowerCase() != "unknown")',
-	:tt_onLoad => "getDayOfMonthPicker($('hiv_test_year').value, $('hiv_test_month').value);",
+	:tt_onLoad => "getDayOfMonthPicker($('hiv_test_year').value, $('hiv_test_month').value);showCategory('Update HIV Status');",
 	:tt_onUnload=> "updateTestDate();",
         :validationCode => 'validateDate();',
         :validationMessage => "Test date out of range",
@@ -196,12 +196,14 @@
 	  :name => "name[Refer to HTC]",
       :condition => '(checkTestDate() == "true") && ($("status").value.toLowerCase() == "negative")',
       :tt_pageStyleClass => "NoKeyboard",
+      :tt_onLoad => "showCategory('Update HIV Status')",
       :helpText => "Patient has been -ve for more than 3 months. Refer patient to HTC?" } %>
 
 	<%= touch_yes_no_tag "Refer to HTC", @patient, nil,
       {:id => "refer_to_htc",
       :name => "name[Refer to HTC]",
 	  :condition => '$("status").value.toLowerCase() == "unknown"',
+          :tt_onLoad => "showCategory('Update HIV Status')",
       :tt_pageStyleClass => "NoKeyboard",
       :helpText => "Refer patient to HTC?" } %>
 			</td>
@@ -211,7 +213,7 @@
 				On ART? 
 			</td>
 			<td>
-<select id='on_art' name='concept[on art]' helpText='On ART? ' pos='5'
+<select id='on_art' name='concept[on art]' helpText='On ART? ' pos='5' tt_onload ="showCategory('Update HIV Status')"
 		condition = '$("status").value.toLowerCase() == "positive"'>
 <option></option>
 <option value='No'>No</option>
@@ -225,7 +227,7 @@
 			</td>
 			<td>
 <select id='enroll' name='concept[Patient enrolled in HIV program]' helpText='Enroll in HIV program?' pos='6'  condition='__$("on_art").value.toLowerCase() == "no"'
-		condition = '$("status").value.toLowerCase() == "positive"' >
+		condition = '$("status").value.toLowerCase() == "positive"' tt_onload ="showCategory('Update HIV Status')" >
 <option></option>
 <option value='No'>No</option>
  <option value='Yes'>Yes</option>
@@ -236,7 +238,7 @@
 		<td>
 			<label for='summary'>Summary</label>
 			<%= text_field_tag :summary, nil, {
-			  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';",
+			  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';showCategory('Update HIV Status');",
 			  :optional => "true",
 			  :tt_pageStyleClass => "NoControls" } %>
 		  </td>
