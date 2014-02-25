@@ -250,6 +250,7 @@ class GenericPrescriptionsController < ApplicationController
   
   
 	def create_advanced_prescription
+    @user = params[:user_id]
 		@patient    = Patient.find(params[:encounter][:patient_id]  || session[:patient_id]) rescue nil
 		encounter  = MedicationService.current_treatment_encounter(@patient)
     
@@ -308,12 +309,12 @@ class GenericPrescriptionsController < ApplicationController
 
 			}
 		end
-
-		if(@patient)
-			redirect_to "/patients/treatment_dashboard/#{@patient.id}" and return
-		else
-			redirect_to "/patients/treatment_dashboard/#{params[:patient_id]}" and return
-		end
+    #raise @user.to_yaml
+	#	if(@patient)
+			    redirect_to  "/patients/treatment_dashboard/#{@patient.id}?user_id=#{params[:user_id]}" and return
+		#else
+		#	redirect_to "/patients/treatment_dashboard/#{params[:patient_id]}" and return
+		#end
 
 	end
 
