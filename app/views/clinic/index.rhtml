@@ -26,7 +26,7 @@
   }
 
   #reason_for_change{
-	height:379px;
+	height:406px;
 	width:100%;
 	border-style: none none solid;
 	border-width: medium medium 1px;
@@ -108,7 +108,7 @@
 	position: absolute;
 	margin-right:auto;
 	width: 800px;
-	height: 390px ! important;
+	height: 411px ! important;
 	padding-bottom: 10px;
 	font-size: 1em;
 	text-align: center;
@@ -137,9 +137,9 @@
 
 	var newDiv = document.createElement('div');
 	newDiv.id = "alertPage";
-	newDiv.style.left = "32%";
+	newDiv.style.left = "39%";
 	newDiv.style.top = "30%";
-	newDiv.style.width = "840px";
+	newDiv.style.width = "548px";
 	newDiv.style.height = "500px";
 
 	var display = "<div id='main_head'><span>Chronic Care Program</span></div>";
@@ -152,13 +152,16 @@
     	display += '<legend>Choose a program:</legend>'
          	display += '<table cellspacing="10"><tr>'
 
-         	display += '<td align="left"><a href="/clinic/programs?user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>&program=ASTHMA">Asthma program</a></td></tr>'
+         	display += '<td align="center"><a href="/clinic/programs?user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>&program=ASTHMA">Asthma </a></td></tr>'
 
          	display += '<tr>'
-         	display += '<td align="left"><a href="/clinic/programs?user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>&program=HYPERTENSION">Hypertension and Diabetes Program</a></td></tr>'
+         	display += '<td align="center"><a href="/clinic/programs?user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>&program=HYPERTENSION">Hypertension</a></td></tr>'
+
+                display += '<tr>'
+         	display += '<td align="center"><a href="/clinic/programs?user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>&program=DIABETES">Diabetes </a></td></tr>'
 
          	display += '<tr>'
-         	display += '<td align="left"><a href="/clinic/programs?user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>&program=EPILEPSY">Epilepsy program</a></td></tr></table>'
+         	display += '<td align="center"><a href="/clinic/programs?user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>&program=EPILEPSY">Epilepsy </a></td></tr></table>'
 
     display += '</fieldset>'
 	display += '</div>'
