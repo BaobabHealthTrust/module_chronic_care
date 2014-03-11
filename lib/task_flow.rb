@@ -552,6 +552,224 @@ class TaskFlow
 		end
 	end
 
+  def hypertension_next_task
+     normal_flow = self.tasks
+
+    flow = {}
+
+    (0..(normal_flow.length-1)).each{|n|
+      flow[normal_flow[n].downcase] = n+1
+    }
+
+    if self.current_user_activities.blank?
+
+      self.encounter_type = "NO TASKS SELECTED"
+      self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}"
+
+      return self
+
+    end
+
+    @patient = self.patient
+
+    # tasks[task] = [weight, path, encounter_type, concept_id, exception_concept_id,
+    #     scope, drug_concept_id, special_field_or_encounter_present, next_if_NOT_user_does_not_have_this_activity]
+
+    tasks = {}
+
+    normal_flow.each{|tsk|
+
+      tasks[tsk.downcase] = [flow[tsk.downcase], "/protocol_patients/#{tsk.downcase.gsub(/\s/, "_")
+          }?patient_id=#{self.patient.id}&user_id=#{self.user.id}", "#{tsk.upcase}",
+        "#{self.task_scopes[tsk.downcase][:concept]}", "#{self.task_scopes[tsk.downcase][:except_concept]}",
+        "#{self.task_scopes[tsk.downcase][:scope]}", "#{self.task_scopes[tsk.downcase][:drug_concept]}",
+        "#{self.task_scopes[tsk.downcase][:special_field]}",
+        (self.current_user_activities.include?(tsk.downcase))
+      ]
+
+    }
+
+    sorted_tasks = {}
+
+    tasks.each{|t,v|
+      sorted_tasks[v[0]] = t
+    }
+
+    self.task_list = tasks
+
+    sorted_tasks = sorted_tasks.sort
+
+
+
+      # next if tasks[tsk][8] == false
+      # If user does not have this activity, goto the patient dashboard
+
+			encounters =  [
+                      'CLINIC VISIT','VITALS','FAMILY HISTORY','SOCIAL HISTORY','GENERAL HEALTH',
+											'UPDATE HIV STATUS','LAB RESULTS','COMPLICATIONS','TREATMENT', 'ASSESSMENT',
+											'OUTCOME'
+                     ]
+		observation = Observation.find(:all,
+												:conditions => ["encounter_id = ?", Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
+                        :conditions =>["DATE(encounter_datetime) <= ? AND patient_id = ? AND encounter_type = ?",
+                                  self.current_date.to_date.to_date, self.patient.id,EncounterType.find_by_name("update hiv status").id]).encounter_id]).to_s rescue ""
+
+		if observation.match(/Refer to HTC:  Yes/i)
+						self.encounter_type = "HIV STATUS"
+						self.url = "/protocol_patients/hiv_status?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
+		 end
+
+			my_activities = self.current_user_activities.map(&:upcase)
+
+			encounters.each do |tsk|
+
+			found = false
+			case tsk
+				when "CLINIC VISIT"
+					next if ! self.current_user_activities.include?(tsk.downcase)
+          visit =  Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "DIABETES HYPERTENSION INITIAL VISIT", "module")
+
+					next if !visit.blank?
+
+					self.encounter_type = 'CLINIC VISIT'
+					self.url = "/protocol_patients/clinic_visit?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+					return self
+
+        when "VITALS"
+          vitals =  Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "VITALS", "module")
+
+					next if !vitals.blank?
+					self.encounter_type = 'VITALS'
+					self.url = "/protocol_patients/vitals?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+					if ! my_activities.include?(tsk)
+						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
+					else
+						return self
+					end
+
+				when "FAMILY HISTORY"
+					next if ! self.current_user_activities.include?('medical history')
+					self.patient.encounters.each do | enc |
+					 found = true if enc.name.upcase == "FAMILY MEDICAL HISTORY"
+					end
+					next if found == true
+          history =  Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "FAMILY MEDICAL HISTORY", "module")
+
+					next if !history.blank?
+					self.encounter_type = 'FAMILY MEDICAL HISTORY'
+					self.url = "/protocol_patients/family_history?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+
+					if ! my_activities.include?(tsk)
+						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
+					else
+						return self
+					end
+
+				when "SOCIAL HISTORY"
+					next if ! self.current_user_activities.include?(tsk.downcase)
+					self.patient.encounters.each do | enc |
+					 found = true if enc.name.upcase == "SOCIAL HISTORY"
+					end
+					next if found == true
+          history =  Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "SOCIAL HISTORY", "module")
+
+					next if !history.blank?
+					self.encounter_type = 'SOCIAL HISTORY'
+					self.url = "/protocol_patients/social_history?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+					if ! my_activities.include?(tsk)
+						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
+					else
+						return self
+					end
+
+        when "GENERAL HEALTH"
+					next if ! self.current_user_activities.include?(tsk.downcase)
+					self.patient.encounters.each do | enc |
+					 found = true if enc.name.upcase == "GENERAL HEALTH"
+					end
+					next if found == true
+          history = Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "GENERAL HEALTH", "module")
+
+					next if !history.blank?
+					self.encounter_type = 'GENERAL HEALTH'
+					self.url = "/protocol_patients/general_health?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+				  if ! my_activities.include?(tsk)
+						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
+					else
+						return self
+					end
+
+        when "UPDATE HIV STATUS"
+					next if ! self.current_user_activities.include?("hiv status")
+					self.patient.encounters.each do | enc |
+					 found = true if enc.name.upcase == "UPDATE HIV STATUS"
+					end
+					next if found == true
+
+					next if @patient.person.observations.to_s.match(/hiv status/i)
+           hiv_status =  Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "UPDATE HIV STATUS", "module")
+
+					if hiv_status.observations.map{|s|s.to_s.split(':').last.strip}.include?('Positive')
+            next
+          end if not hiv_status.blank?
+					self.encounter_type = "HIV STATUS"
+					self.url = "/protocol_patients/hiv_status?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+					if ! my_activities.include?("HIV STATUS")
+						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
+					else
+						return self
+					end
+
+        when "LAB RESULTS"
+					self.patient.encounters.each do | enc |
+					 found = true if enc.name.upcase == "LAB RESULTS"
+					end
+					next if found == true
+					assessment =  Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "LAB RESULTS", "module")
+					next if !assessment.blank?
+					self.encounter_type = "LAB RESULTS"
+					self.url = "/protocol_patients/lab_results?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+					if ! my_activities.include?(tsk)
+						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
+					else
+						return self
+					end
+
+				when "COMPLICATIONS"
+					next if ! self.current_user_activities.include?(tsk.downcase)
+          assessment =  Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "COMPLICATIONS", "module")
+
+					next if !assessment.blank?
+					self.encounter_type = "COMPLICATIONS"
+					self.url = "/protocol_patients/complications?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+					if ! my_activities.include?(tsk)
+						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
+					else
+						return self
+					end
+
+				when "TREATMENT"
+					next if ! self.current_user_activities.include?(tsk.downcase)
+          assessment =  Vitals.done_already_treatment(self.patient.id, 10, self.current_date.to_date.to_date, "TREATMENT", "module")
+
+					next if !assessment.blank?
+					self.encounter_type = "TREATMENT"
+					self.url = "/protocol_patients/treatment?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+					if ! my_activities.include?(tsk)
+						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
+					else
+						return self
+					end
+
+		end
+
+		self.encounter_type = 'NONE'
+		self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}"
+		return self
+		end
+	end
+
   def next_task
     
     # scope: [ TODAY | EXISTS | CURRENT PROGRAM | RECENT ]

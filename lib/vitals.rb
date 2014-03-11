@@ -86,9 +86,9 @@
                     ORDER BY  obs_datetime DESC, date_created DESC LIMIT 1").first rescue nil
 			end
 
-      def self.todays_vitals(patient, vital_sign, session_date = Time.now())
+      def self.todays_vitals(patient, vital_sign, session_date = Date.today)
 				concept = ConceptName.find_by_sql("select concept_id from concept_name where name = '#{vital_sign}' and voided = 0").first.concept_id
-
+        session_date = session_date.to_date
         Observation.find_by_sql("SELECT * from obs where concept_id = '#{concept}' AND person_id = '#{patient.id}'
                     AND DATE(obs_datetime) = '#{session_date}' AND voided = 0
                     ORDER BY  obs_datetime DESC, date_created DESC LIMIT 1").first rescue nil
