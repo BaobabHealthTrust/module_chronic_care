@@ -1,0 +1,116 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>BP Chart</title>
+    <style>
+
+      .highcharts-button {
+         display: none;
+      }
+
+    </style>
+		<%= javascript_include_tag "Highcharts/js/jquery.min.js" %>
+		<script type="text/javascript">
+                <%#= raise @bps.to_yaml %>
+		var bps = JSON.parse('<%=@bps%>');
+
+  function getDates() {
+    dates = [];
+    for(var i = 0; i < bps.length; i++) {
+      dates.push(bps[i][1]);
+    }
+    return dates;
+  }
+
+
+$(function () {
+     
+        $('#container').highcharts({
+            chart: {
+                type: 'line'
+            },
+            title: {
+                text: ''
+            },
+            subtitle: {
+                text: ''
+            },
+            xAxis: {
+                categories:  getDates(),
+                title: {
+                    text: 'Visit Date'
+                }
+            },
+            yAxis: {
+                title: {
+                    text: 'BP'
+                },
+                labels: {
+                    formatter: function() {
+                        return this.value;
+                    }
+                }
+            },
+            plotOptions: {
+                area: {
+                    stacking: 'normal',
+                    lineColor: '#666666',
+                    lineWidth: 1,
+                    marker: {
+                        lineWidth: 1,
+                        lineColor: '#666666'
+                    }
+                }
+            },
+            series: dataG()
+        });
+    });
+
+ function dataG() {
+      var sbp = [];
+      var dbp = [];
+      var bp = [];
+
+      for(var i = 0; i < bps.length; i++) {
+        sbp.push(bps[i][0]);
+        dbp.push(bps[i][2]);
+        bp.push(bps[i][3]);
+      }
+      return [{name: 'SBP', data: sbp},{name: 'DBP', data: dbp},{name: 'BP', data: bp}];
+    }
+    </script>
+  </head>
+  <body>
+
+<%= javascript_include_tag "Highcharts/js/highcharts" %>
+<%= javascript_include_tag "Highcharts/js/modules/exporting" %>
+
+<div id="container" style="width: 99%; height: 310px; margin: 0 auto">
+</div>
+
+<script>
+  function removeHighcharts() {
+/*    try {
+      document.getElementsByClassName('highcharts-button')[0].innerHTML = null;
+    }catch(e){}
+ */
+    tspan = document.getElementsByTagName('tspan');
+    for(var i = 0; i < tspan.length; i++){
+      if(tspan[i].innerHTML == 'Highcharts.com'){
+        tspan[i].innerHTML = null;
+        break;
+      }
+    }
+
+  }
+
+  setInterval("removeHighcharts();",300);
+</script>
+
+	</body>
+</html>
+
+
+
+

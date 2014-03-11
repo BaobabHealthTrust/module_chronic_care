@@ -28,10 +28,10 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
       // nextTask.style.left = (pos[3] + (pos[0]/2) - (270/2)) + "px";
       // nextTask.style.top = (pos[1] + 40) + "px";
 
-      __$("patient-dashboard-application").appendChild(nextTask);
+      //__$("patient-dashboard-application").appendChild(nextTask);
     }
 
-    __$("nextTask").innerHTML = "<b>Next Task:</b><br /><i><%= next_task.titleize rescue "None"%></i>";
+    //__$("nextTask").innerHTML = "<b>Next Task:</b><br /><i><%= next_task.titleize  rescue "None"%></i>";
   }
 
 <% if !next_task.nil? %>
@@ -229,7 +229,9 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
         <option value='/patients/current_visit/<%= @patient.id %>?user_id=<%= @user.id %>'>Current Visit</option>
         <option value='/patients/visit_history/<%= @patient.id %>?user_id=<%= @user.id %>'>Visit History</option>
         <option value='/patients/patient_report/<%= @patient.id %>?user_id=<%= @user.id %>'>Report</option>
-        <option value='/patients/printouts/<%= @patient.id %>?user_id=<%= @user.id %>'>Printouts</option>		
+        <option value='/patients/patient_bp?user_id=<%= @user["user_id"] %>&patient_id=<%= @patient.id %>'>Chart</option>
+        <option value='/patients/printouts/<%= @patient.id %>?user_id=<%= @user.id %>'>Printouts</option>
+        <option value='#'>Next Task : <%= next_task.titleize %></option>
       </select>
       <select id="links">
         <optgroup value="javascript:selectProgram()" label="Change Workflow"></optgroup>
@@ -262,7 +264,7 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
 
         <% end %>
       </select>
-
+      <%#= raise @disable.to_yaml %>
       <select id="navigation_links">
 
         <% if !@demographics_url.nil? %>
@@ -273,12 +275,12 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
         <% end %>
 <%#= raise @task.to_yaml %>
           <option link="/encounter_types/show?encounter_type=Appointment&id=show&patient_id=<%= @patient.id -%>&user_id=<%=  @user.id %>" ttSize = "160px">Set Appointment</option>
-        <% if @disable.to_s != "true" %>
+          <%# if @disable.to_s != "true" and ! @disable.blank? %>
           <% if @task.url != "/patients/show/#{@patient.id}?user_id=#{@user.id}" %>
-                                        <!--- <option link="/encounter_types/show?user_id=<%=  @user["user_id"] %>&encounter_type=Appointment&id=show&patient_id=<%= @patient.id -%>" ttSize = "160px">Appointment</option> --->
+                                         <option link="/encounter_types/show?user_id=<%=  @user["user_id"] %>&encounter_type=Appointment&id=show&patient_id=<%= @patient.id -%>" ttSize = "160px">Appointment</option> 
             <option link="<%= @task.url  %>" ttSize = "160px">Continue</option>
           <% end %>
-        <% end %>
+        <%# end %>
         
       </select>
 
