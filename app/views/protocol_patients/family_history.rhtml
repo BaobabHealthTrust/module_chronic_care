@@ -100,8 +100,12 @@
 
 		conditions.push("Family history of kidney disease: " + $('kidney').value);
 	  }
-
-	  submitForm = document.getElementById("family_history");
+          
+     submitForm = document.getElementById("family_history");
+     if (conditions.length == 0){
+           submitForm.submit()
+         }
+	  
       if (riskValue > 0) {
 		riskValue = (riskValue / 4) * 99;
 		conditions.push("<i style='color: red'>Patient's hypertension risk is almost: " + riskValue + "% </i>");
