@@ -141,7 +141,7 @@
                 <select id='education'
                         name='concept[Education level completed]'
                         helpText='Education level completed?<%= @person_attribute %>'
-			tt_onLoad ="showCategory('Social History')"
+			tt_onLoad ="showCategory('Social History');__$('nextButton').style.display = 'none';"
 			condition='program == "EPILEPSY PROGRAM"'
 			tt_requireNextClick = false >
 			  <option></option>
@@ -156,7 +156,7 @@
 			helpText='Use of substance?<%= @person_attribute %> '
 			pos='3'
 			condition='program == "EPILEPSY PROGRAM"'
-			tt_onLoad ="showCategory('Social History')"
+			tt_onLoad ="showCategory('Social History');__$('nextButton').style.display = 'none';"
 			tt_requireNextClick = false >
 			  <option></option>
 			  <option value='No'>No</option>
@@ -168,7 +168,7 @@
 			helpText='Eats pork? <%= @person_attribute %> '
 			pos='3'
 			condition='program == "EPILEPSY PROGRAM"'
-			tt_onLoad ="showCategory('Social History')"
+			tt_onLoad ="showCategory('Social History');__$('nextButton').style.display = 'none';"
 			tt_requireNextClick = false >
 			  <option></option>
 			  <option value='Do not eat pork'>No</option>
@@ -183,7 +183,7 @@
 		name='concept[Smoking History]'
 		helpText='Ever smoked?  <%= @person_attribute %> '
 		pos='0'
-		tt_onLoad ="showCategory('Social History')"
+		tt_onLoad ="showCategory('Social History');__$('nextButton').style.display = 'none';"
 		tt_requireNextClick = false >
 <option></option>
 <option value='No'>No</option>
@@ -206,7 +206,7 @@
 	  
 	   
 	   tt_pageStyleClass = "Numeric NumbersWithUnknown"
-	   tt_onLoad ="showCategory('Social History')"/>
+	   tt_onLoad ="showCategory('Social History');__$('nextButton').style.display = 'block';"/>
 			</td>
 		</tr>
 		<tr>
@@ -217,7 +217,7 @@
 	   <select id='duration'
 			   name='concept[smoking duration]'
 			   helpText='How long Have been smoking? <%= @person_attribute %> '
-			   tt_onLoad ="showCategory('Social History')"
+			   tt_onLoad ="showCategory('Social History');__$('nextButton').style.display = 'none';"
 			   condition='__$("smoking").value.toLowerCase() == "yes"'
 			   tt_requireNextClick = false >
 			  <option></option>
@@ -238,7 +238,7 @@
 		helpText='Do you currently smoke?  <%= @person_attribute %> '
 		pos='3'
 		condition='__$("smoking").value.toLowerCase() == "yes"'
-		tt_onLoad ="showCategory('Social History')"
+		tt_onLoad ="showCategory('Social History');__$('nextButton').style.display = 'none';"
 		tt_requireNextClick = false >
 <option></option>
 <option value='No'>No</option>
@@ -254,7 +254,7 @@
 		helpText='Do you have a family member who smokes? <%= @person_attribute %> '
 		pos='3'
 		condition='(__$("smoking").value.toLowerCase() == "yes") && (__$("current_smoker").value.toLowerCase() == "no")'
-		tt_onLoad ="showCategory('Social History')"
+		tt_onLoad ="showCategory('Social History');__$('nextButton').style.display = 'none';"
 		tt_requireNextClick = false >
 	 <option></option>
 	 <option value='No'>No</option>
@@ -274,7 +274,7 @@
 		name='concept[Does the patient drink alcohol?]'
 		helpText='Does patient drink alcohol?  <%= @person_attribute %> '
 		pos='4'
-		 tt_onLoad ="showCategory('Social History')"
+		 tt_onLoad ="showCategory('Social History');__$('nextButton').style.display = 'none';"
 		 tt_requireNextClick = false >
 <option></option>
 <option value='No'>No</option>
@@ -294,7 +294,7 @@
 	   pos='5'
 	   condition='__$("drink_alcohol").value.toLowerCase() == "yes"'
 	   tt_pageStyleClass = "Numeric NumbersWithUnknown"
-	   tt_onLoad ="showCategory('Social History')"/>
+	   tt_onLoad ="showCategory('Social History');__$('nextButton').style.display = 'block';"/>
 			</td>
 		</tr>
 		<tr>
@@ -311,7 +311,7 @@
 	   max = 7
 	   condition='__$("drink_alcohol").value.toLowerCase() == "yes"'
 	   tt_pageStyleClass = "Numeric NumbersWithUnknown"
-	   tt_onLoad ="showCategory('Social History')"/>
+	   tt_onLoad ="showCategory('Social History');__$('nextButton').style.display = 'block';"/>
 			</td>
 		</tr>
 		<tr>
@@ -326,7 +326,7 @@
 			condition='program == "ASTHMA PROGRAM"'
 			name='concept[Patient lives or works near?]'
 			helpText='Patient lives or works near? <%= @person_attribute %> ' pos='3'
-			tt_onLoad ="showCategory('Social History')"
+			tt_onLoad ="showCategory('Social History');__$('nextButton').style.display = 'none';"
 			tt_requireNextClick = false >
 	 <option></option>
 	 <option value='Near factory'>Near factory</option>
@@ -341,7 +341,7 @@
 			helpText='Patient exposed to pollution? <%= @person_attribute %> '
 			pos='3'
 			condition='program == "ASTHMA PROGRAM"'
-			tt_onLoad ="showCategory('Social History')"
+			tt_onLoad ="showCategory('Social History');__$('nextButton').style.display = 'none';"
 			tt_requireNextClick = false >
 	 <option></option>
          <option value='No'>No</option>
@@ -356,7 +356,7 @@
                   helpText='Patient mode of coking? <%= @person_attribute %> '
 			pos='3'
 			condition='program == "ASTHMA PROGRAM"'
-			tt_onLoad ="showCategory('Social History')"
+			tt_onLoad ="showCategory('Social History');__$('nextButton').style.display = 'none';"
 			tt_requireNextClick = false >
 	 <option></option>
 	 <option value='Gas'>Gas</option>
@@ -373,7 +373,7 @@
                   helpText='Type of employment? <%= @person_attribute %> '
 			pos='3'
 			condition='program == "HYPERTENSION PROGRAM"'
-			tt_onLoad ="showCategory('Social History')"
+			tt_onLoad ="showCategory('Social History');__$('nextButton').style.display = 'none';"
 			tt_requireNextClick = false >
 	 <option></option>
 	 <option value='Sedentary'>Sedentary</option>
@@ -383,7 +383,7 @@
 		  <td>
 			<label for='summary'>Summary</label>
 	<%= text_field_tag :summary, nil, {
-	  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';showCategory('Social History')",
+	  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';showCategory('Social History');__$('nextButton').style.display = 'block';",
 	  :optional => "true",
 	  :tt_pageStyleClass => "NoControls" } %>
 		  </td>
