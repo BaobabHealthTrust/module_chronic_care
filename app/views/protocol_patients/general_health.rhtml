@@ -174,7 +174,7 @@
       conditions.push("Epilepsy experienced on: " + $('explanation').value);
     }
     var html
-    html = "<ul>"
+    html = "<ol>"
     for(var i=0;i < conditions.length;i++) {
       if (conditions[i].length > 0){
         html += "<li class='data'>" + conditions[i] + "</li>";
@@ -189,7 +189,7 @@
       html += "<li class='warning'>Please refer patient for advice</li>";
       $('refer_to_clinician').value = "Yes"
     }
-    html += "</ul>"
+    html += "</ol>"
     $('inputFrame'+tstCurrentPage).innerHTML = '<div id="summary" style="width:98%;overflow:auto;hieght:500px ! important;">' + html + '</div>' ;
     $("clearButton").style.display = "none";
   }
