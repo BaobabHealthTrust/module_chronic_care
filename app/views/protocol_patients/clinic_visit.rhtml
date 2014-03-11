@@ -18,7 +18,7 @@
 }
 
   function showSelectedConditions() {
-
+    //alert($('patient_type').value)
     if ($('patient_type').value.length > 0){
       conditions.push("Patient Type: " + $('patient_type').value);
     }
@@ -37,6 +37,14 @@
 
     if ($('1.1.3').value.length > 0){
       conditions.push("Patient has diabetes: " + $('1.1.3').value);
+    }
+
+    if ($('1.1.5').value.length > 0){
+      conditions.push("Patient pregnant: " + $('1.1.5').value);
+    }
+
+    if ($('1.1.6').value.length > 0){
+      conditions.push("Patient breastfeeding: " + $('1.1.6').value);
     }
 
     if ($('year_of_diabetes_diagnosis').value.length > 0){
@@ -83,7 +91,9 @@
   <table>
     <tr> <td>
       </td>
-      <% if @first_visit == true %>
+
+      <% #raise @first_visit.to_yaml
+      if @first_visit == true %>
         <%
         ajax_url = "/location/locations?patient_id=#{@patient.id}&user_id=#{@user['user_id']}&search_string="
       %>
@@ -93,7 +103,7 @@
           :name => "concept[TYPE OF PATIENT]",
           :multiple => false,
           :helpText => "Is the patient a:",
-          :tt_onload=> "showCategory('Clinic Visit')",
+          :tt_onload=> "showCategory('Clinic Visit');__$('nextButton').style.display = 'none';",
           :tt_requireNextClick => false } %>
 
         <%= touch_location_tag "location",  @patient, nil,
@@ -103,8 +113,12 @@
           :helpText => "Transferred from",
           :ajaxURL => "#{ajax_url}",
           :condition => '$("patient_type").value == "TRANSFER IN"',
-          :tt_onload=> "showCategory('Clinic Visit')"
+          :tt_onload=> "showCategory('Clinic Visit');__$('nextButton').style.display = 'block';"
         }%>
+
+      <% else %>
+      <input type='hidden' name='concept[Patient referred to another site]' id="location"/>
+     <input type='hidden' name='concept[TYPE OF PATIENT]' id="patient_type" />
       <% end %>
       </td>
       <td>
@@ -114,8 +128,8 @@
         <% if @first_visit == true %>
           <select id='1.1.1' name='concept[HAVE YOU EVER HAD TB?]'
                   helpText='Have you been diagnosed with TB? ' pos='1'
-                  tt_onload="showCategory('Clinic Visit')"
-                  tt_requireNextClick = false >
+                  tt_requireNextClick = false
+                  tt_onload="showCategory('Clinic Visit');__$('nextButton').style.display = 'none';">
             <option></option>
             <option value='No'>No</option>
             <option value='Yes'>Yes</option>
@@ -123,7 +137,7 @@
         <% else %>
           <select id='1.1.1' name='concept[HAVE YOU EVER HAD TB?]'
                   helpText='Have you been diagnosed with TB since your LAST clinic visit? ' pos='1'
-                  tt_onload="showCategory('Clinic Visit')"
+                  tt_onload="showCategory('Clinic Visit');__$('nextButton').style.display = 'none';"
                   tt_requireNextClick = false >
             <option></option>
             <option value='No'>No</option>
@@ -144,7 +158,7 @@
           :tt_pageStyleClass => "longSelectList",
           :absoluteMin => "1950", :min => "1940", :absoluteMax => Date.today.year,
           :helpText => "Year(s) of TB Diagnosis",
-          :tt_onload=> "showCategory('Clinic Visit')"} %>
+          :tt_onload=> "showCategory('Clinic Visit');__$('nextButton').style.display = 'block';"} %>
 
       </td>
     </tr>
@@ -159,7 +173,7 @@
                   helpText='Is patient diabetic? '
                   pos='3'
                   tt_requireNextClick = false
-                  tt_onload="showCategory('Clinic Visit')">
+                  tt_onload="showCategory('Clinic Visit');__$('nextButton').style.display = 'none';">
             <option></option>
             <option value='No'>No</option>
             <option value='Yes'>Yes</option>
@@ -180,8 +194,12 @@
             :tt_pageStyleClass => "longSelectList",
             :absoluteMin => "1950", :min => "1940", :absoluteMax => Date.today.year,
             :helpText => "Year(s) of Diabetes Diagnosis",
-            :tt_onload=> "showCategory('Clinic Visit')"} %>
-        <% end %>
+            :tt_onload=> "showCategory('Clinic Visit');__$('nextButton').style.display = 'block';"} %>
+      <% else %>
+          <input type='hidden' name='concept[DIABETES DIAGNOSIS DATE][]' id="year_of_diabetes_diagnosis" />
+          
+          <input type='hidden' name='concept[Patient has Diabetes]' id="1.1.3" />
+      <% end %>
       </td>
     </tr>
     <tr>
@@ -195,7 +213,7 @@
                   helpText='Is Patient Pregnant'
                   tt_requireNextClick = false
                   pos='5'
-                  tt_onload="showCategory('Clinic Visit')">
+                  tt_onload="showCategory('Clinic Visit');__$('nextButton').style.display = 'none';">
             <option></option>
             <option value='No'>No</option>
             <option value='Yes'>Yes</option>
@@ -212,11 +230,14 @@
                   helpText='Is Patient breastfeeding'
                   tt_requireNextClick = false
                   pos='6'
-                  tt_onload="showCategory('Clinic Visit')">
+                  tt_onload="showCategory('Clinic Visit');__$('nextButton').style.display = 'none';">
             <option></option>
             <option value='No'>No</option>
             <option value='Yes'>Yes</option>
           </select>
+          <% else %>
+            <input type='hidden'  id="1.1.5" />
+              <input type='hidden'  id="1.1.6" />
       <%  end %>		</td>
     </tr>
     <tr><td>
@@ -225,7 +246,7 @@
       <td>
         <label for='summary'>Summary</label>
         <%= text_field_tag :summary, nil, {
-          :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';showCategory('Clinic Visit')",
+          :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';showCategory('Clinic Visit');__$('nextButton').style.display = 'block';",
           :optional => "true",
           :tt_pageStyleClass => "NoControls" } %>
       </td></tr>
