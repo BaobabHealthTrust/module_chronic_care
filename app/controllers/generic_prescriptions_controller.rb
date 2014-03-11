@@ -107,11 +107,13 @@ class GenericPrescriptionsController < ApplicationController
       end  
     end
 
-    if params[:location].blank?
-      redirect_to (params[:auto] == '1' ? "/prescriptions/auto?user_id=#{@user["user_id"]}&patient_id=#{@patient.id}" : "/patients/treatment_dashboard/#{@patient.id}?user_id=#{@user["user_id"]}")
+     print_prescribed = CoreService.get_global_property_value('prescription.print') rescue false
+
+    if print_prescribed == true
+          print_and_redirect("/patients/prescription_print/#{params[:patient_id]}?user_id=#{params[:user_id]}","/patients/treatment_dashboard/#{@patient.id}?user_id=#{params[:user_id]}")
     else
-      render :text => 'import success' and return
-    end
+			    redirect_to  "/patients/treatment_dashboard/#{@patient.id}?user_id=#{params[:user_id]}" and return
+		end
     
   end
   
@@ -263,7 +265,7 @@ class GenericPrescriptionsController < ApplicationController
 				render :new
 				return
 			end
-			start_date = session[:datetime].to_date rescue Time.now
+			#start_date = session[:datetime].to_date rescue Time.now
 			auto_expire_date = session_date.to_date + params[:duration].to_i.days
 			prn = params[:prn].to_i
 
@@ -309,12 +311,14 @@ class GenericPrescriptionsController < ApplicationController
 
 			}
 		end
-    #raise @user.to_yaml
-	#	if(@patient)
+
+    print_prescribed = CoreService.get_global_property_value('prescription.print') rescue false
+    
+    if print_prescribed == true
+          print_and_redirect("/patients/prescription_print/#{params[:patient_id]}?user_id=#{params[:user_id]}","/patients/treatment_dashboard/#{@patient.id}?user_id=#{params[:user_id]}")
+    else
 			    redirect_to  "/patients/treatment_dashboard/#{@patient.id}?user_id=#{params[:user_id]}" and return
-		#else
-		#	redirect_to "/patients/treatment_dashboard/#{params[:patient_id]}" and return
-		#end
+		end
 
 	end
 

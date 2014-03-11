@@ -30,7 +30,7 @@ class ApplicationController < ActionController::Base
 	def is_first_hypertension_clinic_visit(patient_id)
 		session_date = session[:datetime].to_date rescue Date.today
 		hyp_encounter = Encounter.find(:first,:conditions =>["voided = 0 AND patient_id = ? AND encounter_type = ? AND DATE(encounter_datetime) < ?",
-				patient_id, EncounterType.find_by_name('DIABETES HYPERTENSION INITIAL VISIT').id, session_date ]) rescue []
+				patient_id, EncounterType.find_by_name('DIABETES HYPERTENSION INITIAL VISIT').id, session_date ]) #rescue []
 		return true if hyp_encounter.blank?
 		return false
 	end

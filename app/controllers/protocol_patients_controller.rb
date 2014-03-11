@@ -321,9 +321,10 @@ class ProtocolPatientsController < ApplicationController
 
     @treatements_list = ["Heart disease", "Stroke", "TIA", "Diabetes", "Kidney Disease", "Head Injury", "Unknown"]
 
-      @treatements_list.delete_if {|var| var == "Diabetes"} if @diabetic.upcase == "YES"
+      @treatements_list.delete_if {|var| var == "Diabetes"} if @diabetic.upcase == "YES"  #Already diagnosed
     @current_program = current_program
     if current_program == "HYPERTENSION PROGRAM"
+       @treatements_list.delete_if {|var| var == "Head Injury"} #Not useful for diabetes
       if @bmi < 25 and @circumference < 90
         @task = "disable" 
       end

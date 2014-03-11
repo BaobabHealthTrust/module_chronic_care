@@ -57,6 +57,8 @@ class PatientsController < ApplicationController
 			@task.asthma_next_task rescue ""
 		elsif current_program == "EPILEPSY PROGRAM"
 			@task.epilepsy_next_task rescue ""
+    elsif current_program == "HYPERTENSION PROGRAM"
+			@task.hypertension_next_task rescue ""
 		else
 			@task.next_task rescue ""
 		end
@@ -1052,8 +1054,8 @@ class PatientsController < ApplicationController
 
   
   def calculate_bp(patient, visit_date)
-    systolic = Vitals.todays_vitals(patient, "Systolic blood pressure", visit_date).to_s.split(':')[1].squish rescue 0
-    diastolic = Vitals.todays_vitals(patient, "Diastolic blood pressure", visit_date).to_s.split(':')[1].squish rescue 0
+    systolic = Vitals.todays_vitals(patient, "Systolic blood pressure", visit_date).to_s.split(':')[1].squish #rescue 0
+    diastolic = Vitals.todays_vitals(patient, "Diastolic blood pressure", visit_date).to_s.split(':')[1].squish #rescue 0
     
     return "#{systolic}/#{diastolic}"
   end
@@ -1091,34 +1093,61 @@ class PatientsController < ApplicationController
     @obs = Observation.find_by_sql("SELECT * FROM obs WHERE concept_id = '#{concept_id}'
                                     AND person_id = '#{@person.id}'")
 
-		@next_task = @task.next_task.encounter_type.gsub('_',' ') if (current_program == "HYPERTENSION PROGRAM" || current_program.blank?) rescue nil
-		@next_task = @task.asthma_next_task.encounter_type.gsub('_',' ') if current_program == "ASTHMA PROGRAM" rescue nil
-		@next_task = @task.epilepsy_next_task.encounter_type.gsub('_',' ') if current_program == "EPILEPSY PROGRAM" rescue nil
+		@next_task = @task.hypertension_next_task.encounter_type.gsub('_',' ') if current_program == "HYPERTENSION PROGRAM" #rescue nil
+		@next_task = @task.asthma_next_task.encounter_type.gsub('_',' ') if current_program == "ASTHMA PROGRAM" #rescue nil
+		@next_task = @task.epilepsy_next_task.encounter_type.gsub('_',' ') if current_program == "EPILEPSY PROGRAM" #rescue nil
+    @next_task = @task.next_task.encounter_type.gsub('_',' ') if current_program == "DIABETES PROGRAM" #rescue nil
 
-		@current_task = @task.next_task if (current_program == "HYPERTENSION PROGRAM" || current_program.blank?) rescue nil
+
+		@current_task = @task.hypertension_next_task if current_program == "HYPERTENSION PROGRAM"
+    @current_task = @task.next_task if current_program == "DIABETES PROGRAM"
 		@current_task = @task.asthma_next_task if current_program == "ASTHMA PROGRAM" rescue nil
 		@current_task = @task.epilepsy_next_task if current_program == "EPILEPSY PROGRAM" rescue nil
 
 		@arv_number = PatientService.get_patient_identifier(@person, 'ARV Number') rescue ""		
 		@patient_bean = PatientService.get_patient(@person) rescue ""
 		@location = Location.find(params[:location_id] || session[:location_id]).name rescue nil
-		@conditions = []
-		if current_program == "EPILEPSY PROGRAM"
-      @conditions.push("Visit Type											:  First Vist") if  is_first_epilepsy_clinic_visit(@person.id) == true
-      @conditions.push("Visit Type											:  Follow up visit") if  is_first_epilepsy_clinic_visit(@person.id) != true
-      @conditions.push("Expected Appointment date: #{Vitals.get_patient_attribute_value(@person.patient, 'appointment date').to_date.strftime('%d/%m/%Y') rescue 'None'}") if  is_first_epilepsy_clinic_visit(@person.id) != true
-		else
-      @conditions.push("Visit Type											:  First Vist") if  is_first_hypertension_clinic_visit(@person.id) == true
-      @conditions.push("Visit Type											:  Follow up visit") if  is_first_hypertension_clinic_visit(@person.id) != true
 
-      risk = Vitals.current_encounter(@person.patient, "assessment", "assessment comments") rescue "Previous Hypetension Assessment : Not Available"
-      @conditions.push("Expected Appointment date: #{Vitals.get_patient_attribute_value(@person.patient, 'appointment date').to_date.strftime('%d/%m/%Y') rescue 'None'}") if  is_first_hypertension_clinic_visit(@person.id) != true
-      @conditions.push("#{risk} ") if not risk.blank?
-      @conditions.push("Asthma Expected Peak Flow Rate  : #{Vitals.expectect_flow_rate(@person.patient)} Litres/Minute") if  is_first_hypertension_clinic_visit(@person.id) != true
-		end
 		render :layout => 'menu'
 	end
 
+  def patient_bp
+    patient = Patient.find(params[:patient_id])
+    @bps = Observation.find(:all,
+          :conditions => ["person_id = ? AND concept_id = ?", params[:patient_id], ConceptName.find_by_name("systolic blood pressure").concept_id], :order => "obs_datetime DESC", :limit => 5).collect{|o|
+          [calculate_bp(patient,o.obs_datetime).split("/")[0].to_i, 
+            o.obs_datetime.to_date.strftime('%Y/%m/%d'),
+            calculate_bp(patient,o.obs_datetime).split("/")[1].to_i,
+            (calculate_bp(patient,o.obs_datetime).split("/")[0].to_f / calculate_bp(patient,o.obs_datetime).split("/")[1].to_f).to_f.round(2)]}
+    #raise @bps.to_yaml
+
+
+    @bps = @bps.to_json
+    render :partial => 'bp_chart' and return
+  end
+
+  def patient_overview
+    @person = Person.find(params[:patient_id]) rescue []
+    @conditions = []
+    @conditions.push("<table id='overview'><th colspan=2 class='innerside'>Vist Overview</th>")
+		if current_program == "EPILEPSY PROGRAM"
+      @conditions.push("<tr><td>Visit Type</td><td>:  First Vist</td></tr>") if  is_first_epilepsy_clinic_visit(@person.id) == true
+      @conditions.push("<tr><td>Visit Type</td><td>:  Follow up visit</td></tr>") if  is_first_epilepsy_clinic_visit(@person.id) != true
+      @conditions.push("<tr><td>Expected Appointment date</td><td>: #{Vitals.get_patient_attribute_value(@person.patient, 'appointment date').to_date.strftime('%d/%m/%Y') rescue 'None'}</td></tr>") if  is_first_epilepsy_clinic_visit(@person.id) != true
+		else
+      @conditions.push("<tr><td>Visit Type</td><td>:  First Vist</td></tr>") if  is_first_hypertension_clinic_visit(@person.id) == true
+      @conditions.push("<tr><td>Visit Type</td><td>:  Follow up visit</td></tr>") if  is_first_hypertension_clinic_visit(@person.id) != true
+
+      if current_program == "HYPERTENSION PROGRAM" and is_first_hypertension_clinic_visit(@person.id) != true
+        risk = Vitals.current_encounter(@person.patient, "assessment", "assessment comments") rescue "Previous Hypetension Assessment : Not Available"
+      end
+      @conditions.push("<tr><td>Expected Appointment date</td><td>: #{Vitals.get_patient_attribute_value(@person.patient, 'appointment date').to_date.strftime('%d/%m/%Y') rescue 'None'}") if  is_first_hypertension_clinic_visit(@person.id) != true
+      @conditions.push("<tr><td colspan=2>#{risk} </td><tr>") if not risk.blank?
+      @conditions.push("<tr><td>Asthma Expected Peak Flow Rate</td><td>  : #{Vitals.expectect_flow_rate(@person.patient).to_f.round} Litres/Minute</td></tr>") if  is_first_hypertension_clinic_visit(@person.id) != true
+		end
+    @conditions.push("</table>")
+    render :partial => 'patient_overview'
+  end
   def treatment_dashboard
 		@user = User.find(params[:user_id]) rescue nil
 		@patient = Patient.find(params[:id]) rescue nil
@@ -1156,9 +1185,10 @@ class PatientsController < ApplicationController
     session_date = session[:datetime].to_date rescue Date.today
     @prescriptions = Order.find(:all,
       :joins => "INNER JOIN encounter e USING (encounter_id)",
-      :conditions => ["encounter_type = ? AND e.patient_id = ? AND DATE(encounter_datetime) = ?",
+      :conditions => ["encounter_type = ? AND e.patient_id = ? AND DATE(start_date) = ?",
         type.id,@patient.id,session_date])
-		
+
+    #raise session_date.to_date.to_yaml
     @restricted = ProgramLocationRestriction.all(:conditions => {:location_id => Location.current_health_center.id })
 		
     @restricted.each do |restriction|
@@ -1188,7 +1218,7 @@ class PatientsController < ApplicationController
     @prescriptions = Order.find(:all,
       :joins => "INNER JOIN encounter e USING (encounter_id)",
       :conditions => ["encounter_type = ? AND e.patient_id = ?",type.id,@patient.id])
-
+    
     @historical = @patient.orders.historical.prescriptions.all
     @restricted = ProgramLocationRestriction.all(:conditions => {:location_id => Location.current_health_center.id })
     @restricted.each do |restriction|
@@ -1301,8 +1331,72 @@ class PatientsController < ApplicationController
     render :text => (count.to_i >= 0 ? {params[:date] => count}.to_json : 0)
   end
 
-  def dashboard_print_visit
-    print_and_redirect("/patients/visit_label/?patient_id=#{params[:id]}&user_id=#{params[:user_id]}", "/patients/show/#{params[:id]}&user_id=#{params[:user_id]}")
+  def dashboard_visit_print
+      print_and_redirect("/patients/visit_label/?patient_id=#{params[:id]}&user_id=#{params[:user_id]}", "/patients/show/#{params[:id]}&user_id=#{params[:user_id]}")
+  end
+
+  def prescription_print
+    print_and_redirect("/patients/prescription_label/?patient_id=#{params[:id]}&user_id=#{params[:user_id]}", "/patients/treatment_dashboard/#{params[:id]}&user_id=#{params[:user_id]}")
+  end
+
+  def prescription_label
+    		session_date = session[:datetime].to_date rescue Date.today
+		@patient = Patient.find(params[:patient_id])
+    print_string = prescription_print_label(@patient, session_date) rescue (raise "Unable to find patient (#{params[:patient_id]}) or generate a visit label for that patient")
+    send_data(print_string,:type=>"application/label; charset=utf-8", :stream=> false, :filename=>"#{params[:patient_id]}#{rand(10000)}.lbl", :disposition => "inline")
+  end
+
+  def prescription_print_label(patient, date = Date.today)
+    visit = visits(patient, date, true)[date] rescue {}
+
+		return if visit.blank?
+    visit_data = mastercard_visit_data(visit)
+    
+    label = ZebraPrinter::StandardLabel.new
+    label.draw_text("Printed: #{Date.today.strftime('%b %d %Y')}",597,280,0,1,1,1,false)
+    #label.draw_text("#{seen_by(patient,date)}",597,250,0,1,1,1,false)
+    label.draw_text("#{date.strftime("%B %d %Y").upcase}",25,30,0,3,1,1,false)
+    # label.draw_text("#{arv_number}",565,30,0,3,1,1,true)
+    label.draw_text("#{patient.name}(#{patient.gender})",25,60,0,3,1,1,false)
+    #label.draw_text("#{'(' + visit.visit_by + ')' unless visit.visit_by.blank?}",255,30,0,2,1,1,false)
+    label.draw_text("#{visit.height + 'cm' if !visit.height.blank?}  #{visit.weight + 'kg' if !visit.weight.blank?}  #{'BMI:' + visit.bmi if !visit.bmi.blank?}  #{'BP :' + visit_data['bp'] }",25,95,0,2,1,1,false) rescue ""
+    #label.draw_text("SE",25,130,0,3,1,1,false)
+    label.draw_text("TB",110,130,0,3,1,1,false)
+    #label.draw_text("BP",185,130,0,3,1,1,false)
+    label.draw_text("DRUG(S) PRESCRIBED",255,130,0,3,1,1,false)
+    label.draw_text("OUTC",577,130,0,3,1,1,false)
+    label.draw_line(25,150,800,5)
+    label.draw_text("#{visit.tb_status}",110,160,0,2,1,1,false)
+    #label.draw_text("#{visit_data['bp'] rescue nil}",185,160,0,2,1,1,false)
+    label.draw_text("#{visit_data['outcome']}",577,160,0,2,1,1,false)
+    label.draw_text("#{visit_data['outcome_date']}",655,130,0,2,1,1,false)
+    label.draw_text("#{visit_data['next_appointment']}",577,190,0,2,1,1,false) if visit_data['next_appointment']
+    starting_index = 25
+    start_line = 160
+
+     
+    #starting_index = 30
+    visit_data.each{|key,values|
+    
+      data = values.last rescue nil
+      next if data.blank?
+      bold = false
+      #bold = true if key.include?("side_eff") and data !="None"
+      #bold = true if key.include?("arv_given")
+      starting_index = values.first.to_i
+      starting_line = start_line
+      starting_line = start_line + 30 if key.include?("2")
+      starting_line = start_line + 60 if key.include?("3")
+      starting_line = start_line + 90 if key.include?("4")
+      starting_line = start_line + 120 if key.include?("5")
+      starting_line = start_line + 150 if key.include?("6")
+      starting_line = start_line + 180 if key.include?("7")
+      starting_line = start_line + 210 if key.include?("8")
+      starting_line = start_line + 240 if key.include?("9")
+      next if starting_index == 0
+      label.draw_text("#{data}",starting_index,starting_line,0,2,1,1,bold)
+    } rescue []
+    label.print(1)
   end
 
 	def visit_label
@@ -1315,7 +1409,7 @@ class PatientsController < ApplicationController
 
 	def patient_visit_label(patient, date = Date.today)
     #result = Location.find(session[:location_id]).name.match(/outpatient/i)
-		visit = visits(patient, date)[date] rescue {}
+		visit = visits(patient, date, true)[date] rescue {}
 
 		return if visit.blank?
     visit_data = mastercard_visit_data(visit)
@@ -1408,11 +1502,11 @@ class PatientsController < ApplicationController
         data["arv_given#{count}"] = "255",string
       end
       count+= 1
-    end rescue []
+    end #rescue []
 
     unless visit.cpt.blank?
       data["arv_given#{count}"] = "255","CPT (#{visit.cpt})" unless visit.cpt == 0
-    end rescue []
+    end #rescue []
 
     data
 	end
@@ -1462,13 +1556,12 @@ class PatientsController < ApplicationController
     Observation.find(:all, :order => "obs_datetime DESC,date_created DESC", :conditions => ["encounter_id = ? AND concept_id = ?", encounter, concept]) rescue nil
   end
 
-	def visits(patient_obj, encounter_date = nil)
+	def visits(patient_obj, encounter_date = nil, prescribed = false)
     patient_visits = {}
     yes = ConceptName.find_by_name("YES")
     concept_names = ["APPOINTMENT DATE", "HEIGHT (CM)", 'WEIGHT (KG)',
 			"BODY MASS INDEX, MEASURED", "RESPONSIBLE PERSON PRESENT",
-			"PATIENT PRESENT FOR CONSULTATION", "TB STATUS",
-			"AMOUNT DISPENSED", "ARV REGIMENS RECEIVED ABSTRACTED CONSTRUCT",
+			"AMOUNT DISPENSED", "PRESCRIBE DRUGS",
 			"DRUG INDUCED", "AMOUNT OF DRUG BROUGHT TO CLINIC",
 			"WHAT WAS THE PATIENTS ADHERENCE FOR THIS DRUG ORDER",
 			"CLINICAL NOTES CONSTRUCT","ASSESSMENT COMMENTS"]
@@ -1546,6 +1639,28 @@ class PatientsController < ApplicationController
         #	patient_visits[visit_date].tb_status = 'noRx' if status == 'CONFIRMED TB NOT ON TREATMENT'
         #	patient_visits[visit_date].tb_status = 'Rx' if status == 'CONFIRMED TB ON TREATMENT'
         #	patient_visits[visit_date].tb_status = 'Rx' if status == 'CURRENTLY IN TREATMENT'
+      elsif concept_name.upcase == 'PRESCRIBE DRUGS'
+
+       if prescribed == true
+          patient_visits[visit_date].gave = []
+          type = EncounterType.find_by_name('TREATMENT')
+          prescriptions = Order.find(:all,
+          :joins => "INNER JOIN encounter e USING (encounter_id)",
+          :conditions => ["encounter_type = ? AND e.patient_id = ? AND DATE(start_date) = ?",
+            type.id,patient_obj.patient_id,visit_date.to_date])
+            prescriptions.each{|drug_name|
+              patient_visits[visit_date].gave  << [drug_name.drug_order.drug.name, drug_name.drug_order.amount_needed]
+            }
+
+          drugs_given_uniq = Hash.new(0)
+					(patient_visits[visit_date].gave || {}).each do |drug_given_name,quantity_given|
+						drugs_given_uniq[drug_given_name] += quantity_given
+					end
+					patient_visits[visit_date].gave = []
+					(drugs_given_uniq || {}).each do |drug_given_name,quantity_given|
+						patient_visits[visit_date].gave << [drug_given_name,quantity_given]
+					end
+        end
 
 			elsif concept_name.upcase == 'AMOUNT DISPENSED'
 
@@ -1607,6 +1722,8 @@ class PatientsController < ApplicationController
 				patient_visits[visit_date].notes+= '<br/>' + obs.value_text unless patient_visits[visit_date].notes.blank?
 				patient_visits[visit_date].notes = obs.value_text if patient_visits[visit_date].notes.blank?
 			end
+    
+      
 		end
 
     #patients currents/available states (patients outcome/s)
@@ -1622,6 +1739,9 @@ class PatientsController < ApplicationController
 				:joins => "INNER JOIN patient_program p ON p.patient_program_id = patient_state.patient_program_id",
 				:conditions =>["patient_state.voided = 0 AND p.voided = 0 AND p.program_id = ? AND start_date = ? AND p.patient_id =?",
 					program_id,encounter_date.to_date,patient_obj.patient_id],:order => "patient_state_id ASC")
+
+       #raise patient_visits[encounter_date].gave.to_yaml
+
     end
     
     #=begin

@@ -95,6 +95,7 @@ class EncountersController < ApplicationController
 					begin   
 						redirect_to @task.asthma_next_task.url and return if current_program == "ASTHMA PROGRAM"
 						redirect_to @task.epilepsy_next_task.url and return if current_program == "EPILEPSY PROGRAM"
+            redirect_to @task.hypertension_next_task.url and return if current_program == "HYPETENSION PROGRAM"
 						redirect_to @task.next_task.url and return
 					rescue
 						redirect_to "/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}&disable=true" and return
@@ -339,7 +340,7 @@ class EncountersController < ApplicationController
 
 			if params[:encounter_type] == "TREATMENT"
         link = get_global_property_value("prescription.types").upcase rescue []
-				if  params[:concept]["Prescribe Drugs"].to_s.upcase == "EPILEPSY DRUGS" || params[:concept]["Prescribe Drugs"].to_s.upcase == "HYPERTENSION/DIABETES DRUGS" || params[:concept]["Prescribe Drugs"].to_s.upcase == "ASTHMA DRUGS"
+				if  params[:concept]["Prescribe Drugs"].to_s.upcase == "YES"
 					if link == "ADVANCED PRESCRIPTION"
             redirect_to "/prescriptions/generic_advanced_prescription?user_id=#{@user["user_id"]}&patient_id=#{params[:patient_id]}" and return
           else
