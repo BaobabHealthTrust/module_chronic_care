@@ -91,12 +91,15 @@ class Reports::CohortDm
 
   # Get all patients registered in specified period
   def total_registered(encounter_type=nil)
-    
+    type = EncounterType.find_by_name("#{encounter_type}").id
     Patient.find_by_sql("
                   SELECT DISTINCT p.patient_id FROM patient p
+                  INNER JOIN encounter e USING(patient_id)
                   WHERE p.voided = 0
                   AND p.date_created <= '#{@end_date}'
-                  AND p.date_created >= '#{@start_date}'")
+                  AND p.date_created >= '#{@start_date}'
+                  AND e.encounter_type = #{type}
+                  AND e.voided = 0")
   end
 
   def total_adults_registered(ids)
@@ -487,11 +490,15 @@ class Reports::CohortDm
 
   # Get all patients ever registered
   def total_ever_registered(encounter_type=nil)
-    
+    type = EncounterType.find_by_name("#{encounter_type}").id
     Patient.find_by_sql("
-                          SELECT DISTINCT p.patient_id FROM patient p
-                          WHERE p.voided = 0
-                          AND p.date_created <= '#{@end_date}'")
+                  SELECT DISTINCT p.patient_id FROM patient p
+                  INNER JOIN encounter e USING(patient_id)
+                  WHERE p.voided = 0
+                  AND p.date_created <= '#{@end_date}'
+                  AND e.encounter_type = #{type}
+                  AND e.voided = 0")
+    
   end
 
   def total_adults_ever_registered(ids)
@@ -613,11 +620,11 @@ class Reports::CohortDm
       oral_insulin = @ids_for_patients_on_insulin_ever & @ids_for_patients_on_metformin_and_glibenclamide_ever
     end
     total = (oral + insulin + oral_insulin).uniq.join(",")
+    condition = " AND patient.patient_id NOT IN (#{total})" if !total.blank?
     Patient.count(:all,
       :include => {:person =>{}},
       :conditions => ["patient.voided = 0
-                                  AND patient.patient_id IN (#{ids})
-                                  AND patient.patient_id NOT IN (#{total})"]
+                                  AND patient.patient_id IN (#{ids}) #{ condition}"]
     )
   end
   # Insulin
