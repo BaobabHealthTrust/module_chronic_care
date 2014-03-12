@@ -1111,18 +1111,18 @@ class CohortToolController < ApplicationController
 
     @specified_period = report.specified_period
     #raise params[:type].to_yaml
-   # if params[:type] == "ccc"
-              @total_registered = report.total_registered.length rescue 0
-              ids = report.total_registered.map{|patient|patient.patient_id}.join(',') rescue ""
-              ids = report.total_registered.map{|patient|patient.patient_id} if report.total_registered.length == 1
-              @total_ever_registered = report.total_ever_registered.length rescue 0
-              ids_ever = report.total_ever_registered.map{|patient|patient.patient_id}.join(',') rescue ""
-    #else
-     #         @total_registered = report.total_registered("DIABETES HYPERTENSION INITIAL VISIT").length rescue 0
-     #         ids = report.total_registered("DIABETES HYPERTENSION INITIAL VISIT").map{|patient|patient.patient_id.to_s}.join(',') rescue ""
-     #         @total_ever_registered = report.total_ever_registered("DIABETES HYPERTENSION INITIAL VISIT").length rescue 0
-    #          ids_ever = report.total_ever_registered("DIABETES HYPERTENSION INITIAL VISIT").map{|patient|patient.patient_id.to_s}.join(',') rescue ""
-   # end
+    if params[:type] == "ccc"
+              @total_registered = report.total_registered("EPILEPSY CLINIC VISIT").length rescue 0
+              ids = report.total_registered("EPILEPSY CLINIC VISIT").map{|patient|patient.patient_id}.join(',') rescue ""
+              ids = report.total_registered("EPILEPSY CLINIC VISIT").map{|patient|patient.patient_id} if report.total_registered.length == 1
+              @total_ever_registered = report.total_ever_registered("EPILEPSY CLINIC VISIT").length rescue 0
+              ids_ever = report.total_ever_registered("EPILEPSY CLINIC VISIT").map{|patient|patient.patient_id}.join(',') rescue ""
+    else
+            @total_registered = report.total_registered("DIABETES HYPERTENSION INITIAL VISIT").length rescue 0
+            ids = report.total_registered("DIABETES HYPERTENSION INITIAL VISIT").map{|patient|patient.patient_id.to_s}.join(',') rescue ""
+            @total_ever_registered = report.total_ever_registered("DIABETES HYPERTENSION INITIAL VISIT").length rescue 0
+            ids_ever = report.total_ever_registered("DIABETES HYPERTENSION INITIAL VISIT").map{|patient|patient.patient_id.to_s}.join(',') rescue ""
+    end
  
  if params[:type] != "ccc"
     @mi = report.mi(ids) rescue 0
