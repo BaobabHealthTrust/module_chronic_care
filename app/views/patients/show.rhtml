@@ -273,12 +273,14 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
           </option>
           <option link='<%= "/patients/mastercard/#{@patient.id}?user_id=#{@user.id}"  %>' ttSize = "160px">Mastercard</option>
         <% end %>
-<%#= raise @task.to_yaml %>
-          <option link="/encounter_types/show?encounter_type=Appointment&id=show&patient_id=<%= @patient.id -%>&user_id=<%=  @user.id %>" ttSize = "160px">Set Appointment</option>
+<%#= raise @task.url.to_yaml %>
+         
           <%# if @disable.to_s != "true" and ! @disable.blank? %>
           <% if @task.url != "/patients/show/#{@patient.id}?user_id=#{@user.id}" %>
                                          <option link="/encounter_types/show?user_id=<%=  @user["user_id"] %>&encounter_type=Appointment&id=show&patient_id=<%= @patient.id -%>" ttSize = "160px">Appointment</option> 
             <option link="<%= @task.url  %>" ttSize = "160px">Continue</option>
+          <% else %>
+             <option link="/encounter_types/show?encounter_type=Appointment&id=show&patient_id=<%= @patient.id -%>&user_id=<%=  @user.id %>" ttSize = "160px">Set Appointment</option>
           <% end %>
         <%# end %>
         
