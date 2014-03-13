@@ -1110,7 +1110,7 @@ class CohortToolController < ApplicationController
     @facility = Location.current_health_center.name rescue ''
 
     @specified_period = report.specified_period
-    #raise params[:type].to_yaml
+    
     if params[:type] == "ccc"
               @total_registered = report.total_registered("EPILEPSY CLINIC VISIT").length rescue 0
               ids = report.total_registered("EPILEPSY CLINIC VISIT").map{|patient|patient.patient_id}.join(',') rescue ""
@@ -1123,7 +1123,7 @@ class CohortToolController < ApplicationController
             @total_ever_registered = report.total_ever_registered("DIABETES HYPERTENSION INITIAL VISIT").length rescue 0
             ids_ever = report.total_ever_registered("DIABETES HYPERTENSION INITIAL VISIT").map{|patient|patient.patient_id.to_s}.join(',') rescue ""
     end
- 
+   
  if params[:type] != "ccc"
     @mi = report.mi(ids) rescue 0
     @kidney_failure = report.kidney_failure(ids) rescue 0
