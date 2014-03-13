@@ -74,13 +74,13 @@ class Reports::CohortDm
 		@complications_hash_upto_end_date = Patient.count(:all,
       :include => { :encounters => {:observations => {:answer_concept => {:concept_names => {}}}}},
       :conditions => ["patient.date_created <= ?", @end_date],
-      :group => "concept_name.name")
+      :group => "concept_name.name") rescue ""
 											
 		@complications_hash_btn_dates = Patient.count(:all,
       :include => { :encounters => {:observations => {:answer_concept => {:concept_names => {}}}}},
       :conditions => ["patient.date_created >= ? AND patient.date_created <= ?",
         @start_date, @end_date],
-      :group => "concept_name.name")
+      :group => "concept_name.name") rescue ""
   end
 
   # Metformin
