@@ -1122,7 +1122,7 @@ class PatientsController < ApplicationController
     #raise @bps.to_yaml
 
 
-    @bps = @bps.to_json
+    @bps = @bps.sort_by{|atr| atr[1]}.to_json
     render :partial => 'bp_chart' and return
   end
 
