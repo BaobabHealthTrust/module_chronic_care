@@ -131,7 +131,7 @@ class Reports::CohortDm
                                   AND o.concept_id = #{concept}
                                  AND e.encounter_type = #{encounter}
                                  AND o.value_coded != (SELECT concept_id FROM concept_name WHERE name = 'Normal')
-                                 GROUP BY patient.patient_id").length #rescue 0
+                                 GROUP BY patient.patient_id").length rescue 0
 
     elsif type.upcase == "DM"
       ht_concept = ConceptName.find_by_name("cardiovascular system diagnosis").concept_id
@@ -159,7 +159,7 @@ class Reports::CohortDm
                                   #{categorise} 
                                   AND patient.patient_id NOT IN (SELECT person_id FROM obs  WHERE concept_id = #{ht_concept}
                                   AND value_coded != (SELECT concept_id FROM concept_name WHERE name = 'Normal'))
-                                 GROUP BY patient.patient_id").length #rescue 0
+                                 GROUP BY patient.patient_id").length rescue 0
     elsif type.upcase == "ASTHMA"
       @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
                                 INNER JOIN person p ON p.person_id = orders.patient_id
@@ -190,7 +190,7 @@ class Reports::CohortDm
                                   AND o.value_coded != (SELECT concept_id FROM concept_name WHERE name = 'Normal'))
                                   AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
                                   concept_set = #{@diabetes_id})
-                                  GROUP BY patient.patient_id").length #rescue 0
+                                  GROUP BY patient.patient_id").length rescue 0
     elsif type.upcase == "OTHER"
       @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
                                       INNER JOIN person p ON p.person_id = orders.patient_id
@@ -224,7 +224,7 @@ class Reports::CohortDm
                                       AND o.concept_id = #{concept}
                                       AND e.encounter_type = #{encounter}
                                      AND o.value_coded != (SELECT concept_id FROM concept_name WHERE name = 'Normal')
-                                     GROUP BY patient.patient_id").length #rescue 0
+                                     GROUP BY patient.patient_id").length rescue 0
       # raise @orders.to_yaml
     elsif type.upcase == "DM"
       ht_concept = ConceptName.find_by_name("cardiovascular system diagnosis").concept_id
@@ -253,7 +253,7 @@ class Reports::CohortDm
                                   AND patient.patient_id NOT IN (SELECT person_id FROM obs  WHERE concept_id = #{ht_concept}
                                   AND value_coded != (SELECT concept_id FROM concept_name WHERE name = 'Normal'))
                                   
-                                 GROUP BY patient.patient_id").length #rescue 0
+                                 GROUP BY patient.patient_id").length rescue 0
     elsif type.upcase == "ASTHMA"
       @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
                                   INNER JOIN person p ON p.person_id = orders.patient_id
