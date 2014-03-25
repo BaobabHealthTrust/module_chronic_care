@@ -221,7 +221,7 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
         <%= "#{@patient.name}" %>
       </span>
 
-      <span id='patient_id'><%= "#{@patient.national_id}" %></span>
+      <span id='patient_id'><%= "#{@patient.national_id_with_dashes}" %></span>
       <span id='patient_residence'><%= "#{@patient.address}" %></span>
       <span id='patient_age'><%= "#{(@patient.age > 0 ? @patient.age : "#{@patient.age_in_months} months")}" %></span>
       <span id='patient_gender'><%= "#{@patient.gender}" %></span>
