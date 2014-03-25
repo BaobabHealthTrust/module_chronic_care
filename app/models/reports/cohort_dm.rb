@@ -205,6 +205,7 @@ class Reports::CohortDm
   end
 
   def disease_ever_availabe(ids, type, sex)
+    return if ids.length <= 0
     if ! sex.blank?
       patient_initial = sex.split(//).first.upcase
       categorise = "AND (UCASE(p.gender) = '#{sex.upcase}'
@@ -621,6 +622,7 @@ class Reports::CohortDm
     end
     total = (oral + insulin + oral_insulin).uniq.join(",")
     condition = " AND patient.patient_id NOT IN (#{total})" if !total.blank?
+    return if ids.blank?
     Patient.count(:all,
       :include => {:person =>{}},
       :conditions => ["patient.voided = 0
