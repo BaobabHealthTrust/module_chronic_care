@@ -27,3 +27,29 @@ FOR EACH ROW BEGIN
 END$$
 
 DELIMITER ;
+
+DROP VIEW IF EXISTS `start_date`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY INVOKER VIEW `start_date` AS select `p`.`patient_id` AS `patient_id`,`p`.`date_enrolled` AS `date_enrolled`,min(`o`.`obs_datetime`) AS `start_date`,`person`.`death_date` AS `death_date`
+from ((`patient_program` `p` left join `patient_state` `s` on((`p`.`patient_program_id` = `s`.`patient_program_id`)))
+inner join `obs` o on ((`o`.`person_id` = `p`.`patient_id`))
+left join `person` on((`person`.`person_id` = `p`.`patient_id`)))
+where ((`p`.`voided` = 0)
+
+and (`s`.`voided` = 0)
+and (`p`.`program_id` = 10)
+and (`o`.`concept_id` = (select concept_id from concept_name  where name = 'cardiovascular system diagnosis' LIMIT 1))
+and (`o`.`value_coded` != (select concept_id from concept_name  where name = 'normal'))) group by `p`.`patient_id`;
+
+DROP VIEW IF EXISTS `dm_start_date`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY INVOKER VIEW `dm_start_date` AS select `p`.`patient_id` AS `patient_id`,`p`.`date_enrolled` AS `date_enrolled`,min(`o`.`obs_datetime`) AS `start_date`,`person`.`death_date` AS `death_date`
+from ((`patient_program` `p` left join `patient_state` `s` on((`p`.`patient_program_id` = `s`.`patient_program_id`)))
+inner join `obs` o on ((`o`.`person_id` = `p`.`patient_id`))
+left join `person` on((`person`.`person_id` = `p`.`patient_id`)))
+where ((`p`.`voided` = 0)
+
+and (`s`.`voided` = 0)
+and (`p`.`program_id` = 10)
+and (`o`.`concept_id` = (select concept_id from concept_name  where name = 'Patient has diabetes' LIMIT 1))
+and (`o`.`value_coded` = (select concept_id from concept_name  where name = 'yes'))) group by `p`.`patient_id`;
