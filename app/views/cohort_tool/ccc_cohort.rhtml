@@ -299,58 +299,58 @@
                 <tr>
 
                   <td style="text-align:left;">DM</td>
-                  <td><%=  @disease_availabe_dm_male %></td>
-                  <td><%=  @disease_availabe_dm_female %></td>
-                  <td><%=  (@disease_availabe_dm_male + @disease_availabe_dm_female) %></td>
+                  <td><%=  @disease_availabe_dm_male.length rescue 0 %></td>
+                  <td><%=  @disease_availabe_dm_female.length rescue 0 %></td>
+                  <td><%=  (@disease_availabe_dm_male.length rescue 0) + (@disease_availabe_dm_female.length rescue 0) %></td>
                   <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @disease_ever_availabe_dm_male %></td>
-                  <td><%=  @disease_ever_availabe_dm_female %></td>
-                  <td><%=  (@disease_ever_availabe_dm_male + @disease_ever_availabe_dm_female) %></td>
+                  <td><%=  @disease_ever_availabe_dm_male.length rescue 0 %></td>
+                  <td><%=  @disease_ever_availabe_dm_female.length rescue 0 %></td>
+                  <td><%=  (@disease_ever_availabe_dm_male.length rescue 0) + (@disease_ever_availabe_dm_female.length rescue 0) %></td>
                 </tr>
 
                 <tr>
 
                   <td style="text-align:left;">HT</td>
-                  <td><%=  @disease_availabe_ht_male %></td>
-                  <td><%=  @disease_availabe_ht_female %></td>
-                  <td><%=  (@disease_availabe_ht_male + @disease_availabe_ht_female) %></td>
+                  <td><%=  @disease_availabe_ht_male.length rescue 0 %></td>
+                  <td><%=  @disease_availabe_ht_female.length rescue 0 %></td>
+                  <td><%=  (@disease_availabe_ht_male.length rescue 0) + (@disease_availabe_ht_female.length rescue 0) %></td>
                   <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @disease_ever_availabe_ht_male %></td>
-                  <td><%=  @disease_ever_availabe_ht_female %></td>
-                  <td><%=  (@disease_ever_availabe_ht_male.to_i + @disease_ever_availabe_ht_female.to_i) %></td>
+                  <td><%=  @disease_ever_availabe_ht_male.length rescue 0 %></td>
+                  <td><%=  @disease_ever_availabe_ht_female.length rescue 0 %></td>
+                  <td><%=  (@disease_ever_availabe_ht_male.length rescue 0) + (@disease_ever_availabe_ht_female.length rescue 0) %></td>
                 </tr>
                 <tr>
 
                   <td style="text-align:left;">DM + HT</td>
-                  <td><%=  @disease_availabe_dmht_male %></td>
-                  <td><%=  @disease_availabe_dmht_female %></td>
-                  <td><%=  (@disease_availabe_dmht_female + @disease_availabe_dmht_male) %></td>
+                  <td><%=  @disease_availabe_dmht_male.length rescue 0 %></td>
+                  <td><%=  @disease_availabe_dmht_female.length rescue 0 %></td>
+                  <td><%=  (@disease_availabe_dmht_female.length rescue 0) + (@disease_availabe_dmht_male.length rescue 0) %></td>
                   <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @disease_ever_availabe_dmht_male %></td>
-                  <td><%=  @disease_ever_availabe_dmht_female %></td>
-                  <td><%=  (@disease_ever_availabe_dmht_male + @disease_ever_availabe_dmht_female) %></td>
+                  <td><%=  @disease_ever_availabe_dmht_male.length rescue 0 %></td>
+                  <td><%=  @disease_ever_availabe_dmht_female.length rescue 0 %></td>
+                  <td><%=  (@disease_ever_availabe_dmht_male.length rescue 0 ) + (@disease_ever_availabe_dmht_female.length rescue 0 ) %></td>
                 </tr>
                 <tr>
 
                   <td style="text-align:left;">Asthma</td>
-                  <td><%=  @disease_availabe_asthma_male %></td>
-                  <td><%=  @disease_availabe_asthma_female %></td>
-                  <td><%=  (@disease_availabe_asthma_male + @disease_availabe_asthma_female) %></td>
+                  <td><%=  @disease_availabe_asthma_male.length rescue 0 %></td>
+                  <td><%=  @disease_availabe_asthma_female.length rescue 0 %></td>
+                  <td><%=  (@disease_availabe_asthma_male.length rescue 0) + (@disease_availabe_asthma_female.length rescue 0) %></td>
                   <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @disease_ever_availabe_asthma_male %></td>
-                  <td><%=  @disease_ever_availabe_asthma_female %></td>
-                  <td><%=  (@disease_ever_availabe_asthma_male + @disease_ever_availabe_asthma_female) %></td>
+                  <td><%=  @disease_ever_availabe_asthma_male.length rescue 0 %></td>
+                  <td><%=  @disease_ever_availabe_asthma_female.length rescue 0 %></td>
+                  <td><%=  (@disease_ever_availabe_asthma_male.length rescue 0) + (@disease_ever_availabe_asthma_female.length rescue 0 ) %></td>
                 </tr>
                 <tr>
 
                   <td style="text-align:left;">Epilepsy</td>
-                  <td><%=  @disease_availabe_epilepsy_male %></td>
-                  <td><%=  @disease_availabe_epilepsy_female %></td>
-                  <td><%=  (@disease_availabe_epilepsy_male + @disease_availabe_epilepsy_female) %></td>
+                  <td><%=  @disease_availabe_epilepsy_male.length rescue 0 %></td>
+                  <td><%=  @disease_availabe_epilepsy_female.length rescue 0 %></td>
+                  <td><%=  (@disease_availabe_epilepsy_male.length rescue 0 ) + (@disease_availabe_epilepsy_female.length rescue 0 ) %></td>
                   <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @disease_ever_availabe_epilepsy_male %></td>
-                  <td><%=  @disease_ever_availabe_epilepsy_female %></td>
-                  <td><%=  (@disease_ever_availabe_epilepsy_male.to_i + @disease_ever_availabe_epilepsy_female.to_i) %></td>
+                  <td><%=  @disease_ever_availabe_epilepsy_male.length rescue 0 %></td>
+                  <td><%=  @disease_ever_availabe_epilepsy_female.length rescue 0 %></td>
+                  <td><%=  (@disease_ever_availabe_epilepsy_male.length rescue 0) + (@disease_ever_availabe_epilepsy_female.length rescue 0 ) %></td>
                 </tr>
                 <tr>
 
