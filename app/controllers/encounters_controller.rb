@@ -358,7 +358,7 @@ class EncountersController < ApplicationController
       redirect_to params[:next_url] and return if !params[:next_url].nil?
 			
 			if params[:encounter_type].to_s.upcase == "APPOINTMENT"
-        print_and_redirect("/patients/dashboard_print_visit/#{params[:patient_id]}?user_id=#{params[:user_id]}","/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}")
+        print_and_redirect("/patients/specific_patient_visit_date_label/#{params[:patient_id]}?user_id=#{params[:user_id]}","/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}")
         return
       elsif params[:encounter_type].to_s.upcase == "UPDATE HIV STATUS"
         if params[:concept]['Patient enrolled in HIV program'].upcase == "YES"
