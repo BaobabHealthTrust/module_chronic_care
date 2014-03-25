@@ -1112,11 +1112,11 @@ class CohortToolController < ApplicationController
     @specified_period = report.specified_period
     
     if params[:type] == "ccc"
-              @total_registered = report.total_registered("EPILEPSY CLINIC VISIT").length rescue 0
-              ids = report.total_registered("EPILEPSY CLINIC VISIT").map{|patient|patient.patient_id}.join(',') rescue ""
-              ids = report.total_registered("EPILEPSY CLINIC VISIT").map{|patient|patient.patient_id} if report.total_registered.length == 1
-              @total_ever_registered = report.total_ever_registered("EPILEPSY CLINIC VISIT").length rescue 0
-              ids_ever = report.total_ever_registered("EPILEPSY CLINIC VISIT").map{|patient|patient.patient_id}.join(',') rescue ""
+              @total_registered = report.total_registered.length rescue 0
+              ids = report.total_registered.map{|patient|patient.patient_id}.join(',') rescue ""
+              ids = report.total_registered.map{|patient|patient.patient_id} if report.total_registered.length == 1
+              @total_ever_registered = report.total_ever_registered.length rescue 0
+              ids_ever = report.total_ever_registered.map{|patient|patient.patient_id}.join(',') rescue ""
     else
             @total_registered = report.total_registered("DIABETES HYPERTENSION INITIAL VISIT").length rescue 0
             ids = report.total_registered("DIABETES HYPERTENSION INITIAL VISIT").map{|patient|patient.patient_id.to_s}.join(',') rescue ""
@@ -1287,10 +1287,19 @@ class CohortToolController < ApplicationController
     total_disease_ever_male = @disease_ever_availabe_dmht_male + @disease_ever_availabe_dm_male + @disease_ever_availabe_ht_male + @disease_ever_availabe_asthma_male + @disease_ever_availabe_epilepsy_male
     total_disease_ever_female = @disease_ever_availabe_dmht_female + @disease_ever_availabe_dm_female + @disease_ever_availabe_ht_female + @disease_ever_availabe_asthma_female + @disease_ever_availabe_epilepsy_female
 
-    @disease_availabe_other_male = total_male - total_disease_male
-    @disease_availabe_other_female = total_female - total_disease_female
-    @disease_ever_availabe_other_male = total_ever_male - total_disease_ever_male
-    @disease_ever_availabe_other_female = total_ever_female - total_disease_ever_female
+    #raise total_disease_male.map{|patient|patient.patient_id}.uniq.join(',').length
+    @disease_availabe_other_male = total_male - total_disease_male.map{|patient|patient.patient_id}.uniq.length
+    @disease_availabe_other_male = 0 if @disease_availabe_other_male > total_male
+
+    @disease_availabe_other_female = total_female - total_disease_female.map{|patient|patient.patient_id}.uniq.length
+    @disease_availabe_other_female = 0 if @disease_availabe_other_female > total_female
+
+      @disease_ever_availabe_other_male = total_ever_male - total_disease_ever_male.map{|patient|patient.patient_id}.uniq.length
+
+     # raise "#{total_disease_ever_male.map{|patient|patient.patient_id}.uniq.length} Against #{total_ever_male}"
+      @disease_ever_availabe_other_male = 0 if @disease_ever_availabe_other_male.to_i < 0
+      @disease_ever_availabe_other_female = total_ever_female - total_disease_ever_female.map{|patient|patient.patient_id}.uniq.length
+      @disease_ever_availabe_other_female = 0 if @disease_ever_availabe_other_female.to_i < 0
 
     @bmi_greater_female = report.bmi(ids, 'F')
     @bmi_greater_male = report.bmi(ids, 'M')
