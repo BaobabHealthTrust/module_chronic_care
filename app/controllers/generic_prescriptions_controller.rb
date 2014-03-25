@@ -44,8 +44,8 @@ class GenericPrescriptionsController < ApplicationController
     
     if params[:filter] and !params[:filter][:provider].blank?
       user_person_id = User.find_by_username(params[:filter][:provider]).person_id
-    elsif params[:location] # migration
-      user_person_id = params[:provider_id]
+    #elsif params[:location] # migration
+     # user_person_id = params[:provider_id]
     else
       user_person_id = User.find_by_user_id(params[:user_id]).person_id
     end
@@ -107,16 +107,21 @@ class GenericPrescriptionsController < ApplicationController
       end  
     end
 
-     print_prescribed = CoreService.get_global_property_value('prescription.print') rescue false
+    # print_prescribed = CoreService.get_global_property_value('prescription.print') rescue false
 
-    if print_prescribed == true
-          print_and_redirect("/patients/prescription_print/#{params[:patient_id]}?user_id=#{params[:user_id]}","/patients/treatment_dashboard/#{@patient.id}?user_id=#{params[:user_id]}")
-    else
+    #if print_prescribed != true
+    #      print_and_redirect("/patients/prescription_print/#{params[:patient_id]}?user_id=#{params[:user_id]}","/patients/treatment_dashboard/#{@patient.id}?user_id=#{params[:user_id]}")
+    #else
 			    redirect_to  "/patients/treatment_dashboard/#{@patient.id}?user_id=#{params[:user_id]}" and return
-		end
+		#end
     
   end
-  
+
+  def prescription_print
+             @patient = Patient.find(params[:patient_id])
+             print_and_redirect("/patients/prescription_print/#{params[:patient_id]}?user_id=#{params[:user_id]}","/patients/treatment_dashboard/#{@patient.id}?user_id=#{params[:user_id]}")
+  end
+
   def auto
     @patient = Patient.find(params[:patient_id] || session[:patient_id]) rescue nil
     # Find the next diagnosis that doesn't have a corresponding order
