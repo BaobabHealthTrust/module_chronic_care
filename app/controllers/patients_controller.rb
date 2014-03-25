@@ -1093,14 +1093,14 @@ class PatientsController < ApplicationController
     @obs = Observation.find_by_sql("SELECT * FROM obs WHERE concept_id = '#{concept_id}'
                                     AND person_id = '#{@person.id}'")
 
-		@next_task = @task.hypertension_next_task.encounter_type.gsub('_',' ') if current_program == "HYPERTENSION PROGRAM" #rescue nil
-		@next_task = @task.asthma_next_task.encounter_type.gsub('_',' ') if current_program == "ASTHMA PROGRAM" #rescue nil
-		@next_task = @task.epilepsy_next_task.encounter_type.gsub('_',' ') if current_program == "EPILEPSY PROGRAM" #rescue nil
-    @next_task = @task.next_task.encounter_type.gsub('_',' ') if current_program == "DIABETES PROGRAM" #rescue nil
+		@next_task = @task.hypertension_next_task.encounter_type.gsub('_',' ') if current_program == "HYPERTENSION PROGRAM" rescue nil
+		@next_task = @task.asthma_next_task.encounter_type.gsub('_',' ') if current_program == "ASTHMA PROGRAM" rescue nil
+		@next_task = @task.epilepsy_next_task.encounter_type.gsub('_',' ') if current_program == "EPILEPSY PROGRAM" rescue nil
+    @next_task = @task.next_task.encounter_type.gsub('_',' ') if current_program == "DIABETES PROGRAM" rescue nil
 
 
-		@current_task = @task.hypertension_next_task if current_program == "HYPERTENSION PROGRAM"
-    @current_task = @task.next_task if current_program == "DIABETES PROGRAM"
+		@current_task = @task.hypertension_next_task if current_program == "HYPERTENSION PROGRAM" rescue nil
+    @current_task = @task.next_task if current_program == "DIABETES PROGRAM" rescue nil
 		@current_task = @task.asthma_next_task if current_program == "ASTHMA PROGRAM" rescue nil
 		@current_task = @task.epilepsy_next_task if current_program == "EPILEPSY PROGRAM" rescue nil
 
@@ -1401,7 +1401,7 @@ class PatientsController < ApplicationController
 
 	def visit_label
 		session_date = session[:datetime].to_date rescue Date.today
-		@patient = Patient.find(params[:patient_id])
+		@patient = Patient.find(params[:patient_id]) rescue Patient.find(params[:id])
 		#raise @patient.to_yaml
     print_string = patient_visit_label(@patient, session_date) #rescue (raise "Unable to find patient (#{params[:patient_id]}) or generate a visit label for that patient")
     send_data(print_string,:type=>"application/label; charset=utf-8", :stream=> false, :filename=>"#{params[:patient_id]}#{rand(10000)}.lbl", :disposition => "inline")
@@ -1409,7 +1409,7 @@ class PatientsController < ApplicationController
 
 	def patient_visit_label(patient, date = Date.today)
     #result = Location.find(session[:location_id]).name.match(/outpatient/i)
-		visit = visits(patient, date, true)[date] rescue {}
+		visit = visits(patient, date)[date] rescue {}
 
 		return if visit.blank?
     visit_data = mastercard_visit_data(visit)
@@ -1787,8 +1787,10 @@ class PatientsController < ApplicationController
   end
 
   def specific_patient_visit_date_label
+    
 		session_date = params[:session_date].to_date rescue Date.today
-    @patient = Patient.find(params[:patient_id])
+    @patient = Patient.find(params[:patient_id]) rescue Patient.find(params[:id]) rescue []
+    
     print_string = patient_visit_label(@patient, session_date) #rescue (raise "Unable to find patient (#{params[:patient_id]}) or generate a visit label for that patient")
     send_data(print_string,:type=>"application/label; charset=utf-8", :stream=> false, :filename=>"#{params[:patient_id]}#{rand(10000)}.lbl", :disposition => "inline")
   end
