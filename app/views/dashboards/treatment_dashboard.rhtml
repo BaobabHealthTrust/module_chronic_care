@@ -68,6 +68,10 @@
 					<% if @dispense.to_s.downcase == "false" %>
 					 <optgroup value='/dispensations/new?user_id=<%=  @user["user_id"] %>&patient_id=<%= @patient.id -%>' label="Dispense">Dispense</optgroup>
 					<%  end %>
+
+                                        <%  if @advanced.upcase == 'STANDARD OPD PRESCRIPTION' %>
+					 <optgroup value='/prescriptions/prescription_print?user_id=<%=  @user["user_id"] %>&patient_id=<%= @patient.id -%>' label="Prescriptions">Print Prescription</optgroup>
+					<%  end %>
 				</select>
 				<input type='button' value='Done' />
 				<input type='submit' value='Finish' />
