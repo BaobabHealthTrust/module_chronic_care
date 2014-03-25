@@ -12,6 +12,8 @@ class Reports::CohortDm
     @asthma_id             = Concept.find_by_name("ASTHMA MEDICATION").id
     @epilepsy_id             = Concept.find_by_name("EPILEPSY MEDICATION").id
     @program_id = Program.find_by_name('CHRONIC CARE PROGRAM').id
+    @ht_encounter = EncounterType.find_by_name("DIABETES HYPERTENSION INITIAL VISIT").id
+    @ep_encounter = EncounterType.find_by_name("EPILEPSY CLINIC VISIT").id
 
 
     # Metformin And Glibenclamide
@@ -91,14 +93,19 @@ class Reports::CohortDm
 
   # Get all patients registered in specified period
   def total_registered(encounter_type=nil)
-    type = EncounterType.find_by_name("#{encounter_type}").id
+    type = EncounterType.find_by_name("#{encounter_type}").id rescue []
+    if type.blank?
+       conditions = " AND e.encounter_type IN (#{@ht_encounter},#{@ep_encounter})"
+    else
+       conditions = "AND e.encounter_type = #{type}"
+    end
+
     Patient.find_by_sql("
                   SELECT DISTINCT p.patient_id FROM patient p
                   INNER JOIN encounter e USING(patient_id)
                   WHERE p.voided = 0
                   AND p.date_created <= '#{@end_date}'
-                  AND p.date_created >= '#{@start_date}'
-                  AND e.encounter_type = #{type}
+                  AND p.date_created >= '#{@start_date}' #{conditions}
                   AND e.voided = 0")
   end
 
@@ -122,7 +129,7 @@ class Reports::CohortDm
     encounter = EncounterType.find_by_name("Vitals").id
     if type.upcase == "HT"
       concept = ConceptName.find_by_name("cardiovascular system diagnosis").concept_id
-      @orders = Order.find_by_sql("SELECT DISTINCT(o.person_id) FROM obs o
+      @orders = Order.find_by_sql("SELECT DISTINCT(patient.patient_id) FROM obs o
                                   INNER JOIN person p ON p.person_id = o.person_id
                                   INNER JOIN patient ON patient.patient_id = o.person_id
                                   INNER JOIN encounter e ON e.encounter_id = o.encounter_id\
@@ -131,7 +138,7 @@ class Reports::CohortDm
                                   AND o.concept_id = #{concept}
                                  AND e.encounter_type = #{encounter}
                                  AND o.value_coded != (SELECT concept_id FROM concept_name WHERE name = 'Normal')
-                                 GROUP BY patient.patient_id").length rescue 0
+                                 GROUP BY patient.patient_id")#.length rescue 0
 
     elsif type.upcase == "DM"
       ht_concept = ConceptName.find_by_name("cardiovascular system diagnosis").concept_id
@@ -151,7 +158,7 @@ class Reports::CohortDm
                                  concept_set = #{@diabetes_id})
                                  GROUP BY patient.patient_id").length #rescue 0
 =end
-                @orders = Order.find_by_sql("SELECT DISTINCT(o.person_id) FROM obs o
+                @orders = Order.find_by_sql("SELECT DISTINCT(patient.patient_id) FROM obs o
                                   INNER JOIN person p ON p.person_id = o.person_id
                                   INNER JOIN patient ON patient.patient_id = o.person_id
                                   INNER JOIN encounter e ON e.encounter_id = o.encounter_id\
@@ -159,7 +166,7 @@ class Reports::CohortDm
                                   #{categorise} 
                                   AND patient.patient_id NOT IN (SELECT person_id FROM obs  WHERE concept_id = #{ht_concept}
                                   AND value_coded != (SELECT concept_id FROM concept_name WHERE name = 'Normal'))
-                                 GROUP BY patient.patient_id").length rescue 0
+                                 GROUP BY patient.patient_id")#.length rescue 0
     elsif type.upcase == "ASTHMA"
       @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
                                 INNER JOIN person p ON p.person_id = orders.patient_id
@@ -168,7 +175,7 @@ class Reports::CohortDm
                                 #{categorise} 
                                 AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
                                 concept_set = #{@asthma_id})
-                                GROUP BY patient_id").length rescue 0
+                                GROUP BY patient_id")#.length rescue 0
     elsif type.upcase == "EPILEPSY"
       @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
                                 INNER JOIN person p ON p.person_id = orders.patient_id
@@ -177,11 +184,11 @@ class Reports::CohortDm
                                 #{categorise} 
                                 AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
                                 concept_set = #{@epilepsy_id})
-                                GROUP BY patient_id").length rescue 0
+                                GROUP BY patient_id")#.length rescue 0
     elsif type.upcase == "DM HT"
       ht_concept = ConceptName.find_by_name("cardiovascular system diagnosis").concept_id
       dm_concept = ConceptName.find_by_name("Patient has Diabetes").concept_id
-      @orders = Order.find_by_sql("SELECT o.person_id FROM obs o
+      @orders = Order.find_by_sql("SELECT patient.patient_id FROM obs o
                                   INNER JOIN person p ON p.person_id = o.person_id
                                   INNER JOIN patient ON patient.patient_id = o.person_id
                                   INNER JOIN orders ON orders.patient_id = patient.patient_id
@@ -190,7 +197,7 @@ class Reports::CohortDm
                                   AND o.value_coded != (SELECT concept_id FROM concept_name WHERE name = 'Normal'))
                                   AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
                                   concept_set = #{@diabetes_id})
-                                  GROUP BY patient.patient_id").length rescue 0
+                                  GROUP BY patient.patient_id")#.length rescue 0
     elsif type.upcase == "OTHER"
       @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
                                       INNER JOIN person p ON p.person_id = orders.patient_id
@@ -199,7 +206,7 @@ class Reports::CohortDm
                                       #{categorise} 
 																			AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
 																			concept_set NOT IN (#{@hypertensition_medication_id}, #{@asthma_id},#{@diabetes_id}, #{@epilepsy_id})) \
-                                      GROUP BY patient_id").length rescue 0
+                                      GROUP BY patient_id")#.length rescue 0
     end
     return @orders
   end
@@ -216,7 +223,7 @@ class Reports::CohortDm
       concept = ConceptName.find_by_name("cardiovascular system diagnosis").concept_id
       encounter = EncounterType.find_by_name("Vitals").id
 
-      @orders = Observation.find_by_sql("SELECT o.person_id FROM obs o
+      @orders = Observation.find_by_sql("SELECT DISTINCT(patient.patient_id) FROM obs o
                                       INNER JOIN person p ON p.person_id = o.person_id
                                       INNER JOIN patient ON patient.patient_id = o.person_id
                                       INNER JOIN encounter e ON e.encounter_id = o.encounter_id\
@@ -225,7 +232,7 @@ class Reports::CohortDm
                                       AND o.concept_id = #{concept}
                                       AND e.encounter_type = #{encounter}
                                      AND o.value_coded != (SELECT concept_id FROM concept_name WHERE name = 'Normal')
-                                     GROUP BY patient.patient_id").length rescue 0
+                                     GROUP BY patient.patient_id")#.length rescue 0
       # raise @orders.to_yaml
     elsif type.upcase == "DM"
       ht_concept = ConceptName.find_by_name("cardiovascular system diagnosis").concept_id
@@ -244,7 +251,7 @@ class Reports::CohortDm
                                  concept_set = #{@diabetes_id})
                                  GROUP BY patient.patient_id").length #rescue 0
 =end
-      @orders = Order.find_by_sql("SELECT o.person_id FROM obs o
+      @orders = Order.find_by_sql("SELECT DISTINCT(patient.patient_id) FROM obs o
                                   INNER JOIN person p ON p.person_id = o.person_id
                                   INNER JOIN patient ON patient.patient_id = o.person_id
                                   INNER JOIN encounter e ON e.encounter_id = o.encounter_id\
@@ -254,27 +261,27 @@ class Reports::CohortDm
                                   AND patient.patient_id NOT IN (SELECT person_id FROM obs  WHERE concept_id = #{ht_concept}
                                   AND value_coded != (SELECT concept_id FROM concept_name WHERE name = 'Normal'))
                                   
-                                 GROUP BY patient.patient_id").length rescue 0
+                                 GROUP BY patient.patient_id")#.length rescue 0
     elsif type.upcase == "ASTHMA"
-      @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
+      @orders = Order.find_by_sql("SELECT DISTINCT(orders.patient_id) FROM orders
                                   INNER JOIN person p ON p.person_id = orders.patient_id
                                   INNER JOIN patient ON patient.patient_id = orders.patient_id \
                                   WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) 
                                   #{categorise} AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
                                   concept_set = #{@asthma_id})
-                                  GROUP BY patient_id").length rescue 0
+                                  GROUP BY patient_id")#.length rescue 0
     elsif type.upcase == "EPILEPSY"
-      @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
+      @orders = Order.find_by_sql("SELECT DISTINCT(orders.patient_id) FROM orders
                                   INNER JOIN person p ON p.person_id = orders.patient_id
                                   INNER JOIN patient ON patient.patient_id = orders.patient_id \
                                   WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) 
                                   #{categorise} AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
                                   concept_set = #{@epilepsy_id})
-                                  GROUP BY patient_id").length rescue 0
+                                  GROUP BY patient_id")#.length rescue 0
     elsif type.upcase == "DM HT"
       ht_concept = ConceptName.find_by_name("cardiovascular system diagnosis").concept_id
       dm_concept = ConceptName.find_by_name("Patient has Diabetes").concept_id
-      @orders = Order.find_by_sql("SELECT o.person_id FROM obs o
+      @orders = Order.find_by_sql("SELECT DISTINCT(patient.patient_id) FROM obs o
                                   INNER JOIN person p ON p.person_id = o.person_id
                                   INNER JOIN patient ON patient.patient_id = o.person_id
                                   INNER JOIN orders ON orders.patient_id = patient.patient_id
@@ -283,16 +290,16 @@ class Reports::CohortDm
                                   AND o.value_coded != (SELECT concept_id FROM concept_name WHERE name = 'Normal'))
                                   AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
                                   concept_set = #{@diabetes_id})
-                                  GROUP BY patient.patient_id").length
+                                  GROUP BY patient.patient_id")#.length
       
     elsif type.upcase == "OTHER"
-      @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
+      @orders = Order.find_by_sql("SELECT DISTINCT(orders.patient_id) FROM orders
                                   INNER JOIN person p ON p.person_id = orders.patient_id
                                   INNER JOIN patient ON patient.patient_id = orders.patient_id \
                                   WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
                                   #{categorise} AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
                                   concept_set NOT IN (#{@hypertensition_medication_id}, #{@asthma_id},#{@diabetes_id}, #{@epilepsy_id})) \
-                                  GROUP BY patient_id").length rescue 0
+                                  GROUP BY patient_id")#.length rescue 0
       
     end 
     return @orders
@@ -491,13 +498,17 @@ class Reports::CohortDm
 
   # Get all patients ever registered
   def total_ever_registered(encounter_type=nil)
-    type = EncounterType.find_by_name("#{encounter_type}").id
+      type = EncounterType.find_by_name("#{encounter_type}").id rescue []
+    if type.blank?
+       conditions = " AND e.encounter_type IN (#{@ht_encounter},#{@ep_encounter})"
+    else
+       conditions = "AND e.encounter_type = #{type}"
+    end
     Patient.find_by_sql("
                   SELECT DISTINCT p.patient_id FROM patient p
                   INNER JOIN encounter e USING(patient_id)
                   WHERE p.voided = 0
-                  AND p.date_created <= '#{@end_date}'
-                  AND e.encounter_type = #{type}
+                  AND p.date_created <= '#{@end_date}' #{conditions}
                   AND e.voided = 0")
     
   end
