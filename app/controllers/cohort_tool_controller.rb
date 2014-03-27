@@ -1123,7 +1123,7 @@ class CohortToolController < ApplicationController
             @total_ever_registered = report.total_ever_registered("DIABETES HYPERTENSION INITIAL VISIT").length rescue 0
             ids_ever = report.total_ever_registered("DIABETES HYPERTENSION INITIAL VISIT").map{|patient|patient.patient_id.to_s}.join(',') rescue ""
     end
-   
+    
  if params[:type] != "ccc"
     @mi = report.mi(ids) rescue 0
     @kidney_failure = report.kidney_failure(ids) rescue 0
@@ -1252,55 +1252,57 @@ class CohortToolController < ApplicationController
 
     @total_children_ever_registered_male = report.total_children_ever_registered(ids_ever, "male", 0) # rescue 0
     @total_children_ever_registered_female = report.total_children_ever_registered(ids_ever, "female", 0)
-    @disease_availabe_dm_male = report.disease_availabe(ids, "DM", "male")
-    @disease_availabe_dm_female = report.disease_availabe(ids, "DM", "female")
-    @disease_ever_availabe_dm_male = report.disease_ever_availabe(ids_ever, "DM", "male")
-    @disease_ever_availabe_dm_female = report.disease_ever_availabe(ids_ever, "DM", "female")
+    
+    @disease_availabe_dm_male = report.disease_availabe(ids, "DM", "male").map{|patient|patient.patient_id}.uniq - report.disease_availabe(ids, "HT", "male").map{|patient|patient.patient_id}.uniq
+    @disease_availabe_dm_female = report.disease_availabe(ids, "DM", "female").map{|patient|patient.patient_id}.uniq - report.disease_availabe(ids, "HT", "female").map{|patient|patient.patient_id}.uniq
+    @disease_ever_availabe_dm_male = report.disease_ever_availabe(ids_ever, "DM", "male").map{|patient|patient.patient_id}.uniq - report.disease_ever_availabe(ids_ever, "HT", "male").map{|patient|patient.patient_id}.uniq
+    @disease_ever_availabe_dm_female = report.disease_ever_availabe(ids_ever, "DM", "female").map{|patient|patient.patient_id}.uniq - report.disease_ever_availabe(ids_ever, "HT", "male").map{|patient|patient.patient_id}.uniq
 
-    @disease_availabe_ht_male = report.disease_availabe(ids, "HT", "male")
-    @disease_availabe_ht_female = report.disease_availabe(ids, "HT", "female")
-    @disease_ever_availabe_ht_male = report.disease_ever_availabe(ids_ever, "HT", "male")
-    @disease_ever_availabe_ht_female = report.disease_ever_availabe(ids_ever, "HT", "female")
+    
+    @disease_availabe_ht_male = report.disease_availabe(ids, "HT", "male").map{|patient|patient.patient_id}.uniq - report.disease_availabe(ids, "DM", "male").map{|patient|patient.patient_id}.uniq
+    @disease_availabe_ht_female = report.disease_availabe(ids, "HT", "female").map{|patient|patient.patient_id}.uniq - report.disease_availabe(ids, "DM", "female").map{|patient|patient.patient_id}.uniq
 
-    @disease_availabe_asthma_male = report.disease_availabe(ids, "asthma", "male")
-    @disease_availabe_asthma_female = report.disease_availabe(ids, "asthma", "female")
-    @disease_ever_availabe_asthma_male = report.disease_ever_availabe(ids_ever, "asthma", "male")
-    @disease_ever_availabe_asthma_female = report.disease_ever_availabe(ids_ever, "asthma", "female")
+    @disease_ever_availabe_ht_male = report.disease_ever_availabe(ids_ever, "HT", "male").map{|patient|patient.patient_id}.uniq - report.disease_ever_availabe(ids_ever, "DM", "male").map{|patient|patient.patient_id}.uniq
+    @disease_ever_availabe_ht_female = report.disease_ever_availabe(ids_ever, "HT", "female").map{|patient|patient.patient_id}.uniq - report.disease_ever_availabe(ids_ever, "DM", "female").map{|patient|patient.patient_id}.uniq
 
-    @disease_availabe_epilepsy_male = report.disease_availabe(ids, "epilepsy", "male")
-    @disease_availabe_epilepsy_female = report.disease_availabe(ids, "epilepsy", "female")
-    @disease_ever_availabe_epilepsy_male = report.disease_ever_availabe(ids_ever, "epilepsy", "male")
-    @disease_ever_availabe_epilepsy_female = report.disease_ever_availabe(ids_ever, "epilepsy", "female")
+    @disease_availabe_asthma_male = report.disease_availabe(ids, "asthma", "male").map{|patient|patient.patient_id}.uniq
+    @disease_availabe_asthma_female = report.disease_availabe(ids, "asthma", "female").map{|patient|patient.patient_id}.uniq
+    @disease_ever_availabe_asthma_male = report.disease_ever_availabe(ids_ever, "asthma", "male").map{|patient|patient.patient_id}.uniq
+    @disease_ever_availabe_asthma_female = report.disease_ever_availabe(ids_ever, "asthma", "female").map{|patient|patient.patient_id}.uniq
 
-    @disease_availabe_dmht_male = report.disease_availabe(ids, "dm ht", "male")
-    @disease_availabe_dmht_female = report.disease_availabe(ids, "dm ht", "female")
-    @disease_ever_availabe_dmht_male = report.disease_ever_availabe(ids_ever, "dm ht", "male")  
-    @disease_ever_availabe_dmht_female = report.disease_ever_availabe(ids_ever, "dm ht", "female")
+    @disease_availabe_epilepsy_male = report.disease_availabe(ids, "epilepsy", "male").map{|patient|patient.patient_id}.uniq
+    @disease_availabe_epilepsy_female = report.disease_availabe(ids, "epilepsy", "female").map{|patient|patient.patient_id}.uniq
+    @disease_ever_availabe_epilepsy_male = report.disease_ever_availabe(ids_ever, "epilepsy", "male").map{|patient|patient.patient_id}.uniq
+    @disease_ever_availabe_epilepsy_female = report.disease_ever_availabe(ids_ever, "epilepsy", "female").map{|patient|patient.patient_id}.uniq
+
+    @disease_availabe_dmht_male = report.disease_availabe(ids, "dm ht", "male").map{|patient|patient.patient_id}.uniq # - report.disease_availabe(ids, "HT", "male").map{|patient|patient.patient_id}.uniq - report.disease_availabe(ids, "DM", "male").map{|patient|patient.patient_id}.uniq
+    @disease_availabe_dmht_female = report.disease_availabe(ids, "dm ht", "female").map{|patient|patient.patient_id}.uniq #- report.disease_availabe(ids, "HT", "female").map{|patient|patient.patient_id}.uniq - report.disease_availabe(ids, "DM", "female").map{|patient|patient.patient_id}.uniq
+    @disease_ever_availabe_dmht_male = report.disease_ever_availabe(ids_ever, "dm ht", "male").map{|patient|patient.patient_id}.uniq #- report.disease_ever_availabe(ids_ever, "HT", "male").map{|patient|patient.patient_id}.uniq - report.disease_ever_availabe(ids_ever, "DM", "male").map{|patient|patient.patient_id}.uniq
+    @disease_ever_availabe_dmht_female = report.disease_ever_availabe(ids_ever, "dm ht", "female").map{|patient|patient.patient_id}.uniq #- report.disease_ever_availabe(ids_ever, "HT", "female").map{|patient|patient.patient_id}.uniq - report.disease_ever_availabe(ids_ever, "DM", "female").map{|patient|patient.patient_id}.uniq
 
     total_male = @total_children_registered_male + @total_adults_registered_male + @older_persons_registered_male
+    
     total_female = @total_children_registered_female + @total_adults_registered_female + @older_persons_registered_female
-    total_disease_male = @disease_availabe_dmht_male + @disease_availabe_dm_male + @disease_availabe_ht_male + @disease_availabe_asthma_male + @disease_availabe_epilepsy_male
-    total_disease_female = @disease_availabe_dmht_female + @disease_availabe_dm_female + @disease_availabe_ht_female + @disease_availabe_asthma_female + @disease_availabe_epilepsy_female
+    
+    total_disease_male = (@disease_availabe_dmht_male + @disease_availabe_dm_male + @disease_availabe_ht_male + @disease_availabe_asthma_male + @disease_availabe_epilepsy_male).uniq
+    total_disease_female = (@disease_availabe_dmht_female + @disease_availabe_dm_female + @disease_availabe_ht_female + @disease_availabe_asthma_female + @disease_availabe_epilepsy_female).uniq
 
+    
     total_ever_male = @total_children_ever_registered_male + @total_adults_ever_registered_male + @older_persons_ever_registered_male
     total_ever_female = @total_children_ever_registered_female + @total_adults_ever_registered_female + @older_persons_ever_registered_female
-    total_disease_ever_male = @disease_ever_availabe_dmht_male + @disease_ever_availabe_dm_male + @disease_ever_availabe_ht_male + @disease_ever_availabe_asthma_male + @disease_ever_availabe_epilepsy_male
-    total_disease_ever_female = @disease_ever_availabe_dmht_female + @disease_ever_availabe_dm_female + @disease_ever_availabe_ht_female + @disease_ever_availabe_asthma_female + @disease_ever_availabe_epilepsy_female
 
-    #raise total_disease_male.map{|patient|patient.patient_id}.uniq.join(',').length
-    @disease_availabe_other_male = total_male - total_disease_male.map{|patient|patient.patient_id}.uniq.length
-    @disease_availabe_other_male = 0 if @disease_availabe_other_male > total_male
+    total_disease_ever_male = ( (@disease_ever_availabe_dmht_male || "") + (@disease_ever_availabe_dm_male || "") + (@disease_ever_availabe_ht_male || "") + (@disease_ever_availabe_asthma_male || "") + (@disease_ever_availabe_epilepsy_male || "")).uniq
+    total_disease_ever_female = ( (@disease_ever_availabe_dmht_female || "") + (@disease_ever_availabe_dm_female || "") + (@disease_ever_availabe_ht_female || "") + (@disease_ever_availabe_asthma_female || "") + (@disease_ever_availabe_epilepsy_female || "")).uniq
 
-    @disease_availabe_other_female = total_female - total_disease_female.map{|patient|patient.patient_id}.uniq.length
-    @disease_availabe_other_female = 0 if @disease_availabe_other_female > total_female
-
-      @disease_ever_availabe_other_male = total_ever_male - total_disease_ever_male.map{|patient|patient.patient_id}.uniq.length
-
-     # raise "#{total_disease_ever_male.map{|patient|patient.patient_id}.uniq.length} Against #{total_ever_male}"
-      @disease_ever_availabe_other_male = 0 if @disease_ever_availabe_other_male.to_i < 0
-      @disease_ever_availabe_other_female = total_ever_female - total_disease_ever_female.map{|patient|patient.patient_id}.uniq.length
-      @disease_ever_availabe_other_female = 0 if @disease_ever_availabe_other_female.to_i < 0
-
+    #  raise @disease_ever_availabe_dm_male.to_yaml
+    @disease_availabe_other_male = total_male - total_disease_male.length #rescue 0
+    @disease_availabe_other_female = total_female - total_disease_female.length #rescue 0
+   
+    @disease_ever_availabe_other_male = total_ever_male - total_disease_ever_male.length #rescue 0
+   # raise  total_disease_ever_male.length.to_yaml
+    @disease_ever_availabe_other_female = total_ever_female - total_disease_ever_female.length #rescue 0
+     
+      
     @bmi_greater_female = report.bmi(ids, 'F')
     @bmi_greater_male = report.bmi(ids, 'M')
 
@@ -1453,8 +1455,7 @@ class CohortToolController < ApplicationController
 
     #raise report.attending_ever(ids, "female").to_yaml
 
-    @attending_male = report.attending_ever(ids_ever, "male") #- @dead_ever_male - @transfer_out_ever_male - @stopped_treatment_ever_male
-    @attending_female = report.attending_ever(ids_ever, "female") #- @dead_ever_female - @transfer_out_ever_female - @stopped_treatment_ever_female
+   #- @dead_ever_female - @transfer_out_ever_female - @stopped_treatment_ever_female
 
     @not_attend_male = report.not_attending_ever(ids_ever, "male")
     @not_attend_female = report.not_attending_ever(ids_ever, "female")
@@ -1513,7 +1514,12 @@ class CohortToolController < ApplicationController
       @ploriferative_retinapathy +
       @end_stage_retinapathy +
       @maculopathy
-   end
+    else
+      @attending_male = total_disease_ever_male.length - @not_attend_male - @stopped_treatment_male - @lost_followup_male - @transfer_out_male - @dead_ever_male
+      @attending_female = total_disease_ever_female.length - @not_attend_female - @stopped_treatment_female - @lost_followup_female - @transfer_out_female - @dead_ever_female    #- @dead_ever_male - @transfer_out_ever_male - @stopped_treatment_ever_male
+    end
+   
+
     render :template => "/cohort_tool/ccc_cohort", :layout => "application" and return if params[:type] == "ccc"
     render :template => "/cohort_tool/cohort", :layout => "application"
   end
