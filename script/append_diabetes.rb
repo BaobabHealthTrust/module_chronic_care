@@ -9,8 +9,7 @@
                                         WHERE r.patient_id NOT IN
                                         (Select distinct(o.person_id)
                                         from obs o
-                                        inner join encounter e using(encounter_id)
-                                        where e.encounter_type = (select encounter_type_id from encounter_type where name = 'diabetes hypertension initial visit')
+                                        where o.concept_id = (select concept_id from concept_name where name = 'patient has diabetes')
                                         and o.voided = 0)
                                         AND r.voided = 0")
 
