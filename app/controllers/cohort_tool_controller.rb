@@ -1439,8 +1439,9 @@ class CohortToolController < ApplicationController
       @discharged = report.discharged(ids) rescue 0
      end
 
-    @transfer_out_ever_male = report.transfer_out_ever(ids_ever, "male") rescue 0
-    @transfer_out_ever_female = report.transfer_out_ever(ids_ever, "female") rescue 0
+    @transfer_out_ever_male = report.transfer_out_ever(ids_ever, "male") #rescue 0
+    @transfer_out_ever_female = report.transfer_out_ever(ids_ever, "female") #rescue 0
+   # raise @transfer_out_ever_male.to_yaml
 
     @transfer_out_ever = @transfer_out_ever_male + @transfer_out_ever_female
     
@@ -1515,8 +1516,8 @@ class CohortToolController < ApplicationController
       @end_stage_retinapathy +
       @maculopathy
     else
-      @attending_male = total_disease_ever_male.length - @not_attend_male - @stopped_treatment_male - @lost_followup_male - @transfer_out_male - @dead_ever_male
-      @attending_female = total_disease_ever_female.length - @not_attend_female - @stopped_treatment_female - @lost_followup_female - @transfer_out_female - @dead_ever_female    #- @dead_ever_male - @transfer_out_ever_male - @stopped_treatment_ever_male
+      @attending_male = total_ever_male - @not_attend_male - @stopped_treatment_ever_male - @lost_followup_male - @transfer_out_ever_male - @dead_ever_male
+      @attending_female = total_ever_female - @not_attend_female - @stopped_treatment_ever_female - @lost_followup_female - @transfer_out_ever_female - @dead_ever_female    #- @dead_ever_male - @transfer_out_ever_male - @stopped_treatment_ever_male
     end
    
 
