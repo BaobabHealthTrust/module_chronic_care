@@ -176,12 +176,14 @@ class ProtocolPatientsController < ApplicationController
 
     @category = "Mild"
 
-    if (@sbp >= 140 and @sbp < 160) and (@dbp >= 100 and @dbp < 110)
-      @category = "Mild"
-    elsif (@sbp >= 160 and @sbp < 180) and (@dbp >= 90 and @dbp < 100)
-      @category = "Moderate"
-    elsif (@sbp >= 180) and (@dbp >= 110)
-      @category = "Severe"
+    if ! @sbp.blank? and ! @dbp.blank?
+          if (@sbp >= 140 and @sbp < 160) and (@dbp >= 100 and @dbp < 110)
+            @category = "Mild"
+          elsif (@sbp >= 160 and @sbp < 180) and (@dbp >= 90 and @dbp < 100)
+            @category = "Moderate"
+          elsif (@sbp >= 180) and (@dbp >= 110)
+            @category = "Severe"
+          end
     end
     #@sbp = Vitals.current_vitals(@patient, "SYSTOLIC BLOOD PLEASURE")
     #raise @category.to_yaml
