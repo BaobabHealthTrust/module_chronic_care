@@ -11,6 +11,7 @@
   var formulations = <%= @formulations.to_json rescue {} %>
   var generic_drugs = generics;
   var drugs = formulations;
+  var prn = '<%=  @prn %>';
 
   var search_path = "/encounters/load_frequencies_and_dosages";
 
