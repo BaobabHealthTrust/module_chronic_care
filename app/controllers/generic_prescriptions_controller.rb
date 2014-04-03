@@ -250,7 +250,8 @@ class GenericPrescriptionsController < ApplicationController
 			}
 			@formulations[generic[1]] = drug_formulations			
 		}
-   
+     @prn = CoreService.get_global_property_value('show.prn').to_s.downcase rescue "true"
+     
 		@diagnosis = @patient.current_diagnoses["DIAGNOSIS"] rescue []
 		render :layout => 'application', :template => 'prescriptions/give_drugs'
 	end
@@ -259,7 +260,34 @@ class GenericPrescriptionsController < ApplicationController
 	def create_advanced_prescription
     @user = params[:user_id]
 		@patient    = Patient.find(params[:encounter][:patient_id]  || session[:patient_id]) rescue nil
-		encounter  = MedicationService.current_treatment_encounter(@patient)
+    @program = Program.find_by_concept_id(ConceptName.find_by_name("chronic care program").concept_id)
+    session_date = session[:datetime].to_date rescue Date.today
+    type = EncounterType.find_by_name("TREATMENT") rescue nil
+    encounter = @patient.encounters.current.find_by_encounter_type(type.id)
+    encounter ||= @patient.encounters.create(:encounter_type => type.id, :provider_id => @user, :creator => @user)
+      @program_encounter = ProgramEncounter.find_by_program_id(@program.id,
+              :conditions => ["patient_id = ? AND DATE(date_time) = ?",
+                @patient.id, session_date.strftime("%Y-%m-%d")])
+
+            if @program_encounter.blank?
+
+              @program_encounter = ProgramEncounter.create(
+                :patient_id => @patient.id,
+                :date_time => session_date,
+                :program_id => @program.id
+              )
+
+            end
+
+                ProgramEncounterDetail.create(
+                  :encounter_id => encounter.id.to_i,
+                  :program_encounter_id => @program_encounter.id,
+                  :program_id => @program.id
+                )
+
+
+
+		#encounter  = MedicationService.current_treatment_encounter(@patient, @user)
     
 		if params[:prescription].blank?
 			next if params[:formulation].blank?
