@@ -1736,7 +1736,13 @@ function askPRN(){
     
         var qtblcell1_1 = document.createElement("div");
         qtblcell1_1.className = "cell";
-        qtblcell1_1.innerHTML = "Take as required (PRN)";
+        
+        if (prn == 'false'){
+          qtblcell1_1.innerHTML = "Take as required";
+        } else {
+          qtblcell1_1.innerHTML = "Take as required (PRN)";
+        }
+       
     
         qtblrow1.appendChild(qtblcell1_1);
     
