@@ -404,8 +404,10 @@ class EncountersController < ApplicationController
         mixed = "#{drug} #{o.to_piped_s.humanize}"
         [o.id, mixed] rescue nil
       }.compact
-    #elsif encounter.type.name.upcase == "TREATMENT"
-    #  raise encounter.observations.to_s.to_yaml
+    elsif encounter.type.name.upcase == "TREATMENT"
+      obs = encounter.orders.collect{|o|
+        ["drg", o.to_s]
+      }
     else
       obs = encounter.observations.collect{|o|
         [o.id, o.to_piped_s.humanize] rescue nil
