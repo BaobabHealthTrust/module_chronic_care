@@ -231,7 +231,7 @@
 			name='concept[Does the family have a history of cardiovascular related diseases?]'
 			helpText='Family History of Premature cardiovascular death? '
 			tt_onLoad ="showCategory('Family History')"
-			condition='program == "HYPERTENSION PROGRAM"'
+			condition='(program == "HYPERTENSION PROGRAM") || (program == "DIABETES PROGRAM")'
 			tt_requireNextClick = false >
 	<option></option>
 	<option value='No'>No</option>
@@ -254,7 +254,7 @@
 			helpText='Family History of Diabetes? '
 			pos='1'
 			tt_onLoad ="showCategory('Family History')"
-			condition='program == "HYPERTENSION PROGRAM"'
+			condition='(program == "HYPERTENSION PROGRAM") || (program == "DIABETES PROGRAM")'
 			tt_requireNextClick = false >
 	<option></option>
 	<option value='No'>No</option>
@@ -266,7 +266,7 @@
 			helpText='Does the family have a history of hypertension? '
 			pos='2'
 			tt_onLoad ="showCategory('Family History')"
-			condition='program == "HYPERTENSION PROGRAM"'
+			condition='(program == "HYPERTENSION PROGRAM") || (program == "DIABETES PROGRAM")'
 			tt_requireNextClick = false >
 	<option></option>
 	<option value='No'>No</option>
@@ -279,7 +279,7 @@
 			helpText='Family History Kidney disease? '
 			pos='3'
 			tt_onLoad ="showCategory('Family History')"
-			condition='program == "HYPERTENSION PROGRAM"'
+			condition='program == "HYPERTENSION PROGRAM" || program == "DIABETES PROGRAM"'
 			tt_requireNextClick = false >
 	<option></option>
 	<option value='No'>No</option>
