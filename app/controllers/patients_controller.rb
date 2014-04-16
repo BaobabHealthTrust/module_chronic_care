@@ -1642,8 +1642,8 @@ class PatientsController < ApplicationController
     visit_data = mastercard_visit_data(visit)
     #raise visit_data['bp'].to_yaml
     label = ZebraPrinter::StandardLabel.new
-    label.draw_text("Printed: #{Date.today.strftime('%b %d %Y')}",597,280,0,1,1,1,false)
-    label.draw_text("#{seen_by(patient,date)}",597,250,0,1,1,1,false)
+    label.draw_text("Printed: #{Date.today.strftime('%b %d %Y')}",360,30,0,1,1,1,false)
+    label.draw_text("#{seen_by(patient,date)}",597,30,0,1,1,1,false)
     label.draw_text("#{date.strftime("%B %d %Y").upcase}",25,30,0,3,1,1,false)
     # label.draw_text("#{arv_number}",565,30,0,3,1,1,true)
     label.draw_text("#{patient.name}(#{patient.gender})",25,60,0,3,1,1,false)
