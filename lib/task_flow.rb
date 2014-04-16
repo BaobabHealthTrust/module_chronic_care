@@ -89,7 +89,8 @@ class TaskFlow
   end
 
 
-  def epilepsy_next_task
+  def epilepsy_next_task(host, remote_ip)
+    
     normal_flow = self.tasks
 
     flow = {}
@@ -178,7 +179,7 @@ class TaskFlow
 
 					next if !vitals.blank?
 					self.encounter_type = 'VITALS'
-					self.url = "/protocol_patients/vitals?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+					self.url = "http://localhost:3000/vitals?destination=http://#{host}/patients/processvitals/1?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?(tsk)
 						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
 					else
@@ -325,7 +326,8 @@ class TaskFlow
 		end
 	end
 
-	def asthma_next_task
+	def asthma_next_task(host = nil, remote_ip = nil)
+    
     normal_flow = self.tasks
 
     flow = {}
@@ -424,7 +426,7 @@ class TaskFlow
 
 					next if !vitals.blank?
 					self.encounter_type = 'VITALS'
-					self.url = "/protocol_patients/vitals?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+					self.url = "http://localhost:3000/vitals?destination=http://#{host}/patients/processvitals/1?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?(tsk)
 						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
 					else
@@ -552,7 +554,8 @@ class TaskFlow
 		end
 	end
 
-  def hypertension_next_task
+  def hypertension_next_task(host = nil, remote_ip = nil)
+    
      normal_flow = self.tasks
 
     flow = {}
@@ -641,7 +644,7 @@ class TaskFlow
 
 					next if !vitals.blank?
 					self.encounter_type = 'VITALS'
-					self.url = "/protocol_patients/vitals?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+					self.url = "http://localhost:3000/vitals?destination=http://#{host}/patients/processvitals/1?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?(tsk)
 						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
 					else
@@ -770,8 +773,7 @@ class TaskFlow
 		end
 	end
 
-  def next_task
-    
+  def next_task(patient_id, host = nil, remote_ip = nil)
     # scope: [ TODAY | EXISTS | CURRENT PROGRAM | RECENT ]
 
     normal_flow = self.tasks
@@ -871,7 +873,7 @@ class TaskFlow
 
 					next if !vitals.blank?
 					self.encounter_type = 'VITALS'
-					self.url = "/protocol_patients/vitals?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+					self.url = "http://localhost:3000/vitals?destination=http://#{host}/patients/processvitals/1?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?(tsk)
 						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
 					else
