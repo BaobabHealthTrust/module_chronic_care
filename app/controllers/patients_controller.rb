@@ -20,6 +20,9 @@ class PatientsController < ApplicationController
     
     redirect_to "/encounters/no_user" and return if @user.nil?
 
+    session[:patient_id] = @patient.id
+    session[:user_id] = @user.id
+    session[:location_id] = params[:location_id]
 
     program_id = Program.find_by_name('CHRONIC CARE PROGRAM').id
     date = Date.today
@@ -40,10 +43,17 @@ class PatientsController < ApplicationController
 		current_user_activities = UserProperty.find_by_user_id_and_property(params[:user_id],
       "#{@project.downcase.gsub(/\s/, ".")}.activities").property_value.split(",").collect{|a| a.downcase} rescue []
 
+     remote_ip = request.remote_ip
+    host = request.host_with_port
     @task.tasks.each{|task|
 			next if ! current_user_activities.include?(task.downcase)
-      @links[task.titleize] = "/protocol_patients/#{task.gsub(/\s/, "_")}?patient_id=#{@patient.id}&user_id=#{params[:user_id]}"
-			@links[task.titleize] = "/patients/treatment_dashboard/#{@patient.id}?user_id=#{params[:user_id]}" if task.downcase == "treatment"
+      if task.upcase == "VITALS"
+       @links[task.titleize] = "http://#{remote_ip}:3000/vitals?destination=http://#{host}/patients/processvitals/1?patient_id=#{@patient.id}&user_id=#{params[:user_id]}"
+      else
+        @links[task.titleize] = "/protocol_patients/#{task.gsub(/\s/, "_")}?patient_id=#{@patient.id}&user_id=#{params[:user_id]}"
+
+      end
+      @links[task.titleize] = "/patients/treatment_dashboard/#{@patient.id}?user_id=#{params[:user_id]}" if task.downcase == "treatment"
     }
 
     @demographics_url = get_global_property_value("patient.registration.url") rescue nil
@@ -54,13 +64,13 @@ class PatientsController < ApplicationController
 		@demographics_url = "http://" + @demographics_url if !@demographics_url.match(/http:/)
    
 		if current_program == "ASTHMA PROGRAM"
-			@task.asthma_next_task rescue ""
+			@task.asthma_next_task(host,remote_ip) rescue ""
 		elsif current_program == "EPILEPSY PROGRAM"
-			@task.epilepsy_next_task rescue ""
+			@task.epilepsy_next_task(host,remote_ip) rescue ""
     elsif current_program == "HYPERTENSION PROGRAM"
-			@task.hypertension_next_task rescue ""
+			@task.hypertension_next_task(host,remote_ip) rescue ""
 		else
-			@task.next_task rescue ""
+			@task.next_task(host,remote_ip) rescue ""
 		end
 
 		@disable = params[:disable] rescue ""
@@ -126,6 +136,150 @@ class PatientsController < ApplicationController
     @patient_medication_period = DiabetesService.patient_diabetes_medication_duration(@patient.patient_id)
     render :layout => false
   end
+
+  def processvitals
+   
+   
+    encounter_type = EncounterType.find_by_name("VITALS").encounter_type_id
+    uuid = ActiveRecord::Base.connection.select_one("SELECT UUID() as uuid")['uuid']
+    date = session[:datetime] rescue Time.now
+    person = Person.find(params[:patient_id]) rescue []
+    patient = Patient.find(person.id)
+
+     concept = ConceptName.find_by_sql("select concept_id from concept_name where name = 'height (cm)' and voided = 0").first.concept_id
+
+
+    current  = Observation.find_by_sql("SELECT * from obs where concept_id = '#{concept}' AND person_id = '#{patient.id}'
+                    AND DATE(obs_datetime) <= '#{date.to_date}' AND voided = 0
+                    ORDER BY  obs_datetime DESC, date_created DESC LIMIT 1").first.to_s.split(':')[1].squish rescue 0
+
+    
+      unless params["Height"].blank?
+          current = params["Height"].to_i
+      end
+   
+
+
+    concept = ConceptName.find_by_sql("select concept_id from concept_name where name = 'weight (kg)' and voided = 0").first.concept_id
+
+
+    current  = Observation.find_by_sql("SELECT * from obs where concept_id = '#{concept}' AND person_id = '#{patient.id}'
+                    AND DATE(obs_datetime) <= '#{date.to_date}' AND voided = 0
+                    ORDER BY  obs_datetime DESC, date_created DESC LIMIT 1").first.to_s.split(':')[1].squish rescue 0
+
+    if current == 0
+      unless params["Height"].blank?
+          current = params["Height"].to_i
+      end
+    end
+
+    sex =  patient.gender.downcase
+    
+	  if (sex == "female")
+		  sex = "f"
+    end
+	  if (sex == "male")
+		  sex = "m"
+    end
+
+    age = patient.age
+    sex =  patient.gender.downcase
+
+    user = User.find(params[:user_id]) rescue []
+    location = session[:location_id]
+    bmi = (weight/(current * current)*10000).round(1)
+    unless person.blank?
+      encounter = Encounter.create(
+        :patient_id => person.id,
+        :provider_id => user.id,
+        :creator => user.id,
+        :encounter_type => encounter_type,
+        :location_id => location,
+        :encounter_datetime => date,
+        :date_created => Time.now,
+        :uuid => uuid
+      )
+      (params|| []).each {|concept, value|
+        if concept.match(/Systolic/i)
+          concept = "SYstolic Blood Pressure"
+        elsif concept.match(/Diastolic/i)
+          concept = "Diastolic Blood Pressure"
+        elsif concept.match(/Pulse/i)
+          concept = "Pulse"
+        elsif concept.match(/Height/i)
+          concept = "Height (Cm)"
+        elsif concept.match(/Oxygen/i)
+          concept = "Blood Oxygen Saturation"
+        elsif concept.match(/Respiratory/i)
+          concept = "Peak Flow"
+
+            if age < 18
+              pefr = (((current - 100) * 5) + 100).to_i
+            end
+            if ((age >= 18) && (sex == "m"))
+              current = current / 100
+               pefr = ((((current * 5.48) + 1.58) - (age * 0.041)) * 60).to_i
+            end
+
+            if ((age >= 18) && (sex == "f"))
+               current = current / 100
+               pefr = ((((current * 3.72) + 2.24) - (age * 0.03)) * 60).to_i
+            end
+
+           estimate_id = ConceptName.find_by_name("peak flow predicted").concept_id rescue []
+
+        unless estimate_id.blank?
+          uuid = ActiveRecord::Base.connection.select_one("SELECT UUID() as uuid")['uuid']
+          obs = Observation.create(
+            :person_id => person.id,
+            :concept_id => estimate_id,
+            :location_id => encounter.location_id,
+            :obs_datetime => encounter.encounter_datetime,
+            :encounter_id => encounter.id,
+            :value_numeric => pefr,
+            :uuid => uuid,
+            :date_created => Time.now,
+            :creator => encounter.creator
+          )
+        end
+         
+        elsif concept.match(/Temperature/i)
+          concept = "Temperature"
+        end
+        concept_id = ConceptName.find_by_name("#{concept}").concept_id rescue []
+
+        unless concept_id.blank?
+          uuid = ActiveRecord::Base.connection.select_one("SELECT UUID() as uuid")['uuid']
+          obs = Observation.create(
+            :person_id => person.id,
+            :concept_id => concept_id,
+            :location_id => encounter.location_id,
+            :obs_datetime => encounter.encounter_datetime,
+            :encounter_id => encounter.id,
+            :value_numeric => value,
+            :uuid => uuid,
+            :date_created => Time.now,
+            :creator => encounter.creator
+          )
+        end
+      }
+    end
+    
+    remote_ip = request.remote_ip
+    host = request.host_with_port
+    @task = TaskFlow.new(params[:user_id], params[:patient_id])
+    if current_program == "ASTHMA PROGRAM"
+			redirect_to @task.asthma_next_task(host,remote_ip).url
+		elsif current_program == "EPILEPSY PROGRAM"
+			redirect_to @task.epilepsy_next_task(host,remote_ip).url
+    elsif current_program == "HYPERTENSION PROGRAM"
+			redirect_to @task.hypertension_next_task(host,remote_ip).url
+		else
+			redirect_to @task.next_task(host,remote_ip).url
+		end
+
+  end
+
   def chart
     @bps = []
     if params[:type] == "bp"
@@ -1087,22 +1241,25 @@ class PatientsController < ApplicationController
 
 
     @patient = Patient.find(@found_person_id) rescue []
-
+    session[:patient_id] = @patient.id
+    session[:user_id] = @current_user.id
+    session[:location_id] = params[:location_id]
 		@task = TaskFlow.new(params[:user_id], @person.id) rescue []
     concept_id = ConceptName.find_by_name("WEIGHT (KG)")
     @obs = Observation.find_by_sql("SELECT * FROM obs WHERE concept_id = '#{concept_id}'
                                     AND person_id = '#{@person.id}'")
+     remote_ip = request.remote_ip
+    host = request.host_with_port
+		@next_task = @task.hypertension_next_task(host,remote_ip).encounter_type.gsub('_',' ') if current_program == "HYPERTENSION PROGRAM" rescue nil
+		@next_task = @task.asthma_next_task(host,remote_ip).encounter_type.gsub('_',' ') if current_program == "ASTHMA PROGRAM" rescue nil
+		@next_task = @task.epilepsy_next_task(host,remote_ip).encounter_type.gsub('_',' ') if current_program == "EPILEPSY PROGRAM" rescue nil
+    @next_task = @task.next_task(host,remote_ip).encounter_type.gsub('_',' ') if current_program == "DIABETES PROGRAM" rescue nil
 
-		@next_task = @task.hypertension_next_task.encounter_type.gsub('_',' ') if current_program == "HYPERTENSION PROGRAM" rescue nil
-		@next_task = @task.asthma_next_task.encounter_type.gsub('_',' ') if current_program == "ASTHMA PROGRAM" rescue nil
-		@next_task = @task.epilepsy_next_task.encounter_type.gsub('_',' ') if current_program == "EPILEPSY PROGRAM" rescue nil
-    @next_task = @task.next_task.encounter_type.gsub('_',' ') if current_program == "DIABETES PROGRAM" rescue nil
 
-
-		@current_task = @task.hypertension_next_task if current_program == "HYPERTENSION PROGRAM" rescue nil
-    @current_task = @task.next_task if current_program == "DIABETES PROGRAM" rescue nil
-		@current_task = @task.asthma_next_task if current_program == "ASTHMA PROGRAM" rescue nil
-		@current_task = @task.epilepsy_next_task if current_program == "EPILEPSY PROGRAM" rescue nil
+		@current_task = @task.hypertension_next_task(host,remote_ip) if current_program == "HYPERTENSION PROGRAM" rescue nil
+    @current_task = @task.next_task(host,remote_ip) if current_program == "DIABETES PROGRAM" rescue nil
+		@current_task = @task.asthma_next_task(host,remote_ip) if current_program == "ASTHMA PROGRAM" rescue nil
+		@current_task = @task.epilepsy_next_task(host,remote_ip) if current_program == "EPILEPSY PROGRAM" rescue nil
 
 		@arv_number = PatientService.get_patient_identifier(@person, 'ARV Number') rescue ""		
 		@patient_bean = PatientService.get_patient(@person) rescue ""
@@ -1423,21 +1580,17 @@ class PatientsController < ApplicationController
     #label.draw_text("#{'(' + visit.visit_by + ')' unless visit.visit_by.blank?}",255,30,0,2,1,1,false)
     label.draw_text("#{visit.height + 'cm' if !visit.height.blank?}  #{visit.weight + 'kg' if !visit.weight.blank?}  #{'BMI:' + visit.bmi if !visit.bmi.blank?}  #{'BP :' + visit_data['bp'] }",25,95,0,2,1,1,false) rescue ""
     #label.draw_text("SE",25,130,0,3,1,1,false)
-    label.draw_text("TB",110,130,0,3,1,1,false)
+    label.draw_text("Drug",60,130,0,3,1,1,false)
     #label.draw_text("BP",185,130,0,3,1,1,false)
-    label.draw_text("DRUG(S) GIVEN",255,130,0,3,1,1,false)
-    label.draw_text("OUTC",577,130,0,3,1,1,false)
+    label.draw_text("DU",500,130,0,3,1,1,false)
+    label.draw_text("FN",600,130,0,3,1,1,false)
+    label.draw_text("Dose",677,130,0,3,1,1,false)
     label.draw_line(25,150,800,5)
-    label.draw_text("#{visit.tb_status}",110,160,0,2,1,1,false)
-    #label.draw_text("#{visit_data['bp'] rescue nil}",185,160,0,2,1,1,false)
-    label.draw_text("#{visit_data['outcome']}",577,160,0,2,1,1,false)
-    label.draw_text("#{visit_data['outcome_date']}",655,130,0,2,1,1,false)
-    label.draw_text("#{visit_data['next_appointment']}",577,190,0,2,1,1,false) if visit_data['next_appointment']
     starting_index = 25
     start_line = 160
 
     visit_data.each{|key,values|
-      data = values.last rescue nil
+      data = values.last.split(";") rescue nil
       next if data.blank?
       bold = false
       #bold = true if key.include?("side_eff") and data !="None"
@@ -1453,8 +1606,18 @@ class PatientsController < ApplicationController
       starting_line = start_line + 210 if key.include?("8")
       starting_line = start_line + 240 if key.include?("9")
       next if starting_index == 0
-      label.draw_text("#{data}",starting_index,starting_line,0,2,1,1,bold)
+      label.draw_text("#{data[0]}",60,starting_line,0,2,1,1,bold)
+      label.draw_text("#{data[1]}",600,starting_line,0,2,1,1,bold)
+      label.draw_text("#{data[2]}",500,starting_line,0,2,1,1,bold)
+      label.draw_text("#{data[3]}",677,starting_line,0,2,1,1,bold)
     } rescue []
+
+    #starting_line = start_line + 30
+
+   # label.draw_text("#{visit_data['outcome']}",80,starting_line,0,2,1,1,false)
+    #label.draw_text("#{visit_data['outcome_date']}",255,starting_line,0,2,1,1,false)
+    #label.draw_text("#{visit_data['next_appointment']}",577,starting_line,0,2,1,1,false) if visit_data['next_appointment']
+
     label.print(2)
     #end
   end
@@ -1492,14 +1655,15 @@ class PatientsController < ApplicationController
 
     count = 1
     (visit.gave || []).each do | drug, pills |
-      string = "#{drug} (#{pills})"
+      drug = drug.split(";")
+      string = "#{drug[0]} (#{pills})"
       if string.length > 26
         line = string[0..25]
         line2 = string[26..-1]
         data["arv_given#{count}"] = "255",line
-        data["arv_given#{count+=1}"] = "255",line2
+        data["arv_given#{count+=1}"] = "255","#{line2} ; #{drug[1]} ; #{drug[2]} ; #{drug[3]}"
       else
-        data["arv_given#{count}"] = "255",string
+        data["arv_given#{count}"] = "255","#{string} ; #{drug[1]} ; #{drug[2]} ; #{drug[3]}"
       end
       count+= 1
     end #rescue []
@@ -1668,6 +1832,9 @@ class PatientsController < ApplicationController
 				#tb_medical = MedicationService.tb_medication(drug)
 				#next if tb_medical == true
 				next if drug.blank?
+        frequency = DrugOrder.find(obs.order_id).frequency
+        dose = DrugOrder.find(obs.order_id).dose
+        daily_dose = DrugOrder.find(obs.order_id).equivalent_daily_dose
 				drug_name = drug.concept.shortname rescue drug.name
 				if drug_name.match(/Cotrimoxazole/i) || drug_name.match(/CPT/i)
 					patient_visits[visit_date].cpt += obs.value_numeric unless patient_visits[visit_date].cpt.blank?
@@ -1682,7 +1849,8 @@ class PatientsController < ApplicationController
 					end
 					patient_visits[visit_date].gave = []
 					(drugs_given_uniq || {}).each do |drug_given_name,quantity_given|
-						patient_visits[visit_date].gave << [drug_given_name,quantity_given]
+						duration = (quantity_given / daily_dose).to_i
+            patient_visits[visit_date].gave << ["#{drug_given_name} ; #{frequency} ; #{duration} ; #{dose}",quantity_given]
 					end
 				end
 				#if !drug.blank?
@@ -1792,6 +1960,7 @@ class PatientsController < ApplicationController
     @patient = Patient.find(params[:patient_id]) rescue Patient.find(params[:id]) rescue []
     
     print_string = patient_visit_label(@patient, session_date) #rescue (raise "Unable to find patient (#{params[:patient_id]}) or generate a visit label for that patient")
+   
     send_data(print_string,:type=>"application/label; charset=utf-8", :stream=> false, :filename=>"#{params[:patient_id]}#{rand(10000)}.lbl", :disposition => "inline")
   end
 
