@@ -57,7 +57,8 @@ mysql --host=$HOST --user=$USERNAME --password=$PASSWORD $DATABASE < db/create_d
 mysql --host=$HOST --user=$USERNAME --password=$PASSWORD $DATABASE < db/migrate/create_weight_height_for_ages.sql
 mysql --host=$HOST --user=$USERNAME --password=$PASSWORD $DATABASE < db/migrate/insert_weight_for_ages.sql
 #mysql --host=$HOST --user=$USERNAME --password=$PASSWORD $DATABASE < db/regimens.sql
-
+mysql --host=$HOST --user=$USERNAME --password=$PASSWORD $DATABASE < db/modular_tables.sql
+mysql --host=$HOST --user=$USERNAME --password=$PASSWORD $DATABASE < db/proc_insert_program_encounter.sql
 #rake openmrs:bootstrap:load:defaults RAILS_ENV=$ENV
 #rake openmrs:bootstrap:load:site SITE=$SITE RAILS_ENV=production#
 
