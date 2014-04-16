@@ -7,7 +7,8 @@ class EncountersController < ApplicationController
 		@retrospective = Time.now if session[:datetime].blank?
     User.current = User.find(@user["user_id"]) rescue nil
 
-
+    remote_ip = request.remote_ip
+    host = request.host_with_port
     #raise @retrospective.to_yaml
     Location.current = Location.find(params[:location_id] || session[:location_id]) rescue nil
 
@@ -94,10 +95,10 @@ class EncountersController < ApplicationController
         
           redirect_to params[:next_url] and return if !params[:next_url].blank?
 					begin   
-						redirect_to @task.asthma_next_task.url and return if current_program == "ASTHMA PROGRAM"
-						redirect_to @task.epilepsy_next_task.url and return if current_program == "EPILEPSY PROGRAM"
-            redirect_to @task.hypertension_next_task.url and return if current_program == "HYPETENSION PROGRAM"
-						redirect_to @task.next_task.url and return
+						redirect_to @task.asthma_next_task(host,remote_ip).url and return if current_program == "ASTHMA PROGRAM"
+						redirect_to @task.epilepsy_next_task(host,remote_ip).url and return if current_program == "EPILEPSY PROGRAM"
+            redirect_to @task.hypertension_next_task(host,remote_ip).url and return if current_program == "HYPETENSION PROGRAM"
+						redirect_to @task.next_task(host,remote_ip).url and return
 					rescue
 						redirect_to "/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}&disable=true" and return
 					end
@@ -383,9 +384,9 @@ class EncountersController < ApplicationController
       @task = TaskFlow.new(params[:user_id] || User.first.id, patient.id)
 
 			begin
-				redirect_to @task.asthma_next_task.url and return if current_program == "ASTHMA PROGRAM"
-				redirect_to @task.epilepsy_next_task.url and return if current_program == "EPILEPSY PROGRAM"
-				redirect_to @task.next_task.url and return
+				redirect_to @task.asthma_next_task(host,remote_ip).url and return if current_program == "ASTHMA PROGRAM"
+				redirect_to @task.epilepsy_next_task(host,remote_ip).url and return if current_program == "EPILEPSY PROGRAM"
+				redirect_to @task.next_task(host,remote_ip).url and return
 			rescue
 				redirect_to "/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}&disable=true" and return
 			end
@@ -607,7 +608,8 @@ class EncountersController < ApplicationController
 	end
 
 	def new
-		#raise params.to_yaml
+		remote_ip = request.remote_ip
+    host = request.host_with_port
 		@patient = Patient.find(params[:patient_id] || session[:patient_id])
 		#@patient_bean = PatientService.get_patient(@patient.person)
 		session_date = session[:datetime].to_date rescue Date.today
@@ -685,7 +687,7 @@ class EncountersController < ApplicationController
 
 		redirect_to "/" and return unless @patient
 
-		redirect_to next_task(@patient) and return unless params[:encounter_type]
+		redirect_to next_task(@patient, host,remote_ip) and return unless params[:encounter_type]
 
 		redirect_to :action => :create, 'encounter[encounter_type_name]' => params[:encounter_type].upcase, 'encounter[patient_id]' => @patient.id and return if ['registration'].include?(params[:encounter_type])
 
