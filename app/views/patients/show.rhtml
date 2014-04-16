@@ -31,7 +31,7 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
       //__$("patient-dashboard-application").appendChild(nextTask);
     }
 
-    //__$("nextTask").innerHTML = "<b>Next Task:</b><br /><i><%= next_task.titleize  rescue "None"%></i>";
+    //__$("nextTask").innerHTML = "<b>Next Task:</b><br /><i><%= next_task.titleize  rescue "None" %></i>";
   }
 
 <% if !next_task.nil? %>
@@ -231,7 +231,7 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
         <option value='/patients/patient_report/<%= @patient.id %>?user_id=<%= @user.id %>'>Report</option>
         <option value='/patients/patient_bp?user_id=<%= @user["user_id"] %>&patient_id=<%= @patient.id %>'>Chart</option>
         <option value='/patients/printouts/<%= @patient.id %>?user_id=<%= @user.id %>'>Printouts</option>
-        <option value='#'>Next Task : <%= next_task.titleize %></option>
+        <option value='#'>Next Task : <%= next_task.titleize rescue "" %></option>
       </select>
       <select id="links">
         <optgroup value="javascript:selectProgram()" label="Change Workflow"></optgroup>
