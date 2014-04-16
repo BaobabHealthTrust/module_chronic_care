@@ -3,7 +3,7 @@ class ApplicationController < ActionController::Base
   helper :all
 
   before_filter :check_user, :except => [:print_demographics, :demographics_label, :patient_demographics_label,:print_patient_mastercard, :print_mastercard, :prescribe, :locations, :user_login, :user_logout, :missing_program, :static_locations,
-    :missing_concept, :no_user, :no_patient, :project_users_list, :show_selected_fields, :check_role_activities, :missing_encounter_type]
+    :missing_concept, :no_user, :no_patient, :project_users_list, :show_selected_fields, :check_role_activities, :missing_encounter_type, :processvitals]
   
   def get_global_property_value(global_property)
 		property_value = Settings[global_property]
