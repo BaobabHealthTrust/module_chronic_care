@@ -160,18 +160,18 @@ class PatientsController < ApplicationController
    
 
 
-    concept = ConceptName.find_by_sql("select concept_id from concept_name where name = 'weight (kg)' and voided = 0").first.concept_id
+    weight = ConceptName.find_by_sql("select concept_id from concept_name where name = 'weight (kg)' and voided = 0").first.concept_id
 
 
-    current  = Observation.find_by_sql("SELECT * from obs where concept_id = '#{concept}' AND person_id = '#{patient.id}'
+    weight  = Observation.find_by_sql("SELECT * from obs where concept_id = '#{concept}' AND person_id = '#{patient.id}'
                     AND DATE(obs_datetime) <= '#{date.to_date}' AND voided = 0
                     ORDER BY  obs_datetime DESC, date_created DESC LIMIT 1").first.to_s.split(':')[1].squish rescue 0
 
-    if current == 0
-      unless params["Height"].blank?
-          current = params["Height"].to_i
+    
+      unless params["Weight"].blank?
+          weight = params["Weight"].to_f.round(1)
       end
-    end
+      bmi = (weight / ( current * current) * 10000 ).round(1)
 
     sex =  patient.gender.downcase
     
@@ -187,7 +187,7 @@ class PatientsController < ApplicationController
 
     user = User.find(params[:user_id]) rescue []
     location = session[:location_id]
-    bmi = (weight/(current * current)*10000).round(1)
+    
     unless person.blank?
       encounter = Encounter.create(
         :patient_id => person.id,
@@ -199,6 +199,20 @@ class PatientsController < ApplicationController
         :date_created => Time.now,
         :uuid => uuid
       )
+      bmiconcept  = ConceptName.find_by_name("bmi").concept_id rescue []
+      uuid = ActiveRecord::Base.connection.select_one("SELECT UUID() as uuid")['uuid']
+          obs = Observation.create(
+            :person_id => person.id,
+            :concept_id => bmiconcept,
+            :location_id => encounter.location_id,
+            :obs_datetime => encounter.encounter_datetime,
+            :encounter_id => encounter.id,
+            :value_numeric => bmi,
+            :uuid => uuid,
+            :date_created => Time.now,
+            :creator => encounter.creator
+          )
+
       (params|| []).each {|concept, value|
         if concept.match(/Systolic/i)
           concept = "SYstolic Blood Pressure"
