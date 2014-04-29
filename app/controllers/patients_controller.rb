@@ -225,9 +225,9 @@ class PatientsController < ApplicationController
           concept = "Pulse"
         elsif concept.match(/Height/i)
           concept = "Height (Cm)"
-          value = value.round(2)
+          value = value.to_f.round(2)
         elsif concept.match(/Weight/i)
-          value = value.round(2)
+          value = value.to_f.round(2)
         elsif concept.match(/Oxygen/i)
           concept = "Blood Oxygen Saturation"
         elsif concept.match(/Respiratory/i)
