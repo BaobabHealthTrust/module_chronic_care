@@ -28,62 +28,21 @@ class Reports::CohortDm
       @states << ProgramWorkflowState.find(:first, :conditions => ["concept_id IN (?)",concept_name.map{|c|c.concept_id}] ).program_workflow_state_id
     }
     @states = @states.join(',')
-        
 
-  	@ids_for_patients_on_metformin_and_glibenclamide_ever = Patient.find(:all,
-      :include =>{:orders => {:drug_order =>{:drug => {}}}},
-      :conditions => ['(drug.name LIKE ? OR drug.name LIKE ?)
-													 									AND patient.voided = 0 AND patient.date_created <= ?', "%metformin%",
-        "%glibenclamide%", @end_date]
-    ).map{|patient| patient.patient_id}.uniq
-
-												
-		# Patients on metformin and glibenclamide: between @start_date and @end_date
-
-  	@ids_for_patients_on_metformin_and_glibenclamide = Patient.find(:all,
-      :include =>{:orders => {:drug_order =>{:drug => {}}}},
-      :conditions => ['(drug.name LIKE ? OR drug.name LIKE ?)
-													 									AND patient.voided = 0 AND patient.date_created >= ?
-                                            AND patient.date_created <= ?',
-        "%metformin%", "%glibenclamide%",
-        @start_date, @end_date]
-    ).map{|patient| patient.patient_id}.uniq
-    
-
-    # Insulin
-  	@ids_for_patients_on_insulin_ever = ids_for_patient_on_drug_upto_end_date(@end_date, 'insulin')							 			 
-  	@ids_for_patients_on_insulin = ids_for_patient_on_drug_btn_dates(@start_date, @end_date, 'insulin')
-
-    # Metformin
-  	@ids_for_patients_on_metformin_ever = ids_for_patient_on_drug_upto_end_date(@end_date, 'metformin')  							 			 
-  	@ids_for_patients_on_metformin = ids_for_patient_on_drug_btn_dates(@start_date, @end_date, 'metformin')
-  	
-    # Glibenclamide
-  	@ids_for_patients_on_glibenclamide_ever = ids_for_patient_on_drug_upto_end_date(@end_date, 'glibenclamide')  							 			 
-  	@ids_for_patients_on_glibenclamide = ids_for_patient_on_drug_btn_dates(@start_date, @end_date, 'glibenclamide')
-
-    # Lente_insulin
-  	@ids_for_patients_on_lente_insulin_ever = ids_for_patient_on_drug_upto_end_date(@end_date, 'lente', 'insulin')  							 			 
-  	@ids_for_patients_on_lente_insulin = ids_for_patient_on_drug_btn_dates(@start_date, @end_date, 'lente', 'insulin')
-
-    # Soluble insulin ever
-  	@ids_for_patients_on_soluble_insulin_ever = ids_for_patient_on_drug_upto_end_date(@end_date, 'soluble', 'insulin')  							 			 
-  	@ids_for_patients_on_soluble_insulin = ids_for_patient_on_drug_btn_dates(@start_date, @end_date, 'soluble', 'insulin')
-  	
-    # Complications
-		@complications_hash_upto_end_date = Hash.new(0)
-		@complications_hash_btn_dates = Hash.new(0)
-		
-		@complications_hash_upto_end_date = Patient.count(:all,
-      :include => { :encounters => {:observations => {:answer_concept => {:concept_names => {}}}}},
-      :conditions => ["patient.date_created <= ?", @end_date],
-      :group => "concept_name.name") rescue ""
-											
-		@complications_hash_btn_dates = Patient.count(:all,
-      :include => { :encounters => {:observations => {:answer_concept => {:concept_names => {}}}}},
-      :conditions => ["patient.date_created >= ? AND patient.date_created <= ?",
-        @start_date, @end_date],
-      :group => "concept_name.name") rescue ""
+    @ids_for_patients_on_metformin_and_glibenclamide_ever = []
+    @ids_for_patients_on_metformin_and_glibenclamide = []
+    @ids_for_patients_on_insulin_ever = []
+    @ids_for_patients_on_insulin = []
+    @ids_for_patients_on_metformin_ever = []
+    @ids_for_patients_on_metformin = []
+    @ids_for_patients_on_glibenclamide_ever = []
+    @ids_for_patients_on_glibenclamide = []
+    @ids_for_patients_on_lente_insulin_ever = []
+    @ids_for_patients_on_lente_insulin = []
+    @ids_for_patients_on_soluble_insulin_ever = []
+    @ids_for_patients_on_soluble_insulin = []
+    @complications_hash_upto_end_date = []
+    @complications_hash_btn_dates = []
   end
 
   # Metformin
@@ -92,6 +51,63 @@ class Reports::CohortDm
     @range = [@start_date, @end_date]
   end
 
+
+  def set_variable(ids)
+      	@ids_for_patients_on_metformin_and_glibenclamide_ever = Patient.find(:all,
+      :include =>{:orders => {:drug_order =>{:drug => {}}}},
+      :conditions => ["(drug.name LIKE ? OR drug.name LIKE ?)
+													 									AND patient.voided = 0 AND patient.date_created <= ? AND patient.patient_id IN (#{ids})", "%metformin%",
+        "%glibenclamide%", @end_date]
+    ).map{|patient| patient.patient_id}.uniq
+
+
+		# Patients on metformin and glibenclamide: between @start_date and @end_date
+
+  	@ids_for_patients_on_metformin_and_glibenclamide = Patient.find(:all,
+      :include =>{:orders => {:drug_order =>{:drug => {}}}},
+      :conditions => ["(drug.name LIKE ? OR drug.name LIKE ?)
+													 									AND patient.voided = 0 AND patient.date_created >= ?
+                                            AND patient.date_created <= ? AND patient.patient_id IN (#{ids})",
+        "%metformin%", "%glibenclamide%",
+        @start_date, @end_date]
+    ).map{|patient| patient.patient_id}.uniq
+
+
+    # Insulin
+  	@ids_for_patients_on_insulin_ever = ids_for_patient_on_drug_upto_end_date(@end_date, 'insulin',nil, ids)
+  	@ids_for_patients_on_insulin = ids_for_patient_on_drug_btn_dates(@start_date, @end_date, 'insulin',nil, ids)
+
+    # Metformin
+  	@ids_for_patients_on_metformin_ever = ids_for_patient_on_drug_upto_end_date(@end_date, 'metformin',nil, ids)
+  	@ids_for_patients_on_metformin = ids_for_patient_on_drug_btn_dates(@start_date, @end_date, 'metformin',nil, ids)
+
+    # Glibenclamide
+  	@ids_for_patients_on_glibenclamide_ever = ids_for_patient_on_drug_upto_end_date(@end_date, 'glibenclamide',nil, ids)
+  	@ids_for_patients_on_glibenclamide = ids_for_patient_on_drug_btn_dates(@start_date, @end_date, 'glibenclamide',nil, ids)
+
+    # Lente_insulin
+  	@ids_for_patients_on_lente_insulin_ever = ids_for_patient_on_drug_upto_end_date(@end_date, 'lente', 'insulin', ids)
+  	@ids_for_patients_on_lente_insulin = ids_for_patient_on_drug_btn_dates(@start_date, @end_date, 'lente', 'insulin', ids)
+
+    # Soluble insulin ever
+  	@ids_for_patients_on_soluble_insulin_ever = ids_for_patient_on_drug_upto_end_date(@end_date, 'soluble', 'insulin', ids)
+  	@ids_for_patients_on_soluble_insulin = ids_for_patient_on_drug_btn_dates(@start_date, @end_date, 'soluble', 'insulin', ids)
+
+    # Complications
+		@complications_hash_upto_end_date = Hash.new(0)
+		@complications_hash_btn_dates = Hash.new(0)
+
+		@complications_hash_upto_end_date = Patient.count(:all,
+      :include => { :encounters => {:observations => {:answer_concept => {:concept_names => {}}}}},
+      :conditions => ["patient.date_created <= ? AND patient.patient_id IN (#{ids})", @end_date],
+      :group => "concept_name.name") rescue ""
+
+		@complications_hash_btn_dates = Patient.count(:all,
+      :include => { :encounters => {:observations => {:answer_concept => {:concept_names => {}}}}},
+      :conditions => ["patient.date_created >= ? AND patient.date_created <= ? AND patient.patient_id IN (#{ids})",
+        @start_date, @end_date],
+      :group => "concept_name.name") rescue ""
+  end
   # Get all patients registered in specified period
   def total_registered(encounter_type=nil)
     if encounter_type.blank?
@@ -1567,7 +1583,7 @@ class Reports::CohortDm
   end
 
   # Treatment (Alive and Even Defaulters)
-  def on_diet_ever
+  def on_diet_ever(ids)
     @orders = Order.find_by_sql("SELECT DISTINCT orders.patient_id FROM orders \
                                   LEFT OUTER JOIN patient ON patient.patient_id = orders.patient_id \
                                   WHERE NOT order_id IN \
@@ -1577,17 +1593,18 @@ class Reports::CohortDm
                                         (name LIKE '%soluble%' AND name LIKE '%insulin%') OR (name LIKE '%glibenclamide%') OR \
                                         (name LIKE '%metformin%'))) \
                                     AND patient.voided = 0 AND \
+                                        AND patient_id IN (#{ids})
                                         DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'").length rescue 0
   end
 
-  def on_diet
+  def on_diet(ids)
     @orders = Order.find_by_sql("SELECT DISTINCT orders.patient_id FROM orders LEFT OUTER JOIN patient ON \
                                         patient.patient_id = orders.patient_id WHERE NOT order_id IN \
                                     (SELECT order_id FROM drug_order \
                                       WHERE drug_inventory_id IN \
                                         (SELECT drug_id FROM drug d WHERE (name LIKE '%lente%' AND name LIKE '%insulin%') OR \
                                         (name LIKE '%soluble%' AND name LIKE '%insulin%') OR (name LIKE '%glibenclamide%') OR \
-                                        (name LIKE '%metformin%'))) AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') >= '" + 
+                                        (name LIKE '%metformin%'))) AND patient_id IN (#{ids}) AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') >= '" +
         @start_date + "' AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'").length rescue 0
   end
 
@@ -2216,57 +2233,59 @@ class Reports::CohortDm
   end
 
 
-  def ids_for_patient_on_drug_upto_end_date(end_date, drug_name, second_name=nil)
+  def ids_for_patient_on_drug_upto_end_date(end_date, drug_name, second_name=nil, patient_ids=[])
     ids = []
+    
     if second_name.nil?
       ids = Patient.find(:all,
         :include =>{:orders => {:drug_order =>{:drug => {}}}},
-        :conditions => ['drug.name LIKE ? AND patient.date_created <= ?',
+        :conditions => ["patient.patient_id IN (#{patient_ids}) AND drug.name LIKE ? AND patient.date_created <= ?",
           '%' + drug_name + '%', end_date]
       ).map{|patient| patient.patient_id}.uniq
     else
       ids = Patient.find(:all,
         :include =>{:orders => {:drug_order =>{:drug => {}}}},
-        :conditions => ['drug.name LIKE ? AND drug.name LIKE ? AND patient.date_created <= ?',
+        :conditions => ["patient.patient_id IN (#{patient_ids}) AND drug.name LIKE ? AND drug.name LIKE ? AND patient.date_created <= ? ",
           '%' + drug_name + '%', '%' + second_name + '%', end_date]
       ).map{|patient| patient.patient_id}.uniq
     end
     ids
   end
   
-  def ids_for_patient_on_drug_btn_dates(start_date, end_date, drug_name, second_name=nil)
+  def ids_for_patient_on_drug_btn_dates(start_date, end_date, drug_name, second_name=nil, patient_ids=[])
 		ids = []
+    
   	if second_name.nil?
 			ids = Patient.find( :all,
         :include =>{:orders => {:drug_order =>{:drug => {}}}},
-        :conditions => ['drug.name LIKE ? AND patient.date_created >= ?
-										 									AND patient.date_created <= ?', '%' + drug_name + '%',
+        :conditions => ["patient.patient_id IN (#{patient_ids}) AND drug.name LIKE ? AND patient.date_created >= ?
+										 									AND patient.date_created <= ?", '%' + drug_name + '%',
           start_date, end_date]
       ).map{|patient| patient.patient_id}.uniq
 		else
 			ids = Patient.find( :all,
         :include =>{:orders => {:drug_order =>{:drug => {}}}},
-        :conditions => ['drug.name LIKE ? AND drug.name LIKE ? AND patient.date_created >= ?
-										 									AND patient.date_created <= ?', '%' + drug_name + '%',
+        :conditions => ["drug.name LIKE ? AND drug.name LIKE ? AND patient.date_created >= ? AND patient.patient_id IN (#{patient_ids})
+										 									AND patient.date_created <= ?", '%' + drug_name + '%',
           '%' + second_name + '%', start_date, end_date]
       ).map{|patient| patient.patient_id}.uniq
 		end
 		ids
   end
   
-  def ids_for_patients_with_complication_upto_end_date(complication, end_date)
+  def ids_for_patients_with_complication_upto_end_date(complication, end_date, ids=[])
 		Patient.find(:all,
       :include => { :encounters => {:observations => {:answer_concept => {:concept_names => {}}}}},
       :conditions => ["concept_name.name = ?
-							 									AND patient.date_created <= ?",complication,  end_date]
+							 									AND patient.date_created <= ? AND patient.patient_id IN (#{ids})",complication,  end_date]
     ).map{|patient| patient.patient_id}.uniq
 	end
 	
-	def ids_for_patients_with_complication_btn_dates(complication, start_date, end_date)
+	def ids_for_patients_with_complication_btn_dates(complication, start_date, end_date, ids=[])
 		Patient.find(:all,
       :include => { :encounters => {:observations => {:answer_concept => {:concept_names => {}}}}},
       :conditions => ["concept_name.name = ?
-									 									AND patient.date_created >= ? AND patient.date_created <= ?",
+									 									AND patient.date_created >= ? AND patient.date_created <= ?  AND patient.patient_id IN (#{ids})",
         complication, start_date, end_date]
     ).map{|patient| patient.patient_id}.uniq
 	end
