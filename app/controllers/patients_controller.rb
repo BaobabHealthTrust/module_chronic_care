@@ -189,6 +189,24 @@ class PatientsController < ApplicationController
     location = session[:location_id]
     
     unless person.blank?
+
+       program = Program.find_by_concept_id(ConceptName.find_by_name("CHRONIC CARE PROGRAM").concept_id) rescue nil
+
+
+      program_encounter = ProgramEncounter.find_by_program_id(program.id,
+              :conditions => ["patient_id = ? AND DATE(date_time) = ?",
+                patient.id, date.strftime("%Y-%m-%d")])
+
+            if program_encounter.blank?
+
+              program_encounter = ProgramEncounter.create(
+                :patient_id => patient.id,
+                :date_time => date,
+                :program_id => program.id
+              )
+            end
+
+
       encounter = Encounter.create(
         :patient_id => person.id,
         :provider_id => user.id,
@@ -199,6 +217,12 @@ class PatientsController < ApplicationController
         :date_created => Time.now,
         :uuid => uuid
       )
+	  ProgramEncounterDetail.create(
+                  :encounter_id => encounter.id.to_i,
+                  :program_encounter_id => program_encounter.id,
+                  :program_id => program.id
+                )
+
       bmiconcept  = ConceptName.find_by_name("bmi").concept_id rescue []
       uuid = ActiveRecord::Base.connection.select_one("SELECT UUID() as uuid")['uuid']
       obs = Observation.create(
