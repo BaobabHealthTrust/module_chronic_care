@@ -142,7 +142,8 @@ class PatientsController < ApplicationController
     redirect_to "/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}" and return if ! params[:cancel].blank?
     encounter_type = EncounterType.find_by_name("VITALS").encounter_type_id
     uuid = ActiveRecord::Base.connection.select_one("SELECT UUID() as uuid")['uuid']
-    date =  Time.now 
+    date =  Time.now
+    date = session[:datetime] if ! session[:datetime].blank?
     person = Person.find(params[:patient_id]) rescue []
     patient = Patient.find(person.id)
 
