@@ -114,7 +114,7 @@ task = @task
 
 <form id = 'dashboard' action='/clinic'>
   <div id='project_name'>
-       <%=  current_program.humanize.split(" ")[0] rescue "" %>
+       <%=  map_programs(current_program.humanize.split(" ")[0]) rescue "" %>
       </div>
   <span id="patient_name"><%= @patient.name %></span>
   
@@ -131,7 +131,7 @@ task = @task
   </select>
   <input type='submit' value='Finish' />
   <select id="navigation_links">
-                
+    <option link="/clinic/index?user_id=<%=  params[:user_id]%>&location_id=<%=  params[:location_id]%>" class="green">Cancel</option>
                 <option link="<%= task.url %>" class="green">Continue</option>
                 
               </select>
