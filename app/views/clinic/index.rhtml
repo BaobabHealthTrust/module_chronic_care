@@ -189,8 +189,8 @@
   </div>
 <div id="home">
   <div id="project_name">
-    <div style="margin-top: 0px; color: #6281A7; font-size: 0.4em;">
-      <%= @project %><br><span style="font-size:23px;"><%=  current_program.humanize.split(" ")[0] rescue "" %><br>
+    <div style="margin-top: 0px; color: #6281A7; font-size: 0.9em;">
+      <%= @project %><br><span style="font-size:0.5em;"><%=  map_programs(current_program.humanize.split(" ")[0]) rescue "" %><br>
     </div>
   </div>
   <select id="tabs">
