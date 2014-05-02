@@ -36,8 +36,8 @@
 		<div id='content'>
 			<form id = 'dashboard' action='/clinic'>
 				<h1 id='project_name'>
-          <span  style="margin-top: 0px; color: #6281A7; font-size: 0.6em;"><%= @project %></span>
-          <br><span style="font-size:23px; color: #6281A7;"><%=  current_program.humanize.split(" ")[0] rescue "" %></span>
+          <span  style="margin-top: 0px; color: #6281A7; font-size: 0.6em;"><%= @project.split(/\s+/).map(&:first).to_s %></span>
+          <br><span style="font-size:23px; color: #6281A7;"><%=  map_programs(current_program.humanize.split(" ")[0]) rescue "" %></span>
 
 				</h1>
 				<span id='patient_name'><%= @patient.name rescue "" %></span>
