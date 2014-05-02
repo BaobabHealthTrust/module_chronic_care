@@ -139,10 +139,10 @@ class PatientsController < ApplicationController
 
   def processvitals
    
-   
+    redirect_to "/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}" and return if ! params[:cancel].blank?
     encounter_type = EncounterType.find_by_name("VITALS").encounter_type_id
     uuid = ActiveRecord::Base.connection.select_one("SELECT UUID() as uuid")['uuid']
-    date = session[:datetime] rescue Time.now
+    date =  Time.now 
     person = Person.find(params[:patient_id]) rescue []
     patient = Patient.find(person.id)
 
@@ -195,7 +195,7 @@ class PatientsController < ApplicationController
 
       program_encounter = ProgramEncounter.find_by_program_id(program.id,
               :conditions => ["patient_id = ? AND DATE(date_time) = ?",
-                patient.id, date.strftime("%Y-%m-%d")])
+                patient.id, date.to_date.strftime("%Y-%m-%d")])
 
             if program_encounter.blank?
 
