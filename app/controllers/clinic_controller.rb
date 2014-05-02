@@ -19,7 +19,9 @@ class ClinicController < ApplicationController
 		redirect_to "/patients/confirm/#{params[:ext_patient_id]}?found_person_id=#{params[:ext_patient_id]}&location_id=#{
     lock}&user_id=#{params[:user_id]}" and return if !params[:ext_patient_id].nil?
 
-    @project = get_global_property_value("project.name") rescue "Unknown"
+    @project = get_global_property_value("project.name").split(/\s+/).map(&:first).to_s rescue "Unknown"
+
+   
 
     @facility = Location.current_health_center.name rescue get_global_property_value("facility.name") rescue "Unknown"
 

@@ -1123,7 +1123,7 @@ class CohortToolController < ApplicationController
             @total_ever_registered = report.total_ever_registered("DIABETES HYPERTENSION INITIAL VISIT").length rescue 0
             ids_ever = report.total_ever_registered("DIABETES HYPERTENSION INITIAL VISIT").map{|patient|patient.patient_id.to_s}.join(',') rescue ""
     end
-    
+    report.set_variable(ids_ever)
  if params[:type] != "ccc"
     @mi = report.mi(ids) rescue 0
     @kidney_failure = report.kidney_failure(ids) rescue 0
