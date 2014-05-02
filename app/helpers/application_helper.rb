@@ -130,5 +130,14 @@ module ApplicationHelper
     end
 		return session[:selected_program] 
 	end
-	
+
+    def map_programs(program)
+    if program == "Hypertension"
+      return "HT"
+    elsif program == "Diabetes"
+      return "DM"
+    else
+      return program
+    end
+  end
 end
