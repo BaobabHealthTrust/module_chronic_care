@@ -64,7 +64,7 @@
             height:68%;
             width: 98%;
             float: right;
-            position:relative;
+            position:fixed;
           }
 
           .survival-analysis th, .survival-analysis td {
@@ -219,7 +219,7 @@
         <body>
           <%= image_tag(@logo,:class=>"logo")%>
           <br />
-          <h1>Chronic Care Clinic Cohort</h1>
+          <h1>Integrated Chronic Care Clinic Cohort Report</h1>
 	<h1><%= Location.current_health_center.name + " : " + @quarter %></h1>
 	<br />
 
@@ -249,11 +249,11 @@
               </thead>
               <tbody>
                 <tr class = 'row_break heading'>
-                  <td colspan="8" style="text-align:left;border-width:0px 0px 0px 0px">Total registrated</td>
+                  <td colspan="8" style="text-align:left;border-width:0px 0px 0px 0px">Total registrated (Age groups in year)</td>
                 </tr>
                 <tr>
 
-                  <td style="text-align:left;">0-14</td>
+                  <td style="text-align:left;">0 - 14</td>
                   <td><%=  @total_children_registered_male %></td>
                   <td><%=  @total_children_registered_female %></td>
                   <td><%=  (@total_children_registered_male + @total_children_registered_female) %></td>
@@ -265,7 +265,7 @@
 
                 <tr>
 
-                  <td style="text-align:left;">15-54</td>
+                  <td style="text-align:left;">15 - 44</td>
                   <td><%=  @total_adults_registered_male %></td>
                   <td><%=  @total_adults_registered_female %></td>
                   <td><%=  (@total_adults_registered_male + @total_adults_registered_female) %></td>
@@ -275,9 +275,21 @@
                   <td><%=  (@total_adults_ever_registered_male + @total_adults_ever_registered_female) %></td>
                 </tr>
 
+                 <tr>
+
+                  <td style="text-align:left;">45 - 64</td>
+                  <td><%=  @middle_older_persons_registered_male %></td>
+                  <td><%=  @middle_older_persons_registered_female %></td>
+                  <td><%=  (@middle_older_persons_registered_male + @middle_older_persons_registered_female) %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @middle_older_persons_ever_registered_male %></td>
+                  <td><%=  @middle_older_persons_ever_registered_female %></td>
+                  <td><%=  (@middle_older_persons_ever_registered_male + @middle_older_persons_ever_registered_female) %></td>
+                </tr>
+                
                 <tr>
 
-                  <td style="text-align:left;">54 +</td>
+                  <td style="text-align:left;">65 +</td>
                   <td><%=  @older_persons_registered_male %></td>
                   <td><%=  @older_persons_registered_female %></td>
                   <td><%=  (@older_persons_registered_male + @older_persons_registered_female) %></td>
@@ -298,7 +310,7 @@
                 </tr>
                 <tr>
 
-                  <td style="text-align:left;">DM</td>
+                  <td style="text-align:left;">Diabetes Mellitus (DM) alone</td>
                   <td><%=  @disease_availabe_dm_male.length rescue 0 %></td>
                   <td><%=  @disease_availabe_dm_female.length rescue 0 %></td>
                   <td><%=  (@disease_availabe_dm_male.length rescue 0) + (@disease_availabe_dm_female.length rescue 0) %></td>
@@ -310,7 +322,7 @@
 
                 <tr>
 
-                  <td style="text-align:left;">HT</td>
+                  <td style="text-align:left;">Hypertension (HT) alone</td>
                   <td><%=  @disease_availabe_ht_male.length rescue 0 %></td>
                   <td><%=  @disease_availabe_ht_female.length rescue 0 %></td>
                   <td><%=  (@disease_availabe_ht_male.length rescue 0) + (@disease_availabe_ht_female.length rescue 0) %></td>
@@ -321,7 +333,7 @@
                 </tr>
                 <tr>
 
-                  <td style="text-align:left;">DM + HT</td>
+                  <td style="text-align:left;">Diabetes and Hypertension together</td>
                   <td><%=  @disease_availabe_dmht_male.length rescue 0 %></td>
                   <td><%=  @disease_availabe_dmht_female.length rescue 0 %></td>
                   <td><%=  (@disease_availabe_dmht_female.length rescue 0) + (@disease_availabe_dmht_male.length rescue 0) %></td>
@@ -370,11 +382,11 @@
                   <td>&nbsp;</td>
                 </tr>
                 <tr class = 'row_break heading'>
-                  <td colspan="8" style="text-align:left;border-width:0px 0px 0px 0px">Status</td>
+                  <td colspan="8" style="text-align:left;border-width:0px 0px 0px 0px">Patient outcomes at end of quarter</td>
                 </tr>
                 <tr>
 
-                  <td style="text-align:left;" colspan="5">Attending</td>
+                  <td style="text-align:left;" colspan="5">Attended clinic</td>
                   <td><%=  @attending_male %></td>
                   <td><%=  @attending_female %></td>
                   <td><%=  (@attending_male + @attending_female) %></td>
@@ -386,29 +398,34 @@
                   <td><%=  @not_attend_female %></td>
                   <td><%=  (@not_attend_male + @not_attend_female) %></td>
                 </tr>
-                <tr>
 
-                  <td style="text-align:left;" colspan="5">Dead</td>
-                  <td><%=  @dead_ever_male %></td>
-                  <td><%=  @dead_ever_female %></td>
-                  <td><%=  (@dead_ever_male + @dead_ever_female) %></td>
-                </tr>
-                <tr>
 
-                  <td style="text-align:left;" colspan="5">Stopped</td>
-                 
+                 <tr>
+
+                  <td style="text-align:left;" colspan="5">Stopped treatment</td>
+
                   <td><%=  @stopped_treatment_ever_male %></td>
                   <td><%=  @stopped_treatment_ever_female %></td>
                   <td><%=  (@stopped_treatment_ever_female + @stopped_treatment_male) %></td>
                 </tr>
-                <tr>
 
-                  <td style="text-align:left;" colspan="5">Transferred Out</td>
-                  
+                 <tr>
+
+                  <td style="text-align:left;" colspan="5">Transferred out to another facility</td>
+
                   <td><%=  @transfer_out_ever_male %></td>
                   <td><%=  @transfer_out_ever_female %></td>
                   <td><%=  (@transfer_out_ever_female + @transfer_out_ever_male) %></td>
                 </tr>
+                <tr>
+
+                  <td style="text-align:left;" colspan="5">Died</td>
+                  <td><%=  @dead_ever_male %></td>
+                  <td><%=  @dead_ever_female %></td>
+                  <td><%=  (@dead_ever_male + @dead_ever_female) %></td>
+                </tr>
+               
+               
                 <tr>
 
                   <td style="text-align:left;" colspan="5">Lost to follow-up</td>
@@ -423,11 +440,11 @@
                   <td>&nbsp;</td>
                 </tr>
                 <tr class = 'row_break heading'>
-                  <td colspan="8" style="text-align:left;border-width:0px 0px 0px 0px">Comorbidity</td>
+                  <td colspan="8" style="text-align:left;border-width:0px 0px 0px 0px">Co-morbid conditions</td>
                 </tr>
                 <tr>
 
-                  <td style="text-align:left;">BMI >= 30</td>
+                  <td style="text-align:left;">Obese (BMI >= 30)</td>
                   <td><%=  @bmi_greater_male %></td>
                   <td><%=  @bmi_greater_female %></td>
                   <td><%=  @bmi_greater_male + @bmi_greater_female %></td>
@@ -438,7 +455,7 @@
                 </tr>
                 <tr>
 
-                  <td style="text-align:left;">Smoking</td>
+                  <td style="text-align:left;">Current smoking</td>
                   <td><%=  @smoking_male %></td>
                   <td><%=  @smoking_female %></td>
                   <td><%=  @smoking_female + @smoking_male %></td>
@@ -449,7 +466,7 @@
                 </tr>
                 <tr>
 
-                  <td style="text-align:left;">Alcohol</td>
+                  <td style="text-align:left;">Drinks alcohol</td>
                   <td><%=  @alcohol_male %></td>
                   <td><%=  @alcohol_female %></td>
                   <td><%=  @alcohol_female + @alcohol_male %></td>
@@ -466,112 +483,11 @@
                 </tr>
 
                 <tr class = 'row_break heading'>
-                  <td colspan="8" style="text-align:left;border-width:0px 0px 0px 0px">Drugs</td>
+                  <td colspan="8" style="text-align:left;border-width:0px 0px 0px 0px">Measure of disease control</td>
                 </tr>
                 <tr>
 
-                  <td style="text-align:left;">Metformin</td>
-                  <td><%=  @metformin_male %></td>
-                  <td><%=  @metformin_female %></td>
-                  <td><%=  @metformin_male + @metformin_female %></td>
-                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @metformin_ever_male %></td>
-                  <td><%=  @metformin_ever_female %></td>
-                  <td><%=  @metformin_ever_female + @metformin_ever_male %></td>
-                </tr>
-                <tr>
-
-                  <td style="text-align:left;">Glibenclamide</td>
-                  <td><%=  @glibenclamide_male %></td>
-                  <td><%=  @glibenclamide_female %></td>
-                  <td><%=  @glibenclamide_female + @glibenclamide_male %></td>
-                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @glibenclamide_ever_male %></td>
-                  <td><%=  @glibenclamide_ever_female %></td>
-                  <td><%=  @glibenclamide_ever_female + @glibenclamide_ever_male %></td>
-                </tr>
-
-                <tr>
-
-                  <td style="text-align:left;">Insuline</td>
-                  <td><%=  @insulin_male %></td>
-                  <td><%=  @insulin_female %></td>
-                  <td><%=  @insulin_female + @insulin_male %></td>
-                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @insulin_ever_male %></td>
-                  <td><%=  @insulin_ever_female %></td>
-                  <td><%=  @insulin_ever_female + @insulin_ever_male %></td>
-                </tr>
-                <tr>
-
-                  <td style="text-align:left;">HCT</td>
-                  <td><%=  @hct_male %></td>
-                  <td><%=  @hct_female %></td>
-                  <td><%=  @hct_female + @hct_male %></td>
-                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @hct_ever_male %></td>
-                  <td><%=  @hct_ever_female %></td>
-                  <td><%=  @hct_ever_female + @hct_ever_male %></td>
-                </tr>
-                <tr>
-
-                  <td style="text-align:left;">Amlodipine</td>
-                  <td><%=  @amlodipine_male %></td>
-                  <td><%=  @amlodipine_female %></td>
-                  <td><%=  @amlodipine_female + @amlodipine_male %></td>
-                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @amlodipine_ever_male %></td>
-                  <td><%=  @amlodipine_ever_female %></td>
-                  <td><%=  @amlodipine_ever_female + @amlodipine_ever_male %></td>
-                </tr>
-                 <tr>
-
-                  <td style="text-align:left;">Captopril</td>
-                  <td><%=  @captopril_male %></td>
-                  <td><%=  @captopril_female %></td>
-                  <td><%=  @captopril_female + @captopril_male %></td>
-                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @captopril_ever_male %></td>
-                  <td><%=  @captopril_ever_female %></td>
-                  <td><%=  @captopril_female + @captopril_ever_male %></td>
-                </tr>
-
-                 <tr>
-
-                  <td style="text-align:left;">Phenobarbitone</td>
-                  <td><%=  @phenobarbitone_male %></td>
-                  <td><%=  @phenobarbitone_female %></td>
-                  <td><%=  @phenobarbitone_female + @phenobarbitone_male %></td>
-                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @phenobarbitone_ever_male %></td>
-                  <td><%=  @phenobarbitone_female %></td>
-                  <td><%=  @phenobarbitone_ever_female + @phenobarbitone_ever_male %></td>
-                </tr>
-
-                <tr>
-
-                  <td style="text-align:left;">Diazepam</td>
-                  <td><%=  @diazepam_male %></td>
-                  <td><%=  @diazepam_female %></td>
-                  <td><%=  @diazepam_female + @diazepam_male %></td>
-                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @diazepam_ever_male %></td>
-                  <td><%=  @diazepam_ever_female %></td>
-                  <td><%=  @diazepam_ever_female + @diazepam_ever_male %></td>
-                </tr>
-              
-                <tr class = 'row_break'>
-
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
-                </tr>
-                <tr class = 'row_break heading'>
-                  <td colspan="8" style="text-align:left;border-width:0px 0px 0px 0px">Performance</td>
-                </tr>
-                <tr>
-
-                  <td style="text-align:left;">Bp down</td>
+                  <td style="text-align:left;">Blood pressure measured</td>
                   <td><%=  @bp_male %></td>
                   <td><%=  @bp_female %></td>
                   <td><%=  @bp_female + @bp_male %></td>
@@ -582,7 +498,7 @@
                 </tr>
                 <tr>
 
-                  <td style="text-align:left;">Bp < 140/90 </td>
+                  <td style="text-align:left;">Blood pressure controlled (Bp < 140/90) </td>
                   <td><%=  @low_bp_male %></td>
                   <td><%=  @low_bp_female %></td>
                   <td><%=  @low_bp_female + @low_bp_male %></td>
@@ -593,7 +509,19 @@
                 </tr>
                 <tr>
 
-                  <td style="text-align:left;">Glucose down </td>
+                  <td style="text-align:left;">Blood glucose measured </td>
+                  <td><%= @glucose_male %></td>
+                  <td><%= @glucose_female %></td>
+                  <td><%=  @glucose_female + @glucose_male %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @glucose_ever_male %></td>
+                  <td><%=  @glucose_ever_female %></td>
+                  <td><%=  @glucose_ever_female + @glucose_ever_male %></td>
+                </tr>
+
+                 <tr>
+
+                  <td style="text-align:left;">Blood glucose controlled (FBG < 7.0mmol/l) </td>
                   <td><%= @glucose_male %></td>
                   <td><%= @glucose_female %></td>
                   <td><%=  @glucose_female + @glucose_male %></td>
@@ -605,7 +533,7 @@
 
                 <tr>
 
-                  <td style="text-align:left;">Asthmatic</td>
+                  <td style="text-align:left;">No Asthmatic attack in last three months</td>
                   <td><%=  @asthma_male %></td>
                   <td><%=  @asthma_female %></td>
                   <td><%=  (@asthma_male + @asthma_female) %></td>
@@ -617,7 +545,7 @@
 
                 <tr>
 
-                  <td style="text-align:left;">Not Asthmatic</td>
+                  <td style="text-align:left;">No Seizure in last three months</td>
                   <td><%=  @non_asthmatic_male %></td>
                   <td><%=  @non_asthmatic_female %></td>
                   <td><%=  (@non_asthmatic_male + @non_asthmatic_female) %></td>
@@ -628,7 +556,7 @@
                 </tr>
                 <tr>
 
-                  <td style="text-align:left;">Epileptic </td>
+                  <td style="text-align:left;">All disease parameters under control </td>
                   <td><%=  @epilepsy_male %></td>
                   <td><%=  @epilepsy_female %></td>
                   <td><%=  (@epilepsy_female + @epilepsy_male) %></td>
@@ -637,30 +565,7 @@
                   <td><%=  @epilepsy_ever_female %></td>
                   <td><%=  (@epilepsy_ever_female + @epilepsy_ever_male) %></td>
                 </tr>
-                <tr>
-
-                  <td style="text-align:left;">No seizure</td>
-                  <td><%=  @non_epilepsy_male %></td>
-                  <td><%=  @non_epilepsy_female %></td>
-                  <td><%=  (@non_epilepsy_male + @non_epilepsy_female) %></td>
-                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @non_epilepsy_ever_male  %></td>
-                  <td><%=  @non_epilepsy_ever_female  %></td>
-                  <td><%=  (@non_epilepsy_ever_male + @non_epilepsy_ever_female)  %></td>
-                </tr>
-                <tr>
-
-                  <td style="text-align:left;">Number of patients controlled</td>
-                  <td><%=  @controlled_male %></td>
-                  <td><%=  @controlled_female %></td>
-                  <td><%=  (@controlled_male + @controlled_female) %></td>
-                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @controlled_ever_male %></td>
-                  <td><%=  @controlled_ever_female %></td>
-                  <td><%=  (@controlled_ever_male + @controlled_ever_female) %></td>
-                </tr>
-             
-
+                
                 <tr class = 'row_break'>
 
                   <td>&nbsp;</td>
@@ -668,7 +573,7 @@
                   <td>&nbsp;</td>
                 </tr>
 
-             <tr class = 'row_break heading'>
+                 <tr class = 'row_break heading'>
                   <td colspan="8" style="text-align:left;border-width:0px 0px 0px 0px">Complications</td>
                 </tr>
                 <tr>
@@ -725,6 +630,195 @@
                   <td><%=  @comp_burns_ever_male %></td>
                   <td><%=  @comp_burns_ever_female %></td>
                   <td><%=  (@comp_burns_ever_male + @comp_burns_ever_female) %></td>
+                </tr>
+
+                <tr class = 'row_break'>
+
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+
+                <tr class = 'row_break heading'>
+                  <td colspan="8" style="text-align:left;border-width:0px 0px 0px 0px">Drugs: Anti-diabetic</td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;">Metformin</td>
+                  <td><%=  @metformin_male %></td>
+                  <td><%=  @metformin_female %></td>
+                  <td><%=  @metformin_male + @metformin_female %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @metformin_ever_male %></td>
+                  <td><%=  @metformin_ever_female %></td>
+                  <td><%=  @metformin_ever_female + @metformin_ever_male %></td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;">Glibenclamide</td>
+                  <td><%=  @glibenclamide_male %></td>
+                  <td><%=  @glibenclamide_female %></td>
+                  <td><%=  @glibenclamide_female + @glibenclamide_male %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @glibenclamide_ever_male %></td>
+                  <td><%=  @glibenclamide_ever_female %></td>
+                  <td><%=  @glibenclamide_ever_female + @glibenclamide_ever_male %></td>
+                </tr>
+
+                <tr>
+
+                  <td style="text-align:left;">Insuline</td>
+                  <td><%=  @insulin_male %></td>
+                  <td><%=  @insulin_female %></td>
+                  <td><%=  @insulin_female + @insulin_male %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @insulin_ever_male %></td>
+                  <td><%=  @insulin_ever_female %></td>
+                  <td><%=  @insulin_ever_female + @insulin_ever_male %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+
+                <tr class = 'row_break heading'>
+                  <td colspan="8" style="text-align:left;border-width:0px 0px 0px 0px">Drugs: Anti-hypertension</td>
+                </tr>
+                <tr>
+
+                  <td style="text-align:left;">Hydrochlorothiazide</td>
+                  <td><%=  @hct_male %></td>
+                  <td><%=  @hct_female %></td>
+                  <td><%=  @hct_female + @hct_male %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @hct_ever_male %></td>
+                  <td><%=  @hct_ever_female %></td>
+                  <td><%=  @hct_ever_female + @hct_ever_male %></td>
+                </tr>
+
+                 <tr>
+
+                  <td style="text-align:left;">Amlodipine</td>
+                  <td><%=  @amlodipine_male %></td>
+                  <td><%=  @amlodipine_female %></td>
+                  <td><%=  @amlodipine_female + @amlodipine_male %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @amlodipine_ever_male %></td>
+                  <td><%=  @amlodipine_ever_female %></td>
+                  <td><%=  @amlodipine_ever_female + @amlodipine_ever_male %></td>
+                </tr>
+                   <tr>
+
+                  <td style="text-align:left;">Captopril</td>
+                  <td><%=  @captopril_male %></td>
+                  <td><%=  @captopril_female %></td>
+                  <td><%=  @captopril_female + @captopril_male %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @captopril_ever_male %></td>
+                  <td><%=  @captopril_ever_female %></td>
+                  <td><%=  @captopril_female + @captopril_ever_male %></td>
+                </tr>
+
+                   <tr>
+
+                  <td style="text-align:left;">Other</td>
+                  <td><%=  @captopril_male %></td>
+                  <td><%=  @captopril_female %></td>
+                  <td><%=  @captopril_female + @captopril_male %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @captopril_ever_male %></td>
+                  <td><%=  @captopril_ever_female %></td>
+                  <td><%=  @captopril_female + @captopril_ever_male %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+
+                <tr class = 'row_break heading'>
+                  <td colspan="8" style="text-align:left;border-width:0px 0px 0px 0px">Drugs: Anti-asthma</td>
+                </tr>
+                  <tr>
+
+                  <td style="text-align:left;">Salbutamol inhaler</td>
+                  <td><%=  @salbutamol_male %></td>
+                  <td><%=  @salbutamol_female %></td>
+                  <td><%=  @salbutamol_female + @salbutamol_male %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @salbutamol_ever_male %></td>
+                  <td><%=  @salbutamol_ever_female %></td>
+                  <td><%=  @salbutamol_female + @salbutamol_ever_male %></td>
+                </tr>
+
+                  <tr>
+
+                  <td style="text-align:left;">Steroid inhaler</td>
+                  <td><%=  @steroid_male %></td>
+                  <td><%=  @steroid_female %></td>
+                  <td><%=  @steroid_female + @steroid_male %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @steroid_ever_male %></td>
+                  <td><%=  @steroid_ever_female %></td>
+                  <td><%=  @steroid_ever_female + @steroid_ever_male %></td>
+                </tr>
+                  <tr>
+
+                  <td style="text-align:left;">Other</td>
+                  <td><%=  @captopril_male %></td>
+                  <td><%=  @captopril_female %></td>
+                  <td><%=  @captopril_female + @captopril_male %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @captopril_ever_male %></td>
+                  <td><%=  @captopril_ever_female %></td>
+                  <td><%=  @captopril_female + @captopril_ever_male %></td>
+                </tr>
+                <tr class = 'row_break'>
+
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+
+                <tr class = 'row_break heading'>
+                  <td colspan="8" style="text-align:left;border-width:0px 0px 0px 0px">Drugs: Anti-epileptic</td>
+                </tr>
+
+                 <tr>
+
+                  <td style="text-align:left;">Phenobarbitone</td>
+                  <td><%=  @phenobarbitone_male %></td>
+                  <td><%=  @phenobarbitone_female %></td>
+                  <td><%=  @phenobarbitone_female + @phenobarbitone_male %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @phenobarbitone_ever_male %></td>
+                  <td><%=  @phenobarbitone_female %></td>
+                  <td><%=  @phenobarbitone_ever_female + @phenobarbitone_ever_male %></td>
+                </tr>
+                 <tr>
+
+                  <td style="text-align:left;">Phenytoin</td>
+                  <td><%=  @phenytoin_male %></td>
+                  <td><%=  @phenytoin_female %></td>
+                  <td><%=  @phenytoin_female + @phenytoin_male %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @phenytoin_ever_male %></td>
+                  <td><%=  @phenytoin_female %></td>
+                  <td><%=  @phenytoin_ever_female + @phenytoin_ever_male %></td>
+                </tr>
+                 <tr>
+
+                   <td style="text-align:left;">Carbamazepine</td>
+                  <td><%=  @carbamazepine_male %></td>
+                  <td><%=  @carbamazepine_female %></td>
+                  <td><%=  @carbamazepine_female + @carbamazepine_male %></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
+                  <td><%=  @carbamazepine_ever_male %></td>
+                  <td><%=  @carbamazepine_female %></td>
+                  <td><%=  @carbamazepine_ever_female + @carbamazepine_ever_male %></td>
                 </tr>
               </tbody>
             </table>
