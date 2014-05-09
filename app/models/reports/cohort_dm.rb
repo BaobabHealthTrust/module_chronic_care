@@ -317,9 +317,12 @@ class Reports::CohortDm
     if ! age.blank?
       if age == 14
         range = "AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) > 14
-                AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) <= 54"
-      elsif age == 54
-        range = "AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) > 54"
+                AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) <= 44"
+      elsif age == 44
+        range = "AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) > 45
+                AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) <= 64"
+       elsif age == 64
+        range = "AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) > 64"
       else
         range = "AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) <= 14"
       end
@@ -534,11 +537,14 @@ class Reports::CohortDm
                                     OR UCASE(person.gender) = '#{patient_initial}')"
     end
     if ! age.blank?
-      if age == 14
+         if age == 14
         range = "AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) > 14
-                AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) <= 54"
-      elsif age == 54
-        range = "AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) > 54"
+                AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) <= 44"
+      elsif age == 44
+        range = "AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) > 45
+                AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) <= 64"
+       elsif age == 64
+        range = "AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) > 64"
       else
         range = "AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) <= 14"
       end
