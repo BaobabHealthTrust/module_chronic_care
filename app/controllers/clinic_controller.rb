@@ -37,6 +37,9 @@ class ClinicController < ApplicationController
 
     @selected = YAML.load_file("#{Rails.root}/config/application.yml")["#{Rails.env
         }"]["demographic.fields"].split(",") rescue []
+    if current_program.blank?
+      session[:selected_program] = "HYPERTENSION PROGRAM"
+    end
 
   end
 
