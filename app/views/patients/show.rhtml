@@ -48,6 +48,11 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
     ele.style.display = "inline";
     document.body.appendChild(ele);
 
+    var ele = document.getElementById('program_menu')
+    ele.style.display = "inline";
+    document.body.appendChild(ele);
+    return
+    
     var newDiv = document.createElement('div');
     newDiv.id = "alertPage";
     newDiv.style.left = "38%";
@@ -84,10 +89,78 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
 </script>
 
 <style type="text/css">
-#popup {
- 	top: 50px;
-	height:80% ! important;
-  }
+
+    #popup{
+      -moz-user-select: none;
+      background-color: white;
+      border: 4px solid #C6C6C6;
+      border-radius: 15px 15px 15px 15px;
+      color: black;
+      font-size: 28px;
+      height: 579px;
+      left: 14%;
+      padding: 5px;
+      position: absolute;
+      text-align: center;
+      top: 5%;
+      width: 947px;
+      z-index: 991;
+    }
+    #cover{
+      display:none;
+      position: absolute;
+      background-color: black;
+      width: 100%;
+      height: 102%;
+      left: 0%;
+      top: 0%;
+      z-index: 990;
+      opacity: 0.5;
+    }
+
+    #viral_load_done {
+      position: absolute;
+      border-radius: 7px;
+      background-color:	#2E8B57;
+      border-bottom: 1px outset black;
+      border-style: outset;
+      border-top: 1px outset black;
+      color: white;
+      padding: 9px 16px 16px 19px;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      bottom: 0px;
+      left: 54px;
+      font-weight: bold;
+      font-size: 18pt;
+    }
+ #program_menu{
+        border-radius: 10px;
+        position: absolute;
+        background-color: #DCDCDC;
+        border: 3px solid black;
+        height: 50%;
+        z-index: 991;
+        left: 40%;
+        top:20%;
+        width: 45%;
+        left: 20%;
+      }
+
+    #program_button{
+        display: block;
+        border-radius: 17px;
+        background-color: #6E7B8B;
+        border-style: outset;
+        padding: 19px 21px 18px 45px;
+        cursor: pointer;
+        width: 40%;
+        margin-left: 20%;
+        text-align: center;
+        color: white;
+        font-size: 14pt;
+      }
 
   #reason_for_tb_treatment_change {
 	height:80%;
@@ -150,19 +223,6 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
 	width: 150px;
   }
 
-  #cover {
-	position: absolute;
-	background-color: black;
-	width: 100%;
-	height: 100%;
-	left: 0%;
-	top: 0%;
-	z-index: 500;
-	opacity: 0.5;
-	align: center;
-	display:none;
-  }
-
   #newText{
 	top: 40%;
     	left: 40%;
@@ -205,8 +265,7 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
   }
 
 </style>
-<div id="cover" align="center">
-</div>
+
 <div id='contented'>
   <div id='description' style='color:#777;position:absolute;margin-top:-70px;'>
     <form id = 'dashboard' action='home.html' onload="addDiv()">
@@ -290,3 +349,17 @@ next_task = @task.encounter_type.gsub('_',' ') rescue nil
     </form>
   </div>
 </div>
+<div id="cover">
+      </div>
+      <div id="program_menu" style="display:none">
+        <div><br />
+
+          <span id="program_button" onclick='window.location = "/clinic/programs?patient_id=<%= @patient.id %>&user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>&program=HYPERTENSION"'>Hypertension</span><br />
+          <% else %>
+          <span id="program_button" onclick='window.location = "/clinic/programs?patient_id=<%= @patient.id %>&user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>&program=DIABETES"'>Diabetes</span><br />
+
+          <span id="program_button" onclick='window.location = "/clinic/programs?patient_id=<%= @patient.id %>&user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>&program=ASTHMA"'>Asthma</span><br />
+
+          <span id="program_button" onclick='window.location = "/clinic/programs?patient_id=<%= @patient.id %>&user_id=<%=  params[:user_id] %>&location_id=<%= session[:location_id] || params[:location_id] %>&program=EPILEPSY"'>Epilepsy</span><br />
+        </div>
+    </div>
