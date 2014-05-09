@@ -1238,11 +1238,19 @@ class CohortToolController < ApplicationController
           @total_adults_registered_male = report.total_children_registered(ids, "male", 14)# rescue 0
     @total_adults_registered_female = report.total_children_registered(ids, "female", 14)# rescue 0
 
-    @older_persons_registered_male = report.total_children_registered(ids, "male", 54)
-    @older_persons_registered_female = report.total_children_registered(ids, "female", 54)
+    @older_persons_registered_male = report.total_children_registered(ids, "male", 64)
+    @older_persons_registered_female = report.total_children_registered(ids, "female", 64)
 
-    @older_persons_ever_registered_male = report.total_children_ever_registered(ids_ever, "male", 54)
-    @older_persons_ever_registered_female = report.total_children_ever_registered(ids_ever, "female", 54)
+    @older_persons_ever_registered_male = report.total_children_ever_registered(ids_ever, "male", 64)
+    @older_persons_ever_registered_female = report.total_children_ever_registered(ids_ever, "female", 64)
+
+
+    @middle_older_persons_registered_male = report.total_children_registered(ids, "male", 44)
+    @middle_older_persons_registered_female = report.total_children_registered(ids, "female", 44)
+
+    @middle_older_persons_ever_registered_male = report.total_children_ever_registered(ids_ever, "male", 44)
+    @middle_older_persons_ever_registered_female = report.total_children_ever_registered(ids_ever, "female", 44)
+
 
     @total_adults_ever_registered_male = report.total_children_ever_registered(ids_ever, "male", 14)# rescue 0
     @total_adults_ever_registered_female = report.total_children_ever_registered(ids_ever, "female", 14)# rescue 0
@@ -1280,16 +1288,16 @@ class CohortToolController < ApplicationController
     @disease_ever_availabe_dmht_male = report.disease_ever_availabe(ids_ever, "dm ht", "male").map{|patient|patient.patient_id}.uniq #- report.disease_ever_availabe(ids_ever, "HT", "male").map{|patient|patient.patient_id}.uniq - report.disease_ever_availabe(ids_ever, "DM", "male").map{|patient|patient.patient_id}.uniq
     @disease_ever_availabe_dmht_female = report.disease_ever_availabe(ids_ever, "dm ht", "female").map{|patient|patient.patient_id}.uniq #- report.disease_ever_availabe(ids_ever, "HT", "female").map{|patient|patient.patient_id}.uniq - report.disease_ever_availabe(ids_ever, "DM", "female").map{|patient|patient.patient_id}.uniq
 
-    total_male = @total_children_registered_male + @total_adults_registered_male + @older_persons_registered_male
+    total_male = @total_children_registered_male + @total_adults_registered_male + @older_persons_registered_male + @middle_older_persons_registered_male
     
-    total_female = @total_children_registered_female + @total_adults_registered_female + @older_persons_registered_female
+    total_female = @total_children_registered_female + @total_adults_registered_female + @older_persons_registered_female + @middle_older_persons_registered_female
     
     total_disease_male = (@disease_availabe_dmht_male + @disease_availabe_dm_male + @disease_availabe_ht_male + @disease_availabe_asthma_male + @disease_availabe_epilepsy_male).uniq
     total_disease_female = (@disease_availabe_dmht_female + @disease_availabe_dm_female + @disease_availabe_ht_female + @disease_availabe_asthma_female + @disease_availabe_epilepsy_female).uniq
 
     
-    total_ever_male = @total_children_ever_registered_male + @total_adults_ever_registered_male + @older_persons_ever_registered_male
-    total_ever_female = @total_children_ever_registered_female + @total_adults_ever_registered_female + @older_persons_ever_registered_female
+    total_ever_male = @total_children_ever_registered_male + @total_adults_ever_registered_male + @older_persons_ever_registered_male + @middle_older_persons_ever_registered_male
+    total_ever_female = @total_children_ever_registered_female + @total_adults_ever_registered_female + @older_persons_ever_registered_female + @middle_older_persons_ever_registered_female
 
     total_disease_ever_male = ( (@disease_ever_availabe_dmht_male || "") + (@disease_ever_availabe_dm_male || "") + (@disease_ever_availabe_ht_male || "") + (@disease_ever_availabe_asthma_male || "") + (@disease_ever_availabe_epilepsy_male || "")).uniq
     total_disease_ever_female = ( (@disease_ever_availabe_dmht_female || "") + (@disease_ever_availabe_dm_female || "") + (@disease_ever_availabe_ht_female || "") + (@disease_ever_availabe_asthma_female || "") + (@disease_ever_availabe_epilepsy_female || "")).uniq
@@ -1331,6 +1339,31 @@ class CohortToolController < ApplicationController
     @glibenclamide_ever_female = report.patient_ever_on_drugs(ids_ever, "F", 'Glibenclamide')
     @glibenclamide_ever_male = report.patient_ever_on_drugs(ids_ever, "M", 'Glibenclamide')
 
+
+   #==========================================
+    @salbutamol_female = report.patient_on_drugs(ids, "F", 'salbutamol inhaler')
+    @salbutamol_male = report.patient_on_drugs(ids, "M", 'Salbutamol inhaler')
+    @salbutamol_ever_female = report.patient_ever_on_drugs(ids_ever, "F", 'Salbutamol inhaler')
+    @salbutamol_ever_male = report.patient_ever_on_drugs(ids_ever, "M", 'salbutamol inhaler')
+
+
+    @steroid_female = report.patient_on_drugs(ids, "F", 'Beclomethasone inhaler')
+    @steroid_male = report.patient_on_drugs(ids, "M", 'Beclomethasone inhaler')
+    @steroid_ever_female = report.patient_ever_on_drugs(ids_ever, "F", 'Beclomethasone inhaler')
+    @steroid_ever_male = report.patient_ever_on_drugs(ids_ever, "M", 'Beclomethasone inhaler')
+
+    @phenytoin_female = report.patient_on_drugs(ids, "F", 'Phenytoin')
+    @phenytoin_male = report.patient_on_drugs(ids, "M", 'Phenytoin')
+    @phenytoin_ever_female = report.patient_ever_on_drugs(ids_ever, "F", 'Phenytoin')
+    @phenytoin_ever_male = report.patient_ever_on_drugs(ids_ever, "M", 'Phenytoin')
+    
+    @carbamazepine_female = report.patient_on_drugs(ids, "F", 'carbamazepine')
+    @carbamazepine_male = report.patient_on_drugs(ids, "M", 'carbamazepine')
+    @carbamazepine_ever_female = report.patient_ever_on_drugs(ids_ever, "F", 'carbamazepine')
+    @carbamazepine_ever_male = report.patient_ever_on_drugs(ids_ever, "M", 'carbamazepine')
+
+
+   # ==========================================
     @metformin_female = report.patient_on_drugs(ids, "F", 'Metformin')
     @metformin_male = report.patient_on_drugs(ids, "M", 'Metformin')
     @metformin_ever_female = report.patient_ever_on_drugs(ids_ever, "F", 'Metformin')
