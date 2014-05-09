@@ -1303,8 +1303,8 @@ class PatientsController < ApplicationController
 
   
   def calculate_bp(patient, visit_date)
-    systolic = Vitals.todays_vitals(patient, "Systolic blood pressure", visit_date).to_s.split(':')[1].squish #rescue 0
-    diastolic = Vitals.todays_vitals(patient, "Diastolic blood pressure", visit_date).to_s.split(':')[1].squish #rescue 0
+    systolic = Vitals.todays_vitals(patient, "Systolic blood pressure", visit_date).to_s.split(':')[1].squish rescue 0
+    diastolic = Vitals.todays_vitals(patient, "Diastolic blood pressure", visit_date).to_s.split(':')[1].squish rescue 0
     
     return "#{systolic}/#{diastolic}"
   end
@@ -1661,7 +1661,7 @@ class PatientsController < ApplicationController
 
 	def patient_visit_label(patient, date = Date.today)
     #result = Location.find(session[:location_id]).name.match(/outpatient/i)
-		visit = visits(patient, date)[date] rescue {}
+		visit = visits(patient, date)[date] #rescue {}
 
 		return if visit.blank?
     visit_data = mastercard_visit_data(visit)
@@ -1685,7 +1685,7 @@ class PatientsController < ApplicationController
     start_line = 160
 
     visit_data.each{|key,values|
-      data = values.last.split(";") rescue nil
+      data = values.last.split(";") #rescue nil
       next if data.blank?
       bold = false
       #bold = true if key.include?("side_eff") and data !="None"
@@ -1705,7 +1705,7 @@ class PatientsController < ApplicationController
       label.draw_text("#{data[1]}",600,starting_line,0,2,1,1,bold)
       label.draw_text("#{data[2]}",500,starting_line,0,2,1,1,bold)
       label.draw_text("#{data[3]}",677,starting_line,0,2,1,1,bold)
-    } rescue []
+    } #rescue []
 
     #starting_line = start_line + 30
 
