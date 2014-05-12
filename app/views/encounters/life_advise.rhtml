@@ -1,0 +1,52 @@
+<style>
+
+</style>
+<script type='text/javascript' language='javascript'>
+  <!--
+  tt_cancel_show = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
+  tt_cancel_destination = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
+
+  function changeProgram(){
+    $('program_state').value = "Patient Transferred Out"
+  }
+
+</script>
+
+<form method='post' action='/encounters/create'>
+  <input type='hidden' name='program' value='CHRONIC CARE PROGRAM' />
+  <input type='hidden' name='encounter_type' value='TREATMENT' />
+  <input type='hidden' name='patient_id' value='<%= @patient.id %>' />
+  <input type='hidden' name='user_id' value='<%= @user.id %>' />
+  <input type='hidden' name='advise' value='true' />
+  <input type="hidden" name="programs[][states][][state]" value="On treatment" id="program_id" />
+
+        <% if @current_program != "ASTHMA PROGRAM" %>
+
+          <% @changes_list = ["Regular exercises"]
+            @changes_list += ["Lose weight"]# if @bmi < 25
+            @changes_list += ["Stop Smoking"] #if @smoking == "YES"
+            @changes_list += ["Avoid heavy drinking"] #if @drinking == "YES"
+        %>
+          <%= select_tag "You receive helpful advice on important things in your life", options_for_select(@changes_list),
+            { :field_type => 'text',
+            :helpText => "Advise on Life Changes",
+            :id => "1.1.3",
+            :name=> "concept[You receive helpful advice on important things in your life][]",
+            :multiple => true,
+            :tt_pageStyleClass => "MultiSelectList",
+            :optional => true,
+            :tt_onload=> "showCategory('Treatment')"} %>
+ 
+      <% else %>
+        <% @changes_list = ["Cigarette or smoke free environment", "Correct use of in-haler", "Loose weight", "Breathing control exercise", "Allergen avoidance", "Acid reflux"] %>
+        <%= select_tag "You receive helpful advice on important things in your life", options_for_select(@changes_list),
+          { :field_type => 'text',
+          :helpText => "Advise on Life Changes",
+          :id => "1.1.3",
+          :name=> "concept[You receive helpful advice on important things in your life][]",
+          :multiple => true,
+          :tt_pageStyleClass => "MultiSelectList",
+          :optional => true,
+          :tt_onload=> "showCategory('Treatment')"} %>
+      <% end %>
+</form>
