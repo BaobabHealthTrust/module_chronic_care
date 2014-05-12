@@ -491,9 +491,5 @@ class ProtocolPatientsController < ApplicationController
     @current_program = current_program
 	end
 
-  def check_encounter(patient, enc, current_date = Date.today)
-    Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
-                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
-                                  current_date.to_date.to_date, patient.id,EncounterType.find_by_name(enc).id])
-  end
+  
 end
