@@ -70,9 +70,11 @@
 					<%  end %>
 
                                         <%  if @advanced.upcase == 'STANDARD OPD PRESCRIPTION' %>
-					 <optgroup value='/prescriptions/prescription_print?user_id=<%=  @user["user_id"] %>&patient_id=<%= @patient.id -%>' label="Prescriptions">Print Prescription</optgroup>
+					 <optgroup value='/prescriptions/prescription_print?user_id=<%=  @user["user_id"] %>&patient_id=<%= @patient.id -%>' label="Prescriptions (Print)">Prescription (Print)</optgroup>
 					<%  end %>
+                                          <optgroup value='/encounters/life_advise?user_id=<%=  @user["user_id"] %>&patient_id=<%= @patient.id -%>' label="Life Changes">Life Changes</optgroup>
 				</select>
+
 				<input type='button' value='Done' />
 				<input type='submit' value='Finish' />
 			</form>
