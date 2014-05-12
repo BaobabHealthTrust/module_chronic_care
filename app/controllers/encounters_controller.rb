@@ -49,13 +49,13 @@ class EncountersController < ApplicationController
               )
 
             end
-            if params[:encounter_type].upcase != "VITALS"
+            #if params[:encounter_type].upcase != "VITALS"
                 ProgramEncounterDetail.create(
                   :encounter_id => @encounter.id.to_i,
                   :program_encounter_id => @program_encounter.id,
                   :program_id => @program.id
                 )
-            end
+            #end
 						
             @current = PatientProgram.find_by_program_id(@program.id,
               :conditions => ["patient_id = ? AND COALESCE(date_completed, '') = ''", patient.id])
