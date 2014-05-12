@@ -939,11 +939,9 @@ class PatientsController < ApplicationController
   end
 
   def patient_national_id_label(patient)
-	  patient_bean = patient.person
-    national_id = get_patient_identifier(patient, "National ID")
-    
+    patient_bean = patient.person
+    national_id = patient.national_id_with_dashes
     sex =  patient_bean.gender.match(/F/i) ? "(F)" : "(M)"
-    #raise sex.to_yaml
     address = patient.person.address.strip[0..24].humanize rescue ""
     label = ZebraPrinter::StandardLabel.new
     label.font_size = 2
