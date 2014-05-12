@@ -179,8 +179,8 @@ class TaskFlow
 
 					next if !vitals.blank?
 					self.encounter_type = 'VITALS'
-					self.url = "http://localhost:3000/vitals?destination=http://#{host}/patients/processvitals/1?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
-					if ! my_activities.include?(tsk)
+				  self.url = "/protocol_patients/vitals?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+         	if ! my_activities.include?(tsk)
 						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
           end
 						return self
@@ -426,8 +426,8 @@ class TaskFlow
 
 					next if !vitals.blank?
 					self.encounter_type = 'VITALS'
-					self.url = "http://localhost:3000/vitals?destination=http://#{host}/patients/processvitals/1?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
-					if ! my_activities.include?(tsk)
+				self.url = "/protocol_patients/vitals?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+         	if ! my_activities.include?(tsk)
 						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
           end
 						return self
@@ -644,8 +644,8 @@ class TaskFlow
 
 					next if !vitals.blank?
 					self.encounter_type = 'VITALS'
-					self.url = "http://localhost:3000/vitals?destination=http://#{host}/patients/processvitals/1?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
-					if ! my_activities.include?(tsk)
+					self.url = "/protocol_patients/vitals?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+          if ! my_activities.include?(tsk)
 						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
           end
 						return self
@@ -872,8 +872,9 @@ class TaskFlow
 
 					next if !vitals.blank?
 					self.encounter_type = 'VITALS'
-					self.url = "http://localhost:3000/vitals?destination=http://#{host}/patients/processvitals/1?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
-					if ! my_activities.include?(tsk)
+          self.url = "/protocol_patients/vitals?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+
+          if ! my_activities.include?(tsk)
 						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
           end
 						return self
