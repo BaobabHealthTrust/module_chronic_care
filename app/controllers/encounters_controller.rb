@@ -341,6 +341,10 @@ class EncountersController < ApplicationController
       end
 
 			if params[:encounter_type] == "TREATMENT"
+       if  params[:advise] == "true"
+          redirect_to "/patients/treatment_dashboard/#{params[:patient_id]}?user_id=#{params[:user_id]}" and return
+       end
+
         link = get_global_property_value("prescription.types").upcase rescue []
 				if  params[:concept]["Prescribe Drugs"].to_s.upcase == "YES"
 					if link == "ADVANCED PRESCRIPTION"
@@ -395,6 +399,62 @@ class EncountersController < ApplicationController
 
   end
 
+
+  def life_advise
+  	
+    	@patient = Patient.find(params[:patient_id])
+    	@user = User.find(params[:user_id])
+    	 current_date = (!session[:datetime].nil? ? session[:datetime].to_date : Date.today)
+    previous_days = 3.months
+    current_date = current_date - previous_days
+    @age = @patient.age
+    @sbp = Observation.find_by_sql("SELECT * from obs
+                   WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'SBP' LIMIT 1)
+                   AND voided = 0 AND person_id = #{@patient.id} ORDER BY obs_datetime DESC LIMIT 1").first.value_numeric rescue 0
+
+    @previous_sbp = Observation.find_by_sql("SELECT * from obs
+                   WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'SBP' LIMIT 1)
+                   AND DATE(obs_datetime) <= #{current_date}
+                   AND voided = 0 AND person_id = #{@patient.id} ORDER BY obs_datetime DESC LIMIT 1").first.value_numeric rescue 0
+
+    @previous_dbp = Observation.find_by_sql("SELECT * from obs
+               WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'DBP' LIMIT 1)
+               AND DATE(obs_datetime) <= #{current_date}
+               AND voided = 0 AND person_id = #{@patient.id} ORDER BY obs_datetime DESC LIMIT 1").first.value_numeric rescue 0
+
+
+    @dbp = Observation.find_by_sql("SELECT * from obs
+                   WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'DBP' LIMIT 1)
+                   AND voided = 0 AND person_id = #{@patient.id} ORDER BY obs_datetime DESC LIMIT 1").first.value_numeric rescue 0
+
+    @bmi = Observation.find_by_sql("SELECT * from obs
+                   WHERE concept_id = (SELECT concept_id FROM concept_name WHERE name = 'bmi' LIMIT 1)
+                   AND voided = 0 AND person_id = #{@patient.id} ORDER BY obs_datetime DESC LIMIT 1").first.to_s.split(":")[1].squish.to_f.round(2) rescue 0
+
+    @smoking = Vitals.current_vitals(@patient, "current smoker").to_s.split(":")[1].squish.upcase rescue "Unknown"
+    @drinking = Vitals.current_vitals(@patient, "Does the patient drink alcohol?").to_s.split(":")[1].squish.upcase rescue "Unknown"
+
+    current_date = current_date + 2.months
+    
+    @previous_treatment = check_encounter(@patient, "TREATMENT", current_date)
+
+    @bp = (@sbp / @dbp).to_f rescue 0
+    @previous_bp = (@previous_sbp / @previous_dbp).to_f rescue 0
+    @normal_bp = (180/100)
+
+    @category = "Mild"
+
+    if ! @sbp.blank? and ! @dbp.blank?
+          if (@sbp >= 140 and @sbp < 160) and (@dbp >= 100 and @dbp < 110)
+            @category = "Mild"
+          elsif (@sbp >= 160 and @sbp < 180) and (@dbp >= 90 and @dbp < 100)
+            @category = "Moderate"
+          elsif (@sbp >= 180) and (@dbp >= 110)
+            @category = "Severe"
+          end
+    end
+  end
+  
   def list_observations
     obs = []
     encounter = Encounter.find(params[:encounter_id])
@@ -405,10 +465,10 @@ class EncountersController < ApplicationController
         mixed = "#{drug} #{o.to_piped_s.humanize}"
         [o.id, mixed] rescue nil
       }.compact
-    elsif encounter.type.name.upcase == "TREATMENT"
-      obs = encounter.orders.collect{|o|
-        ["drg", o.to_s]
-      }
+   # elsif encounter.type.name.upcase == "TREATMENT"
+    #  obs = encounter.orders.collect{|o|
+     #   ["drg", o.to_s]
+     # }
     else
       obs = encounter.observations.collect{|o|
         [o.id, o.to_piped_s.humanize] rescue nil
