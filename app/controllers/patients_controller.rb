@@ -47,12 +47,12 @@ class PatientsController < ApplicationController
     host = request.host_with_port
     @task.tasks.each{|task|
 			next if ! current_user_activities.include?(task.downcase)
-      if task.upcase == "VITALS"
-        @links[task.titleize] = "http://#{remote_ip}:3000/vitals?destination=http://#{host}/patients/processvitals/1?patient_id=#{@patient.id}&user_id=#{params[:user_id]}"
-      else
+      #if task.upcase == "VITALS"
+       # @links[task.titleize] = "http://#{remote_ip}:3000/vitals?destination=http://#{host}/patients/processvitals/1?patient_id=#{@patient.id}&user_id=#{params[:user_id]}"
+      #else
         @links[task.titleize] = "/protocol_patients/#{task.gsub(/\s/, "_")}?patient_id=#{@patient.id}&user_id=#{params[:user_id]}"
 
-      end
+      #end
       @links[task.titleize] = "/patients/treatment_dashboard/#{@patient.id}?user_id=#{params[:user_id]}" if task.downcase == "treatment"
     }
 
