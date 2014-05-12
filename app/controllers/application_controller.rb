@@ -17,6 +17,12 @@ class ApplicationController < ActionController::Base
   def create_from_dde_server
     get_global_property_value('create.from.dde.server').to_s == "true" rescue false
   end
+  
+  def check_encounter(patient, enc, current_date = Date.today)
+    Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
+                                  :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
+                                  current_date.to_date.to_date, patient.id,EncounterType.find_by_name(enc).id])
+  end
 
   def print_and_redirect(print_url, redirect_url, message = "Printing, please wait...", show_next_button = false, patient_id = nil)
     @print_url = print_url
