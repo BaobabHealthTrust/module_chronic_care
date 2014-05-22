@@ -1603,7 +1603,7 @@ class PatientsController < ApplicationController
     visit_data = mastercard_visit_data(visit)
     
     label = ZebraPrinter::StandardLabel.new
-    label.draw_text("Printed: #{Date.today.strftime('%b %d %Y')}",597,280,0,1,1,1,false)
+    #label.draw_text("Printed: #{Date.today.strftime('%b %d %Y')}",597,280,0,1,1,1,false)
     #label.draw_text("#{seen_by(patient,date)}",597,250,0,1,1,1,false)
     label.draw_text("#{date.strftime("%B %d %Y").upcase}",25,30,0,3,1,1,false)
     # label.draw_text("#{arv_number}",565,30,0,3,1,1,true)
@@ -1620,7 +1620,7 @@ class PatientsController < ApplicationController
     #label.draw_text("#{visit_data['bp'] rescue nil}",185,160,0,2,1,1,false)
     label.draw_text("#{visit_data['outcome']}",577,160,0,2,1,1,false)
     label.draw_text("#{visit_data['outcome_date']}",655,130,0,2,1,1,false)
-    label.draw_text("#{visit_data['next_appointment']}",577,190,0,2,1,1,false) if visit_data['next_appointment']
+    label.draw_text("#{visit_data['next_appointment']}",25,190,0,2,1,1,false) if visit_data['next_appointment']
     starting_index = 25
     start_line = 160
 
@@ -1665,8 +1665,8 @@ class PatientsController < ApplicationController
     visit_data = mastercard_visit_data(visit)
     #raise visit_data['bp'].to_yaml
     label = ZebraPrinter::StandardLabel.new
-    label.draw_text("Printed: #{Date.today.strftime('%b %d %Y')}",597,280,0,1,1,1,false)
-    label.draw_text("#{seen_by(patient,date)}",597,250,0,1,1,1,false)
+    #label.draw_text("Printed: #{Date.today.strftime('%b %d %Y')}",597,280,0,1,1,1,false)
+    #label.draw_text("#{seen_by(patient,date)}",597,250,0,1,1,1,false)
     label.draw_text("#{date.strftime("%B %d %Y").upcase}",25,30,0,3,1,1,false)
     # label.draw_text("#{arv_number}",565,30,0,3,1,1,true)
     label.draw_text("#{patient.name}(#{patient.gender})",25,60,0,3,1,1,false)
@@ -1678,6 +1678,7 @@ class PatientsController < ApplicationController
     label.draw_text("DU",500,130,0,3,1,1,false)
     label.draw_text("FN",600,130,0,3,1,1,false)
     label.draw_text("Dose",677,130,0,3,1,1,false)
+    label.draw_text("#{visit_data['next_appointment']}",577, 30,0,2,1,1,false) if visit_data['next_appointment']
     label.draw_line(25,150,800,5)
     starting_index = 25
     start_line = 160
