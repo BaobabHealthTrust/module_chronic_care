@@ -50,11 +50,40 @@ class GenericPrescriptionsController < ApplicationController
       user_person_id = User.find_by_user_id(params[:user_id]).person_id
     end
 
-    @encounter = @patient.encounters.find(:first,:conditions =>["encounter_datetime BETWEEN ? AND ? AND encounter_type = ?",
-        session_date.to_date.strftime('%Y-%m-%d 00:00:00'),
-        session_date.to_date.strftime('%Y-%m-%d 23:59:59'),
-        EncounterType.find_by_name("TREATMENT").id])
-    @encounter ||= @patient.encounters.create(:encounter_type => EncounterType.find_by_name("TREATMENT").id,:encounter_datetime => session_date, :provider_id => user_person_id)
+	
+	
+    @encounter = current_prescription_encounter(@patient, session_date, user_person_id)
+    
+     @program = Program.find_by_concept_id(ConceptName.find_by_name('CHRONIC CARE PROGRAM').concept_id) rescue nil
+
+          if !@program.nil?
+
+            @program_encounter = ProgramEncounter.find_by_program_id(@program.id,
+              :conditions => ["patient_id = ? AND DATE(date_time) = ?",
+                @patient.id, @encounter.encounter_datetime.to_date.strftime("%Y-%m-%d")])
+
+            if @program_encounter.blank?
+
+              @program_encounter = ProgramEncounter.create(
+                :patient_id => @patient.id,
+                :date_time => @encounter.encounter_datetime.to_date,
+                :program_id => @program.id
+              )
+
+            end
+
+            ProgramEncounterDetail.create(
+              :encounter_id => @encounter.id.to_i,
+              :program_encounter_id => @program_encounter.id,
+              :program_id => @program.id
+            )
+
+          @current = PatientProgram.find_by_program_id(@program.id,
+          :conditions => ["patient_id = ? AND COALESCE(date_completed, '') = ''", @patient.id])
+
+          end
+   
+   
     @diagnosis = Observation.find(params[:diagnosis]) rescue nil
         
     @suggestions.each do |suggestion|
@@ -115,6 +144,12 @@ class GenericPrescriptionsController < ApplicationController
 			    redirect_to  "/patients/treatment_dashboard/#{@patient.id}?user_id=#{params[:user_id]}" and return
 		#end
     
+  end
+	
+  def current_prescription_encounter(patient, date = Time.now(), provider = user_person_id)
+    type = EncounterType.find_by_name("TREATMENT")
+    encounter = patient.encounters.find(:first,:conditions =>["DATE(encounter_datetime) = ? AND encounter_type = ?",date.to_date,type.id])
+    encounter ||= patient.encounters.create(:encounter_type => type.id,:encounter_datetime => date, :provider_id => provider)
   end
 
   def prescription_print
