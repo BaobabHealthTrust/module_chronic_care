@@ -465,10 +465,18 @@ class EncountersController < ApplicationController
         mixed = "#{drug} #{o.to_piped_s.humanize}"
         [o.id, mixed] rescue nil
       }.compact
-   # elsif encounter.type.name.upcase == "TREATMENT"
-    #  obs = encounter.orders.collect{|o|
-     #   ["drg", o.to_s]
-     # }
+    elsif encounter.type.name.upcase == "TREATMENT"
+     
+      if encounter.observations.length > 0
+	      obs = encounter.observations.collect{|o|
+		[o.id, o.to_piped_s.humanize] rescue nil
+	      }.compact
+      end
+       if encounter.orders.length > 0
+	      obs += encounter.orders.collect{|o|
+		["drg", o.to_s]
+	      }
+      end
     else
       obs = encounter.observations.collect{|o|
         [o.id, o.to_piped_s.humanize] rescue nil
