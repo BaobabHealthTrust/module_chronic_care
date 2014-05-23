@@ -160,6 +160,7 @@
                                 INNER JOIN program_encounter_details p
                                 ON p.encounter_id = e.encounter_id
                                 WHERE p.voided = 0
+                                AND e.voided = 0
                                 AND e.patient_id = #{patient_id}
                                 AND DATE(e.encounter_datetime) = '#{date}'
                                 AND p.program_id != #{program_id}
@@ -171,6 +172,7 @@
                                 INNER JOIN obs o
                                 ON o.encounter_id = e.encounter_id
                                 WHERE o.voided = 0
+                                AND e.voided = 0
                                 AND e.patient_id = #{patient_id}
                                 AND DATE(e.encounter_datetime) = '#{date}'
                                 AND et.name = '#{encounter}'")
@@ -182,6 +184,7 @@
                                 INNER JOIN obs o
                                 ON o.encounter_id = e.encounter_id
                                 WHERE o.voided = 0
+                                AND e.voided = 0
                                 AND e.patient_id = #{patient_id}
                                 AND DATE(e.encounter_datetime) = '#{date}'
                                 AND et.name = '#{encounter}'")
@@ -192,6 +195,7 @@
                                 INNER JOIN program_encounter_details p
                                 ON p.encounter_id = e.encounter_id
                                 WHERE p.voided = 0
+                                AND e.voided = 0
                                 AND e.patient_id = #{patient_id}
                                 AND DATE(e.encounter_datetime) = '#{date}'
                                 AND et.name = '#{encounter}'")
