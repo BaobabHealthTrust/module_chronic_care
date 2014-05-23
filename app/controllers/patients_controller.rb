@@ -155,12 +155,12 @@ class PatientsController < ApplicationController
                     ORDER BY  obs_datetime DESC, date_created DESC LIMIT 1").first.to_s.split(':')[1].squish rescue 0
 
 
-    unless params["Height"].blank?
+    if !params["Height"].blank? and params["Height"].to_i > 0
       current = params["Height"].to_i
     end
 
 
-
+	
     weight = ConceptName.find_by_sql("select concept_id from concept_name where name = 'weight (kg)' and voided = 0").first.concept_id
 
 
@@ -169,10 +169,11 @@ class PatientsController < ApplicationController
                     ORDER BY  obs_datetime DESC, date_created DESC LIMIT 1").first.to_s.split(':')[1].squish rescue 0
 
 
-    unless params["Weight"].blank?
+    if !params["Weight"].blank? and params["Weight"].to_i > 0
       weight = params["Weight"].to_f.round(1)
     end
-    bmi = (weight / ( current * current) * 10000 ).round(1)
+    
+    bmi = (weight / ( current * current) * 10000 ).round(1) rescue ""
 
     sex =  patient.gender.downcase
 
@@ -251,8 +252,10 @@ class PatientsController < ApplicationController
         elsif concept.match(/Height/i)
           concept = "Height (Cm)"
           value = value.to_f.round(2)
+          next if value <= 0
         elsif concept.match(/Weight/i)
           value = value.to_f.round(2)
+          next if value <= 0
         elsif concept.match(/Oxygen/i)
           concept = "Blood Oxygen Saturation"
         elsif concept.match(/Respiratory/i)
@@ -262,7 +265,8 @@ class PatientsController < ApplicationController
             pefr = (((current - 100) * 5) + 100).to_i
           end
           if ((age >= 18) && (sex == "m"))
-            current = current / 100
+            
+            current = current.to_f / 100
             pefr = ((((current * 5.48) + 1.58) - (age * 0.041)) * 60).to_i
           end
 
