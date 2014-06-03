@@ -1592,60 +1592,60 @@ class PatientsController < ApplicationController
   def prescription_label
     session_date = session[:datetime].to_date rescue Date.today
 		@patient = Patient.find(params[:patient_id])
-    print_string = prescription_print_label(@patient, session_date) rescue (raise "Unable to find patient (#{params[:patient_id]}) or generate a visit label for that patient")
+    print_string = prescription_print_label(@patient, session_date) #rescue (raise "Unable to find patient (#{params[:patient_id]}) or generate a visit label for that patient")
     send_data(print_string,:type=>"application/label; charset=utf-8", :stream=> false, :filename=>"#{params[:patient_id]}#{rand(10000)}.lbl", :disposition => "inline")
   end
 
   def prescription_print_label(patient, date = Date.today)
     visit = visits(patient, date, true)[date] rescue {}
-
+    results = lab_results(patient.id, date)
 		return if visit.blank?
     visit_data = mastercard_visit_data(visit)
     
     label = ZebraPrinter::StandardLabel.new
-    #label.draw_text("Printed: #{Date.today.strftime('%b %d %Y')}",597,280,0,1,1,1,false)
-    #label.draw_text("#{seen_by(patient,date)}",597,250,0,1,1,1,false)
-    label.draw_text("#{date.strftime("%B %d %Y").upcase}",25,30,0,3,1,1,false)
-    # label.draw_text("#{arv_number}",565,30,0,3,1,1,true)
-    label.draw_text("#{patient.name}(#{patient.gender})",25,60,0,3,1,1,false)
-    #label.draw_text("#{'(' + visit.visit_by + ')' unless visit.visit_by.blank?}",255,30,0,2,1,1,false)
-    label.draw_text("#{visit.height + 'cm' if !visit.height.blank?}  #{visit.weight + 'kg' if !visit.weight.blank?}  #{'BMI:' + visit.bmi if !visit.bmi.blank?}  #{'BP :' + visit_data['bp'] }",25,95,0,2,1,1,false) rescue ""
-    #label.draw_text("SE",25,130,0,3,1,1,false)
-    label.draw_text("TB",110,130,0,3,1,1,false)
-    #label.draw_text("BP",185,130,0,3,1,1,false)
-    label.draw_text("DRUG(S) PRESCRIBED",255,130,0,3,1,1,false)
-    label.draw_text("OUTC",577,130,0,3,1,1,false)
-    label.draw_line(25,150,800,5)
-    label.draw_text("#{visit.tb_status}",110,160,0,2,1,1,false)
-    #label.draw_text("#{visit_data['bp'] rescue nil}",185,160,0,2,1,1,false)
-    label.draw_text("#{visit_data['outcome']}",577,160,0,2,1,1,false)
-    label.draw_text("#{visit_data['outcome_date']}",655,130,0,2,1,1,false)
-    label.draw_text("#{visit_data['next_appointment']}",25,190,0,2,1,1,false) if visit_data['next_appointment']
-    starting_index = 25
-    start_line = 160
-
-     
-    #starting_index = 30
-    visit_data.each{|key,values|
     
-      data = values.last rescue nil
+    label.draw_text("#{patient.name}(#{patient.gender})",25,60,0,3,1,1,false)
+    label.draw_text("#{visit.height + 'cm' if !visit.height.blank?}  #{visit.weight + 'kg' if !visit.weight.blank?}  #{'BMI:' + visit.bmi if !visit.bmi.blank?}  #{'BP :' + visit_data['bp'] }",25,95,0,2,1,1,false) rescue ""
+    
+    line = 25
+    (results || []).each {|sugar|
+      label.draw_text("#{sugar}",line,120,0,2,1,1,false)
+      line += 205
+    }
+    label.draw_text("Drug(s) Prescribed",25,150,0,3,1,1,false)
+    label.draw_text("DU",700,150,0,3,1,1,false)
+    label.draw_text("FN",600,150,0,3,1,1,false)
+    label.draw_text("Dose",500,150,0,3,1,1,false)
+    label.draw_line(25,170,800,5)
+
+    starting_index = 25
+    start_line = 180
+    starting_line = 180
+    
+    visit.gave.each{|values|  
+      data = values.last.split(";")
       next if data.blank?
-      bold = false
-      #bold = true if key.include?("side_eff") and data !="None"
-      #bold = true if key.include?("arv_given")
-      starting_index = values.first.to_i
-      starting_line = start_line
-      starting_line = start_line + 30 if key.include?("2")
-      starting_line = start_line + 60 if key.include?("3")
-      starting_line = start_line + 90 if key.include?("4")
-      starting_line = start_line + 120 if key.include?("5")
-      starting_line = start_line + 150 if key.include?("6")
-      starting_line = start_line + 180 if key.include?("7")
-      starting_line = start_line + 210 if key.include?("8")
-      starting_line = start_line + 240 if key.include?("9")
-      next if starting_index == 0
-      label.draw_text("#{data}",starting_index,starting_line,0,2,1,1,bold)
+      bold = false   
+      label.draw_text("#{data[0]}",25,starting_line,0,2,1,1,bold)
+      label.draw_text("#{data[1]}",600,starting_line,0,2,1,1,bold)
+      label.draw_text("#{data[2]}",700,starting_line,0,2,1,1,bold)
+      label.draw_text("#{data[3]}",500,starting_line,0,2,1,1,bold)
+      starting_line = starting_line + 20
     } rescue []
+    
+    starting_line = starting_line + 10
+    label.draw_line(25,starting_line,800,5)
+    starting_line = starting_line + 10
+    label.draw_text("Life Style",25,starting_line,0,2,1,1,false) unless life_style(patient.id, date).blank?
+
+    
+    starting_line = starting_line + 20
+    label.draw_text("#{visit_data['next_appointment']}",30,starting_line,0,2,1,1,false) if visit_data['next_appointment']
+    label.draw_text("#{seen_by(patient,date)}",597,starting_line,0,1,1,1,false)
+    starting_line = starting_line + 20
+    label.draw_text("Printed: #{Date.today.strftime('%b %d %Y')}",597,starting_line,0,1,1,1,false)
+    
+    
     label.print(1)
   end
 
@@ -1660,61 +1660,105 @@ class PatientsController < ApplicationController
 	def patient_visit_label(patient, date = Date.today)
     #result = Location.find(session[:location_id]).name.match(/outpatient/i)
 		visit = visits(patient, date)[date] #rescue {}
+	results = lab_results(patient.id, date)
+	return if visit.blank?
+	visit_data = mastercard_visit_data(visit)
 
-		return if visit.blank?
-    visit_data = mastercard_visit_data(visit)
-    #raise visit_data['bp'].to_yaml
-    label = ZebraPrinter::StandardLabel.new
-    #label.draw_text("Printed: #{Date.today.strftime('%b %d %Y')}",597,280,0,1,1,1,false)
-    #label.draw_text("#{seen_by(patient,date)}",597,250,0,1,1,1,false)
-    label.draw_text("#{date.strftime("%B %d %Y").upcase}",25,30,0,3,1,1,false)
-    # label.draw_text("#{arv_number}",565,30,0,3,1,1,true)
-    label.draw_text("#{patient.name}(#{patient.gender})",25,60,0,3,1,1,false)
-    #label.draw_text("#{'(' + visit.visit_by + ')' unless visit.visit_by.blank?}",255,30,0,2,1,1,false)
-    label.draw_text("#{visit.height + 'cm' if !visit.height.blank?}  #{visit.weight + 'kg' if !visit.weight.blank?}  #{'BMI:' + visit.bmi if !visit.bmi.blank?}  #{'BP :' + visit_data['bp'] }",25,95,0,2,1,1,false) rescue ""
-    #label.draw_text("SE",25,130,0,3,1,1,false)
-    label.draw_text("Drug",60,130,0,3,1,1,false)
-    #label.draw_text("BP",185,130,0,3,1,1,false)
-    label.draw_text("DU",500,130,0,3,1,1,false)
-    label.draw_text("FN",600,130,0,3,1,1,false)
-    label.draw_text("Dose",677,130,0,3,1,1,false)
-    label.draw_text("#{visit_data['next_appointment']}",577, 30,0,2,1,1,false) if visit_data['next_appointment']
-    label.draw_line(25,150,800,5)
-    starting_index = 25
-    start_line = 160
+	label = ZebraPrinter::StandardLabel.new
+	
+	label.draw_text("#{patient.name}(#{patient.gender})",25,60,0,3,1,1,false)
+	label.draw_text("#{visit.height + 'cm' if !visit.height.blank?}  #{visit.weight + 'kg' if !visit.weight.blank?}  #{'BMI:' + visit.bmi if !visit.bmi.blank?}  #{'BP :' + visit_data['bp'] }",25,95,0,2,1,1,false) rescue ""
+	
+	line = 25
+	(results || []).each {|sugar|
+	label.draw_text("#{sugar}",line,120,0,2,1,1,false)
+	line += 205
+	}
+	label.draw_text("Drug(s)",25,150,0,3,1,1,false)
+	label.draw_text("DU",700,150,0,3,1,1,false)
+	label.draw_text("FN",600,150,0,3,1,1,false)
+	label.draw_text("Dose",500,150,0,3,1,1,false)
+	label.draw_line(25,170,800,5)
+	starting_index = 25
+	start_line = 180
+	starting_line = 180
 
-    visit_data.each{|key,values|
-      data = values.last.split(";") #rescue nil
+    visit.gave.each{|values|  
+      data = values.last.split(";")
       next if data.blank?
-      bold = false
-      #bold = true if key.include?("side_eff") and data !="None"
-      #bold = true if key.include?("arv_given")
-      starting_index = values.first.to_i
-      starting_line = start_line
-      starting_line = start_line + 30 if key.include?("2")
-      starting_line = start_line + 60 if key.include?("3")
-      starting_line = start_line + 90 if key.include?("4")
-      starting_line = start_line + 120 if key.include?("5")
-      starting_line = start_line + 150 if key.include?("6")
-      starting_line = start_line + 180 if key.include?("7")
-      starting_line = start_line + 210 if key.include?("8")
-      starting_line = start_line + 240 if key.include?("9")
-      next if starting_index == 0
-      label.draw_text("#{data[0]}",60,starting_line,0,2,1,1,bold)
+      bold = false   
+      label.draw_text("#{data[0]}",25,starting_line,0,2,1,1,bold)
       label.draw_text("#{data[1]}",600,starting_line,0,2,1,1,bold)
-      label.draw_text("#{data[2]}",500,starting_line,0,2,1,1,bold)
-      label.draw_text("#{data[3]}",677,starting_line,0,2,1,1,bold)
-    } #rescue []
+      label.draw_text("#{data[2]}",700,starting_line,0,2,1,1,bold)
+      label.draw_text("#{data[3]}",500,starting_line,0,2,1,1,bold)
+      starting_line = starting_line + 20
+    } rescue []
+    
+    starting_line = starting_line + 10
+    label.draw_line(25,starting_line,800,5)
+    starting_line = starting_line + 10
+    label.draw_text("Life Style",25,starting_line,0,2,1,1,false) unless life_style(patient.id, date).blank?
 
-    #starting_line = start_line + 30
-
-    # label.draw_text("#{visit_data['outcome']}",80,starting_line,0,2,1,1,false)
-    #label.draw_text("#{visit_data['outcome_date']}",255,starting_line,0,2,1,1,false)
-    #label.draw_text("#{visit_data['next_appointment']}",577,starting_line,0,2,1,1,false) if visit_data['next_appointment']
-
+    
+    starting_line = starting_line + 20
+    label.draw_text("#{visit_data['next_appointment']}",30,starting_line,0,2,1,1,false) if visit_data['next_appointment']
+    label.draw_text("#{seen_by(patient,date)}",597,starting_line,0,1,1,1,false)
+    starting_line = starting_line + 20
+    label.draw_text("Printed: #{Date.today.strftime('%b %d %Y')}",597,starting_line,0,1,1,1,false)
+    
     label.print(2)
     #end
   end
+
+  def life_style(patient_id, visit_date)
+    concept = ConceptName.find_by_name("You receive helpful advice on important things in your life").concept_id
+    obs = Observation.find(:all, :conditions => ["concept_id = ? AND voided = 0 AND person_id = ? AND DATE(obs_datetime) = ?", concept, patient_id, visit_date.strftime('%Y-%m-%d')]) rescue []
+    result_set = []
+    obs.each {|o|
+       result_set << o.to_s.split(':')[1]
+    }
+    return result_set
+  end
+
+  def lab_results(patient_id, visit_date)
+    encounter_type = EncounterType.find_by_name("Lab Results")
+    encounter = Encounter.find(:all, :conditions => ["encounter_type = #{encounter_type.encounter_type_id} and patient_id = #{patient_id}
+                  AND voided = 0 AND DATE(encounter_datetime) = ?", visit_date.strftime("%Y-%m-%d")])
+    obs = Observation.find(:all, :conditions => ["encounter_id = ? AND obs_group_id IS NULL", encounter.first.encounter_id]) rescue []
+    result_set = []
+    obs.each {|o|
+      name = o.to_s.split(':')[0]
+      value = Observation.find(:last, :conditions => ["obs_group_id = ?", o.obs_id]).to_s.split(':')
+      name = "#{value[0].chars.first}Ch" if name.match(/Cholesterol/i)
+      name = "#{value[0].chars.first}BS" if name.match(/Blood Sugar/i)
+      name = "SeC" if name.match(/Serum creatinine/i)
+      
+      result_set << "#{name} :#{(value[1].strip.to_f / 18).round(0).to_i} mmol/l"
+    }
+    return result_set
+  end
+
+  def doses_per_day(frequency)
+    return 1 if frequency.upcase == "ONCE A DAY (OD)"
+    return 1 if frequency.upcase == "ONCE A DAY"
+    return 2 if frequency.upcase == "TWICE A DAY (BD)"
+    return 2 if frequency.upcase == "TWICE A DAY"
+    return 3 if frequency.upcase == "THREE A DAY (TDS)"
+    return 3 if frequency.upcase == "THREE A DAY"
+    return 4 if frequency.upcase == "FOUR TIMES A DAY (QID)" || "FOUR TIMES A DAY"
+    return 5 if frequency.upcase == "FIVE TIMES A DAY (5X/D)" || "FIVE TIMES A DAY"
+    return 6 if frequency.upcase == "SIX TIMES A DAY (Q4HRS)" || "SIX TIMES A DAY"
+    return 1 if frequency.upcase == "IN THE MORNING (QAM)" || "IN THE MORNING"
+    return 1 if frequency.upcase == "ONCE A DAY AT NOON (QNOON)" || "ONCE A DAY AT NOON"
+    return 1 if frequency.upcase == "IN THE EVENING (QPM)" || "IN THE EVENING"
+    return 1 if frequency.upcase == "ONCE A DAY AT NIGHT (QHS)" || "ONCE A DAY AT NIGHT"
+    return 0.5 if frequency.upcase == "EVERY OTHER DAY (QOD)" || "EVERY OTHER DAY"
+    return 1.to_f / 7.to_f if frequency.upcase == "ONCE A WEEK (QWK)" || "ONCE A WEEK"
+    return 1.to_f / 28.to_f if frequency.upcase == "ONCE A MONTH"
+    return 1.to_f / 14.to_f if frequency.upcase == "TWICE A MONTH"
+    1
+  end
+
 
   def seen_by(patient,date = Date.today)
     provider = patient.encounters.find_by_date(date).collect{|e| next unless e.name == 'HIV CLINIC CONSULTATION' ; [e.name,e.creator]}.compact
@@ -1753,7 +1797,7 @@ class PatientsController < ApplicationController
       string = "#{drug[0]} (#{pills})"
       if string.length > 26
         line = string[0..25]
-        line2 = string[26..-1]
+       line2 = string[26..-1]
         data["arv_given#{count}"] = "255",line
         data["arv_given#{count+=1}"] = "255","#{line2} ; #{drug[1]} ; #{drug[2]} ; #{drug[3]}"
       else
@@ -1907,17 +1951,15 @@ class PatientsController < ApplicationController
             :conditions => ["encounter_type = ? AND e.patient_id = ? AND DATE(start_date) = ?",
               type.id,patient_obj.patient_id,visit_date.to_date])
           prescriptions.each{|drug_name|
-            patient_visits[visit_date].gave  << [drug_name.drug_order.drug.name, drug_name.drug_order.amount_needed]
+            drug_given_name = drug_name.drug_order.drug.name
+            frequency = drug_name.drug_order.frequency
+            dose = drug_name.drug_order.dose
+            daily_dose = drug_name.drug_order.equivalent_daily_dose
+            duration = (drug_name.drug_order.amount_needed / daily_dose).to_i
+           
+            patient_visits[visit_date].gave << ["#{drug_given_name} ; #{doses_per_day(frequency)} ; #{duration} ; #{dose} ; #{drug_name.drug_order.amount_needed}"]
           }
 
-          drugs_given_uniq = Hash.new(0)
-					(patient_visits[visit_date].gave || {}).each do |drug_given_name,quantity_given|
-						drugs_given_uniq[drug_given_name] += quantity_given
-					end
-					patient_visits[visit_date].gave = []
-					(drugs_given_uniq || {}).each do |drug_given_name,quantity_given|
-						patient_visits[visit_date].gave << [drug_given_name,quantity_given]
-					end
         end
 
 			elsif concept_name.upcase == 'AMOUNT DISPENSED'
@@ -1944,7 +1986,8 @@ class PatientsController < ApplicationController
 					patient_visits[visit_date].gave = []
 					(drugs_given_uniq || {}).each do |drug_given_name,quantity_given|
 						duration = (quantity_given / daily_dose).to_i
-            patient_visits[visit_date].gave << ["#{drug_given_name} ; #{frequency} ; #{duration} ; #{dose}",quantity_given]
+						
+            				patient_visits[visit_date].gave << ["#{drug_given_name} ; #{doses_per_day(frequency)} ; #{duration} ; #{dose} ; #{quantity_given}"]
 					end
 				end
 				#if !drug.blank?
