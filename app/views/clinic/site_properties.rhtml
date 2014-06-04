@@ -2,7 +2,9 @@
   body {
     -moz-user-select:none;
   }
-
+  .btn {
+    min-width:280px ! important;
+  }
   #stats {
     width:98%;
     border:1px solid #eee;
@@ -84,6 +86,16 @@
               %>&location_id=<%= session[:location_id] || params[:location_id] %>&src=<%= @host %>'">
           <span>
             Lab Results
+          </span>
+        </button>
+      </td>
+
+      </td>
+       <td style="height: 70px;">
+        <button class="btn" onclick="window.parent.location='/drug/drug_sets?user_id=<%= params[:user_id]
+              %>&location_id=<%= session[:location_id] || params[:location_id] %>&src=<%= @host %>'">
+          <span>
+              Drug Sets
           </span>
         </button>
       </td>
