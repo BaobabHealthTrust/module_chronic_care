@@ -208,6 +208,35 @@ class ClinicController < ApplicationController
 		end
 	end
 
+  def clinic_days
+     if request.post?
+      ['peads','all'].each do | age_group |
+        if age_group == 'peads'
+          clinic_days = GlobalProperty.find_by_property('peads.clinic.days')
+          weekdays = params[:peadswkdays]
+        else
+          clinic_days = GlobalProperty.find_by_property('clinic.days')
+          weekdays = params[:weekdays]
+        end
+
+        if clinic_days.blank?
+          clinic_days = GlobalProperty.new()
+          clinic_days.property = 'clinic.days'
+          clinic_days.property = 'peads.clinic.days' if age_group == 'peads'
+          clinic_days.description = 'Week days when the clinic is open'
+        end
+        weekdays = weekdays.split(',').collect{ |wd|wd.capitalize }
+        clinic_days.property_value = weekdays.join(',')
+        clinic_days.save
+      end
+      flash[:notice] = "Week day(s) successfully created."
+      redirect_to "/clinic?user_id=#{params[:user_id]}&location_id=#{session[:location_id] || params[:location_id]}" and return
+    end
+    @peads_clinic_days = CoreService.get_global_property_value('peads.clinic.days') rescue nil
+    @clinic_days = CoreService.get_global_property_value('clinic.days') rescue nil
+    render :layout => "menu"
+  end
+
 	def lab_results
 	  if request.post?
       lab_results = get_global_property_value("lab_results") rescue nil
