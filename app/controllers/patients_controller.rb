@@ -1400,7 +1400,7 @@ class PatientsController < ApplicationController
   end
   def treatment_dashboard
 		@user = User.find(params[:user_id]) rescue nil
-		@patient = Patient.find(params[:id]) rescue nil
+		@patient = Patient.find(params[:id]) rescue Patient.find(params[:patient_id]) rescue nil
 		@dispense = CoreService.get_global_property_value('use_drug_barcodes_only')
 	  #@patient_bean = PatientService.get_patient(@patient.person)
     @amount_needed = 0
@@ -1597,7 +1597,7 @@ class PatientsController < ApplicationController
   end
 
   def prescription_print_label(patient, date = Date.today)
-    visit = visits(patient, date, true)[date] rescue {}
+    visit = visits(patient, date, true)[date] #rescue {}
     results = lab_results(patient.id, date)
 		return if visit.blank?
     visit_data = mastercard_visit_data(visit)
@@ -1880,7 +1880,29 @@ class PatientsController < ApplicationController
           patient_obj.patient_id,encounter_date.to_date, concept_ids],
         :order =>"obs_datetime").map{|obs| obs if !obs.concept.nil?}
     end
-		
+
+   if prescribed == true
+          visit_date = encounter_date.to_date
+          patient_visits[visit_date] = Mastercard.new() if patient_visits[visit_date].blank?
+          patient_visits[visit_date].gave = []
+          type = EncounterType.find_by_name('TREATMENT')
+          prescriptions = Order.find(:all,
+            :joins => "INNER JOIN encounter e USING (encounter_id)",
+            :conditions => ["encounter_type = ? AND e.patient_id = ? AND DATE(start_date) = ?",
+              type.id,patient_obj.patient_id,visit_date.to_date])
+
+      prescriptions.each{|drug_name|
+            drug_given_name = drug_name.drug_order.drug.name
+            frequency = drug_name.drug_order.frequency
+            dose = drug_name.drug_order.dose
+            daily_dose = drug_name.drug_order.equivalent_daily_dose
+            duration = (drug_name.drug_order.amount_needed / daily_dose).to_i
+
+            patient_visits[visit_date].gave << ["#{drug_given_name} ; #{doses_per_day(frequency)} ; #{duration} ; #{dose} ; #{drug_name.drug_order.amount_needed}"]
+          }
+
+    end
+
 		gave_hash = Hash.new(0)
 		observations.map do |obs|
 			drug = Drug.find(obs.order.drug_order.drug_inventory_id) rescue nil
