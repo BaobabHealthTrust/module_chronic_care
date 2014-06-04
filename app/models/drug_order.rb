@@ -83,7 +83,7 @@ class DrugOrder < ActiveRecord::Base
     duration = (auto_expire_date.to_date - start_date.to_date).to_i rescue nil
     equivalent_daily_dose = nil
     drug_order = nil       
-    # if (frequency == "VARIABLE")
+     if (frequency == "VARIABLE")
     
     if instructions.blank?
       instructions = "#{drug.name}:"
@@ -106,13 +106,13 @@ class DrugOrder < ActiveRecord::Base
     end
     equivalent_daily_dose ||= dose
 
-    #else
-    #  equivalent_daily_dose ||= dose.to_f * DrugOrder.doses_per_day(frequency)
-    #  if instructions.blank?
-    #    instructions = "#{drug.name}: #{dose} #{units} #{frequency} for #{duration||'some'} days"
-    #    instructions += " (prn)" if prn == 1
-    #  end
-    # end
+    else
+      equivalent_daily_dose ||= dose.to_f * DrugOrder.doses_per_day(frequency)
+      if instructions.blank?
+        instructions = "#{drug.name}: #{dose} #{units} #{frequency} for #{duration||'some'} days"
+        instructions += " (prn)" if prn == 1
+      end
+     end
     
    
     ActiveRecord::Base.transaction do
