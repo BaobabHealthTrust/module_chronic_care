@@ -62,7 +62,9 @@
 
 					<% if @advanced.upcase == "ADVANCED PRESCRIPTION" %>
 						<optgroup value='/prescriptions/generic_advanced_prescription?user_id=<%=  @user["user_id"] %>&patient_id=<%= @patient.id -%>' label="Drugs">Drugs</option>
-					<% else %>
+					<% elsif @advanced.upcase == "PRESCRIPTION WITH SETS"%>
+                                                <optgroup value='/prescriptions/new_prescription?user_id=<%=  @user["user_id"] %>&patient_id=<%= @patient.id -%>' label="Drugs">Drugs</optgroup>
+                                        <% else %>
 						<optgroup value='/prescriptions/prescribe?user_id=<%=  @user["user_id"] %>&patient_id=<%= @patient.id -%>' label="Drugs">Drugs</optgroup>
 					<% end %>
 					<% if @dispense.to_s.downcase == "false" %>
