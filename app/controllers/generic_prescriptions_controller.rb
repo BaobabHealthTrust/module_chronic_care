@@ -50,7 +50,9 @@ class GenericPrescriptionsController < ApplicationController
       user_person_id = User.find_by_user_id(params[:user_id]).person_id
     end
 
-	
+	  if user_person_id.blank?
+        user_person_id = User.find(1).person_id rescue []
+    end
 	
     @encounter = current_prescription_encounter(@patient, session_date, user_person_id)
     

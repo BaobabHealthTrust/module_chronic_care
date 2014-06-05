@@ -121,7 +121,7 @@ list-style-type: none;
         <%= touch_location_tag "location",  @patient, nil,
           {	:id => "location",
           :value_datetime => true,
-          :name => "concept[Patient referred to another site]",
+          :name => "concept[Source of referral]",
           :helpText => "Transferred from",
           :ajaxURL => "#{ajax_url}",
           :condition => '$("patient_type").value == "TRANSFER IN"',
