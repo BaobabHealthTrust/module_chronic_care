@@ -28,7 +28,19 @@ $(function () {
      
         $('#container').highcharts({
             chart: {
-                type: 'line'
+                type: 'line',
+                className: 'skies',
+                borderWidth: 0,
+                plotShadow: true,
+                backgroundColor: 'lightyellow',
+                plotBackgroundColor: {
+                   linearGradient: [0, 0, 250, 500],
+                   stops: [
+                      [0, 'rgba(255, 255, 255, 1)'],
+                      [1, 'rgba(255, 255, 255, 0)']
+                   ]
+                },
+                plotBorderWidth: 1
             },
             title: {
                 text: ''
@@ -43,6 +55,10 @@ $(function () {
                 }
             },
             yAxis: {
+                alternateGridColor: 'rgba(255, 255, 255, .5)',
+                lineColor: '#C0D0E0',
+                tickColor: '#C0D0E0',
+                tickWidth: 1,
                 title: {
                     text: 'BP'
                 },
@@ -53,15 +69,14 @@ $(function () {
                 }
             },
             plotOptions: {
-                area: {
-                    stacking: 'normal',
-                    lineColor: '#666666',
-                    lineWidth: 1,
-                    marker: {
-                        lineWidth: 1,
-                        lineColor: '#666666'
-                    }
-                }
+               line: {
+                dataLabels: {
+                    color: "black",
+                    enabled: true
+                },
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
             },
             series: dataG()
         });
@@ -77,7 +92,7 @@ $(function () {
         dbp.push(bps[i][2]);
         bp.push(bps[i][3]);
       }
-      return [{name: 'SBP', data: sbp},{name: 'DBP', data: dbp},{name: 'BP', data: bp}];
+      return [{name: 'Systolic BP', data: sbp},{name: 'Diastolic BP', data: dbp},{name: 'Blood Pressure', data: bp}];
     }
     </script>
   </head>
