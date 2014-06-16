@@ -18,8 +18,9 @@ class ReportController < ApplicationController
 		@location = {}
 		@gender["F"] = 0
 		@gender["M"] = 0
-		(Clinic.total_in_program(Program.find_by_concept_id(Concept.find_by_name('CHRONIC CARE PROGRAM').id).id) || []).each do |patient|
-			pat = Patient.find(patient.patient_id)
+    report = Reports::CohortDm.new('1900-01-01', Date.today)
+		report.total_registered.map{|patient|patient.patient_id}.each do |patient|
+			pat = Patient.find(patient)
       sex = ""
       unless pat.gender.blank?
         sex = pat.gender
@@ -30,7 +31,7 @@ class ReportController < ApplicationController
 			(@location[pat.address].nil?) ? @location[pat.address] = 1 : @location[pat.address] += 1
 			@total << [pat.name, sex, pat.age, pat.address]
 		end
-    @total =  @total.sort
+    	@total =  @total.sort rescue []
 		render :layout => 'application'
 	end
 
