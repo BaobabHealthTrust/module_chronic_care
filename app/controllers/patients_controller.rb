@@ -1739,24 +1739,24 @@ class PatientsController < ApplicationController
   end
 
   def doses_per_day(frequency)
-    return 1 if frequency.upcase == "ONCE A DAY (OD)"
-    return 1 if frequency.upcase == "ONCE A DAY"
-    return 2 if frequency.upcase == "TWICE A DAY (BD)"
-    return 2 if frequency.upcase == "TWICE A DAY"
-    return 3 if frequency.upcase == "THREE A DAY (TDS)"
-    return 3 if frequency.upcase == "THREE A DAY"
-    return 4 if frequency.upcase == "FOUR TIMES A DAY (QID)" || "FOUR TIMES A DAY"
-    return 5 if frequency.upcase == "FIVE TIMES A DAY (5X/D)" || "FIVE TIMES A DAY"
-    return 6 if frequency.upcase == "SIX TIMES A DAY (Q4HRS)" || "SIX TIMES A DAY"
-    return 1 if frequency.upcase == "IN THE MORNING (QAM)" || "IN THE MORNING"
-    return 1 if frequency.upcase == "ONCE A DAY AT NOON (QNOON)" || "ONCE A DAY AT NOON"
-    return 1 if frequency.upcase == "IN THE EVENING (QPM)" || "IN THE EVENING"
-    return 1 if frequency.upcase == "ONCE A DAY AT NIGHT (QHS)" || "ONCE A DAY AT NIGHT"
-    return 0.5 if frequency.upcase == "EVERY OTHER DAY (QOD)" || "EVERY OTHER DAY"
-    return 1.to_f / 7.to_f if frequency.upcase == "ONCE A WEEK (QWK)" || "ONCE A WEEK"
-    return 1.to_f / 28.to_f if frequency.upcase == "ONCE A MONTH"
-    return 1.to_f / 14.to_f if frequency.upcase == "TWICE A MONTH"
-    1
+    return "OD" if frequency.upcase == "ONCE A DAY (OD)"
+    return "OD" if frequency.upcase == "ONCE A DAY"
+    return "BD" if frequency.upcase == "TWICE A DAY (BD)"
+    return "BD" if frequency.upcase == "TWICE A DAY"
+    return "TDS" if frequency.upcase == "THREE A DAY (TDS)"
+    return "TDS" if frequency.upcase == "THREE A DAY"
+    return "QID" if frequency.upcase == "FOUR TIMES A DAY (QID)" || "FOUR TIMES A DAY"
+    return "5X/D" if frequency.upcase == "FIVE TIMES A DAY (5X/D)" || "FIVE TIMES A DAY"
+    return "Q4HRS" if frequency.upcase == "SIX TIMES A DAY (Q4HRS)" || "SIX TIMES A DAY"
+    return "QAM" if frequency.upcase == "IN THE MORNING (QAM)" || "IN THE MORNING"
+    return "QNOON" if frequency.upcase == "ONCE A DAY AT NOON (QNOON)" || "ONCE A DAY AT NOON"
+    return "QPM" if frequency.upcase == "IN THE EVENING (QPM)" || "IN THE EVENING"
+    return "QHS" if frequency.upcase == "ONCE A DAY AT NIGHT (QHS)" || "ONCE A DAY AT NIGHT"
+    return "QOD" if frequency.upcase == "EVERY OTHER DAY (QOD)" || "EVERY OTHER DAY"
+    return "QWK" if frequency.upcase == "ONCE A WEEK (QWK)" || "ONCE A WEEK"
+    return "ONCE A MONTH" if frequency.upcase == "ONCE A MONTH"
+    return "TWICE A MONTH" if frequency.upcase == "TWICE A MONTH"
+    "OD"
   end
 
 
