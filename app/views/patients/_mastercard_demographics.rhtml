@@ -6,16 +6,16 @@
     <td colspan="7" style="height:40px;padding-left:10px;border-style:solid;border-width:0px 0px 1px 0px;"><b><font size="4"> Diabetes, Cardio Vascular( Hypertension) and Asthma Care: Adult  Patient Master Card Version 2</font></b></td>
   </tr>
   <tr>
-    <td colspan="2" style="height:30px;padding-left:10px;border-style:solid;border-width:0px 0px 1px 0px;"><b><font size="4"> Zone Name: <%= @data_demo.zone -%></font></b></td>
-    <td colspan="3" style="height:30px;padding-left:10px;border-style:solid;border-width:0px 0px 1px 0px;"><b><font size="4"> Clinic Name and Number:  <%= @data_demo.clinic -%></font></b></td>
-    <td colspan="2" style="height:30px;padding-left:10px;border-style:solid;border-width:0px 0px 1px 0px;"><b><font size="4"> District:  <%= @data_demo.district -%></font></b></td>
+    <td colspan="2" style="height:30px;padding-left:10px;border-style:solid;border-width:0px 0px 1px 0px;"><b><font size="4"> Zone Name: <%= @data_demo.zone rescue "" -%></font></b></td>
+    <td colspan="3" style="height:30px;padding-left:10px;border-style:solid;border-width:0px 0px 1px 0px;"><b><font size="4"> Clinic Name and Number:  <%= @data_demo.clinic  rescue "" -%></font></b></td>
+    <td colspan="2" style="height:30px;padding-left:10px;border-style:solid;border-width:0px 0px 1px 0px;"><b><font size="4"> District:  <%= @data_demo.district  rescue "" -%></font></b></td>
   </tr>
   <tr valign="top">
     <td valign="top" colspan="2" style="height:30px;padding-left:10px;border-style:solid;border-width:1px 1px 1px 1px;">
       <font size="4">Patient/Guardian Details</font>
       <table width="100%" cellpadding="5">
         <tr>
-          <td  colspan="1"><%=  "Patient name:" -%></td><td  colspan="3" align="right"><%= @data_demo.name -%></td>
+          <td  colspan="1"><%=  "Patient name:" -%></td><td  colspan="3" align="right"><%= @data_demo.name  rescue "" -%></td>
         </tr>
         <tr class="master_data">
           <td width="50%">
@@ -23,8 +23,8 @@
             Height,
             <%= "Age" -%>
           </td>
-          <td  width="10%"><%= @data_demo.sex -%></td>
-          <td  width="20%">H : <span style="text-decoration:underline;"><%= @data_demo.init_ht -%></span> CM</td>
+          <td  width="10%"><%= @data_demo.sex  rescue "" -%></td>
+          <td  width="20%">H : <span style="text-decoration:underline;"><%= @data_demo.init_ht  rescue "" -%></span> CM</td>
           <td  width="20%"><%= @data_demo.age -%> Yrs &nbsp;
 
             <%= "DOB:" -%> <%= @data_demo.birth_date -%>
