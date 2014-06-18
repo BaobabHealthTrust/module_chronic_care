@@ -1636,13 +1636,16 @@ class PatientsController < ApplicationController
     starting_line = starting_line + 10
     label.draw_line(25,starting_line,800,5)
     starting_line = starting_line + 10
-    label.draw_text("Life Style",25,starting_line,0,2,1,1,false) unless life_style(patient.id, date).blank?
-
-    
-    starting_line = starting_line + 20
-    label.draw_text("#{visit_data['next_appointment']}",30,starting_line,0,2,1,1,false) if visit_data['next_appointment']
+    if life_style(patient.id, date).blank?
+      label.draw_text("Life Style Given: No",25,starting_line,0,1,1,1,false)
+    else
+      label.draw_text("Life Style Given: Yes",25,starting_line,0,1,1,1,false)
+    end
     label.draw_text("#{seen_by(patient,date)}",597,starting_line,0,1,1,1,false)
     starting_line = starting_line + 20
+    label.draw_text("#{visit_data['next_appointment']}",30,starting_line,0,2,1,1,false) if visit_data['next_appointment']
+    
+    #starting_line = starting_line + 20
     label.draw_text("Printed: #{Date.today.strftime('%b %d %Y')}",597,starting_line,0,1,1,1,false)
     
     
@@ -1674,38 +1677,42 @@ class PatientsController < ApplicationController
 	label.draw_text("#{sugar}",line,120,0,2,1,1,false)
 	line += 205
 	}
-	label.draw_text("Drug(s)",25,150,0,3,1,1,false)
-	label.draw_text("DU",700,150,0,3,1,1,false)
-	label.draw_text("FN",600,150,0,3,1,1,false)
-	label.draw_text("Dose",500,150,0,3,1,1,false)
+	label.draw_text("Drug(s) Dispensed",25,150,0,3,1,1,false)
+	#label.draw_text("DU",700,150,0,3,1,1,false)
+	#label.draw_text("FN",600,150,0,3,1,1,false)
+	#label.draw_text("Dose",500,150,0,3,1,1,false)
 	label.draw_line(25,170,800,5)
 	starting_index = 25
 	start_line = 180
 	starting_line = 180
 
     visit.gave.each{|values|  
-      data = values.last.split(";")
+      data = values#.last.split(";")
       next if data.blank?
       bold = false   
-      label.draw_text("#{data[0]}",25,starting_line,0,2,1,1,bold)
-      label.draw_text("#{data[1]}",600,starting_line,0,2,1,1,bold)
-      label.draw_text("#{data[2]}",700,starting_line,0,2,1,1,bold)
-      label.draw_text("#{data[3]}",500,starting_line,0,2,1,1,bold)
+      label.draw_text("#{data}",25,starting_line,0,2,1,1,bold)
+     # label.draw_text("#{data[1]}",600,starting_line,0,2,1,1,bold)
+     # label.draw_text("#{data[2]}",700,starting_line,0,2,1,1,bold)
+     # label.draw_text("#{data[3]}",500,starting_line,0,2,1,1,bold)
       starting_line = starting_line + 20
     } rescue []
     
     starting_line = starting_line + 10
     label.draw_line(25,starting_line,800,5)
     starting_line = starting_line + 10
-    label.draw_text("Life Style",25,starting_line,0,2,1,1,false) unless life_style(patient.id, date).blank?
-
-    
+    if life_style(patient.id, date).blank?
+      label.draw_text("Life Style Given: No",25,starting_line,0,1,1,1,false)
+    else
+      label.draw_text("Life Style Given: Yes",25,starting_line,0,1,1,1,false)
+    end
+     label.draw_text("#{seen_by(patient,date)}",597,starting_line,0,1,1,1,false)
     starting_line = starting_line + 20
     label.draw_text("#{visit_data['next_appointment']}",30,starting_line,0,2,1,1,false) if visit_data['next_appointment']
-    label.draw_text("#{seen_by(patient,date)}",597,starting_line,0,1,1,1,false)
-    starting_line = starting_line + 20
+
+    #starting_line = starting_line + 20
     label.draw_text("Printed: #{Date.today.strftime('%b %d %Y')}",597,starting_line,0,1,1,1,false)
-    
+
+
     label.print(2)
     #end
   end
@@ -1909,7 +1916,31 @@ class PatientsController < ApplicationController
 
             patient_visits[visit_date].gave << ["#{drug_name.drug_order.amount_needed}#{drug_name.drug_order.drug.units}:#{drug_given_name};#{dose}(#{doses_per_day(frequency)}) for #{duration} days"]
           }
+   else
+    
+         visit_date = encounter_date.to_date
+          patient_visits[visit_date] = Mastercard.new() if patient_visits[visit_date].blank?
+          patient_visits[visit_date].gave = []
+          type = EncounterType.find_by_name('TREATMENT')
+          concept_id = ConceptName.find_by_name("Amount dispensed").concept_id
+          obs = Observation.find(:all, :conditions => ["person_id = ? AND concept_id = ? AND DATE(obs_datetime) = ? AND voided = 0",
+                 patient_obj.patient_id, concept_id, visit_date.to_date]).collect{|r| r.value_drug}.uniq
+         
+         patient_visits[visit_date].gave = []
+         obs.each{|drug_id|
 
+            drug = Drug.find(drug_id)
+            drug_given_name = drug.name
+            drugs_given_uniq = Hash.new(0)
+            Observation.find(:all, :conditions => ["value_drug = ? AND person_id = ? AND concept_id = ?",
+                drug_id, patient_obj.patient_id, concept_id]).each{|given|
+                  drugs_given_uniq[drug_given_name] += given.value_numeric
+                }
+          (drugs_given_uniq || {}).each do |drug_name,quantity_given|
+             patient_visits[visit_date].gave << ["#{drug_name} #{quantity_given} #{drug.units}"]
+          end
+          }
+          
     end
 
 		gave_hash = Hash.new(0)
@@ -1972,62 +2003,7 @@ class PatientsController < ApplicationController
         #	patient_visits[visit_date].tb_status = 'noRx' if status == 'CONFIRMED TB NOT ON TREATMENT'
         #	patient_visits[visit_date].tb_status = 'Rx' if status == 'CONFIRMED TB ON TREATMENT'
         #	patient_visits[visit_date].tb_status = 'Rx' if status == 'CURRENTLY IN TREATMENT'
-      elsif concept_name.upcase == 'PRESCRIBE DRUGS'
-
-        if prescribed == true
-          patient_visits[visit_date].gave = []
-          type = EncounterType.find_by_name('TREATMENT')
-          prescriptions = Order.find(:all,
-            :joins => "INNER JOIN encounter e USING (encounter_id)",
-            :conditions => ["encounter_type = ? AND e.patient_id = ? AND DATE(start_date) = ?",
-              type.id,patient_obj.patient_id,visit_date.to_date])
-          prescriptions.each{|drug_name|
-            drug_given_name = drug_name.drug_order.drug.name
-            frequency = drug_name.drug_order.frequency
-            dose = drug_name.drug_order.dose
-            daily_dose = drug_name.drug_order.equivalent_daily_dose
-            duration = (drug_name.drug_order.amount_needed / daily_dose).to_i
-           
-            patient_visits[visit_date].gave << ["#{drug_name.drug_order.amount_needed}#{drug_name.drug_order.drug.units}:#{drug_given_name};#{dose}(#{doses_per_day(frequency)}) for #{duration} days"]
-          }
-
-        end
-
-			elsif concept_name.upcase == 'AMOUNT DISPENSED'
-
-				drug = Drug.find(obs.value_drug) rescue nil
-				#tb_medical = MedicationService.tb_medication(drug)
-				#next if tb_medical == true
-				next if drug.blank?
-        frequency = DrugOrder.find(obs.order_id).frequency
-        dose = DrugOrder.find(obs.order_id).dose
-        daily_dose = DrugOrder.find(obs.order_id).equivalent_daily_dose
-				drug_name = drug.concept.shortname rescue drug.name
-				if drug_name.match(/Cotrimoxazole/i) || drug_name.match(/CPT/i)
-					patient_visits[visit_date].cpt += obs.value_numeric unless patient_visits[visit_date].cpt.blank?
-					patient_visits[visit_date].cpt = obs.value_numeric if patient_visits[visit_date].cpt.blank?
-				else
-					tb_medical = MedicationService.tb_medication(drug)
-					patient_visits[visit_date].gave = [] if patient_visits[visit_date].gave.blank?
-					patient_visits[visit_date].gave << [drug_name,obs.value_numeric]
-					drugs_given_uniq = Hash.new(0)
-					(patient_visits[visit_date].gave || {}).each do |drug_given_name,quantity_given|
-						drugs_given_uniq[drug_given_name] += quantity_given
-					end
-					patient_visits[visit_date].gave = []
-					(drugs_given_uniq || {}).each do |drug_given_name,quantity_given|
-						duration = (quantity_given / daily_dose).to_i
-						
-            				patient_visits[visit_date].gave << ["#{drug_given_name} ; #{doses_per_day(frequency)} ; #{duration} ; #{dose} ; #{quantity_given}"]
-					end
-				end
-				#if !drug.blank?
-				#	tb_medical = MedicationService.tb_medication(drug)
-        #patient_visits[visit_date].ipt = [] if patient_visits[visit_date].ipt.blank?
-        #patient_visits[visit_date].tb_status = "tb medical" if tb_medical == true
-        #raise patient_visits[visit_date].tb_status.to_yaml
-				#end
-
+     
 			elsif concept_name.upcase == 'ARV REGIMENS RECEIVED ABSTRACTED CONSTRUCT'
 				patient_visits[visit_date].reg = 'Unknown' if obs.value_coded == ConceptName.find_by_name("Unknown antiretroviral drug").concept_id
 				patient_visits[visit_date].reg =  Concept.find_by_concept_id(obs.value_coded).concept_names.typed("SHORT").first.name if !patient_visits[visit_date].reg
