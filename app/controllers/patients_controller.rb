@@ -1613,9 +1613,9 @@ class PatientsController < ApplicationController
       line += 205
     }
     label.draw_text("Drug(s) Prescribed",25,150,0,3,1,1,false)
-    label.draw_text("DU",700,150,0,3,1,1,false)
-    label.draw_text("FN",600,150,0,3,1,1,false)
-    label.draw_text("Dose",500,150,0,3,1,1,false)
+    #label.draw_text("DU",700,150,0,3,1,1,false)
+    #label.draw_text("FN",600,150,0,3,1,1,false)
+    #label.draw_text("Dose",500,150,0,3,1,1,false)
     label.draw_line(25,170,800,5)
 
     starting_index = 25
@@ -1623,13 +1623,13 @@ class PatientsController < ApplicationController
     starting_line = 180
     
     visit.gave.each{|values|  
-      data = values.last.split(";")
+      data = values#.last.split(";")
       next if data.blank?
       bold = false   
-      label.draw_text("#{data[0]}",25,starting_line,0,2,1,1,bold)
-      label.draw_text("#{data[1]}",600,starting_line,0,2,1,1,bold)
-      label.draw_text("#{data[2]}",700,starting_line,0,2,1,1,bold)
-      label.draw_text("#{data[3]}",500,starting_line,0,2,1,1,bold)
+      label.draw_text("#{data}",25,starting_line,0,2,1,1,bold)
+      #label.draw_text("#{data[1]}",600,starting_line,0,2,1,1,bold)
+      #label.draw_text("#{data[2]}",700,starting_line,0,2,1,1,bold)
+      #label.draw_text("#{data[3]}",500,starting_line,0,2,1,1,bold)
       starting_line = starting_line + 20
     } rescue []
     
@@ -1745,17 +1745,26 @@ class PatientsController < ApplicationController
     return "BD" if frequency.upcase == "TWICE A DAY"
     return "TDS" if frequency.upcase == "THREE A DAY (TDS)"
     return "TDS" if frequency.upcase == "THREE A DAY"
-    return "QID" if frequency.upcase == "FOUR TIMES A DAY (QID)" || "FOUR TIMES A DAY"
-    return "5X/D" if frequency.upcase == "FIVE TIMES A DAY (5X/D)" || "FIVE TIMES A DAY"
-    return "Q4HRS" if frequency.upcase == "SIX TIMES A DAY (Q4HRS)" || "SIX TIMES A DAY"
-    return "QAM" if frequency.upcase == "IN THE MORNING (QAM)" || "IN THE MORNING"
-    return "QNOON" if frequency.upcase == "ONCE A DAY AT NOON (QNOON)" || "ONCE A DAY AT NOON"
-    return "QPM" if frequency.upcase == "IN THE EVENING (QPM)" || "IN THE EVENING"
-    return "QHS" if frequency.upcase == "ONCE A DAY AT NIGHT (QHS)" || "ONCE A DAY AT NIGHT"
-    return "QOD" if frequency.upcase == "EVERY OTHER DAY (QOD)" || "EVERY OTHER DAY"
-    return "QWK" if frequency.upcase == "ONCE A WEEK (QWK)" || "ONCE A WEEK"
-    return "ONCE A MONTH" if frequency.upcase == "ONCE A MONTH"
-    return "TWICE A MONTH" if frequency.upcase == "TWICE A MONTH"
+    return "QID" if frequency.upcase == "FOUR TIMES A DAY (QID)" #||
+    return "QID" if frequency.upcase =="FOUR TIMES A DAY"
+    return "5X/D" if frequency.upcase == "FIVE TIMES A DAY (5X/D)"
+    return "5X/D" if frequency.upcase ==  "FIVE TIMES A DAY"
+    return "Q4HRS" if frequency.upcase == "SIX TIMES A DAY (Q4HRS)" 
+    return "Q4HRS" if frequency.upcase ==  "SIX TIMES A DAY"
+    return "QAM" if frequency.upcase == "IN THE MORNING (QAM)" 
+    return "QAM" if frequency.upcase ==  "IN THE MORNING"
+    return "QNOON" if frequency.upcase == "ONCE A DAY AT NOON (QNOON)" 
+    return "QNOON" if frequency.upcase == "ONCE A DAY AT NOON"
+    return "QPM" if frequency.upcase == "IN THE EVENING (QPM)" 
+    return "QPM" if frequency.upcase == "IN THE EVENING"
+    return "QHS" if frequency.upcase == "ONCE A DAY AT NIGHT (QHS)" 
+    return "QHS" if frequency.upcase ==  "ONCE A DAY AT NIGHT"
+    return "QOD" if frequency.upcase == "EVERY OTHER DAY (QOD)" 
+    return "QOD" if frequency.upcase ==  "EVERY OTHER DAY"
+    return "QWK" if frequency.upcase == "ONCE A WEEK (QWK)" 
+    return "QWK" if frequency.upcase == "ONCE A WEEK"
+    return "once a month" if frequency.upcase == "ONCE A MONTH"
+    return "twice a month" if frequency.upcase == "TWICE A MONTH"
     "OD"
   end
 
@@ -1898,7 +1907,7 @@ class PatientsController < ApplicationController
             daily_dose = drug_name.drug_order.equivalent_daily_dose
             duration = (drug_name.drug_order.amount_needed / daily_dose).to_i
 
-            patient_visits[visit_date].gave << ["#{drug_given_name} ; #{doses_per_day(frequency)} ; #{duration} ; #{dose} ; #{drug_name.drug_order.amount_needed}"]
+            patient_visits[visit_date].gave << ["#{drug_name.drug_order.amount_needed}#{drug_name.drug_order.drug.units}:#{drug_given_name};#{dose}(#{doses_per_day(frequency)}) for #{duration} days"]
           }
 
     end
@@ -1979,7 +1988,7 @@ class PatientsController < ApplicationController
             daily_dose = drug_name.drug_order.equivalent_daily_dose
             duration = (drug_name.drug_order.amount_needed / daily_dose).to_i
            
-            patient_visits[visit_date].gave << ["#{drug_given_name} ; #{doses_per_day(frequency)} ; #{duration} ; #{dose} ; #{drug_name.drug_order.amount_needed}"]
+            patient_visits[visit_date].gave << ["#{drug_name.drug_order.amount_needed}#{drug_name.drug_order.drug.units}:#{drug_given_name};#{dose}(#{doses_per_day(frequency)}) for #{duration} days"]
           }
 
         end
