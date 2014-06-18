@@ -1917,12 +1917,13 @@ class PatientsController < ApplicationController
             patient_visits[visit_date].gave << ["#{drug_name.drug_order.amount_needed}#{drug_name.drug_order.drug.units}:#{drug_given_name};#{dose}(#{doses_per_day(frequency)}) for #{duration} days"]
           }
    else
-    
-         visit_date = encounter_date.to_date
+       type = EncounterType.find_by_name('TREATMENT')
+       concept_id = ConceptName.find_by_name("Amount dispensed").concept_id
+       if ! encounter_date.blank?
+          visit_date = encounter_date.to_date
           patient_visits[visit_date] = Mastercard.new() if patient_visits[visit_date].blank?
           patient_visits[visit_date].gave = []
-          type = EncounterType.find_by_name('TREATMENT')
-          concept_id = ConceptName.find_by_name("Amount dispensed").concept_id
+          
           obs = Observation.find(:all, :conditions => ["person_id = ? AND concept_id = ? AND DATE(obs_datetime) = ? AND voided = 0",
                  patient_obj.patient_id, concept_id, visit_date.to_date]).collect{|r| r.value_drug}.uniq
          
@@ -1940,8 +1941,32 @@ class PatientsController < ApplicationController
              patient_visits[visit_date].gave << ["#{drug_name} #{quantity_given} #{drug.units}"]
           end
           }
+       else
+         observations.each{|obs|
+          visit_date = obs.obs_datetime.to_date
+          patient_visits[visit_date] = Mastercard.new() if patient_visits[visit_date].blank?
+          patient_visits[visit_date].gave = []
+          obs = Observation.find(:all, :conditions => ["person_id = ? AND concept_id = ? AND DATE(obs_datetime) = ? AND voided = 0",
+                 patient_obj.patient_id, concept_id, visit_date.to_date]).collect{|r| r.value_drug}.uniq
+
+         patient_visits[visit_date].gave = []
+         obs.each{|drug_id|
+
+            drug = Drug.find(drug_id)
+            drug_given_name = drug.name
+            drugs_given_uniq = Hash.new(0)
+            Observation.find(:all, :conditions => ["value_drug = ? AND person_id = ? AND concept_id = ?",
+                drug_id, patient_obj.patient_id, concept_id]).each{|given|
+                  drugs_given_uniq[drug_given_name] += given.value_numeric
+                }
+          (drugs_given_uniq || {}).each do |drug_name,quantity_given|
+             patient_visits[visit_date].gave << ["#{drug_name} #{quantity_given} #{drug.units}"]
+          end
+          }
+         }
+       end
           
-    end
+    end #rescue ""
 
 		gave_hash = Hash.new(0)
 		observations.map do |obs|
