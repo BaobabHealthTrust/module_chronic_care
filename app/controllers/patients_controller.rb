@@ -669,7 +669,7 @@ class PatientsController < ApplicationController
       #  @visits = visits(Patient.find(@patient_id))
     else
       @patient_id = params[:patient_id]
-      @patient_art_start_date = PatientService.patient_art_start_date(@patient_id) rescue
+      @patient_art_start_date = PatientService.patient_art_start_date(@patient_id)# rescue
       @data_demo = mastercard_demographics(Patient.find(@patient_id))
 			#raise @data_demo.eptb.to_yaml
       @visits = visits(Patient.find(@patient_id))
@@ -973,14 +973,15 @@ class PatientsController < ApplicationController
     
   	#patient_bean = PatientService.get_patient(patient_obj.person)
     visits = Mastercard.new()
-    visits.zone = get_global_property_value("facility.zone.name") rescue "Unknown"
-    visits.clinic = get_global_property_value("facility.name") rescue "Unknown"
-    visits.district = get_global_property_value("facility.district") rescue "Unknown"
+    visits.zone = get_global_property_value("facility.zone.name")# rescue "Unknown"
+    visits.clinic = get_global_property_value("facility.name")# rescue "Unknown"
+    visits.district = get_global_property_value("facility.district")# rescue "Unknown"
     visits.patient_id = patient_obj.id
-    visits.arv_number = patient_obj.arv_number rescue ""
+   # visits.arv_number = patient_obj.arv_number# rescue ""
     visits.address = patient_obj.address
     visits.national_id = patient_obj.national_id
-    visits.name = patient_obj.name rescue nil
+    visits.name = patient_obj.name # rescue nil
+   # raise visits.name.to_yaml
     visits.sex = patient_obj.gender
     visits.age = patient_obj.age
     visits.birth_date = patient_obj.person.birthdate rescue patient_obj.person.birthdate_estimated rescue nil
