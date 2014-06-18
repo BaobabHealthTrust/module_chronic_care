@@ -669,7 +669,6 @@ class PatientsController < ApplicationController
       #  @visits = visits(Patient.find(@patient_id))
     else
       @patient_id = params[:patient_id]
-      @patient_art_start_date = PatientService.patient_art_start_date(@patient_id)# rescue
       @data_demo = mastercard_demographics(Patient.find(@patient_id))
 			#raise @data_demo.eptb.to_yaml
       @visits = visits(Patient.find(@patient_id))
