@@ -45,6 +45,14 @@
     border-style: solid;
     border-width: 0px 0px 1px 0px;
   }
+    #helper {
+  display: block;
+  float:right;
+  color: black;
+  background-color: #EEFFEE;
+  border: 1px solid #CCCCCC;
+  border-radius: 20px 20px 20px 20px;
+  }
 </style>
 
 <script type='text/javascript' language='javascript'>
@@ -122,10 +130,9 @@ function showSelectedConditions() {
                   <td>
                     <select id='cysticercosis'
         name='concept[Cysticercosis]'
-        helpText='Ever had cysticercosis?'
+        helpText='Ever had cysticercosis?<span id="helper">Medical History</span>'
         pos='2'
-        tt_requireNextClick = false
-        tt_onLoad = "showCategory('Medical History')" >
+        tt_requireNextClick = false >
 <option></option>
 <option value='NO'>No</option>
  <option value='YES'>Yes</option>
@@ -136,10 +143,9 @@ function showSelectedConditions() {
                   <td>
                     <select id='head_injury'
         name='concept[Head Injury]'
-        helpText='Previous head trauma?'
+        helpText='Previous head trauma?<span id="helper">Medical History</span>'
         pos='2'
-        tt_requireNextClick = false
-        tt_onLoad = "showCategory('Medical History')" >
+        tt_requireNextClick = false >
 <option></option>
 <option value='NO'>No</option>
  <option value='YES'>Yes</option>
@@ -150,10 +156,9 @@ function showSelectedConditions() {
                    <td>
         <select id='meningitis'
         name='concept[Meningitis]'
-        helpText='Ever had meningitis?'
+        helpText='Ever had meningitis?<span id="helper">Medical History</span>'
         pos='2'
-        tt_requireNextClick = false
-        tt_onLoad = "showCategory('Medical History')" >
+        tt_requireNextClick = false >
 <option></option>
 <option value='NO'>No</option>
  <option value='YES'>Yes</option>
@@ -164,10 +169,9 @@ function showSelectedConditions() {
                   <td>
         <select id='malaria'
         name='concept[Malaria cerebral]'
-        helpText='Ever had cerebral malaria?'
+        helpText='Ever had cerebral malaria?<span id="helper">Medical History</span>'
         pos='2'
-        tt_requireNextClick = false
-        tt_onLoad = "showCategory('Medical History')" >
+        tt_requireNextClick = false>
 <option></option>
 <option value='NO'>No</option>
  <option value='YES'>Yes</option>
@@ -178,10 +182,9 @@ function showSelectedConditions() {
         <td>
         <select id='seizure_history'
         name='concept[Seizures known epileptic]'
-        helpText='Any known history of seizure?'
+        helpText='Any known history of seizure?<span id="helper">Medical History</span>'
         pos='2'
-        tt_requireNextClick = false
-        tt_onLoad = "showCategory('Medical History')" >
+        tt_requireNextClick = false >
 <option></option>
 <option value='NO'>No</option>
  <option value='YES'>Yes</option>
@@ -198,10 +201,9 @@ function showSelectedConditions() {
 			<td>
 <select id='tb'
         name='concept[tb in previous two years]'
-        helpText='History of TB in the past two years'
+        helpText='History of TB in the past two years<span id="helper">Medical History</span>'
         pos='1'
-        tt_requireNextClick = false
-        tt_onLoad = "showCategory('Medical History')">
+        tt_requireNextClick = false>
 <option></option>
 <option value = 'NO'>No</option>
  <option value = 'YES'>Yes</option>
@@ -215,10 +217,9 @@ function showSelectedConditions() {
 			<td>
 <select id='stroke'
         name='concept[ever had a stroke]'
-        helpText='History of stroke'
+        helpText='History of stroke<span id="helper">Medical History</span>'
         pos='2'
-        tt_requireNextClick = false 
-        tt_onLoad = "showCategory('Medical History')" >
+        tt_requireNextClick = false  >
 <option></option>
 <option value='NO'>No</option>
  <option value='YES'>Yes</option>
@@ -232,10 +233,9 @@ function showSelectedConditions() {
 			<td>
 <select id='deformaties'
         name='concept[cardiovascular complications present]'
-        helpText='Chest deformaties at birth'
+        helpText='Chest deformaties at birth<span id="helper">Medical History</span>'
         tt_requireNextClick = false 
-        pos='3'
-        tt_onLoad = "showCategory('Medical History')" >
+        pos='3'>
 <option></option>
 <option value='NO'>No</option>
  <option value='YES'>Yes</option>
@@ -253,13 +253,12 @@ function showSelectedConditions() {
 
 <%= select_tag "allergic", options_for_select(@treatements_list),
 	{ :field_type => 'text',
-      :helpText => "Allergic to:",
+      :helpText => "Allergic to:<span id='helper'>Medical History</span>",
       :id => "allergic",
 	  :name=> "concept[allergic][]",
       :multiple => true,
       :tt_pageStyleClass => "MultiSelectList",
-      :optional => true,
-	  :tt_onLoad => "showCategory('Medical History')"} %>
+      :optional => true} %>
 			</td>
 		</tr>
 		<tr>
@@ -269,10 +268,9 @@ function showSelectedConditions() {
 			<td>
 <select id='asthma'
         name='concept[asthma]'
-        helpText='Asthma history in the past month?'
+        helpText='Asthma history in the past month?<span id="helper">Medical History</span>'
         pos='5'
-        tt_requireNextClick = false
-        tt_onLoad = "showCategory('Medical History')">
+        tt_requireNextClick = false>
 <option></option>
 <option value='NO'>No</option>
  <option value='YES'>Yes</option>
@@ -291,13 +289,12 @@ function showSelectedConditions() {
 		:multiple => true,
 		:name => 'concept[taking medication][]',
 		:tt_pageStyleClass => "MultiSelectList",
-		:helpText => "Chronic Disease medicine patient is taking",
-		:tt_onLoad => "showCategory('Medical History')" } %>
+		:helpText => "Chronic Disease medicine patient is taking <span id='helper'>Medical History</span>" } %>
 			</td>
 			<td>
-			    <label for='summary'>Summary</label>
+			    <label for='summary'>Summary <span id="helper">Medical History</span></label>
 	<%= text_field_tag :summary, nil, {
-	  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';showCategory('Medical History')",
+	  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';",
 	  :optional => "true",
 	  :tt_pageStyleClass => "NoControls" } %>
 			</td>

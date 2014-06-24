@@ -8,6 +8,14 @@
     color: black;
     font-size: 25px;
   }
+    #helper {
+  display: block;
+  float:right;
+  color: black;
+  background-color: #EEFFEE;
+  border: 1px solid #CCCCCC;
+  border-radius: 20px 20px 20px 20px;
+  }
 </style>
 <script type='text/javascript' language='javascript'>
 <!--
@@ -161,17 +169,16 @@
         <% end %>
 	<input type='text' id='family_members'
 	   name='concept[Number of people in household excluding patient]'
-	   helpText='Number of family members including the deceased?'
+	   helpText='Number of family members including the deceased? <span id="helper">Family History</span>'
 	   field_type="number"  pos='1'
 	   min = 1
 	   max = 20
 	   condition='program == "EPILEPSY PROGRAM"'
 	   tt_pageStyleClass = "Numeric NumbersWithUnknown"
-	   tt_onLoad ="showCategory('Family History')"
 	   tt_onUnLoad = "setLimit()"/>
 
 	<input type='text' id='position'
-		 helpText='Patient birth order position?'
+		 helpText='Patient birth order position?<span id="helper">Family History</span>'
 		 name='concept[position]'
 		 field_type="number"  pos='1'
                  absoluteMin = 1
@@ -180,14 +187,12 @@
 		 validationCode = "limitNumber(this)"
 		 validationMessage = "Birth position can not be greater than total number of people"
 		 condition='program == "EPILEPSY PROGRAM"'
-		 tt_pageStyleClass = "Numeric NumbersWithUnknown"
-		 tt_onLoad ="showCategory('Family History');this.value = ''"/>
+		 tt_pageStyleClass = "Numeric NumbersWithUnknown"/>
 
   <select id='epilepsy'
 			name='concept[epilepsy]'
-			helpText='Family History of epilepsy? '
+			helpText='Family History of epilepsy?<span id="helper">Family History</span> '
 			condition='program == "EPILEPSY PROGRAM"'
-			tt_onLoad ="showCategory('Family History')"
 			tt_requireNextClick = false >
 	<option></option>
 	<option value='No'>No</option>
@@ -196,9 +201,8 @@
 
   	<select id='convulsion'
 			name='concept[Convulsion]'
-			helpText='Family History of Convulsions? '
+			helpText='Family History of Convulsions?<span id="helper">Family History</span> '
 			condition='program == "EPILEPSY PROGRAM"'
-			tt_onLoad ="showCategory('Family History')"
 			tt_requireNextClick = false >
 	<option></option>
 	<option value='No'>No</option>
@@ -207,9 +211,8 @@
 
 	<select id='seizures'
 			name='concept[Seizures]'
-			helpText='Family History of Seizures?'
+			helpText='Family History of Seizures?<span id="helper">Family History</span>'
 			condition='program == "EPILEPSY PROGRAM"'
-			tt_onLoad ="showCategory('Family History')"
 			tt_requireNextClick = false >
 	<option></option>
 	<option value='No'>No</option>
@@ -219,8 +222,7 @@
   	<select id='mental_disorder'
 			name='concept[Mental Disorders]'
 			condition='program == "EPILEPSY PROGRAM"'
-			helpText='Family History of Mental Disorders?'
-			tt_onLoad ="showCategory('Family History')"
+			helpText='Family History of Mental Disorders?<span id="helper">Family History</span>'
 			tt_requireNextClick = false >
 	<option></option>
 	<option value='No'>No</option>
@@ -229,8 +231,7 @@
 <%#= raise @current_program.to_yaml %>
 	<select id='cardiovascular'
 			name='concept[Does the family have a history of cardiovascular related diseases?]'
-			helpText='Family History of Premature cardiovascular death? '
-			tt_onLoad ="showCategory('Family History')"
+			helpText='Family History of Premature cardiovascular death? <span id="helper">Family History</span>'
 			condition='(program == "HYPERTENSION PROGRAM") || (program == "DIABETES PROGRAM")'
 			tt_requireNextClick = false >
 	<option></option>
@@ -240,7 +241,7 @@
 
         <select id='cardiovascular'
 			name='concept[Does the family have a history of cardiovascular related diseases?]'
-			helpText='Family History of cardiovascular related diseases? '
+			helpText='Family History of cardiovascular related diseases? <span id="helper">Family History</span>'
 			tt_onLoad ="showCategory('Family History')"
 			condition='program == "ASTHMA PROGRAM"'
 			tt_requireNextClick = false >
@@ -251,9 +252,8 @@
 
 	<select id='diabetes'
 			name='concept[diabetes family history]'
-			helpText='Family History of Diabetes? '
+			helpText='Family History of Diabetes? <span id="helper">Family History</span> '
 			pos='1'
-			tt_onLoad ="showCategory('Family History')"
 			condition='(program == "HYPERTENSION PROGRAM") || (program == "DIABETES PROGRAM")'
 			tt_requireNextClick = false >
 	<option></option>
@@ -263,9 +263,8 @@
 
 	<select id='hypertension'
 			name='concept[Does the family have a history of hypertension?]'
-			helpText='Does the family have a history of hypertension? '
+			helpText='Does the family have a history of hypertension? <span id="helper">Family History</span>'
 			pos='2'
-			tt_onLoad ="showCategory('Family History')"
 			condition='(program == "HYPERTENSION PROGRAM") || (program == "DIABETES PROGRAM")'
 			tt_requireNextClick = false >
 	<option></option>
@@ -276,9 +275,8 @@
 
 	<select id='kidney'
 			name='concept[Kidney disease]'
-			helpText='Family History Kidney disease? '
+			helpText='Family History Kidney disease? <span id="helper">Family History</span>'
 			pos='3'
-			tt_onLoad ="showCategory('Family History')"
 			condition='program == "HYPERTENSION PROGRAM" || program == "DIABETES PROGRAM"'
 			tt_requireNextClick = false >
 	<option></option>
@@ -289,9 +287,8 @@
 
 	<select id='asthma'
 			name='concept[Has the family a history of asthma?]'
-			helpText='Family History Asthma? '
+			helpText='Family History Asthma? <span id="helper">Family History</span>'
 			pos='3'
-			tt_onLoad ="showCategory('Family History')"
 			condition='program == "ASTHMA PROGRAM"'
 			tt_requireNextClick = false >
 	<option></option>
@@ -301,9 +298,8 @@
 
 	<select id='tb'
 			name='concept[tuberculosis smear history]'
-			helpText='Family History of TB? '
+			helpText='Family History of TB? <span id="helper">Family History</span>'
 			pos='3'
-			tt_onLoad ="showCategory('Family History')"
 			condition='program == "ASTHMA PROGRAM"'
 			tt_requireNextClick = false >
 	<option></option>
@@ -311,9 +307,9 @@
 	<option value='Yes'>Yes</option>
 	</select>
 
-<label for='summary'>Summary</label>
+<label for='summary'>Summary <span id="helper">Social History</span></label>
 	<%= text_field_tag :summary, nil, {
-	  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';showCategory('Family History')",
+	  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';",
 	  :optional => "true",
 	  :tt_pageStyleClass => "NoControls" } %>
 
