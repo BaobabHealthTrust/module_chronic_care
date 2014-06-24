@@ -138,6 +138,7 @@
 	<%#= raise @patient.age.to_yaml   %>
 	<table>
 		<tr>
+                  <% if  @current_program == "EPILEPSY PROGRAM" %>
                 <select id='education'
                         name='concept[Education level completed]'
                         helpText='Education level completed?<%= @person_attribute %>'
@@ -174,7 +175,7 @@
 			  <option value='Do not eat pork'>No</option>
 			  <option value='Eats pork'>Yes</option>
  </select>
-
+<% end %>
 			<td>
 				Ever smoked?
 			</td>
@@ -182,7 +183,6 @@
 <select id='smoking'
 		name='concept[Smoking History]'
 		helpText='Ever smoked?  <%= @person_attribute %> '
-		pos='0'
 		tt_onLoad ="showCategory('Social History');__$('nextButton').style.display = 'none';"
 		tt_requireNextClick = false >
 <option></option>
