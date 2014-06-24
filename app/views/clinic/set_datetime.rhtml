@@ -22,11 +22,11 @@ function validateDate() {
 }
 
 function dateDiff(year,month,day){
-  today = new Date();
-  dateStr = today.getDate();
-  monthStr = today.getMonth() + 1;
-  yearStr = today.getFullYear();
-  today = new Date(parseFloat(yearStr),parseFloat(monthStr),parseFloat(dateStr));
+  //var today = new Date()
+   dateStr = today.getDate();
+   monthStr = today.getMonth() + 1;
+   yearStr = today.getFullYear();
+   today = new Date(parseFloat(yearStr),parseFloat(monthStr),parseFloat(dateStr));
   set_date = new Date(parseFloat(year),parseFloat(month),parseFloat(day));
   return (today > set_date)
 }
@@ -69,16 +69,18 @@ function setMonths(){
 
 function setDay(){
 // return;
+  month = (parseFloat(document.getElementsByName('set_month')[0].value) - 1)
 for(var d = 1; d <= 31; d++){
   if((__$("set_year").value == date.getFullYear() && d < date.getDate())){
 
   } else if(__$("set_year").value < date.getFullYear()){
 
   } else {
-
+    if (parseFloat(date.getMonth()) == month){
     if(__$(d))
       __$(d).style.display = "none";
 
+  }
   }
 }
 }
@@ -115,7 +117,7 @@ var tt_cancel_destination = "/clinic?user_id=<%= params[:user_id] %>&location_id
   unknown=Array.new
   unknown[0]= "Unknown"
   days_with_unknown = day
-  days = [""].concat day%>
+  days = [""].concat day %>
   <%= select_tag(:set_day, options_for_select(days),
     :field_type => 'number',
     :helpText => 'Day',
