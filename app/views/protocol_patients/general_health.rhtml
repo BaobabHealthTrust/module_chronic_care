@@ -1,6 +1,14 @@
 <%= javascript_include_tag 'jquery' %>
 <%= javascript_include_tag "utils" %>
 <style>
+      #helper {
+  display: block;
+  float:right;
+  color: black;
+  background-color: #EEFFEE;
+  border: 1px solid #CCCCCC;
+  border-radius: 20px 20px 20px 20px;
+  }
   #tt_page_treatment_received #viewport {
     height: 500px;
   }
@@ -221,13 +229,13 @@ end
   <% if @task != "disable" %>
     <%= select_tag "choice", options_for_select(@treatements_list),
       { :field_type => 'text',
-      :helpText => "Patient has any of the following",
+      :helpText => "Patient has any of the following<span id='helper'> General Health</span>",
       :id => "choice",
       :name=> "concept[Chronic disease][]",
       :multiple => true,
       :tt_pageStyleClass => "MultiSelectList",
       :optional => true,
-      :tt_onLoad => "showCategory('General Health');clearTreatment();"} %>
+      :tt_onLoad => "clearTreatment();"} %>
 
 
     <%= select_tag "treatment", options_for_select(@concept),
@@ -237,18 +245,18 @@ end
       :name => 'concept[treatment][]',
       :tt_pageStyleClass => "MultiSelectList",
       :condition => "$('choice').value.length > 0",
-      :helpText => "Treatment Received",
-      :tt_onLoad => "showCategory('General Health')"} %>
+      :helpText => "Treatment Received<span id='helper'> General Health</span>",
+      :tt_onLoad => ""} %>
 
     <%= select_tag "Drug Allergy", options_for_select(["","Yes", "No"]),
       {	:id => "drug_allergy",
       :condition => "$('choice').value.length > 0" ,
       :name => 'concept[Drug Allergy]',
-      :helpText => "Any drug allergies",
-      :tt_onLoad => "showCategory('General Health')"} %>
+      :helpText => "Any drug allergies<span id='helper'> General Health</span>",
+      :tt_onLoad => ""} %>
 
     <select id='1.1.13' name="concept[Complications during patient's birth][]"
-            helpText="Complications during patient's birth"
+            helpText="Complications during patient's birth<span id='helper'> General Health</span>"
             pos='15'
             condition='program == "EPILEPSY PROGRAM"'
             multiple ="multiple"
@@ -265,20 +273,20 @@ end
       :name => 'concept[epilepsy][]',
       :tt_pageStyleClass => "MultiSelectList",
       :condition => 'program == "EPILEPSY PROGRAM"',
-      :helpText => "Effects of Epilepsy experienced on the following: ",
-      :tt_onLoad => "showCategory('General Health')"} %>
+      :helpText => "Effects of Epilepsy experienced on the following: <span id='helper'> General Health</span>",
+      :tt_onLoad => ""} %>
 
     <% if @current_program == "EPILEPSY PROGRAM" %>
     <textarea name="concept[CLINICAL NOTES CONSTRUCT]"
-              helpText="Explanation of effects experienced"
+              helpText="Explanation of effects experienced<span id='helper'> General Health</span>"
               condition="$('epilepsy').value.length > 0"
               id="explanation"
               >
     </textarea>
     <% end %>
-  <label for='summary'>Summary</label>
+  <label for='summary'>Summary<span id='helper'> General Health</span></label>
   <%= text_field_tag :summary, nil, {
-    :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';showCategory('General Health')",
+    :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';",
     :optional => "true",
     :tt_pageStyleClass => "NoControls" } %>
   <% end %>

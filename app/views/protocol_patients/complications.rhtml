@@ -1,4 +1,12 @@
 <style>
+      #helper {
+  display: block;
+  float:right;
+  color: black;
+  background-color: #EEFFEE;
+  border: 1px solid #CCCCCC;
+  border-radius: 20px 20px 20px 20px;
+  }
   #tt_page_patient_has_any_of_the_following #viewport {
     height: 500px;
   }
@@ -227,66 +235,66 @@ function selectedOptions(selected){
 
 <%= select_tag "Complication", options_for_select(@treatements_list),
 	{ :field_type => 'text',
-      :helpText => "Patient has any of the following",
+      :helpText => "Patient has any of the following<span id='helper'> Complications</span>",
       :id => "choice",
 	  :name=> "concept[Complications][]",
       :multiple => true,
       :tt_pageStyleClass => "MultiSelectList",
       :optional => true,
-	  :tt_onLoad => "showCategory('Complications')"} %>
+	  :tt_onLoad => ""} %>
 
 
 <%= text_field_tag "Oedema", nil, {
-	:helpText => 'Oedema Test Date',
+	:helpText => 'Oedema Test Date<span id="helper"> Complications</span>',
 	:name => 'concept[oedema]',
 	:field_type => 'date',
 	:id => 'oedema',
 	:condition => 'getSelected().match(/oedema/i)',
-	:tt_onLoad => "showCategory('Complications')"}  %>
+	:tt_onLoad => ""}  %>
 
 <%= text_field_tag "Shortness of breath", nil, {
-	:helpText => 'Shortness of breath Test Date',
+	:helpText => 'Shortness of breath Test Date<span id="helper"> Complications</span>',
 	:name => 'concept[Shortness of breath]',
 	:field_type => 'date',
 	:id => 'shortness_of_breath',
 	:condition => 'getSelected().match(/shortness\sof\sbreath/i)',
-	:tt_onLoad => "showCategory('Complications')"}  %>
+	:tt_onLoad => ""}  %>
 
 <%= text_field_tag "Funduscopy", nil, {
-	:helpText => 'Funduscopy Test Date',
+	:helpText => 'Funduscopy Test Date<span id="helper"> Complications</span>',
 	:name => 'concept[Fundus]',
 	:field_type => 'date',
 	:id => 'funduscopy',
 	:condition => 'getSelected().match(/funduscopy/i)',
-	:tt_onLoad => "showCategory('Complications')"}  %>
+	:tt_onLoad => ""}  %>
 
 <%= text_field_tag "Creatinine", nil, {
-	:helpText => 'Creatinine Test Date',
+	:helpText => 'Creatinine Test Date<span id="helper"> Complications</span>',
 	:name => 'concept[Creatinine]',
 	:field_type => 'date',
 	:id => 'creatinine',
 	:condition => 'getSelected().match(/creatinine/i)',
-	:tt_onLoad => "showCategory('Complications')"}  %>
+	:tt_onLoad => ""}  %>
 
 <%= text_field_tag "MI", nil, {
-	:helpText => 'Myocardial Injactia Test Date',
+	:helpText => 'Myocardial Injactia Test Date<span id="helper"> Complications</span>',
 	:name => 'concept[myocardial injactia]',
 	:field_type => 'date',
 	:id => 'mi',
 	:condition => 'getSelected().match(/myocardial injactia(mi)/i)',
-	:tt_onLoad => "showCategory('Complications')"}  %>
+	:tt_onLoad => ""}  %>
 
 <%= text_field_tag "CVA", nil, {
-	:helpText => 'CVA Test Date',
+	:helpText => 'CVA Test Date<span id="helper"> Complications</span>',
 	:name => 'concept[Cardiac]',
 	:field_type => 'date',
 	:id => 'cva',
 	:condition => 'getSelected().match(/cva/i)',
-	:tt_onLoad => "showCategory('Complications')"}  %>
+	:tt_onLoad => ""}  %>
 
-			<label for='summary'>Complications Summary</label>
+			<label for='summary'>Summary<span id='helper'> Complications</span></label>
 	<%= text_field_tag :summary, nil, {
-	  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';showCategory('Complications')",
+	  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';",
 	  :optional => "true",
 	  :tt_pageStyleClass => "NoControls" } %>
 

@@ -1,4 +1,12 @@
 <style>
+      #helper {
+  display: block;
+  float:right;
+  color: black;
+  background-color: #EEFFEE;
+  border: 1px solid #CCCCCC;
+  border-radius: 20px 20px 20px 20px;
+  }
   #tt_page_cause_of_seizure .inputFrameClass {
     height: 610px;
   }
@@ -97,10 +105,10 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
         <% if @in_seizure.blank? || (@in_seizure == "YES") %>
           <%= touch_yes_no_tag "seizures focal", @patient, nil,
             {	:id => 'seizure_focal',
-            :name => 'concept[Patient in active seizure]',
+            :name => 'concept[Patient in active seizure]<span id="helper"> Clinic Visit</span>',
             :allowFreeText => 'false',
             :helpText => "Is the patient still in active seizure?",
-            :tt_onLoad => "showCategory('Clinic Visit')",
+            :tt_onLoad => "",
             :tt_requireNextClick => false } %>
         <% end %>
       </td>
@@ -111,10 +119,10 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
         <% if @first_visit == true and @patient.age > 14 and @mrdt == "YES" %>
           <select type='text' id='1.1.4'
                   name='concept[Diazepam]'
-                  helpText='Administer 10mg iv diazepam?'
+                  helpText='Administer 10mg iv diazepam?<span id="helper"> Clinic Visit</span>'
                   condition ="$('seizure_focal').value.toLowerCase() != 'no'"
                   pos='4'
-                  tt_onLoad = "showCategory('Clinic Visit')"
+                  tt_onLoad = ""
                   tt_requireNextClick = false >
             <option></option>
             <option value="No">No</option>
@@ -123,10 +131,10 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
         <% elsif @first_visit == true and @patient.age <= 14 and @mrdt == "YES" %>
           <select type='text' id='1.1.4'
                   name='concept[Diazepam]'
-                  helpText='Administer (paraldehyde 0.2mls/kg) diazepam?'
+                  helpText='Administer (paraldehyde 0.2mls/kg) diazepam?<span id="helper"> Clinic Visit</span>'
                   condition ="$('seizure_focal').value.toLowerCase() != 'no'"
                   pos='4'
-                  tt_onLoad = "showCategory('Clinic Visit')"
+                  tt_onLoad = ""
                   tt_requireNextClick = false >
             <option></option>
             <option value="No">No</option>
@@ -150,10 +158,10 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
 
           <input type='text' id='1.1.7'
                  name='concept[time of seizure]'
-                 helpText='Time of Seizure?'
+                 helpText='Time of Seizure?<span id="helper"> Clinic Visit</span>'
                  field_type='advancedTime'
                  pos='28'
-                 tt_onLoad = "showCategory('Clinic Visit')"/>
+                 tt_onLoad = ""/>
 
         </td>
       </tr>
@@ -165,14 +173,14 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
           <% if @first_visit == true %>
             <input type='text' id='year_of_first_seizure'
                    name='concept[Year of first Seizure]'
-                   helpText='Year of first seizure'
+                   helpText='Year of first seizure<span id="helper"> Clinic Visit</span>'
                    absoluteMax = '<%= Date.today.year %>'
                    absoluteMin = '<%= Date.today.year.to_i - @patient.age.to_i %>'
                    field_type='number'
                    tt_onUnLoad = "ageOfFirstSeizure()"
                    tt_pageStyleClass = "Numeric NumbersWithUnknownAndDecimal"
                    pos='7'
-                   tt_onLoad = "showCategory('Clinic Visit')"/>
+                   tt_onLoad = ""/>
 
           </td>
         </tr>
@@ -195,10 +203,10 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
         <td>
           <select id='1.1.9'
                   name='concept[Cause of Seizure][]'
-                  helpText='What triggered the seizure' pos='9'
+                  helpText='What triggered the seizure<span id="helper"> Clinic Visit</span>' pos='9'
                   multiple="multiple"
                   optional="true"
-                  tt_onLoad ="__$('keyboard').style.display = 'none';showCategory('Clinic Visit')"
+                  tt_onLoad ="__$('keyboard').style.display = 'none';"
                   field_type="text">
             <option></option>
             <option value='head or brain trauma'>Head or Brain Trauma</option>
@@ -230,10 +238,10 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
         <td>
           <select id='seizure_occurance'
                   name='concept[How often seizure occurs]'
-                  helpText='How often seizure occurs'
+                  helpText='How often seizure occurs<span id="helper"> Clinic Visit</span>'
                   fieldtype='number'
                   pos='10'
-                  tt_onLoad = "showCategory('Clinic Visit')"
+                  tt_onLoad = ""
                   tt_requireNextClick = false >
             <option></option>
             <option value='regularly'>Regularly</option>
@@ -248,8 +256,8 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
         <td>
           <select id='seizure_occurance'
                   name='concept[Seizures]'
-                  helpText='Seizure duration'
-                  tt_onLoad ="__$('keyboard').style.display = 'none';showCategory('Clinic Visit')"
+                  helpText='Seizure duration<span id="helper"> Clinic Visit</span>'
+                  tt_onLoad ="__$('keyboard').style.display = 'none';"
                   pos='10'
                   field_type="text"
                   tt_requireNextClick = false >
@@ -270,10 +278,10 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
         <td>
           <select id='1.1.10'
                   name='concept[Seizure remission]'
-                  helpText='Seizure remission'
+                  helpText='Seizure remission<span id="helper"> Clinic Visit</span>'
                   fieldtype='number'
                   pos='10'
-                  tt_onLoad = "showCategory('Clinic Visit')"
+                  tt_onLoad = ""
                   tt_requireNextClick = false >
             <option></option>
             <option value='Spontaneous'>Spontaneous</option>
@@ -286,9 +294,9 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
         <td>
           <select id='1.1.23'
                   name='concept[Seizure medicine taken before][]'
-                  helpText='Has patient taken Clinical medicine for seizure before'
+                  helpText='Has patient taken Clinical medicine for seizure before<span id="helper"> Clinic Visit</span>'
                   pos='13'
-                  tt_onLoad = "showCategory('Clinic Visit')"
+                  tt_onLoad = ""
                   tt_requireNextClick = false >
             <option></option>
             <option value='No'>No</option>
@@ -310,16 +318,16 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
             :name => 'concept[Seizure medicine taken before][]',
             :condition => '__$("1.1.23").value.toLowerCase() == "yes"',
             :tt_pageStyleClass => "MultiSelectList",
-            :helpText => "Clinical medicine for seizure taken before",
-            :tt_onLoad => "showCategory('Clinic Visit')" } %>
+            :helpText => "Clinical medicine for seizure taken before<span id='helper'> Clinic Visit</span>",
+            :tt_onLoad => "" } %>
         </td>
 
         <td>
           <select id='1.1.24'
                   name='concept[Herbal traditional medications]'
-                  helpText='Has patient taken traditional medicine for seizure before'
+                  helpText='Has patient taken traditional medicine for seizure before<span id="helper"> Clinic Visit</span>'
                   pos='13'
-                  tt_onLoad = "showCategory('Clinic Visit')"
+                  tt_onLoad = ""
                   tt_requireNextClick = false >
             <option></option>
             <option value='No'>No</option>
@@ -336,9 +344,9 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
       <td>
         <select id='1.1.11'
                 name='concept[Head injury]'
-                helpText='Patient has had head injuries?'
+                helpText='Patient has had head injuries?<span id="helper"> Clinic Visit</span>'
                 pos='13'
-                tt_onLoad = "showCategory('Clinic Visit')"
+                tt_onLoad = ""
                 tt_requireNextClick = false >
           <option></option>
           <option value='No'>No</option>
@@ -353,9 +361,9 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
       <td>
         <select id='burns'
                 name='concept[Burns]'
-                helpText='Patient has had burns?'
+                helpText='Patient has had burns?<span id="helper"> Clinic Visit</span>'
                 pos='13'
-                tt_onLoad = "showCategory('Clinic Visit')"
+                tt_onLoad = ""
                 tt_requireNextClick = false >
           <option></option>
           <option value='No'>No</option>
@@ -371,9 +379,9 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
         <td>
           <select id='1.1.12'
                   name='concept[surgery]'
-                  helpText='Patient has had head surgery?'
+                  helpText='Patient has had head surgery?<span id="helper"> Clinic Visit</span>'
                   pos='14'
-                  tt_onLoad = "showCategory('Clinic Visit')"
+                  tt_onLoad = ""
                   tt_requireNextClick = false >
             <option></option>
             <option value='No'>No</option>
@@ -417,11 +425,11 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
         <td>
           <select id='before'
                   name='concept[what patient experienced before seizure][]'
-                  helpText='What patient experienced before seizure'
+                  helpText='What patient experienced before seizure<span id="helper"> Clinic Visit</span>'
                   pos='17'
                   multiple="multiple"
                   optional="true"
-                  tt_onLoad ="__$('keyboard').style.display = 'none';showCategory('Clinic Visit')"
+                  tt_onLoad ="__$('keyboard').style.display = 'none';"
                   field_type="text" >
             <option></option>
             <option value='No memory recall'>No memory recall</option>
@@ -443,11 +451,11 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
         <td>
           <select id='1.1.15'
                   name='concept[what patient experienced during seizure][]'
-                  helpText='What patient experienced during seizure'
+                  helpText='What patient experienced during seizure<span id="helper"> Clinic Visit</span>'
                   pos='17'
                   multiple="multiple"
                   optional="true"
-                  tt_onLoad ="__$('keyboard').style.display = 'none';showCategory('Clinic Visit')"
+                  tt_onLoad ="__$('keyboard').style.display = 'none';"
                   field_type="text" >
             <option></option>
             <option value='No memory recall'>No memory recall</option>
@@ -469,11 +477,11 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
         <td>
           <select id='1.1.16'
                   name='concept[observation][]'
-                  helpText='What the patient experienced after seizure'
+                  helpText='What the patient experienced after seizure<span id="helper"> Clinic Visit</span>'
                   pos='18'
                   multiple="multiple"
                   optional="true"
-                  tt_onLoad ="__$('keyboard').style.display = 'none';showCategory('Clinic Visit')"
+                  tt_onLoad ="__$('keyboard').style.display = 'none';"
                   field_type="text" >
             <option></option>
             <option value='No memory recall'>No memory recall</option>
@@ -491,9 +499,9 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
         <td>
           <select id='1.1.17'
                   name='concept[was witness available before seizure?]'
-                  helpText='Witness was available before the seizure '
+                  helpText='Witness was available before the seizure<span id="helper"> Clinic Visit</span> '
                   pos='19'
-                  tt_onLoad = "showCategory('Clinic Visit')"
+                  tt_onLoad = ""
                   tt_requireNextClick = false >
             <option></option>
             <option value='No'>No</option>
@@ -508,12 +516,12 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
         <td>
           <select id='1.1.18'
                   name='concept[witness saw before seizure][]'
-                  helpText='What witness saw '
+                  helpText='What witness saw <span id="helper"> Clinic Visit</span>'
                   condition='$("1.1.17").value == "Yes"'
                   pos='20'
                   multiple="multiple"
                   optional="true"
-                  tt_onLoad ="__$('keyboard').style.display = 'none';showCategory('Clinic Visit')"
+                  tt_onLoad ="__$('keyboard').style.display = 'none';"
                   field_type="text" >
             <option></option>
             <option value='Crying'>Crying</option>
@@ -531,9 +539,9 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
         <td>
           <select id='1.1.19'
                   name='concept[was witness available during seizure?]'
-                  helpText='Witness was available during seizure '
+                  helpText='Witness was available during seizure <span id="helper"> Clinic Visit</span>'
                   pos='21'
-                  tt_onLoad = "showCategory('Clinic Visit')"
+                  tt_onLoad = ""
                   tt_requireNextClick = false >
             <option></option>
             <option value='No'>No</option>
@@ -548,12 +556,12 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
         <td>
           <select id='1.1.20'
                   name='concept[witness saw during seizure][]'
-                  helpText='What witness saw'
+                  helpText='What witness saw<span id="helper"> Clinic Visit</span>'
                   condition='$("1.1.19").value == "Yes"'
                   pos='22'
                   multiple="multiple"
                   optional="true"
-                  tt_onLoad ="__$('keyboard').style.display = 'none';showCategory('Clinic Visit')"
+                  tt_onLoad ="__$('keyboard').style.display = 'none';"
                   field_type="text" >
             <option></option>
             <option value='Biting of tongue or lips'>Biting of tongue or lips</option>
@@ -577,9 +585,9 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
         <td>
           <select id='1.1.21'
                   name='concept[was witness available after seizure?]'
-                  helpText='Witness was available after seizure '
+                  helpText='Witness was available after seizure <span id="helper"> Clinic Visit</span>'
                   pos='23'
-                  tt_onLoad = "showCategory('Clinic Visit')"
+                  tt_onLoad = ""
                   tt_requireNextClick = false >
             <option></option>
             <option value='No'>No</option>
@@ -594,12 +602,12 @@ sex = 'F' if @patient.gender.upcase == 'FEMALE'
         <td>
           <select id='1.1.22'
                   name='concept[witness saw after seizure][]'
-                  helpText='What witness saw '
+                  helpText='What witness saw <span id="helper"> Clinic Visit</span>'
                   pos='24'
                   multiple="multiple"
                   condition='$("1.1.21").value == "Yes"'
                   optional="true"
-                  tt_onLoad ="__$('keyboard').style.display = 'none';showCategory('Clinic Visit')"
+                  tt_onLoad ="__$('keyboard').style.display = 'none';"
                   field_type="text" >
             <option></option>
             <option value='Confusion'>Confusion</option>

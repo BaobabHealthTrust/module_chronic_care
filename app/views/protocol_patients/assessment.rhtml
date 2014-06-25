@@ -256,6 +256,14 @@
     font-size:15px;
     width: 50%;
   }
+      #helper {
+  display: block;
+  float:right;
+  color: black;
+  background-color: #EEFFEE;
+  border: 1px solid #CCCCCC;
+  border-radius: 20px 20px 20px 20px;
+  }
 </style>
 
 <script type='text/javascript' language='javascript'>
@@ -570,7 +578,7 @@
         </td>
         <td>
           <% if @diabetic.upcase != "YES" %>
-            <select id='diabetic' name='concept[Patient has Diabetes]' helpText='Is patient Diabetic? ' pos='1' >
+            <select id='diabetic' name='concept[Patient has Diabetes]' helpText='Is patient Diabetic?<span id="helper">Assessment</span> ' pos='1' >
               <option></option>
               <option value='No'>No</option>
               <option value='Yes'>Yes</option>
@@ -585,7 +593,7 @@
                                   Risk Pridiction for: <b><%= @patient.name %></b>
         </td>
         <td>
-          <label for='summary'>Risk Pridiction for: <b><%= @patient.name %></b> </label>
+          <label for='summary'>Risk Pridiction for: <b><%= @patient.name %></b> <span id="helper">Assessment</span></label>
           <%= text_field_tag :summary, nil, {
             :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';",
             :optional => "true",

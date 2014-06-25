@@ -1,5 +1,12 @@
 <style>
-
+    #helper {
+  display: block;
+  float:right;
+  color: black;
+  background-color: #EEFFEE;
+  border: 1px solid #CCCCCC;
+  border-radius: 20px 20px 20px 20px;
+  }
   #tt_page_asthma_measurement_summary .inputFrameClass {
     background: none repeat scroll 0 0 #F0F0F0;
     border: 1px solid black;
@@ -231,9 +238,9 @@
       <td>
         <select id='attack'
                 name='concept[attack][]'
-                helpText=' Patient is currently having an attack '
+                helpText=' Patient is currently having an attack<span id="helper"> Asthma Measure</span> '
                 pos='1'
-                tt_OnLoad ="showCategory('Asthma Measure')">
+                tt_OnLoad ="">
           <option></option>
           <option value='No'>No</option>
           <option value='Yes'>Yes</option>
@@ -248,10 +255,10 @@
         <%= touch_hidden_tag "attacks", @patient, nil, {:id => 'attacks', :name => 'concept[attack][]'} %>
         <select id='attacks'
                 name='concept[attack][]'
-                helpText='Attack triggered by '
+                helpText='Attack triggered by<span id="helper"> Asthma Measure</span> '
                 condition="__$('attack').value.toLowerCase() == 'yes'"
                 multiple="multiple"
-                tt_OnLoad ="showCategory('Asthma Measure')"
+                tt_OnLoad =""
                 >
           <option></option>
           <option value='Other'>Other</option>
@@ -267,11 +274,11 @@
       <td>
         <select id='symptoms'
                 name='concept[Symptom present][]'
-                helpText='Symptoms'
+                helpText='Symptoms<span id="helper"> Asthma Measure</span>'
                 multiple="multiple"
                 optional="true"
                 field_type="text"
-                tt_OnLoad ="showCategory('Asthma Measure')">
+                tt_OnLoad ="">
 
           <option> </option>
           <option value='chest tightiness'>Chest tightiness</option>
@@ -289,9 +296,9 @@
 
         <select id='shortness_of_breath'
                 name='concept[Shortness of breath][]'
-                helpText='Shortness of breath'
+                helpText='Shortness of breath<span id="helper"> Asthma Measure</span>'
                 field_type="text"
-                tt_OnLoad ="showCategory('Asthma Measure')"
+                tt_OnLoad =""
                 condition = "getSelected().match(/SHORTNESS\sOF\sBREATH/i)">
 
           <option value='Mild'>Mild</option>
@@ -307,9 +314,9 @@
       <td>
         <select id='vascular'
                 name='concept[cardiovascular disease]'
-                helpText='Patient has cardiovascular related diseases '
+                helpText='Patient has cardiovascular related diseases <span id="helper"> Asthma Measure</span>'
                 pos='6'
-                tt_OnLoad ="showCategory('Asthma Measure')" >
+                tt_OnLoad ="" >
           <option></option>
           <option value='No'>No</option>
           <option value='Yes'>Yes</option>
@@ -331,7 +338,7 @@
       <td>
 
 
-        <label for='summary'>Asthma Measurement Summary</label>
+        <label for='summary'>Asthma Measurement Summary<span id="helper"> Asthma Measure</span></label>
         <%= text_field_tag :summary, nil, {
           :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';",
           :optional => "true",
@@ -341,9 +348,9 @@
 
         <select id='prevention'
                 name='concept[prevention]'
-                helpText='Is asthma being controlled? '
+                helpText='Is asthma being controlled?<span id="helper"> Asthma Measure</span> '
                 pos='5'
-                tt_OnLoad ="showCategory('Asthma Measure')"
+                tt_OnLoad =""
                 condition ="__$('asthmatic').value.toLowerCase() == 'yes'">
           <option></option>
           <option value='Poor control'>Poor control</option>

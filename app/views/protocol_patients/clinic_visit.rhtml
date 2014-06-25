@@ -86,6 +86,14 @@
 {
 list-style-type: none;
 }
+    #helper {
+  display: block;
+  float:right;
+  color: black;
+  background-color: #EEFFEE;
+  border: 1px solid #CCCCCC;
+  border-radius: 20px 20px 20px 20px;
+  }
 </style>
 <form method='post' action='/encounters/create'>
   <%
@@ -114,18 +122,18 @@ list-style-type: none;
           {	:id => "patient_type",
           :name => "concept[TYPE OF PATIENT]",
           :multiple => false,
-          :helpText => "Is the patient a:",
-          :tt_onload=> "showCategory('Clinic Visit');__$('nextButton').style.display = 'none';",
+          :helpText => "Is the patient a:<span id='helper'> Clinic Visit</span>",
+          :tt_onload=> "__$('nextButton').style.display = 'none';",
           :tt_requireNextClick => false } %>
 
         <%= touch_location_tag "location",  @patient, nil,
           {	:id => "location",
           :value_datetime => true,
           :name => "concept[Source of referral]",
-          :helpText => "Transferred from",
+          :helpText => "Transferred from<span id='helper'> Clinic Visit</span>",
           :ajaxURL => "#{ajax_url}",
           :condition => '$("patient_type").value == "TRANSFER IN"',
-          :tt_onload=> "showCategory('Clinic Visit');__$('nextButton').style.display = 'block';"
+          :tt_onload=> "__$('nextButton').style.display = 'block';"
         }%>
 
       <% else %>
@@ -139,17 +147,17 @@ list-style-type: none;
       <td>
         <% if @first_visit == true %>
           <select id='1.1.1' name='concept[HAVE YOU EVER HAD TB?]'
-                  helpText='Have you been diagnosed with TB? ' pos='1'
+                  helpText='Have you been diagnosed with TB? <span id="helper"> Clinic Visit</span>' pos='1'
                   tt_requireNextClick = false
-                  tt_onload="showCategory('Clinic Visit');__$('nextButton').style.display = 'none';">
+                  tt_onload="__$('nextButton').style.display = 'none';">
             <option></option>
             <option value='No'>No</option>
             <option value='Yes'>Yes</option>
           </select>
         <% else %>
           <select id='1.1.1' name='concept[HAVE YOU EVER HAD TB?]'
-                  helpText='Have you been diagnosed with TB since your LAST clinic visit? ' pos='1'
-                  tt_onload="showCategory('Clinic Visit');__$('nextButton').style.display = 'none';"
+                  helpText='Have you been diagnosed with TB since your LAST clinic visit? <span id="helper"> Clinic Visit</span>' pos='1'
+                  tt_onload="__$('nextButton').style.display = 'none';"
                   tt_requireNextClick = false >
             <option></option>
             <option value='No'>No</option>
@@ -169,8 +177,8 @@ list-style-type: none;
           :condition => "$('1.1.1').value.match(/^yes$/i);",
           :tt_pageStyleClass => "longSelectList",
           :absoluteMin => "1950", :min => "1940", :absoluteMax => Date.today.year,
-          :helpText => "Year(s) of TB Diagnosis",
-          :tt_onload=> "showCategory('Clinic Visit');__$('nextButton').style.display = 'block';"} %>
+          :helpText => "Year(s) of TB Diagnosis<span id='helper'> Clinic Visit</span>",
+          :tt_onload=> "__$('nextButton').style.display = 'block';"} %>
 
       </td>
     </tr>
@@ -182,10 +190,10 @@ list-style-type: none;
         <% if @first_visit == true || !@diabetic.blank? %>
           <select id='1.1.3'
                   name='concept[Patient has Diabetes]'
-                  helpText='Is patient diabetic? '
+                  helpText='Is patient diabetic? <span id="helper"> Clinic Visit</span>'
                   pos='3'
                   tt_requireNextClick = false
-                  tt_onload="showCategory('Clinic Visit');__$('nextButton').style.display = 'none';">
+                  tt_onload="__$('nextButton').style.display = 'none';">
             <option></option>
             <option value='No'>No</option>
             <option value='Yes'>Yes</option>
@@ -205,8 +213,8 @@ list-style-type: none;
             :condition => "$('1.1.3').value.match(/^yes$/i);",
             :tt_pageStyleClass => "longSelectList",
             :absoluteMin => "1950", :min => "1940", :absoluteMax => Date.today.year,
-            :helpText => "Year(s) of Diabetes Diagnosis",
-            :tt_onload=> "showCategory('Clinic Visit');__$('nextButton').style.display = 'block';"} %>
+            :helpText => "Year(s) of Diabetes Diagnosis<span id='helper'> Clinic Visit</span>",
+            :tt_onload=> "__$('nextButton').style.display = 'block';"} %>
       <% else %>
           <input type='hidden' name='concept[DIABETES DIAGNOSIS DATE][]' id="year_of_diabetes_diagnosis" />
           
@@ -222,10 +230,10 @@ list-style-type: none;
         <% if @patient.gender.upcase == ("F" || "FEMALE")  %>
           <select id='1.1.5'
                   name='concept[Is patient pregnant?]'
-                  helpText='Is Patient Pregnant'
+                  helpText='Is Patient Pregnant<span id="helper"> Clinic Visit</span>'
                   tt_requireNextClick = false
                   pos='5'
-                  tt_onload="showCategory('Clinic Visit');__$('nextButton').style.display = 'none';">
+                  tt_onload="__$('nextButton').style.display = 'none';">
             <option></option>
             <option value='No'>No</option>
             <option value='Yes'>Yes</option>
@@ -239,10 +247,10 @@ list-style-type: none;
         <td>
           <select id='1.1.6'
                   name='concept[Is patient breast feeding?]'
-                  helpText='Is Patient breastfeeding'
+                  helpText='Is Patient breastfeeding<span id="helper"> Clinic Visit</span>'
                   tt_requireNextClick = false
                   pos='6'
-                  tt_onload="showCategory('Clinic Visit');__$('nextButton').style.display = 'none';">
+                  tt_onload="__$('nextButton').style.display = 'none';">
             <option></option>
             <option value='No'>No</option>
             <option value='Yes'>Yes</option>
@@ -256,9 +264,9 @@ list-style-type: none;
         Summary
       </td>
       <td>
-        <label for='summary'>Summary</label>
+        <label for='summary'>Summary<span id='helper'> Clinic Visit</span></label>
         <%= text_field_tag :summary, nil, {
-          :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';showCategory('Clinic Visit');__$('nextButton').style.display = 'block';",
+          :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';__$('nextButton').style.display = 'block';",
           :optional => "true",
           :tt_pageStyleClass => "NoControls" } %>
       </td></tr>

@@ -1,3 +1,13 @@
+<style>
+      #helper {
+  display: block;
+  float:right;
+  color: black;
+  background-color: #EEFFEE;
+  border: 1px solid #CCCCCC;
+  border-radius: 20px 20px 20px 20px;
+  }
+</style>
 <script type='text/javascript' language='javascript'>
   <!--
   tt_cancel_show = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
@@ -21,9 +31,9 @@
       <td>
         <select id='1.1.1'
                 name='programs[][states][][state]'
-                helpText='New Outcome '
+                helpText='New Outcome <span id="helper">Update Outcome</span>'
                 pos='1'
-                tt_onload= "showCategory('Outcome Update')"
+                tt_onload= ""
                 tt_onUnload ="changeProgram()">
           <option></option>
           <option value='Patient transferred out'>Patient Transfered Out</option>
@@ -39,10 +49,9 @@
           {	:id => "location",
           :value_datetime => true,
           :name => "concept[transferred to]",
-          :helpText => "Select Location transferred to:",
+          :helpText => "Select Location transferred to: <span id='helper'>Update Outcome</span>",
           :ajaxURL => '/location/locations?search_string=',
-          :condition => '$("1.1.1").value == "Patient transferred out"',
-          :tt_onload=> "showCategory('Outcome Update')"
+          :condition => '$("1.1.1").value == "Patient transferred out"'
         }%>
       </td>
  <% initial_date = "#{session[:datetime].strftime('%Y-%m-%d')}" rescue "#{(Date.today).strftime('%Y-%m-%d')}"%>
@@ -52,7 +61,7 @@
          :field_type => 'date',
          :name => "programs[][states][][state_date]",
          :tt_onLoad => "changeNextButtonCaption();",
-         :helpText => "New outcome start date",
+         :helpText => "New outcome start date <span id='helper'>Update Outcome</span>",
          :max => "#{(Date.today).strftime('%Y-%m-%d')}",
          :tt_pageStyleClass => "Date DatesOnly"} %>
       </td>

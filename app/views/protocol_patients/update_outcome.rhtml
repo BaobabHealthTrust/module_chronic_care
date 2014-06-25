@@ -1,3 +1,13 @@
+<style>
+      #helper {
+  display: block;
+  float:right;
+  color: black;
+  background-color: #EEFFEE;
+  border: 1px solid #CCCCCC;
+  border-radius: 20px 20px 20px 20px;
+  }
+</style>
 <script type='text/javascript' language='javascript'>
 <!--
 	tt_cancel_show = '/patients/show/<%= @patient.id %>?user_id=<%= @user.id %>';
@@ -12,10 +22,10 @@
 	<table>
 		<tr>
 			<td>
-				Weight 
+				Outcome
 			</td>
 			<td>
-<select id='1.1.1' name='concept[asthma[][outcome]]' helpText='Weight ' field_type='number'  pos='1' >
+<select id='1.1.1' name='concept[asthma[][outcome]]' helpText='Outcome <span id="helper">Outcomes</span> ' field_type='number'  pos='1' >
 <option></option>
 <option value='Defaulted'>Defaulted</option>
  <option value='Stop treatment'>Stop treatment</option>

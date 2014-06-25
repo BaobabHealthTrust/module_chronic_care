@@ -1,3 +1,13 @@
+<style>
+      #helper {
+  display: block;
+  float:right;
+  color: black;
+  background-color: #EEFFEE;
+  border: 1px solid #CCCCCC;
+  border-radius: 20px 20px 20px 20px;
+  }
+</style>
 <%= javascript_include_tag 'jquery' %>
 <%= javascript_include_tag "utils" %>
 <script type="text/javascript">
@@ -174,18 +184,18 @@
   <%= touch_yes_no_tag "Patient in active seizure", @patient, nil,
 			{	:id => 'seizure_focal',
 			:allowFreeText => 'false',
-			:helpText => "Is the patient in active seizure?",
+			:helpText => "Is the patient in active seizure? <span id='helper'> Lab Results</span>",
                         :tt_onLoad => '__$("nextButton").style.display = "block";'} %>
 
   <% options=default.merge({
       :field_type => 'text',
-      :helpText => "Select the type of blood sugar test taken:",
+      :helpText => "Select the type of blood sugar test taken: <span id='helper'> Lab Results</span>",
       :id => "test_types",
       :tt_onUnLoad => "setConceptNamesAndValues()",
       :tt_pageStyleClass => "MultiSelectList",
       :optional => true,
 	  :condition => "$('seizure_focal').value.toLowerCase() == 'yes'",
-	  :tt_onLoad => "showCategory('Lab Results');__$('nextButton').style.display = 'block';"
+	  :tt_onLoad => "__$('nextButton').style.display = 'block';"
     }) %>
 
 	  <%= select_tag("test_type_values",options_for_select(@sugar),options)%>
@@ -193,11 +203,11 @@
   <% options = default.merge({
           :id           => "fbs_unit",
           :field_type   => "text",
-          :tt_onload    => "$('infoBar'+tstCurrentPage).innerHTML = ' Fasting Blood Sugar';showCategory('Lab Results');__$('nextButton').style.display = 'none';",
+          :tt_onload    => "$('infoBar'+tstCurrentPage).innerHTML = ' Fasting Blood Sugar';__$('nextButton').style.display = 'none';",
           :condition    => "getSelected().match(/FASTING\sBLOOD\sSUGAR/i) && $('seizure_focal').value.toLowerCase() == 'yes'",
           :tt_onUnLoad  => "$('fbs_measurement_unit').value = $('fbs_unit').value",
           :tt_requireNextClick => false,
-          :helpText   =>"Select blood sugar units of measure"
+          :helpText   =>"Select blood sugar units of measure <span id='helper'> Lab Results</span>"
       }) %>
     <%= select_tag("fbs_unit", options_for_select([
       "",
@@ -208,7 +218,7 @@
   <% options = default.merge({
         :id             => "fbs_value",
         :field_type     => 'number',
-        :helpText       =>"Fasting Blood Sugar Value",
+        :helpText       =>"Fasting Blood Sugar Value <span id='helper'> Lab Results</span>",
         :condition      => "getSelected().match(/FASTING\sBLOOD\sSUGAR/i) && $('seizure_focal').value.toLowerCase() == 'yes'",
         :min            => 50,
         :max            => 500,
@@ -216,7 +226,7 @@
         :validationMessage => "You must enter a decimal between 0 and 9 (for example: 36<b>.6</b>)",
         :tt_pageStyleClass => "Numeric NumbersOnlyWithDecimal",
         :tt_onUnLoad  => "$('fbs_value_numeric').value = $('fbs_value').value",
-        :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'fbs');showCategory('Lab Results');__$('nextButton').style.display = 'block';"
+        :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'fbs');__$('nextButton').style.display = 'block';"
       }) %>
 
     <%= text_field_tag "fbs_value_numeric", nil, options%>
@@ -237,11 +247,11 @@
     <% options = default.merge({
           :id           => "rbs_unit",
           :field_type   => "text",
-          :tt_onload    => "$('infoBar'+tstCurrentPage).innerHTML = ' Random Blood Sugar';showCategory('Lab Results');__$('nextButton').style.display = 'none';",
+          :tt_onload    => "$('infoBar'+tstCurrentPage).innerHTML = ' Random Blood Sugar';__$('nextButton').style.display = 'none';",
           :condition      => "getSelected().match(/RANDOM\sBLOOD\sSUGAR/i) && $('seizure_focal').value.toLowerCase() == 'yes'",
           :tt_onUnLoad  => "$('rbs_measurement_unit').value = $('rbs_unit').value",
           :tt_requireNextClick => false,
-          :helpText   =>"Select blood sugar units of measure"
+          :helpText   =>"Select blood sugar units of measure <span id='helper'> Lab Results</span>"
       }) %>
     <%= select_tag("rbs_unit", options_for_select([
       "",
@@ -252,7 +262,7 @@
   <% options = default.merge({
         :id             => "rbs_value",
         :field_type     => 'number',
-        :helpText       =>"Random Blood Sugar Value",
+        :helpText       =>"Random Blood Sugar Value <span id='helper'> Lab Results</span>",
         :condition      => "getSelected().match(/RANDOM\sBLOOD\sSUGAR/i) && $('seizure_focal').value.toLowerCase() == 'yes'",
         :min            => 50,
         :max            => 500,
@@ -260,7 +270,7 @@
         :validationMessage => "You must enter a decimal between 0 and 9 (for example: 36<b>.6</b>)",
         :tt_pageStyleClass => "Numeric NumbersOnlyWithDecimal",
         :tt_onUnLoad  => "$('rbs_value_numeric').value = $('rbs_value').value",
-        :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'rbs');showCategory('Lab Results')"
+        :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'rbs');"
       }) %>
 
     <%= text_field_tag "rbs_value_numeric", nil, options%>
@@ -269,18 +279,18 @@
 		{	:id => "mrdt",
 			:multiple => false,
 			:condition      => "$('seizure_focal').value.toLowerCase() == 'yes'",
-			:helpText => "RDT or blood smear positive for malaria",
-                        :tt_onLoad => "showCategory('Lab Results');__$('nextButton').style.display = 'block';"} %>
+			:helpText => "RDT or blood smear positive for malaria <span id='helper'> Lab Results</span>",
+                        :tt_onLoad => "__$('nextButton').style.display = 'block';"} %>
 
  <% else %>
 	 <% options=default.merge({
       :field_type => 'text',
-      :helpText => "Select the type of blood sugar test taken:",
+      :helpText => "Select the type of blood sugar test taken: <span id='helper'> Lab Results</span>",
       :id => "test_types",
       :tt_onUnLoad => "setConceptNamesAndValues()",
       :tt_pageStyleClass => "MultiSelectList",
       :optional => true,
-	  :tt_onLoad => "showCategory('Lab Results');__$('nextButton').style.display = 'block';"
+	  :tt_onLoad => "__$('nextButton').style.display = 'block';"
     }) %>
 
 	  <%= select_tag("test_type_values",options_for_select(@sugar),options)%>
@@ -288,11 +298,11 @@
   <% options = default.merge({
           :id           => "fbs_unit",
           :field_type   => "text",
-          :tt_onload    => "$('infoBar'+tstCurrentPage).innerHTML = ' Fasting Blood Sugar';showCategory('Lab Results');__$('nextButton').style.display = 'none';",
+          :tt_onload    => "$('infoBar'+tstCurrentPage).innerHTML = ' Fasting Blood Sugar';__$('nextButton').style.display = 'none';",
           :condition    => "getSelected().match(/FASTING\sBLOOD\sSUGAR/i)",
           :tt_onUnLoad  => "$('fbs_measurement_unit').value = $('fbs_unit').value",
           :tt_requireNextClick => false,
-          :helpText   =>"Select blood sugar units of measure"
+          :helpText   =>"Select blood sugar units of measure <span id='helper'> Lab Results</span>"
       }) %>
     <%= select_tag("fbs_unit", options_for_select([
       "",
@@ -303,7 +313,7 @@
   <% options = default.merge({
         :id             => "fbs_value",
         :field_type     => 'number',
-        :helpText       =>"Fasting Blood Sugar Value",
+        :helpText       =>"Fasting Blood Sugar Value <span id='helper'> Lab Results</span>",
         :condition      => "getSelected().match(/FASTING\sBLOOD\sSUGAR/i)",
         :min            => 50,
         :max            => 500,
@@ -311,7 +321,7 @@
         :validationMessage => "You must enter a decimal between 0 and 9 (for example: 36<b>.6</b>)",
         :tt_pageStyleClass => "Numeric NumbersOnlyWithDecimal",
         :tt_onUnLoad  => "$('fbs_value_numeric').value = $('fbs_value').value",
-        :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'fbs');showCategory('Lab Results');__$('nextButton').style.display = 'block';"
+        :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'fbs');__$('nextButton').style.display = 'block';"
       }) %>
 
     <%= text_field_tag "fbs_value_numeric", nil, options%>
@@ -332,11 +342,11 @@
     <% options = default.merge({
           :id           => "rbs_unit",
           :field_type   => "text",
-          :tt_onload    => "$('infoBar'+tstCurrentPage).innerHTML = ' Random Blood Sugar';showCategory('Lab Results');__$('nextButton').style.display = 'none';",
+          :tt_onload    => "$('infoBar'+tstCurrentPage).innerHTML = ' Random Blood Sugar';__$('nextButton').style.display = 'none';",
           :condition      => "getSelected().match(/RANDOM\sBLOOD\sSUGAR/i)",
           :tt_onUnLoad  => "$('rbs_measurement_unit').value = $('rbs_unit').value",
           :tt_requireNextClick => false,
-          :helpText   =>"Select blood sugar units of measure"
+          :helpText   =>"Select blood sugar units of measure <span id='helper'> Lab Results</span>"
       }) %>
     <%= select_tag("rbs_unit", options_for_select([
       "",
@@ -347,7 +357,7 @@
   <% options = default.merge({
         :id             => "rbs_value",
         :field_type     => 'number',
-        :helpText       =>"Random Blood Sugar Value",
+        :helpText       =>"Random Blood Sugar Value <span id='helper'> Lab Results</span>",
         :condition      => "getSelected().match(/RANDOM\sBLOOD\sSUGAR/i)",
         :min            => 50,
         :max            => 500,
@@ -355,7 +365,7 @@
         :validationMessage => "You must enter a decimal between 0 and 9 (for example: 36<b>.6</b>)",
         :tt_pageStyleClass => "Numeric NumbersOnlyWithDecimal",
         :tt_onUnLoad  => "$('rbs_value_numeric').value = $('rbs_value').value",
-        :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'rbs');showCategory('Lab Results');__$('nextButton').style.display = 'block';"
+        :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'rbs');__$('nextButton').style.display = 'block';"
       }) %>
 
     <%= text_field_tag "rbs_value_numeric", nil, options%>
@@ -378,7 +388,7 @@
     <% options = default.merge({
         :id             => "HbA1c_value",
         :field_type     => 'number',
-        :helpText       =>"Enter HbA1c Value",
+        :helpText       =>"Enter HbA1c Value <span id='helper'> Lab Results</span>",
         :condition      => "getSelected().match(/HbA1c/i)",
         :min            => 0,
         :max            => 30,
@@ -388,7 +398,7 @@
         :validationMessage => "You must enter a decimal between 0 and 9 (for example: 36<b>.6</b>)",
         :tt_pageStyleClass => "Numeric NumbersOnlyWithDecimal",
         :tt_onUnLoad  => "$('HbA1c_value_numeric').value = $('HbA1c_value').value",
-        :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'hba1c');showCategory('Lab Results');__$('nextButton').style.display = 'block';"
+        :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'hba1c');__$('nextButton').style.display = 'block';"
       }) %>
 
     <%= text_field_tag "HbA1c_value_numeric", nil, options%>
@@ -409,12 +419,12 @@
 <% unless @cholesterol.blank? %>
 	  <% options=default.merge({
       :field_type => 'text',
-      :helpText => "Select the type of test taken:",
+      :helpText => "Select the type of test taken: <span id='helper'> Lab Results</span>",
       :id => "test_types1",
       :tt_onUnLoad => "setConceptNamesAndValues1()",
       :tt_pageStyleClass => "MultiSelectList",
       :optional => true,
-	  :tt_onLoad => "showCategory('Lab Results');__$('nextButton').style.display = 'block';"
+	  :tt_onLoad => "__$('nextButton').style.display = 'block';"
     }) %>
 
 	
@@ -423,11 +433,11 @@
     <% options = default.merge({
           :id           => "cf_unit",
           :field_type   => "text",
-          :tt_onload    => "$('infoBar'+tstCurrentPage).innerHTML = ' Cholesterol Fasting';showCategory('Lab Results');__$('nextButton').style.display = 'none';",
+          :tt_onload    => "$('infoBar'+tstCurrentPage).innerHTML = ' Cholesterol Fasting';__$('nextButton').style.display = 'none';",
           :condition    => "getSelected1().match(/CHOLESTEROL\sFASTING/i)",
           :tt_onUnLoad  => "$('cf_measurement_unit').value = $('cf_unit').value",
           :tt_requireNextClick => false,
-          :helpText   =>"Select cholesterol units of measure"
+          :helpText   =>"Select cholesterol units of measure <span id='helper'> Lab Results</span>"
       }) %>
     <%= select_tag("cf_unit", options_for_select([
       "",
@@ -439,7 +449,7 @@
   <% options = default.merge({
         :id             => "cf_value",
         :field_type     => 'number',
-        :helpText       =>"Cholesterol Fasting Value",
+        :helpText       =>"Cholesterol Fasting Value <span id='helper'> Lab Results</span>",
         :condition      => "(getSelected1().match(/CHOLESTEROL\sFASTING/i)) && ($('cf_unit').value != 'Lo/Hi')",
         :min            => 50,
         :max            => 500,
@@ -447,7 +457,7 @@
         :validationMessage => "You must enter a decimal between 0 and 9 (for example: 36<b>.6</b>)",
         :tt_pageStyleClass => "Numeric NumbersOnlyWithDecimal",
         :tt_onUnLoad  => "$('cf_value_numeric').value = $('cf_value').value",
-        :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'cf');showCategory('Lab Results');__$('nextButton').style.display = 'block';"
+        :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'cf');__$('nextButton').style.display = 'block';"
       }) %>
 
     <%= text_field_tag "cf_value_numeric", nil, options%>
@@ -457,8 +467,8 @@
       :id           => "cf_lo_or_hi",
       :tt_onUnLoad  => "$('cf_value_text').value = $('cf_lo_or_hi').value",
       :condition    => "(getSelected1().match(/CHOLESTEROL\sFASTING/i)) && ($('cf_unit').value == 'Lo/Hi')",
-      :helpText     =>"Cholesterol Fasting Value",
-      :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'cf');showCategory('Lab Results');__$('nextButton').style.display = 'block';",
+      :helpText     =>"Cholesterol Fasting Value <span id='helper'> Lab Results</span>",
+      :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'cf');__$('nextButton').style.display = 'block';",
       :tt_requireNextClick => false
     }) %>
     <%= select_tag("cf_value_lo_or_hi", options_for_select(["","Lo","Hi"]), options ) %>
@@ -481,11 +491,11 @@
     <% options = default.merge({
           :id           => "cnf_unit",
           :field_type   => "text",
-          :tt_onload    => "$('infoBar'+tstCurrentPage).innerHTML = ' Cholesterol Not Fasting';showCategory('Lab Results');__$('nextButton').style.display = 'none';",
+          :tt_onload    => "$('infoBar'+tstCurrentPage).innerHTML = ' Cholesterol Not Fasting';__$('nextButton').style.display = 'none';",
           :condition    => "getSelected1().match(/CHOLESTEROL\sNOT\sFASTING/i)",
           :tt_onUnLoad  => "$('cnf_measurement_unit').value = $('cnf_unit').value",
           :tt_requireNextClick => false,
-          :helpText   =>"Select cholesterol units of measure"
+          :helpText   =>"Select cholesterol units of measure <span id='helper'> Lab Results</span>"
       }) %>
     <%= select_tag("cnf_unit", options_for_select([
       "",
@@ -497,7 +507,7 @@
   <% options = default.merge({
         :id             => "cnf_value",
         :field_type     => 'number',
-        :helpText       =>"Cholesterol Not Fasting Value",
+        :helpText       =>"Cholesterol Not Fasting Value <span id='helper'> Lab Results</span>",
         :condition      => "(getSelected1().match(/CHOLESTEROL\sNOT\sFASTING/i))  && ($('cnf_unit').value != 'Lo/Hi')",
         :min            => 50,
         :max            => 500,
@@ -505,7 +515,7 @@
         :validationMessage => "You must enter a decimal between 0 and 9 (for example: 36<b>.6</b>)",
         :tt_pageStyleClass => "Numeric NumbersOnlyWithDecimal",
         :tt_onUnLoad  => "$('cnf_value_numeric').value = $('cnf_value').value",
-        :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'cnf');showCategory('Lab Results');__$('nextButton').style.display = 'block';"
+        :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'cnf');__$('nextButton').style.display = 'block';"
       }) %>
 
     <%= text_field_tag "cnf_value_numeric", nil, options%>
@@ -515,8 +525,8 @@
       :id           => "cnf_lo_or_hi",
       :tt_onUnLoad  => "$('cnf_value_text').value = $('cnf_lo_or_hi').value",
       :condition    => "(getSelected1().match(/CHOLESTEROL\sNOT\sFASTING/i))  && ($('cnf_unit').value == 'Lo/Hi')",
-      :helpText     =>"Cholesterol Not Fasting Value",
-      :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'cnf');showCategory('Lab Results');__$('nextButton').style.display = 'block';",
+      :helpText     =>"Cholesterol Not Fasting Value <span id='helper'> Lab Results</span>",
+      :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'cnf');__$('nextButton').style.display = 'block';",
       :tt_requireNextClick => false
     }) %>
     <%= select_tag("cnf_value_lo_or_hi", options_for_select(["","Lo","Hi"]), options ) %>
@@ -539,12 +549,12 @@
 <% unless @generic.blank? %>
 	 <% options=default.merge({
       :field_type => 'text',
-      :helpText => "Select the type of test taken:",
+      :helpText => "Select the type of test taken: <span id='helper'> Lab Results</span>",
       :id => "test_types2",
       :tt_onUnLoad => "setConceptNamesAndValues2()",
       :tt_pageStyleClass => "MultiSelectList",
       :optional => true,
-	  :tt_onLoad => "showCategory('Lab Results');__$('nextButton').style.display = 'block';"
+	  :tt_onLoad => "__$('nextButton').style.display = 'block';"
     }) %>
 
 	
@@ -553,11 +563,11 @@
  <% options = default.merge({
           :id           => "ctn_unit",
           :field_type   => "text",
-          :tt_onload    => "$('infoBar'+tstCurrentPage).innerHTML = 'Creatinine';showCategory('Lab Results');__$('nextButton').style.display = 'none';",
+          :tt_onload    => "$('infoBar'+tstCurrentPage).innerHTML = 'Creatinine';__$('nextButton').style.display = 'none';",
           :condition    => "getSelected2().match(/CREATININE/i)",
           :tt_onUnLoad  => "$('ctn_measurement_unit').value = $('ctn_unit').value",
           :tt_requireNextClick => false,
-          :helpText   =>"Select creatinine units of measure"
+          :helpText   =>"Select creatinine units of measure <span id='helper'> Lab Results</span>"
       }) %>
     <%= select_tag("ctn_unit", options_for_select([
       "",
@@ -569,7 +579,7 @@
   <% options = default.merge({
         :id             => "ctn_value",
         :field_type     => 'number',
-        :helpText       =>"Creatinine",
+        :helpText       =>"Creatinine <span id='helper'> Lab Results</span>",
         :condition      => "(getSelected2().match(/CREATININE/i)) && ($('ctn_unit').value != 'Lo/Hi')",
         :min            => 50,
         :max            => 500,
@@ -577,7 +587,7 @@
         :validationMessage => "You must enter a decimal between 0 and 9 (for example: 36<b>.6</b>)",
         :tt_pageStyleClass => "Numeric NumbersOnlyWithDecimal",
         :tt_onUnLoad  => "$('ctn_value_numeric').value = $('ctn_value').value",
-        :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'ctn');showCategory('Lab Results');__$('nextButton').style.display = 'block';"
+        :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'ctn');__$('nextButton').style.display = 'block';"
       }) %>
 
     <%= text_field_tag "ctn_value_numeric", nil, options%>
@@ -587,8 +597,8 @@
       :id           => "ctn_lo_or_hi",
       :tt_onUnLoad  => "$('ctn_value_text').value = $('ctn_lo_or_hi').value",
       :condition    => "(getSelected2().match(/CREATININE/i)) && ($('ctn_unit').value == 'Lo/Hi')",
-      :helpText     =>"Creatinine",
-      :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'cf');showCategory('Lab Results');__$('nextButton').style.display = 'block';",
+      :helpText     =>"Creatinine <span id='helper'> Lab Results</span>",
+      :tt_onload    => "resetPageAttributes('touchscreenInput'+tstCurrentPage, 'cf');__$('nextButton').style.display = 'block';",
       :tt_requireNextClick => false
     }) %>
     <%= select_tag("ctn_value_lo_or_hi", options_for_select(["","Lo","Hi"]), options ) %>
@@ -611,7 +621,7 @@
 
 
 	<% if @retrospective %>
-		<p><label for="filter_provider">Staff who provided the information (Provider)</label></br>
+		<p><label for="filter_provider">Staff who provided the information (Provider)</label> <span id='helper'> Lab Results</span></br>
 		<%= text_field "filter" , 'provider', :helpText => 'Staff who provided the information (Provider)', :ajaxURL => '/user/username?username=' %></p>
 	<% else %>
 		<%= hidden_field_tag "filter[provider]", nil %>

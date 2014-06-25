@@ -23,6 +23,14 @@ list-style-type: none;
  #tt_page_hiv_test_month  #viewport {
   height: 600px;
 }
+    #helper {
+  display: block;
+  float:right;
+  color: black;
+  background-color: #EEFFEE;
+  border: 1px solid #CCCCCC;
+  border-radius: 20px 20px 20px 20px;
+  }
 </style>
 
 <script type='text/javascript' language='javascript'>
@@ -143,7 +151,7 @@ list-style-type: none;
 				HIV Status 
 			</td>
 			<td>
-<select id='status' name='concept[HIV Status]' helpText='HIV Status ' pos='0' tt_onLoad ="showCategory('Update HIV Status')" >
+<select id='status' name='concept[HIV Status]' helpText='HIV Status  <span id="helper"> HIV Status</span>' pos='0' tt_onLoad ="" >
 <option></option>
 <option value='Unknown'>Unknown</option>
  <option value='Positive'>Positive</option>
@@ -157,14 +165,14 @@ list-style-type: none;
 			</td>
 			<td>
 <%= text_field_tag "hiv_test_year", nil,
-	{:helpText => 'HIV test year',
+	{:helpText => 'HIV test year <span id="helper"> HIV Status</span>',
 	:field_type => 'number',
 	:absoluteMin => "1982",
 	:min => "1982",
 	:absoluteMax => Date.today.year,
 	:tt_pageStyleClass => "Numeric NumbersOnly",
 	:condition => '$("status").value.toLowerCase() != "unknown"',
-	:tt_onLoad => "showCategory('Update HIV status')"} %>
+	:tt_onLoad => ""} %>
 			</td>
 		</tr>
 		<tr>
@@ -173,9 +181,9 @@ list-style-type: none;
 			</td>
 			<td>
 <%= select_tag "hiv_test_month", month_name_options,
-	{:helpText => 'HIV test month',
+	{:helpText => 'HIV test month <span id="helper"> HIV Status</span>',
 	:condition => '($("hiv_test_year").value.toLowerCase() != "unknown") && ($("status").value.toLowerCase() != "unknown")',
-	:tt_onLoad => "__$('keyboard').style.display = 'none';showCategory('Update HIV status')"}%>
+	:tt_onLoad => "__$('keyboard').style.display = 'none';"}%>
 			</td>
 		</tr>
 		<tr>
@@ -185,9 +193,9 @@ list-style-type: none;
 			<td>
   <%= text_field_tag "hiv_test_day",  nil,
 	{:field_type => 'number',
-	:helpText => 'HIV test day',
+	:helpText => 'HIV test day <span id="helper"> HIV Status</span>',
 	:condition => '($("hiv_test_year").value != "Unknown") && ($("hiv_test_month").value != "Unknown") && ($("status").value.toLowerCase() != "unknown")',
-	:tt_onLoad => "getDayOfMonthPicker($('hiv_test_year').value, $('hiv_test_month').value);showCategory('Update HIV Status');",
+	:tt_onLoad => "getDayOfMonthPicker($('hiv_test_year').value, $('hiv_test_month').value);;",
 	:tt_onUnload=> "updateTestDate();",
         :validationCode => 'validateDate();',
         :validationMessage => "Test date out of range",
@@ -201,16 +209,16 @@ list-style-type: none;
 	  :name => "name[Refer to HTC]",
       :condition => '(checkTestDate() == "true") && ($("status").value.toLowerCase() == "negative")',
       :tt_pageStyleClass => "NoKeyboard",
-      :tt_onLoad => "showCategory('Update HIV Status')",
-      :helpText => "Patient has been -ve for more than 3 months. Refer patient to HTC?" } %>
+      :tt_onLoad => "",
+      :helpText => "Patient has been -ve for more than 3 months. Refer patient to HTC?<span id='helper'> HIV Status</span>" } %>
 
 	<%= touch_yes_no_tag "Refer to HTC", @patient, nil,
       {:id => "refer_to_htc",
       :name => "name[Refer to HTC]",
 	  :condition => '$("status").value.toLowerCase() == "unknown"',
-          :tt_onLoad => "showCategory('Update HIV Status')",
+          :tt_onLoad => "",
       :tt_pageStyleClass => "NoKeyboard",
-      :helpText => "Refer patient to HTC?" } %>
+      :helpText => "Refer patient to HTC?<span id='helper'> HIV Status</span>" } %>
 			</td>
 		</tr>
 		<tr>
@@ -218,7 +226,7 @@ list-style-type: none;
 				On ART? 
 			</td>
 			<td>
-<select id='on_art' name='concept[on art]' helpText='On ART? ' pos='5' tt_onload ="showCategory('Update HIV Status')"
+<select id='on_art' name='concept[on art]' helpText='On ART? <span id="helper"> HIV Status</span>' pos='5' tt_onload =""
 		condition = '$("status").value.toLowerCase() == "positive"'>
 <option></option>
 <option value='No'>No</option>
@@ -231,8 +239,8 @@ list-style-type: none;
 				Enroll in HIV program?
 			</td>
 			<td>
-<select id='enroll' name='concept[Patient enrolled in HIV program]' helpText='Enroll in HIV program?' pos='6'  condition='__$("on_art").value.toLowerCase() == "no"'
-		condition = '$("status").value.toLowerCase() == "positive"' tt_onload ="showCategory('Update HIV Status')" >
+<select id='enroll' name='concept[Patient enrolled in HIV program]' helpText='Enroll in HIV program?<span id="helper"> HIV Status</span>' pos='6'  condition='__$("on_art").value.toLowerCase() == "no"'
+		condition = '$("status").value.toLowerCase() == "positive"' tt_onload ="" >
 <option></option>
 <option value='No'>No</option>
  <option value='Yes'>Yes</option>
@@ -241,9 +249,9 @@ list-style-type: none;
 		</tr>
 		<tr>
 		<td>
-			<label for='summary'>Summary</label>
+			<label for='summary'>Summary<span id="helper"> HIV Status</span></label>
 			<%= text_field_tag :summary, nil, {
-			  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';showCategory('Update HIV Status');",
+			  :tt_onLoad => "showSelectedConditions();__$('keyboard').style.display = 'none';;",
 			  :optional => "true",
 			  :tt_pageStyleClass => "NoControls" } %>
 		  </td>
