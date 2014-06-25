@@ -1772,7 +1772,7 @@ class PatientsController < ApplicationController
     return "QWK" if frequency.upcase == "ONCE A WEEK"
     return "once a month" if frequency.upcase == "ONCE A MONTH"
     return "twice a month" if frequency.upcase == "TWICE A MONTH"
-    "OD"
+    return frequency.upcase
   end
 
 
