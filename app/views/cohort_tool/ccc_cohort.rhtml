@@ -9,8 +9,8 @@
         <%= javascript_include_tag 'jquery' %>
         <script>
           jQuery(document).ready(function($) {
-            document.getElementById('content').style = 'position : relative; width : 98%; margin-left : -49%;'
-            document.getElementById('description').style = 'color:#777;position:absolute;margin-top:-70px;'
+          //  document.getElementById('content').style = 'position : relative; width : 98%; margin-left : -49%;'
+          //  document.getElementById('description').style = 'color:#777;position:absolute;margin-top:-70px;'
             $('#finish').click(function() {
               window.location = '/clinic/index?user_id=<%=params[:user_id]%>&location_id=<%params[:location_id]%>'
             })
@@ -33,7 +33,16 @@
           }
         </script>
         <style>
-
+          #content{
+            position : relative;
+            width : 98%;
+            margin-left : -49%;
+}
+#description{
+          color:#777;
+          position:absolute;
+          margin-top:-70px;
+}
           table {
             border-style:none;
             border-width:1px;

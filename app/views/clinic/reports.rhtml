@@ -104,42 +104,16 @@
           </span>
         </button>
       </td>
-      <!---
-	  <td style="height: 70px;">
-        <button class="btn" onclick="window.parent.location='/report/assessment?user_id=<%= params[:user_id]
-              %>&location_id=<%= session[:location_id] || params[:location_id] %>&src=<%= @host %>'">
-          <span>
-            Assessment Report
-          </span>
-        </button>
-      </td>
     </tr>
     <tr>
-      <td style="height: 70px;">
-        <button class="btn" onclick="window.parent.location='/clinic/lab_results?user_id=<%= params[:user_id]
-              %>&location_id=<%= session[:location_id] || params[:location_id] %>&src=<%= @host %>'">
+	   <td style="height: 70px;">
+        <button class="btn" onclick="window.parent.location='/report/cohort_menu?user_id=<%= params[:user_id]
+              %>&location_id=<%= session[:location_id] || params[:location_id] %>&id=integrated'">
           <span>
-            Diabetes Report
+            Integrated Report
           </span>
         </button>
       </td>
-	  <td style="height: 70px;">
-        <button class="btn" onclick="window.parent.location='/report/hypertension_report?user_id=<%= params[:user_id]
-              %>&location_id=<%= session[:location_id] || params[:location_id] %>&src=<%= @host %>'">
-          <span>
-            Hypertension Report
-          </span>
-        </button>
-      </td>
-	  <td style="height: 70px;">
-        <button class="btn" onclick="window.parent.location='/clinic/lab_results?user_id=<%= params[:user_id]
-              %>&location_id=<%= session[:location_id] || params[:location_id] %>&src=<%= @host %>'">
-          <span>
-            FBS Report
-          </span>
-        </button>
-      </td>
---->
     </tr>
   </table>
 </div>
