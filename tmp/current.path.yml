@@ -1,2 +1,2 @@
 development:
-    current.path: http://0.0.0.0:3012/patients/show/181?user_id=1
+    current.path: http://localhost:3030/report/cohort_menu?user_id=1&location_id=722&id=integrated

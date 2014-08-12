@@ -308,32 +308,25 @@ class Reports::CohortDm
     return @orders
   end
 
-  def total_children_registered(ids, sex=nil, age=nil )
+  def total_children_registered(ids, sex=nil, min=nil, max=nil, start=nil )
     if ! sex.blank?
       patient_initial = sex.split(//).first.upcase
       categorise = "AND (UCASE(person.gender) = '#{sex.upcase}'
                                     OR UCASE(person.gender) = '#{patient_initial}')"
     end
-    if ! age.blank?
-      if age == 14
-        range = "AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) > 14
-                AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) <= 54"
-      elsif age == 54
-        range = "AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) > 54"
-      else
-        range = "AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) <= 14"
-      end
-    end
+   start = @start_date if start.blank?
+   range = "AND (COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) > #{min}
+                AND COALESCE(DATEDIFF(NOW(), person.birthdate)/365, 0) <= #{max})"
     unless ids.blank?
       conditions = "AND patient.patient_id IN (#{ids})"
     end
 		Patient.count(:all,
       :include => {:person =>{}},
       :conditions => ["patient.date_created >= ?
-								 										AND patient.date_created <= ? 
-                                     #{conditions} #{categorise} #{range}
-																		AND patient.voided = 0", @start_date, @end_date]
-    )
+						AND patient.date_created <= ? 
+						#{conditions} #{categorise} #{range}
+						AND patient.voided = 0", start, @end_date]
+						)
   end
 
   def total_men_registered(ids)
