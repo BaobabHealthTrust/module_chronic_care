@@ -611,487 +611,94 @@ class CohortToolController < ApplicationController
     start_date,end_date = Report.generate_cohort_date_range(@quarter)
     cohort = Cohort.new(start_date,end_date)
     @cohort = cohort.report
-    @survival_analysis = SurvivalAnalysis.report(cohort)
     render :layout => 'cohort'
   end
 
   def cohort_menu
   end
 
-  def adherence
-    adherences = get_adherence(params[:quarter])
-    @quarter = params[:quarter]
-    type = "patients_with_adherence_greater_than_hundred"
-    @report_type = "Adherence Histogram for all patients"
-    @adherence_summary = "&nbsp;&nbsp;<button onclick='adhSummary();'>Summary</button>" unless adherences.blank?
-    @adherence_summary+="<input class='test_name' type=\"button\" onmousedown=\"document.location='/cohort_tool/reports?report=#{@quarter}&report_type=#{type}';\" value=\"Over 100% Adherence\"/>"  unless adherences.blank?
-    @adherence_summary_hash = Hash.new(0)
-    adherences.each{|adherence,value|
-      adh_value = value.to_i
-      current_adh = adherence.to_i
-      if current_adh <= 94
-        @adherence_summary_hash["0 - 94"]+= adh_value
-      elsif current_adh >= 95 and current_adh <= 100
-        @adherence_summary_hash["95 - 100"]+= adh_value
-      else current_adh > 100
-        @adherence_summary_hash["> 100"]+= adh_value
-      end
-    }
-    @adherence_summary_hash['missing'] = CohortTool.missing_adherence(@quarter).length rescue 0
-    @adherence_summary_hash.values.each{|n|@adherence_summary_hash["total"]+=n}
+  def integrated_report
+          @quarter = params[:quarter]
+          @start_date, @end_date = Report.generate_cohort_date_range(@quarter)
+          @user = User.find(params["user_id"]) rescue nil
+          @logo = CoreService.get_global_property_value('logo').to_s
+          @facility = Location.current_health_center.name rescue CoreService.get_global_property_value('facility.name') rescue ""
+          @start_date, @end_date = Report.generate_cohort_date_range(@quarter)
+          report = Reports::CohortDm.new(@start_date, @end_date)
+          @specified_period = report.specified_period
 
-    data = ""
-    adherences.each{|x,y|data+="#{x}:#{y}:"}
-    @id = data[0..-2] || ''
+          @total_registered = report.total_registered.length rescue 0
+          ids = report.total_registered.map{|patient|patient.patient_id}.join(',') rescue ""
+          ids = report.total_registered.map{|patient|patient.patient_id} if report.total_registered.length == 1
+          @total_ever_registered = report.total_ever_registered.length rescue 0
+          ids_ever = report.total_ever_registered.map{|patient|patient.patient_id}.join(',') rescue ""
 
-    @results = @id
-    @results = @results.split(':').enum_slice(2).map
-    @results = @results.each {|result| result[0] = result[0]}.sort_by{|result| result[0]}
-    @results.each{|result| @graph_max = result[1].to_f if result[1].to_f > (@graph_max || 0)}
-    @graph_max ||= 0
-    render :layout => false
-  end
+          @registered_male = report.total_children_registered(ids, "male", 0, 1000)
+          @registered_ever_male = report.total_children_registered(ids_ever, "male", 0, 1000, '1900-01-01')
+          @registered_female = report.total_children_registered(ids, "female", 0, 1000)
+          @registered_ever_female = report.total_children_registered(ids_ever, "female", 0, 1000, '1900-01-01')
 
-  def patients_with_adherence_greater_than_hundred
+          @registered_0_14 = report.total_children_registered(ids, nil, 0, 14)
+          @registered_0_14_ever = report.total_children_registered(ids_ever, nil, 0, 14, '1900-01-01')
 
-    min_range = params[:min_range]
-    max_range = params[:max_range]
-    missing_adherence = false
-    missing_adherence = true if params[:show_missing_adherence] == "yes"
-    session[:list_of_patients] = nil
+          @registered_14_44 = report.total_children_registered(ids, nil, 14, 44)
+          @registered_14_44_ever = report.total_children_registered(ids_ever, nil, 14, 44, '1900-01-01')
 
-    @patients = adherence_over_hundred(params[:quarter],min_range,max_range,missing_adherence)
+          @registered_44_64 = report.total_children_registered(ids, nil, 44, 64)
+          @registered_44_64_ever = report.total_children_registered(ids_ever, nil, 44, 64, '1900-01-01')
 
-    @quarter = params[:quarter] + ": (#{@patients.length})" rescue  params[:quarter]
-    if missing_adherence
-      @report_type = "Patient(s) with missing adherence"
-    elsif max_range.blank? and min_range.blank?
-      @report_type = "Patient(s) with adherence greater than 100%"
-    else
-      @report_type = "Patient(s) with adherence starting from  #{min_range}% to #{max_range}%"
-    end
-    render :layout => 'report'
-    return
-  end
+          @registered_64_1000 = report.total_children_registered(ids, nil, 64, 1000)
+          @registered_64_1000_ever = report.total_children_registered(ids_ever, nil, 64, 1000, '1900-01-01')
+          ht_male = report.disease_availabe(ids, "HT", "male").map{|patient|patient.patient_id}.uniq
+          ht_female = report.disease_availabe(ids, "HT", "female").map{|patient|patient.patient_id}.uniq
+          ever_ht_male = report.disease_availabe(ids_ever, "HT", "male").map{|patient|patient.patient_id}.uniq
+          ever_ht_female = report.disease_availabe(ids_ever, "HT", "female").map{|patient|patient.patient_id}.uniq
 
-  def report_patients_with_multiple_start_reasons(start_date , end_date)
+          @ht = ht_male + ht_female
+          @ht_ever = ever_ht_male + ever_ht_female
 
-    art_eligibility_id = ConceptName.find_by_name('REASON FOR ART ELIGIBILITY').concept_id
-    patients = Observation.find_by_sql(
-      ["SELECT person_id, concept_id, date_created, obs_datetime, value_coded_name_id
-                 FROM obs
-                 WHERE (SELECT COUNT(*)
-                        FROM obs observation
-                        WHERE   observation.concept_id = ?
-                                AND observation.person_id = obs.person_id) > 1
-                                AND date_created >= ? AND date_created <= ?
-                                AND obs.concept_id = ?
-                                AND obs.voided = 0", art_eligibility_id, start_date, end_date, art_eligibility_id])
+          dm_male = report.disease_availabe(ids, "DM", "male").map{|patient|patient.patient_id}.uniq - ht_male
+          dm_female = report.disease_availabe(ids, "DM", "female").map{|patient|patient.patient_id}.uniq - ht_female
+          ever_dm_male = report.disease_ever_availabe(ids_ever, "DM", "male").map{|patient|patient.patient_id}.uniq - ever_ht_male
+          ever_dm_female = report.disease_ever_availabe(ids_ever, "DM", "female").map{|patient|patient.patient_id}.uniq - ever_ht_female
 
-    patients_data = []
+          @dm = dm_male + dm_female
+          @dm_ever = ever_dm_male + ever_dm_female
 
-    patients.each do |reason|
-      patient = Patient.find(reason[:person_id])
-      patient_bean = PatientService.get_patient(patient.person)
-      patients_data << {'person_id' => patient.id,
-        'arv_number' => patient_bean.arv_number,
-        'national_id' => patient_bean.national_id,
-        'date_created' => reason[:date_created].strftime("%Y-%m-%d %H:%M:%S"),
-        'start_reason' => ConceptName.find(reason[:value_coded_name_id]).name
-      }
-    end
-    patients_data
+          dmht_male = report.disease_availabe(ids, "dm ht", "male").map{|patient|patient.patient_id}.uniq # - report.disease_availabe(ids, "HT", "male").map{|patient|patient.patient_id}.uniq - report.disease_availabe(ids, "DM", "male").map{|patient|patient.patient_id}.uniq
+          dmht_female = report.disease_availabe(ids, "dm ht", "female").map{|patient|patient.patient_id}.uniq #- report.disease_availabe(ids, "HT", "female").map{|patient|patient.patient_id}.uniq - report.disease_availabe(ids, "DM", "female").map{|patient|patient.patient_id}.uniq
+          ever_dmht_male = report.disease_ever_availabe(ids_ever, "dm ht", "male").map{|patient|patient.patient_id}.uniq #- report.disease_ever_availabe(ids_ever, "HT", "male").map{|patient|patient.patient_id}.uniq - report.disease_ever_availabe(ids_ever, "DM", "male").map{|patient|patient.patient_id}.uniq
+          ever_dmht_female = report.disease_ever_availabe(ids_ever, "dm ht", "female").map{|patient|patient.patient_id}.uniq #- report.disease_ever_availabe(ids_ever, "HT", "female").map{|patient|patient.patient_id}.uniq - report.disease_ever_availabe(ids_ever, "DM", "female").map{|patient|patient.patient_id}.uniq
+
+          @dmht = dmht_male + dmht_female
+          @dmht_ever = ever_dmht_male + ever_dmht_female
+
+
+          @disease_availabe_asthma_male = report.disease_availabe(ids, "asthma", "male").map{|patient|patient.patient_id}.uniq
+          @disease_availabe_asthma_female = report.disease_availabe(ids, "asthma", "female").map{|patient|patient.patient_id}.uniq
+          @disease_ever_availabe_asthma_male = report.disease_ever_availabe(ids_ever, "asthma", "male").map{|patient|patient.patient_id}.uniq
+          @disease_ever_availabe_asthma_female = report.disease_ever_availabe(ids_ever, "asthma", "female").map{|patient|patient.patient_id}.uniq
+
+    @disease_availabe_epilepsy_male = report.disease_availabe(ids, "epilepsy", "male").map{|patient|patient.patient_id}.uniq
+    @disease_availabe_epilepsy_female = report.disease_availabe(ids, "epilepsy", "female").map{|patient|patient.patient_id}.uniq
+    @disease_ever_availabe_epilepsy_male = report.disease_ever_availabe(ids_ever, "epilepsy", "male").map{|patient|patient.patient_id}.uniq
+    @disease_ever_availabe_epilepsy_female = report.disease_ever_availabe(ids_ever, "epilepsy", "female").map{|patient|patient.patient_id}.uniq
+
+
   end
 
   def voided_observations(encounter)
-    voided_obs = Observation.find_by_sql("SELECT * FROM obs WHERE obs.encounter_id = #{encounter.encounter_id} AND obs.voided = 1")
-    (!voided_obs.empty?) ? voided_obs : nil
+          voided_obs = Observation.find_by_sql("SELECT * FROM obs WHERE obs.encounter_id = #{encounter.encounter_id} AND obs.voided = 1")
+          (!voided_obs.empty?) ? voided_obs : nil
   end
 
   def voided_orders(new_encounter)
-    voided_orders = Order.find_by_sql("SELECT * FROM orders WHERE orders.encounter_id = #{new_encounter.encounter_id} AND orders.voided = 1")
-    (!voided_orders.empty?) ? voided_orders : nil
-  end
-
-  def report_out_of_range_arv_numbers(arv_number_range, start_date , end_date)
-    arv_number_id             = PatientIdentifierType.find_by_name('ARV Number').patient_identifier_type_id
-    arv_start_number          = arv_number_range.first
-    arv_end_number            = arv_number_range.last
-
-    out_of_range_arv_numbers  = PatientIdentifier.find_by_sql(["SELECT patient_id, identifier, date_created FROM patient_identifier
-                                   WHERE identifier_type = ? AND REPLACE(identifier, 'MPC-ARV-', '') >= ?
-                                   AND REPLACE(identifier, 'MPC-ARV-', '') <= ?
-                                   AND voided = 0
-                                   AND (NOT EXISTS(SELECT * FROM patient_identifier
-                                   WHERE identifier_type = ? AND date_created >= ? AND date_created <= ?))",
-        arv_number_id,  arv_start_number,  arv_end_number, arv_number_id, start_date, end_date])
-
-    out_of_range_arv_numbers_data = []
-    out_of_range_arv_numbers.each do |arv_num_data|
-      patient     = Person.find(arv_num_data[:patient_id].to_i)
-      patient_bean = PatientService.get_patient(patient.person)
-
-      out_of_range_arv_numbers_data <<{'person_id' => patient.id,
-        'arv_number' => patient_bean.arv_number,
-        'name' => patient_bean.name,
-        'national_id' => patient_bean.national_id,
-        'gender' => patient_bean.sex,
-        'age' => patient_bean.age,
-        'birthdate' => patient_bean.birth_date,
-        'date_created' => arv_num_data[:date_created].strftime("%Y-%m-%d %H:%M:%S")
-      }
-    end
-    out_of_range_arv_numbers_data
-  end
-
-  def report_dispensations_without_prescriptions_data(start_date , end_date)
-    pills_dispensed_id      = ConceptName.find_by_name('PILLS DISPENSED').concept_id
-
-    missed_prescriptions_data = Observation.find(:all, :select =>  "person_id, value_drug, date_created",
-      :conditions =>["order_id IS NULL
-                                                AND date_created >= ? AND date_created <= ? AND
-                                                    concept_id = ? AND voided = 0" ,start_date , end_date, pills_dispensed_id])
-    dispensations_without_prescriptions = []
-
-    missed_prescriptions_data.each do |dispensation|
-      patient = Patient.find(dispensation[:person_id])
-      patient_bean = PatientService.get_patient(patient.person)
-      drug_name    = Drug.find(dispensation[:value_drug]).name
-
-      dispensations_without_prescriptions << { 'person_id' => patient.id,
-        'arv_number' => patient_bean.arv_number,
-        'national_id' => patient_bean.national_id,
-        'date_created' => dispensation[:date_created].strftime("%Y-%m-%d %H:%M:%S"),
-        'drug_name' => drug_name
-      }
-    end
-
-    dispensations_without_prescriptions
-  end
-
-  def report_prescriptions_without_dispensations_data(start_date , end_date)
-    pills_dispensed_id      = ConceptName.find_by_name('PILLS DISPENSED').concept_id
-
-    missed_dispensations_data = Observation.find_by_sql(["SELECT order_id, patient_id, date_created from orders
-              WHERE NOT EXISTS (SELECT * FROM obs
-               WHERE orders.order_id = obs.order_id AND obs.concept_id = ?)
-                AND date_created >= ? AND date_created <= ? AND orders.voided = 0", pills_dispensed_id, start_date , end_date ])
-
-    prescriptions_without_dispensations = []
-
-    missed_dispensations_data.each do |prescription|
-      patient      = Patient.find(prescription[:patient_id])
-      drug_id      = DrugOrder.find(prescription[:order_id]).drug_inventory_id
-      drug_name    = Drug.find(drug_id).name
-
-      prescriptions_without_dispensations << {'person_id' => patient.id,
-        'arv_number' => PatientService.get_patient_identifier(patient, 'ARV Number'),
-        'national_id' => PatientService.get_national_id(patient),
-        'date_created' => prescription[:date_created].strftime("%Y-%m-%d %H:%M:%S"),
-        'drug_name' => drug_name
-      }
-    end
-    prescriptions_without_dispensations
-  end
-
-  def report_dead_with_visits(start_date, end_date)
-    patient_died_concept    = ConceptName.find_by_name('PATIENT DIED').concept_id
-
-    all_dead_patients_with_visits = "SELECT *
-    FROM (SELECT observation.person_id AS patient_id, DATE(p.death_date) AS date_of_death, DATE(observation.date_created) AS date_started
-          FROM person p right join obs observation ON p.person_id = observation.person_id
-          WHERE p.dead = 1 AND DATE(p.death_date) < DATE(observation.date_created) AND observation.voided = 0
-          ORDER BY observation.date_created ASC) AS dead_patients_visits
-    WHERE DATE(date_of_death) >= DATE('#{start_date}') AND DATE(date_of_death) <= DATE('#{end_date}')
-    GROUP BY patient_id"
-    patients = Patient.find_by_sql([all_dead_patients_with_visits])
-
-    patients_data  = []
-    patients.each do |patient_data_row|
-      person = Person.find(patient_data_row[:patient_id].to_i)
-      patient_bean = PatientService.get_patient(person)
-      patients_data <<{ 'person_id' => person.id,
-        'arv_number' => patient_bean.arv_number,
-        'name' => patient_bean.name,
-        'national_id' => patient_bean.national_id,
-        'gender' => patient_bean.sex,
-        'age' => patient_bean.age,
-        'birthdate' => patient_bean.birth_date,
-        'phone' => PatientService.phone_numbers(person),
-        'date_created' => patient_data_row[:date_started]
-      }
-    end
-    patients_data
-  end
-
-  def report_males_allegedly_pregnant(start_date, end_date)
-    pregnant_patient_concept_id = ConceptName.find_by_name('IS PATIENT PREGNANT?').concept_id
-    patients = PatientIdentifier.find_by_sql(["
-                                   SELECT person.person_id,obs.obs_datetime
-                                       FROM obs INNER JOIN person ON obs.person_id = person.person_id
-                                           WHERE person.gender = 'M' AND
-                                           obs.concept_id = ? AND obs.obs_datetime >= ? AND obs.obs_datetime <= ? AND obs.voided = 0",
-        pregnant_patient_concept_id, '2008-12-23 00:00:00', end_date])
-
-    patients_data  = []
-    patients.each do |patient_data_row|
-      person = Person.find(patient_data_row[:person_id].to_i)
-		  patient_bean = PatientService.get_patient(person)
-      patients_data <<{ 'person_id' => person.id,
-        'arv_number' => patient_bean.arv_number,
-        'name' => patient_bean.name,
-        'national_id' => patient_bean.national_id,
-        'gender' => patient_bean.sex,
-        'age' => patient_bean.age,
-        'birthdate' => patient_bean.birth_date,
-        'phone' => PatientService.phone_numbers(person),
-        'date_created' => patient_data_row[:obs_datetime]
-      }
-    end
-    patients_data
-  end
-
-  def report_patients_who_moved_from_second_to_first_line_drugs(start_date, end_date)
-
-    first_line_regimen = "('D4T+3TC+NVP', 'd4T 3TC + d4T 3TC NVP')"
-    second_line_regimen = "('AZT+3TC+NVP', 'D4T+3TC+EFV', 'AZT+3TC+EFV', 'TDF+3TC+EFV', 'TDF+3TC+NVP', 'TDF/3TC+LPV/r', 'AZT+3TC+LPV/R', 'ABC/3TC+LPV/r')"
-
-    patients_who_moved_from_nd_to_st_line_drugs = "SELECT * FROM (
-        SELECT patient_on_second_line_drugs.* , DATE(patient_on_first_line_drugs.date_created) AS date_started FROM (
-        SELECT person_id, date_created
-        FROM obs
-        WHERE value_drug IN (
-        SELECT drug_id
-        FROM drug
-        WHERE concept_id IN (SELECT concept_id FROM concept_name
-        WHERE name IN #{second_line_regimen}))
-        ) AS patient_on_second_line_drugs inner join
-
-        (SELECT person_id, date_created
-        FROM obs
-        WHERE value_drug IN (
-        SELECT drug_id
-        FROM drug
-        WHERE concept_id IN (SELECT concept_id FROM concept_name
-        WHERE name IN #{first_line_regimen}))
-        ) AS patient_on_first_line_drugs
-        ON patient_on_first_line_drugs.person_id = patient_on_second_line_drugs.person_id
-        WHERE DATE(patient_on_first_line_drugs.date_created) > DATE(patient_on_second_line_drugs.date_created) AND
-              DATE(patient_on_first_line_drugs.date_created) >= DATE('#{start_date}') AND DATE(patient_on_first_line_drugs.date_created) <= DATE('#{end_date}')
-        ORDER BY patient_on_first_line_drugs.date_created ASC) AS patients
-        GROUP BY person_id"
-
-    patients = Patient.find_by_sql([patients_who_moved_from_nd_to_st_line_drugs])
-
-    patients_data  = []
-    patients.each do |patient_data_row|
-      person = Person.find(patient_data_row[:person_id].to_i)
-      patient_bean = PatientService.get_patient(person)
-      patients_data <<{ 'person_id' => person.id,
-        'arv_number' => patient_bean.arv_number,
-        'name' => patient_bean.name,
-        'national_id' => patient_bean.national_id,
-        'gender' => patient_bean.sex,
-        'age' => patient_bean.age,
-        'birthdate' => patient_bean.birth_date,
-        'phone' => PatientService.phone_numbers(person),
-        'date_created' => patient_data_row[:date_started]
-      }
-    end
-    patients_data
-  end
-
-  def report_with_drug_start_dates_less_than_program_enrollment_dates(start_date, end_date)
-
-    arv_drugs_concepts      = MedicationService.arv_drugs.inject([]) {|result, drug| result << drug.concept_id}
-    on_arv_concept_id       = ConceptName.find_by_name('ON ANTIRETROVIRALS').concept_id
-    hvi_program_id          = Program.find_by_name('HIV PROGRAM').program_id
-    national_identifier_id  = PatientIdentifierType.find_by_name('National id').patient_identifier_type_id
-    arv_number_id           = PatientIdentifierType.find_by_name('ARV Number').patient_identifier_type_id
-
-    patients_on_antiretrovirals_sql = "
-         (SELECT p.patient_id, s.date_created as Date_Started_ARV
-          FROM patient_program p INNER JOIN patient_state s
-          ON  p.patient_program_id = s.patient_program_id
-          WHERE s.state IN (SELECT program_workflow_state_id
-                            FROM program_workflow_state g
-                            WHERE g.concept_id = #{on_arv_concept_id})
-                            AND p.program_id = #{hvi_program_id}
-         ) patients_on_antiretrovirals"
-
-    antiretrovirals_obs_sql = "
-         (SELECT * FROM obs
-          WHERE  value_drug IN (SELECT drug_id FROM drug
-          WHERE concept_id IN ( #{arv_drugs_concepts.join(', ')} ) )
-         ) antiretrovirals_obs"
-
-    drug_start_dates_less_than_program_enrollment_dates_sql= "
-      SELECT * FROM (
-                  SELECT patients_on_antiretrovirals.patient_id, DATE(patients_on_antiretrovirals.date_started_ARV) AS date_started_ARV,
-                         antiretrovirals_obs.obs_datetime, antiretrovirals_obs.value_drug
-                  FROM #{patients_on_antiretrovirals_sql}, #{antiretrovirals_obs_sql}
-                  WHERE patients_on_antiretrovirals.Date_Started_ARV > antiretrovirals_obs.obs_datetime
-                        AND patients_on_antiretrovirals.patient_id = antiretrovirals_obs.person_id
-                        AND patients_on_antiretrovirals.Date_Started_ARV >='#{start_date}' AND patients_on_antiretrovirals.Date_Started_ARV <= '#{end_date}'
-                  ORDER BY patients_on_antiretrovirals.date_started_ARV ASC) AS patient_select
-      GROUP BY patient_id"
-
-
-    patients       = Patient.find_by_sql(drug_start_dates_less_than_program_enrollment_dates_sql)
-    patients_data  = []
-    patients.each do |patient_data_row|
-      person = Person.find(patient_data_row[:patient_id])
-      patient_bean = PatientService.get_patient(person)
-      patients_data <<{ 'person_id' => person.id,
-        'arv_number' => patient_bean.arv_number,
-        'name' => patient_bean.name,
-        'national_id' => patient_bean.national_id,
-        'gender' => patient_bean.sex,
-        'age' => patient_bean.age,
-        'birthdate' => patient_bean.birth_date,
-        'phone' => PatientService.phone_numbers(person),
-        'date_created' => patient_data_row[:date_started_ARV]
-      }
-    end
-    patients_data
-  end
-
-  def get_adherence(quarter="Q1 2009")
-    date = Report.generate_cohort_date_range(quarter)
-
-    start_date  = date.first.beginning_of_day.strftime("%Y-%m-%d %H:%M:%S")
-    end_date    = date.last.end_of_day.strftime("%Y-%m-%d %H:%M:%S")
-    adherences  = Hash.new(0)
-    adherence_concept_id = ConceptName.find_by_name("WHAT WAS THE PATIENTS ADHERENCE FOR THIS DRUG ORDER").concept_id
-
-    adherence_sql_statement= " SELECT worse_adherence_dif, pat_ad.person_id as patient_id, pat_ad.value_numeric AS adherence_rate_worse
-                            FROM (SELECT ABS(100 - Abs(value_numeric)) as worse_adherence_dif, obs_id, person_id, concept_id, encounter_id, order_id, obs_datetime, location_id, value_numeric
-                                  FROM obs q
-                                  WHERE concept_id = #{adherence_concept_id} AND order_id IS NOT NULL
-                                  ORDER BY q.obs_datetime DESC, worse_adherence_dif DESC, person_id ASC)pat_ad
-                            WHERE pat_ad.obs_datetime >= '#{start_date}' AND pat_ad.obs_datetime<= '#{end_date}'
-                            GROUP BY patient_id "
-
-    adherence_rates = Observation.find_by_sql(adherence_sql_statement)
-
-    adherence_rates.each{|adherence|
-
-      rate = adherence.adherence_rate_worse.to_i
-
-      if rate >= 91 and rate <= 94
-        cal_adherence = 94
-      elsif  rate >= 95 and rate <= 100
-        cal_adherence = 100
-      else
-        cal_adherence = rate + (5- rate%5)%5
-      end
-      adherences[cal_adherence]+=1
-    }
-    adherences
-  end
-
-  def adherence_over_hundred(quarter="Q1 2009",min_range = nil,max_range=nil,missing_adherence=false)
-    date_range                 = Report.generate_cohort_date_range(quarter)
-    start_date                 = date_range.first.beginning_of_day.strftime("%Y-%m-%d %H:%M:%S")
-    end_date                   = date_range.last.end_of_day.strftime("%Y-%m-%d %H:%M:%S")
-    adherence_range_filter     = " (adherence_rate_worse >= #{min_range} AND adherence_rate_worse <= #{max_range}) "
-    adherence_concept_id       = ConceptName.find_by_name("WHAT WAS THE PATIENTS ADHERENCE FOR THIS DRUG ORDER").concept_id
-    brought_drug_concept_id    = ConceptName.find_by_name("AMOUNT OF DRUG BROUGHT TO CLINIC").concept_id
-
-    patients = {}
-
-    if (min_range.blank? or max_range.blank?) and !missing_adherence
-      adherence_range_filter = " (adherence_rate_worse > 100) "
-    elsif missing_adherence
-
-      adherence_range_filter = " (adherence_rate_worse IS NULL) "
-
-    end
-
-    patients_with_adherences =  " (SELECT   oders.start_date, obs_inner_order.obs_datetime, obs_inner_order.adherence_rate AS adherence_rate,
-                                        obs_inner_order.id, obs_inner_order.patient_id, obs_inner_order.drug_inventory_id AS drug_id,
-                                        ROUND(DATEDIFF(obs_inner_order.obs_datetime, oders.start_date)* obs_inner_order.equivalent_daily_dose, 0) AS expected_remaining,
-                                        obs_inner_order.quantity AS quantity, obs_inner_order.encounter_id, obs_inner_order.order_id
-                               FROM (SELECT latest_adherence.obs_datetime, latest_adherence.adherence_rate, latest_adherence.id, latest_adherence.patient_id, latest_adherence.order_id, drugOrder.drug_inventory_id, drugOrder.equivalent_daily_dose, drugOrder.quantity, latest_adherence.encounter_id
-                                    FROM (SELECT all_adherences.obs_datetime, all_adherences.value_numeric AS adherence_rate, all_adherences.obs_id as id, all_adherences.person_id as patient_id,all_adherences.order_id, all_adherences.encounter_id
-                                          FROM (SELECT obs_id, person_id, concept_id, encounter_id, order_id, obs_datetime, location_id, value_numeric
-                                                FROM obs Observations
-                                                WHERE concept_id = #{adherence_concept_id}
-                                                ORDER BY person_id ASC , Observations.obs_datetime DESC )all_adherences
-                                          WHERE all_adherences.obs_datetime >= '#{start_date}' AND all_adherences.obs_datetime<= '#{end_date}'
-                                          GROUP BY order_id, patient_id) latest_adherence
-                                    INNER JOIN
-                                          drug_order drugOrder
-                                    On    drugOrder.order_id = latest_adherence.order_id) obs_inner_order
-                               INNER JOIN
-                                    orders oders
-                               On     oders.order_id = obs_inner_order.order_id) patients_with_adherence  "
-
-    worse_adherence_per_patient =" (SELECT worse_adherence_dif, pat_ad.person_id as patient_id, pat_ad.value_numeric AS adherence_rate_worse
-                                FROM (SELECT ABS(100 - Abs(value_numeric)) as worse_adherence_dif, obs_id, person_id, concept_id, encounter_id, order_id, obs_datetime, location_id, value_numeric
-                                      FROM obs q
-                                      WHERE concept_id = #{adherence_concept_id} AND order_id IS NOT NULL
-                                      ORDER BY q.obs_datetime DESC, worse_adherence_dif DESC, person_id ASC)pat_ad
-                                WHERE pat_ad.obs_datetime >= '#{start_date}' AND pat_ad.obs_datetime<= '#{end_date}'
-                                GROUP BY patient_id ) worse_adherence_per_patient   "
-
-    patient_adherences_sql =  " SELECT *
-                                 FROM   #{patients_with_adherences} INNER JOIN #{worse_adherence_per_patient}
-                                 ON patients_with_adherence.patient_id = worse_adherence_per_patient.patient_id
-                                 WHERE  #{adherence_range_filter} "
-
-    rates = Observation.find_by_sql(patient_adherences_sql)
-
-    patients_rates = []
-    rates.each{|rate|
-      patients_rates << rate
-    }
-    adherence_rates = patients_rates
-
-    arv_number_id = PatientIdentifierType.find_by_name('ARV Number').patient_identifier_type_id
-    adherence_rates.each{|rate|
-
-      patient    = Patient.find(rate.patient_id)
-      person     = patient.person
-      patient_bean = PatientService.get_patient(person)
-      drug       = Drug.find(rate.drug_id)
-      pill_count = Observation.find(:first, :conditions => "order_id = #{rate.order_id} AND encounter_id = #{rate.encounter_id} AND concept_id = #{brought_drug_concept_id} ").value_numeric rescue ""
-      if !patients[patient.patient_id] then
-
-        patients[patient.patient_id]={"id" =>patient.id,
-          "arv_number" => patient_bean.arv_number,
-          "name" => patient_bean.name,
-          "national_id" => patient_bean.national_id,
-          "visit_date" =>rate.obs_datetime,
-          "gender" =>patient_bean.sex,
-          "age" => PatientService.patient_age_at_initiation(patient, rate.start_date.to_date),
-          "birthdate" => patient_bean.birth_date,
-          "pill_count" => pill_count.to_i.to_s,
-          "adherence" => rate. adherence_rate_worse,
-          "start_date" => rate.start_date.to_date,
-          "expected_count" =>rate.expected_remaining,
-          "drug" => drug.name}
-      elsif  patients[patient.patient_id] then
-
-        patients[patient.patient_id]["age"].to_i < PatientService.patient_age_at_initiation(patient, rate.start_date.to_date).to_i ? patients[patient.patient_id]["age"] = patient.age_at_initiation(rate.start_date.to_date).to_s : ""
-
-        patients[patient.patient_id]["drug"] = patients[patient.patient_id]["drug"].to_s + "<br>#{drug.name}"
-
-        patients[patient.patient_id]["pill_count"] << "<br>#{pill_count.to_i.to_s}"
-
-        patients[patient.patient_id]["expected_count"] << "<br>#{rate.expected_remaining.to_i.to_s}"
-
-        patients[patient.patient_id]["start_date"].to_date > rate.start_date.to_date ?
-          patients[patient.patient_id]["start_date"] = rate.start_date.to_date : ""
-
-      end
-    }
-
-    patients.sort { |a,b| a[1]['adherence'].to_i <=> b[1]['adherence'].to_i }
+          voided_orders = Order.find_by_sql("SELECT * FROM orders WHERE orders.encounter_id = #{new_encounter.encounter_id} AND orders.voided = 1")
+          (!voided_orders.empty?) ? voided_orders : nil
   end
 
   def dm_cohort_report_options
-    render :layout => false
+        render :layout => false
   end
 
   def dm_cohort

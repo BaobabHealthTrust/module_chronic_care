@@ -271,7 +271,7 @@ class PatientsController < ApplicationController
           end
 
           if ((age >= 18) && (sex == "f"))
-            current = current / 100
+            current = current.to_f / 100
             pefr = ((((current * 3.72) + 2.24) - (age * 0.03)) * 60).to_i
           end
 
