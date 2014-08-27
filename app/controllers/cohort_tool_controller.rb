@@ -674,17 +674,27 @@ class CohortToolController < ApplicationController
           @dmht_ever = ever_dmht_male + ever_dmht_female
 
 
-          @disease_availabe_asthma_male = report.disease_availabe(ids, "asthma", "male").map{|patient|patient.patient_id}.uniq
-          @disease_availabe_asthma_female = report.disease_availabe(ids, "asthma", "female").map{|patient|patient.patient_id}.uniq
-          @disease_ever_availabe_asthma_male = report.disease_ever_availabe(ids_ever, "asthma", "male").map{|patient|patient.patient_id}.uniq
-          @disease_ever_availabe_asthma_female = report.disease_ever_availabe(ids_ever, "asthma", "female").map{|patient|patient.patient_id}.uniq
+          asthma_male = report.disease_availabe(ids, "asthma", "male").map{|patient|patient.patient_id}.uniq
+          asthma_female = report.disease_availabe(ids, "asthma", "female").map{|patient|patient.patient_id}.uniq
+          ever_asthma_male = report.disease_ever_availabe(ids_ever, "asthma", "male").map{|patient|patient.patient_id}.uniq
+          ever_asthma_female = report.disease_ever_availabe(ids_ever, "asthma", "female").map{|patient|patient.patient_id}.uniq
 
-    @disease_availabe_epilepsy_male = report.disease_availabe(ids, "epilepsy", "male").map{|patient|patient.patient_id}.uniq
-    @disease_availabe_epilepsy_female = report.disease_availabe(ids, "epilepsy", "female").map{|patient|patient.patient_id}.uniq
-    @disease_ever_availabe_epilepsy_male = report.disease_ever_availabe(ids_ever, "epilepsy", "male").map{|patient|patient.patient_id}.uniq
-    @disease_ever_availabe_epilepsy_female = report.disease_ever_availabe(ids_ever, "epilepsy", "female").map{|patient|patient.patient_id}.uniq
+          @asthma = asthma_male + asthma_female
+           @asthma_ever = ever_asthma_male + ever_asthma_female
 
+         epilepsy_male = report.disease_availabe(ids, "epilepsy", "male").map{|patient|patient.patient_id}.uniq
+         epilepsy_female = report.disease_availabe(ids, "epilepsy", "female").map{|patient|patient.patient_id}.uniq
+         ever_epilepsy_male = report.disease_ever_availabe(ids_ever, "epilepsy", "male").map{|patient|patient.patient_id}.uniq
+         ever_epilepsy_female = report.disease_ever_availabe(ids_ever, "epilepsy", "female").map{|patient|patient.patient_id}.uniq
 
+         @epilepsy = epilepsy_male + epilepsy_female
+         @epilepsy_ever = ever_epilepsy_male + ever_epilepsy_female
+
+         overall_disease = @ht + @dm + @dmht + @asthma + @epilepsy
+         overall_disease_ever = @ht_ever + @dm_ever + @dmht_ever + @asthma_ever + @epilepsy_ever
+         #raise overall_disease.uniq.sort.length.to_yaml
+         @other_ever = @total_registered_ever  -  overall_disease_ever.uniq.length
+         @other = @total_registered - overall_disease.uniq.length
   end
 
   def voided_observations(encounter)
