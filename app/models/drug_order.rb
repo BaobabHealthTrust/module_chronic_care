@@ -82,8 +82,9 @@ class DrugOrder < ActiveRecord::Base
     units = drug.units || 'per dose'
     duration = (auto_expire_date.to_date - start_date.to_date).to_i rescue nil
     equivalent_daily_dose = nil
-    drug_order = nil       
-     if (frequency == "VARIABLE")
+    drug_order = nil  
+		     
+     if (frequency.upcase == "VARIABLE")
     
     if instructions.blank?
       instructions = "#{drug.name}:"
