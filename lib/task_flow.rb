@@ -3,13 +3,13 @@ class TaskFlow
 
   attr_accessor :patient, :person, :user, :current_date, :tasks, :current_user_activities,
     :encounter_type, :url, :task_scopes, :task_list, :labels, :redirect_to, :current_program, :present_date
-
+    
   def initialize(user_id, patient_id, session_date = Date.today)
     self.patient = Patient.find(patient_id)
     self.user = User.find(user_id)
     self.current_date = session_date
 		#self.current_date = self.present_date
-
+		
 
     if File.exists?("#{Rails.root}/config/protocol_task_flow.yml")
       settings = YAML.load_file("#{Rails.root}/config/protocol_task_flow.yml")["#{Rails.env
@@ -21,7 +21,7 @@ class TaskFlow
       concepts = {}
 
       YAML.load_file("#{Rails.root}/config/protocol_task_flow.yml")["#{Rails.env
-        }"]["concept"].strip.split(",").map{|e|
+        }"]["concept"].strip.split(",").map{|e| 
         s = e.split("|")
         concepts[s[0].downcase] = s[1]
       } rescue {}
@@ -29,7 +29,7 @@ class TaskFlow
       except_concepts = {}
 
       YAML.load_file("#{Rails.root}/config/protocol_task_flow.yml")["#{Rails.env
-        }"]["except_concept"].strip.split(",").map{|e|
+        }"]["except_concept"].strip.split(",").map{|e| 
         s = e.split("|")
         except_concepts[s[0].downcase] = s[1]
       } rescue {}
@@ -37,7 +37,7 @@ class TaskFlow
       drug_concepts = {}
 
       YAML.load_file("#{Rails.root}/config/protocol_task_flow.yml")["#{Rails.env
-        }"]["drug_concept"].strip.split(",").map{|e|
+        }"]["drug_concept"].strip.split(",").map{|e| 
         s = e.split("|")
         drug_concepts[s[0].downcase] = s[1]
       } rescue {}
@@ -45,7 +45,7 @@ class TaskFlow
       special_fields = {}
 
       YAML.load_file("#{Rails.root}/config/protocol_task_flow.yml")["#{Rails.env
-        }"]["special_fields"].strip.split(",").map{|e|
+        }"]["special_fields"].strip.split(",").map{|e| 
         s = e.split("|")
         special_fields[s[0].downcase] = s[1]
       } rescue {}
@@ -73,14 +73,14 @@ class TaskFlow
           :special_field => (special_fields[item[0].downcase] rescue nil)
         }
       }
-
+      
     end
 
     project = get_global_property_value("project.name").downcase.gsub(/\s/, ".") rescue nil
 
     self.current_user_activities = UserProperty.find_by_user_id_and_property(user_id,
       "#{project}.activities").property_value.split(",").collect{|a| a.downcase} rescue {}
-
+      
   end
 
   def get_global_property_value(param)
@@ -90,7 +90,7 @@ class TaskFlow
 
 
   def epilepsy_next_task(host, remote_ip)
-
+    
     normal_flow = self.tasks
 
     flow = {}
@@ -154,7 +154,7 @@ class TaskFlow
 		if observation.match(/Refer to HTC:  Yes/i)
 						self.encounter_type = "HIV STATUS"
 						self.url = "/protocol_patients/hiv_status?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
+						return self
 		 end
 
 			my_activities = self.current_user_activities.map(&:upcase)
@@ -179,12 +179,12 @@ class TaskFlow
 
 					next if !vitals.blank?
 					self.encounter_type = 'VITALS'
-					self.url = "http://localhost:3000/vitals?destination=http://#{host}/patients/processvitals/1?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
-					if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+				  self.url = "/protocol_patients/vitals?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+         	if ! my_activities.include?(tsk)
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
 				when "FAMILY HISTORY"
 					next if ! self.current_user_activities.include?('medical history')
@@ -199,10 +199,10 @@ class TaskFlow
 					self.url = "/protocol_patients/family_history?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 
 					if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
 				when "SOCIAL HISTORY"
 					next if ! self.current_user_activities.include?(tsk.downcase)
@@ -216,10 +216,10 @@ class TaskFlow
 					self.encounter_type = 'SOCIAL HISTORY'
 					self.url = "/protocol_patients/social_history?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
 				when "MEDICAL HISTORY"
 					next if ! self.current_user_activities.include?(tsk.downcase)
@@ -233,10 +233,10 @@ class TaskFlow
 					self.encounter_type = 'MEDICAL HISTORY'
 					self.url = "/protocol_patients/medical_history?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 				  if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
         when "UPDATE HIV STATUS"
 					next if ! self.current_user_activities.include?("hiv status")
@@ -257,10 +257,10 @@ class TaskFlow
 					self.encounter_type = "HIV STATUS"
 					self.url = "/protocol_patients/hiv_status?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?("HIV STATUS")
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
-						return self
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
 					end
+						return self
+					
         when "GENERAL HEALTH"
 					next if ! self.current_user_activities.include?(tsk.downcase)
 					self.patient.encounters.each do | enc |
@@ -273,23 +273,23 @@ class TaskFlow
 					self.encounter_type = 'GENERAL HEALTH'
 					self.url = "/protocol_patients/general_health?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 				  if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
 				when "COMPLICATIONS"
 					next if ! self.current_user_activities.include?(tsk.downcase)
           assessment = Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "COMPLICATIONS", "module")
-
+					
 					next if !assessment.blank?
 					self.encounter_type = "COMPLICATIONS"
 					self.url = "/protocol_patients/complications?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
 				when "TREATMENT"
 					next if ! self.current_user_activities.include?(tsk.downcase)
@@ -299,10 +299,10 @@ class TaskFlow
 					self.encounter_type = "TREATMENT"
 					self.url = "/protocol_patients/treatment?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
 			when "LAB RESULTS"
 					self.patient.encounters.each do | enc |
@@ -314,10 +314,10 @@ class TaskFlow
 					self.encounter_type = "LAB RESULTS"
 					self.url = "/protocol_patients/lab_results?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 		end
 
 		self.encounter_type = 'NONE'
@@ -327,7 +327,7 @@ class TaskFlow
 	end
 
 	def asthma_next_task(host = nil, remote_ip = nil)
-
+    
     normal_flow = self.tasks
 
     flow = {}
@@ -392,11 +392,11 @@ class TaskFlow
 		if observation.match(/Refer to HTC:  Yes/i)
 						self.encounter_type = "HIV STATUS"
 						self.url = "/protocol_patients/hiv_status?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
+						return self
 		 end
 
 			my_activities = self.current_user_activities.map(&:upcase)
-
+			
 			encounters.each do |tsk|
 
 			found = false
@@ -417,21 +417,21 @@ class TaskFlow
 					self.encounter_type = "ASSESSMENT"
 					self.url = "/protocol_patients/assessment?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
         when "VITALS"
           vitals =  Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "VITALS", "module")
 
 					next if !vitals.blank?
 					self.encounter_type = 'VITALS'
-					self.url = "http://localhost:3000/vitals?destination=http://#{host}/patients/processvitals/1?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
-					if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+				self.url = "/protocol_patients/vitals?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+         	if ! my_activities.include?(tsk)
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
 				when "FAMILY HISTORY"
 					next if ! self.current_user_activities.include?('medical history')
@@ -440,16 +440,16 @@ class TaskFlow
 					end
 					next if found == true
           history =  Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "FAMILY MEDICAL HISTORY", "module")
-
+          
 					next if !history.blank?
 					self.encounter_type = 'FAMILY MEDICAL HISTORY'
 					self.url = "/protocol_patients/family_history?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 
 					if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
 				when "SOCIAL HISTORY"
 					next if ! self.current_user_activities.include?(tsk.downcase)
@@ -463,10 +463,10 @@ class TaskFlow
 					self.encounter_type = 'SOCIAL HISTORY'
 					self.url = "/protocol_patients/social_history?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
 				when "MEDICAL HISTORY"
 					next if ! self.current_user_activities.include?(tsk.downcase)
@@ -475,16 +475,16 @@ class TaskFlow
 					end
 					next if found == true
            history =  Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "MEDICAL HISTORY", "module")
-
+          
 
 					next if !history.blank?
 					self.encounter_type = 'MEDICAL HISTORY'
 					self.url = "/protocol_patients/medical_history?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 				  if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
         when "UPDATE HIV STATUS"
 					next if ! self.current_user_activities.include?("hiv status")
@@ -502,10 +502,10 @@ class TaskFlow
 					self.encounter_type = "HIV STATUS"
 					self.url = "/protocol_patients/hiv_status?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?("HIV STATUS")
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
 				when "ASTHMA MEASURE"
 					next if ! self.current_user_activities.include?(tsk.downcase)
@@ -515,23 +515,23 @@ class TaskFlow
 					self.encounter_type = "ASTHMA MEASURE"
 					self.url = "/protocol_patients/asthma_measure?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
 				when "COMPLICATIONS"
 					next if ! self.current_user_activities.include?(tsk.downcase)
           assessment =  Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "COMPLICATIONS", "module")
-
+					
 					next if !assessment.blank?
 					self.encounter_type = "COMPLICATIONS"
 					self.url = "/protocol_patients/complications?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
 				when "TREATMENT"
 					next if ! self.current_user_activities.include?(tsk.downcase)
@@ -541,10 +541,10 @@ class TaskFlow
 					self.encounter_type = "TREATMENT"
 					self.url = "/protocol_patients/treatment?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
 		end
 
@@ -555,7 +555,7 @@ class TaskFlow
 	end
 
   def hypertension_next_task(host = nil, remote_ip = nil)
-
+    
      normal_flow = self.tasks
 
     flow = {}
@@ -620,7 +620,7 @@ class TaskFlow
 		if observation.match(/Refer to HTC:  Yes/i)
 						self.encounter_type = "HIV STATUS"
 						self.url = "/protocol_patients/hiv_status?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
+						return self
 		 end
 
 			my_activities = self.current_user_activities.map(&:upcase)
@@ -644,12 +644,12 @@ class TaskFlow
 
 					next if !vitals.blank?
 					self.encounter_type = 'VITALS'
-					self.url = "http://localhost:3000/vitals?destination=http://#{host}/patients/processvitals/1?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
-					if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+					self.url = "/protocol_patients/vitals?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+          if ! my_activities.include?(tsk)
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
 				when "FAMILY HISTORY"
 					next if ! self.current_user_activities.include?('medical history')
@@ -664,10 +664,9 @@ class TaskFlow
 					self.url = "/protocol_patients/family_history?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 
 					if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
 
 				when "SOCIAL HISTORY"
 					next if ! self.current_user_activities.include?(tsk.downcase)
@@ -681,10 +680,10 @@ class TaskFlow
 					self.encounter_type = 'SOCIAL HISTORY'
 					self.url = "/protocol_patients/social_history?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
         when "GENERAL HEALTH"
 					next if ! self.current_user_activities.include?(tsk.downcase)
@@ -698,10 +697,10 @@ class TaskFlow
 					self.encounter_type = 'GENERAL HEALTH'
 					self.url = "/protocol_patients/general_health?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 				  if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
         when "UPDATE HIV STATUS"
 					next if ! self.current_user_activities.include?("hiv status")
@@ -719,10 +718,10 @@ class TaskFlow
 					self.encounter_type = "HIV STATUS"
 					self.url = "/protocol_patients/hiv_status?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?("HIV STATUS")
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
-						return self
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
 					end
+						return self
+					
 
         when "LAB RESULTS"
 					self.patient.encounters.each do | enc |
@@ -734,10 +733,10 @@ class TaskFlow
 					self.encounter_type = "LAB RESULTS"
 					self.url = "/protocol_patients/lab_results?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
-						return self
-					end
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
+					return self
+					
 
 				when "COMPLICATIONS"
 					next if ! self.current_user_activities.include?(tsk.downcase)
@@ -747,10 +746,10 @@ class TaskFlow
 					self.encounter_type = "COMPLICATIONS"
 					self.url = "/protocol_patients/complications?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
 				when "TREATMENT"
 					next if ! self.current_user_activities.include?(tsk.downcase)
@@ -760,10 +759,10 @@ class TaskFlow
 					self.encounter_type = "TREATMENT"
 					self.url = "/protocol_patients/treatment?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
 		end
 
@@ -783,7 +782,7 @@ class TaskFlow
     (0..(normal_flow.length-1)).each{|n|
       flow[normal_flow[n].downcase] = n+1
     }
-
+		
     if self.current_user_activities.blank?
 
       self.encounter_type = "NO TASKS SELECTED"
@@ -795,18 +794,18 @@ class TaskFlow
 
     @patient = self.patient
 
-    # tasks[task] = [weight, path, encounter_type, concept_id, exception_concept_id,
+    # tasks[task] = [weight, path, encounter_type, concept_id, exception_concept_id, 
     #     scope, drug_concept_id, special_field_or_encounter_present, next_if_NOT_user_does_not_have_this_activity]
 
     tasks = {}
 
     normal_flow.each{|tsk|
-
+      
       tasks[tsk.downcase] = [flow[tsk.downcase], "/protocol_patients/#{tsk.downcase.gsub(/\s/, "_")
-          }?patient_id=#{self.patient.id}&user_id=#{self.user.id}", "#{tsk.upcase}",
+          }?patient_id=#{self.patient.id}&user_id=#{self.user.id}", "#{tsk.upcase}", 
         "#{self.task_scopes[tsk.downcase][:concept]}", "#{self.task_scopes[tsk.downcase][:except_concept]}",
         "#{self.task_scopes[tsk.downcase][:scope]}", "#{self.task_scopes[tsk.downcase][:drug_concept]}",
-        "#{self.task_scopes[tsk.downcase][:special_field]}",
+        "#{self.task_scopes[tsk.downcase][:special_field]}", 
         (self.current_user_activities.include?(tsk.downcase))
       ]
 
@@ -819,14 +818,14 @@ class TaskFlow
     }
 
     self.task_list = tasks
-
+		
     sorted_tasks = sorted_tasks.sort
 
-
+    
 
       # next if tasks[tsk][8] == false
       # If user does not have this activity, goto the patient dashboard
-
+			
 			encounters =  [
                       'CLINIC VISIT','VITALS','FAMILY HISTORY','SOCIAL HISTORY','GENERAL HEALTH',
 											'UPDATE HIV STATUS','LAB RESULTS','COMPLICATIONS','TREATMENT',
@@ -847,13 +846,13 @@ class TaskFlow
 		 if observation.match(/Refer to HTC:  Yes/i)
 						self.encounter_type = "HIV STATUS"
 						self.url = "/protocol_patients/hiv_status?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
+						return self
 		 end
 
 			my_activities = self.current_user_activities.map(&:upcase)
-
+			
 			encounters.each do |tsk|
-
+			
 			found = false
 			case tsk
 				when "CLINIC VISIT"
@@ -861,7 +860,7 @@ class TaskFlow
           visit = Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "DIABETES HYPERTENSION INITIAL VISIT", "module")
 
 					next if !visit.blank?
-
+					
 					self.encounter_type = 'CLINIC VISIT'
 					self.url = "/protocol_patients/clinic_visit?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					return self
@@ -869,16 +868,17 @@ class TaskFlow
         when "VITALS"
 					next if ! self.current_user_activities.include?(tsk.downcase)
            vitals = Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "VITALS", "module")
-
+          
 
 					next if !vitals.blank?
 					self.encounter_type = 'VITALS'
-					self.url = "http://localhost:3000/vitals?destination=http://#{host}/patients/processvitals/1?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
-					if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+          self.url = "/protocol_patients/vitals?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+
+          if ! my_activities.include?(tsk)
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
 				when "FAMILY HISTORY"
 					next if ! self.current_user_activities.include?('medical history')
@@ -891,12 +891,12 @@ class TaskFlow
 					next if !history.blank?
 					self.encounter_type = 'FAMILY MEDICAL HISTORY'
 					self.url = "/protocol_patients/family_history?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
-
+					
 					if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
 				when "SOCIAL HISTORY"
 					next if ! self.current_user_activities.include?(tsk.downcase)
@@ -905,16 +905,16 @@ class TaskFlow
 					end
 					next if found == true
           history = Vitals.done_already(self.patient.id, 10, self.current_date.to_date.to_date, "SOCIAL HISTORY", "module")
-
+          
 
 					next if !history.blank?
 					self.encounter_type = 'SOCIAL HISTORY'
 					self.url = "/protocol_patients/social_history?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
 				when "GENERAL HEALTH"
 					next if ! self.current_user_activities.include?(tsk.downcase)
@@ -928,10 +928,10 @@ class TaskFlow
 					self.encounter_type = 'GENERAL HEALTH'
 					self.url = "/protocol_patients/general_health?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 				  if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
         when "UPDATE HIV STATUS"
 					next if ! self.current_user_activities.include?('hiv status')
@@ -949,10 +949,10 @@ class TaskFlow
 					self.encounter_type = "HIV STATUS"
 					self.url = "/protocol_patients/hiv_status?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?("HIV STATUS")
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
 				when "ASSESSMENT"
 					next if ! self.current_user_activities.include?(tsk.downcase)
@@ -961,10 +961,10 @@ class TaskFlow
 					self.encounter_type = "ASSESSMENT"
 					self.url = "/protocol_patients/assessment?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
 				when "COMPLICATIONS"
 					next if ! self.current_user_activities.include?(tsk.downcase)
@@ -975,10 +975,10 @@ class TaskFlow
 					self.encounter_type = "COMPLICATIONS"
 					self.url = "/protocol_patients/complications?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
 				when "TREATMENT"
 					next if ! self.current_user_activities.include?(tsk.downcase)
@@ -988,10 +988,10 @@ class TaskFlow
 					self.encounter_type = "TREATMENT"
 					self.url = "/protocol_patients/treatment?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true"
+          end
 						return self
-					end
+					
 
 				when "LAB RESULTS"
 					self.patient.encounters.each do | enc |
@@ -1003,12 +1003,12 @@ class TaskFlow
 					self.encounter_type = "LAB RESULTS"
 					self.url = "/protocol_patients/lab_results?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
 					if ! my_activities.include?(tsk)
-						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
-					else
+						self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" 
+          end
 						return self
-					end
+					
 			end
-
+					
 		end
 
 		self.encounter_type = 'NONE'
@@ -1016,15 +1016,15 @@ class TaskFlow
 		return self
 
 =begin
-      if tasks[tsk][8] == false
+      if tasks[tsk][8] == false        
         self.encounter_type = tsk
         self.url = "/patients/show/#{self.patient.id}?user_id=#{self.user.id}"
         return self
       end
-
+			
       case tasks[tsk][2]
       when "VITALS"
-
+				
         checked_already = false
 
         if !tasks[tsk][3].blank? && checked_already == false    # Check for presence of specific concept_id
