@@ -22,6 +22,18 @@
             width : 98%;
             margin-left : -49%;
 }
+.middles{
+   text-align:left;
+   border-width:0px 0px 0px 1px;
+}
+.bottoms{
+   text-align:left;
+   border-width:0px 0px 1px 1px;
+}
+.tops{
+  text-align:left;
+  border-width:1px 0px 0px 1px;
+}
 #description{
           color:#777;
           position:absolute;
@@ -216,48 +228,48 @@
 
                   <td  style="text-align:left;border-width:1px 0px 0px 1px">Patient Outcome<br>at end of quarter</td>
                   <td style="text-align:left;border-width:1px 0px 0px 1px">Attended the clinic</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td class="tops"></td>
+                  <td><%= @attending %></td>
 
                 </tr>
                  <tr >
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Did not attend in quarter</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                   <td class="middles"></td>
+                  <td><%= @not_attend_ever %></td>>
 
                 </tr>
                 <tr >
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Stopped treatment</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td class="middles"></td>
+                  <td><%= @stopped_treatment_ever %></td>
 
                 </tr>
                 <tr >
 
                   <td  style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Transferred out to another facility</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td class="middles"></td>
+                  <td><%= @transfer_out_ever %></td>
 
                 </tr>
                 <tr >
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Died</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td class="middles"></td>
+                  <td><%= @dead_ever %></td>
 
                 </tr>
                 <tr >
 
                   <td style="text-align:left;border-width:0px 0px 1px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 1px 1px">Lost to follow-up</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td class="bottoms"></td>
+                  <td><%= @lost_followup_ever %></td>
 
                 </tr>
                 <tr class = 'row_break'>
@@ -270,24 +282,24 @@
 
                   <td  style="text-align:left;border-width:1px 0px 0px 1px">Co-morbid conditions</td>
                   <td style="text-align:left;border-width:1px 0px 0px 1px">Obese(BMI >= 30)</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><%= @bmi %></td>
+                  <td><%= @bmi_ever %></td>
 
                 </tr>
                  <tr >
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Current Smoker</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><%= @smoking %></td>
+                  <td><%= @smoking_ever %></td>
 
                 </tr>
                 <tr >
 
                   <td style="text-align:left;border-width:0px 0px 1px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 1px 1px">Drinks Alcohol</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><%= @alcohol %></td>
+                  <td><%= @alcohol_ever %></td>
 
                 </tr>
                 <tr class = 'row_break'>
@@ -300,56 +312,56 @@
 
                   <td  style="text-align:left;border-width:1px 0px 0px 1px">Measure of disease control</td>
                   <td style="text-align:left;border-width:1px 0px 0px 1px">Blood pressure measured</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><%= @bp_measured %></td>
+                  <td><%= @bp_measured_ever %></td>
 
                 </tr>
                  <tr >
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Blood pressure controlled (BP <= 140/90)</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><%= @low_bp %></td>
+                  <td><%= @low_bp_ever %></td>
 
                 </tr>
                 <tr >
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Blood glucose measured</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><%= @glucose_measured %></td>
+                  <td><%= @glucose_ever_measured %></td>
 
                 </tr>
                  <tr >
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Blood glucose controlled (FBG < 7.0mmol/l)</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><%= @glucose_controlled %></td>
+                  <td><%= @glucose_ever_controlled %></td>
 
                 </tr>
                  <tr >
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">No asthma attack in last three month</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><%= @no_asthma %></td>
+                  <td><%= @no_asthma_ever %></td>
 
                 </tr>
                  <tr >
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">No seizure in last three months</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><%= @no_epilepsy %></td>
+                  <td><%=  @no_epilepsy_ever %></td>
 
                 </tr>
                  <tr >
 
                   <td style="text-align:left;border-width:0px 0px 1px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 1px 1px">All disease parameters under control</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><%= @controlled %></td>
+                  <td><%= @controlled_ever %></td>
 
                 </tr>
                 
@@ -363,40 +375,40 @@
 
                   <td  style="text-align:left;border-width:1px 0px 0px 1px">Disease Complications</td>
                   <td style="text-align:left;border-width:1px 0px 0px 1px">Stroke</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><%= @stroke %></td>
+                  <td><%= @stroke_ever %></td>
 
                 </tr>
                  <tr >
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Myocardial infarction</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><%= @mi %></td>
+                  <td><%= @mi_ever %></td>
 
                 </tr>
                 <tr >
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Cardiovascular disease</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><%= @cardiovascular %></td>
+                  <td><%= @cardiovascular_ever %></td>
 
                 </tr>
                  <tr >
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Blindness</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><%= @blind %></td>
+                  <td><%= @blind_ever %></td>
 
                 </tr>
                  <tr >
 
                   <td style="text-align:left;border-width:0px 0px 1px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 1px 1px">Burns</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><%= @burns %></td>
+                  <td><%= @burns_ever %></td>
 
                 </tr>
 
@@ -415,48 +427,48 @@
 
                   <td  style="text-align:left;border-width:1px 0px 0px 1px">Anti-diabetic</td>
                   <td style="text-align:left;border-width:1px 0px 0px 1px">Metformin</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><%= @metformin %></td>
+                  <td><%= @metformin_ever %></td>
 
                 </tr>
                  <tr >
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Glibenclamide</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><%= @glibe %></td>
+                  <td><%= @glibe_ever %></td>
 
                 </tr>
                 <tr >
 
                   <td style="text-align:left;border-width:0px 0px 1px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 1px 1px">Insulin</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><%= @insulin %></td>
+                  <td><%= @insulin_ever %></td>
 
                 </tr>
                  <tr >
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Anti-hypertensive</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Hydrochlorothiazide</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><%= @hct %></td>
+                  <td><%= @hct_ever %></td>
 
                 </tr>
                  <tr >
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Amlodipine</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><%= @amlodipine%></td>
+                  <td><%= @amlodipine_ever %></td>
 
                 </tr>
                  <tr >
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Captopril</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><%= @captopril %></td>
+                  <td><%= @captopril_ever %></td>
 
                 </tr>
                  <tr >
@@ -471,48 +483,48 @@
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Anti-asthma</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Salbutamol Inhaler</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><%= @salbutamol %></td>
+                  <td><%= @salbutamol_ever %></td>
 
                 </tr>
                 <tr >
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Steroid Inhaler</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><%= @beclomethasone %></td>
+                  <td><%= @beclomethasone_ever %></td>
 
                 </tr>
                  <tr >
 
                    <td style="text-align:left;border-width:0px 0px 1px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 1px 1px">Other</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><%= @other_asthma %></td>
+                  <td><%= @other_asthma_ever %></td>
 
                 </tr>
                  <tr >
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Anti-epilepsy</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Phernobabitone</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><%= @phenobarbitone %></td>
+                  <td><%= @phenobarbitone_ever %></td>
 
                 </tr>
                  <tr >
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Phenytoin</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><%= @phenytoin %></td>
+                  <td><%= @phenytoin_ever %></td>
 
                 </tr>
                 <tr >
 
                   <td style="text-align:left;border-width:0px 0px 1px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 1px 1px">Carbamazepine</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
+                  <td><%= @carbamazepine %></td>
+                  <td><%= @carbamazepine_ever %></td>
 
                 </tr>
                 <tr class = 'row_break'>
