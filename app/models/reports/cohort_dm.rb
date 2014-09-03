@@ -263,8 +263,10 @@ class Reports::CohortDm
                                   WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) 
                                   #{categorise}
                                   AND o.obs_datetime <= '#{@end_date}'
-                                  AND (o.concept_id = #{as_concept}
+                                  AND ( (o.concept_id = #{as_concept}
                                   AND o.value_coded = #{as_answer})
+                                  OR   orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+                                  concept_set  = '#{@asthma_id}'))
                                   GROUP BY patient_id")
 
     elsif type.upcase == "EPILEPSY"
@@ -278,8 +280,10 @@ class Reports::CohortDm
                                   WHERE patient.voided = 0
                                   AND o.voided = 0 AND DATE(o.obs_datetime) <= '#{@end_date}'
                                   AND patient.patient_id IN (#{ids})
-                                  #{categorise} AND (o.concept_id = #{ep_concept}
+                                  #{categorise} AND ((o.concept_id = #{ep_concept}
                                   AND o.value_coded = #{ep_answer})
+                                  OR   orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+                                  concept_set  = '#{@epilepsy_id}'))
                                   GROUP BY patient_id")
 
     elsif type.upcase == "DM HT"
@@ -306,6 +310,41 @@ class Reports::CohortDm
       
     end 
     return @orders
+  end
+
+  def epilepsy_asthma(ids, type)
+    start_date = @end_date.to_date -  3.months
+   if type.upcase == "ASTHMA"
+
+      as_concept = ConceptName.find_by_name("ASTHMA").concept_id
+      as_answer = ConceptName.find_by_name("yes").concept_id
+      @orders = Order.find_by_sql("SELECT DISTINCT(orders.patient_id) FROM orders
+                                  INNER JOIN obs o ON o.person_id = orders.patient_id
+                                  INNER JOIN person p ON p.person_id = orders.patient_id
+                                  INNER JOIN patient ON patient.patient_id = orders.patient_id \
+                                  WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) 
+                                  AND DATE(o.obs_datetime) > '#{start_date}'
+                                  AND o.obs_datetime <= '#{@end_date}'
+                                  AND (o.concept_id = #{as_concept}
+                                  AND o.value_coded = #{as_answer})
+                                  GROUP BY patient_id")
+
+    elsif type.upcase == "EPILEPSY"
+
+       ep_concept = ConceptName.find_by_name("Confirm diagnosis of epilepsy").concept_id
+       ep_answer = ConceptName.find_by_name("yes").concept_id
+      @orders = Order.find_by_sql("SELECT DISTINCT(orders.patient_id) FROM orders
+                                  INNER JOIN obs o ON o.person_id = orders.patient_id
+                                  INNER JOIN person p ON p.person_id = orders.patient_id
+                                  INNER JOIN patient ON patient.patient_id = orders.patient_id \
+                                  WHERE patient.voided = 0
+                                  AND o.voided = 0 AND DATE(o.obs_datetime) <= '#{@end_date}'
+                                  AND patient.patient_id IN (#{ids})
+                                  AND DATE(o.obs_datetime) > '#{start_date}'
+                                  AND (o.concept_id = #{ep_concept}
+                                  AND o.value_coded = #{ep_answer})
+                                  GROUP BY patient_id")
+  end
   end
 
   def total_children_registered(ids, sex=nil, min=nil, max=nil, start=nil )
@@ -1518,7 +1557,7 @@ class Reports::CohortDm
                 INNER JOIN concept_name c ON c.concept_id = pw.concept_id
                 WHERE ps.start_date <= '#{@end_date}'
                 #{categorise} AND p.patient_id IN (#{ids})
-                AND c.name = 'PATIENT TRANSFERRED OUT'").length rescue 0
+                AND c.name = 'PATIENT TRANSFERRED OUT'").length  rescue 0
 
   end
 
@@ -1648,7 +1687,7 @@ class Reports::CohortDm
                                       GROUP BY patient_id").length rescue 0
   end
 
-  def not_attending_ever(ids, sex)
+  def not_attending_ever(ids, sex=nil)
     if ! sex.blank?
       patient_initial = sex.split(//).first.upcase
       categorise = "AND (UCASE(pe.gender) = '#{sex.upcase}'
@@ -1669,7 +1708,7 @@ class Reports::CohortDm
                                       GROUP BY patient_id").length rescue 0
   end
 
-  def lost_followup_ever(ids, sex)
+  def lost_followup_ever(ids, sex=nil)
     if ! sex.blank?
       patient_initial = sex.split(//).first.upcase
       categorise = "AND (UCASE(pe.gender) = '#{sex.upcase}'
@@ -1689,7 +1728,7 @@ class Reports::CohortDm
                                       GROUP BY patient_id").length rescue 0
   end
 
-  def attending(ids, sex)
+  def attending(ids, sex=nil)
     if ! sex.blank?
       patient_initial = sex.split(//).first.upcase
       categorise = "AND (UCASE(pe.gender) = '#{sex.upcase}'
@@ -1984,23 +2023,37 @@ class Reports::CohortDm
               AND p.patient_id IN (#{ids})
               AND pe.gender LIKE '#{sex}%'").length rescue 0
   end
+  
+  def patient_ids_on_drugs(ids,drug)
+	  @orders = Patient.find_by_sql("
+              SELECT DISTINCT(p.patient_id) FROM patient p
+              INNER JOIN person pe ON pe.person_id = p.patient_id
+              INNER JOIN encounter e ON e.patient_id = p.patient_id
+              INNER JOIN orders o ON o.encounter_id = e.encounter_id
+              INNER JOIN concept_name c ON c.concept_id = o.concept_id
+              WHERE c.name LIKE '%#{drug}%'
+              AND e.voided = 0
+              AND p.date_created <= '" + @end_date + "'
+              AND p.patient_id IN (#{ids})")
+  end
 
   def decrease_in_bp(ids, sex, reason=nil)
     total = 0
     Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
       WHERE person_id IN (#{ids})
-      AND gender LIKE '#{sex}%'").each { |patient|
+      AND gender LIKE '#{sex}%'").each { |patient| 
       if reason == "compare"
         total += 1 if compare_bp(patient.person_id.to_i) == true
+      elsif reason == "measured"
+        total += 1 if measured_bp(patient.person_id.to_i) == true
       else
         total += 1 if low_bp(patient.person_id.to_i) == true
       end
-    } rescue []
-   
+    }rescue []
     return total
   end
 
-  def controlled(ids, sex)
+  def controlled(ids, sex=nil)
     total = 0
     Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
       WHERE person_id IN (#{ids})
@@ -2016,7 +2069,7 @@ class Reports::CohortDm
     return total
   end
   
-  def epilepsy_ever(ids, sex)
+  def epilepsy_ever(ids, sex=nil)
     total = 0
     Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
       WHERE person_id IN (#{ids})
@@ -2028,7 +2081,7 @@ class Reports::CohortDm
     return total
   end
 
-  def burns_ever(ids, sex)
+  def burns_ever(ids, sex=nil)
     total = 0
     Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
       WHERE person_id IN (#{ids})
@@ -2040,7 +2093,7 @@ class Reports::CohortDm
     return total
   end
 
-  def comp_amputation_ever(ids, sex)
+  def comp_amputation_ever(ids, sex=nil)
     total = 0
     Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
       WHERE person_id IN (#{ids})
@@ -2051,7 +2104,7 @@ class Reports::CohortDm
 
     return total
   end
-  def comp_mi_ever(ids, sex)
+  def comp_mi_ever(ids, sex=nil)
     total = 0
     Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
       WHERE person_id IN (#{ids})
@@ -2063,7 +2116,7 @@ class Reports::CohortDm
     return total
   end
 
-  def cardiovascular_ever(ids, sex)
+  def cardiovascular_ever(ids, sex=nil)
     total = 0
     Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
       WHERE person_id IN (#{ids})
@@ -2075,7 +2128,7 @@ class Reports::CohortDm
     return total
   end
 
-  def blind_ever(ids, sex)
+  def blind_ever(ids, sex=nil)
     total = 0
     Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
       WHERE person_id IN (#{ids})
@@ -2103,7 +2156,7 @@ class Reports::CohortDm
     
   end
 
-  def asthma_ever(ids, sex)
+  def asthma_ever(ids, sex=nil)
     total = 0
     asthma_answer = ConceptName.find_by_name("yes").concept_id
     Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
@@ -2118,12 +2171,18 @@ class Reports::CohortDm
     return total
   end
 
-  def decrease_in_sugar(ids, sex)
+  def decrease_in_sugar(ids, sex=nil, reason=nil)
     total = 0
     Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
       WHERE person_id IN (#{ids})
       AND gender LIKE '#{sex}%'").each { |patient|
-      total += 1 if compare_sugar(patient.person_id.to_i) == true
+      if reason == "controlled"
+        total += 1 if sugar_below_threshold(patient.person_id.to_i) == true
+      elsif reason == "measured"
+        total += 1 if sugar_measured(patient.person_id.to_i) == true
+      else
+        total += 1 if compare_sugar(patient.person_id.to_i) == true
+      end
       
     } rescue []
    
@@ -2145,6 +2204,64 @@ class Reports::CohortDm
                     AND DATE(obs_datetime) < '#{sys_obs.first.obs_datetime.to_date}' AND voided = 0
                     ORDER BY  obs_datetime DESC, date_created DESC").first.to_s.split(':')[1].to_i rescue 0
       return true if first_sys < previous_obs
+
+    end
+    return false
+  end
+
+    def sugar_measured(patient_id)
+    fasting = ConceptName.find_by_sql("select concept_id from concept_name where name = 'Fasting' and voided = 0").first.concept_id
+    random = ConceptName.find_by_sql("select concept_id from concept_name where name = 'Random' and voided = 0").first.concept_id
+
+    sys_obs = Observation.find_by_sql("SELECT * from obs where concept_id IN ('#{fasting}, #{random}') AND person_id = #{patient_id}
+                    AND DATE(obs_datetime) <= '#{@end_date}' AND voided = 0
+                    ORDER BY  obs_datetime DESC, date_created DESC") rescue []
+
+    if sys_obs.length > 0
+      first_sys = sys_obs.first.to_s.split(':')[1].to_i
+      #raise sys_obs.first.obs_datetime.to_yaml
+      previous_obs = Observation.find_by_sql("SELECT * from obs where concept_id IN ('#{fasting}, #{random}') AND person_id = #{patient_id}
+                    AND DATE(obs_datetime) < '#{sys_obs.first.obs_datetime.to_date}' AND voided = 0
+                    ORDER BY  obs_datetime DESC, date_created DESC") rescue []
+      return true if previous_obs.length > 0
+
+    end
+    return false
+  end
+
+    def sugar_below_threshold(patient_id)
+    fasting = ConceptName.find_by_sql("select concept_id from concept_name where name = 'Fasting' and voided = 0").first.concept_id
+    random = ConceptName.find_by_sql("select concept_id from concept_name where name = 'Random' and voided = 0").first.concept_id
+
+    sys_obs = Observation.find_by_sql("SELECT * from obs where concept_id IN ('#{fasting}, #{random}') AND person_id = #{patient_id}
+                    AND DATE(obs_datetime) <= '#{@end_date}' AND voided = 0
+                    ORDER BY  obs_datetime DESC, date_created DESC") rescue []
+
+    if sys_obs.length > 1
+      first_sys = sys_obs.first.to_s.split(':')[1].to_i
+      #raise sys_obs.first.obs_datetime.to_yaml
+      previous_obs = Observation.find_by_sql("SELECT * from obs where concept_id IN ('#{fasting}, #{random}') AND person_id = #{patient_id}
+                    AND DATE(obs_datetime) < '#{sys_obs.first.obs_datetime.to_date}' AND voided = 0
+                    ORDER BY  obs_datetime DESC, date_created DESC").first.to_s.split(':')[1].to_i rescue 0
+       return true if ((previous_obs / 18) < 7)
+    end
+    return false
+  end
+
+    def measured_bp(patient_id)
+    sys_concept = ConceptName.find_by_sql("select concept_id from concept_name where name = 'Systolic blood pressure' and voided = 0").first.concept_id
+    dys_concept = ConceptName.find_by_sql("select concept_id from concept_name where name = 'Diastolic blood pressure' and voided = 0").first.concept_id
+
+    sys_obs = Observation.find_by_sql("SELECT * from obs where concept_id = '#{sys_concept}' AND person_id = #{patient_id}
+                    AND DATE(obs_datetime) <= '#{@end_date}' AND voided = 0
+                    ORDER BY  obs_datetime DESC, date_created DESC") rescue []
+    
+    if sys_obs.length >= 1
+      dys_obs = Observation.find_by_sql("SELECT * from obs where concept_id = '#{dys_concept}' AND person_id = #{patient_id}
+                    AND DATE(obs_datetime) = '#{sys_obs.first.obs_datetime.to_date}' AND voided = 0
+                    ORDER BY  obs_datetime DESC, date_created DESC") rescue []
+      
+      return true if dys_obs.length >= 1
 
     end
     return false
