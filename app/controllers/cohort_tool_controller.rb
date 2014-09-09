@@ -1029,12 +1029,14 @@ class CohortToolController < ApplicationController
     @tb_after_diabetes = report.tb_after_diabetes(ids) rescue 0
     @tb_before_diabetes_ever = report.tb_before_diabetes_ever(ids_ever) rescue 0
     @tb_before_diabetes = report.tb_before_diabetes(ids) rescue 0
-    @tb_unknown_ever = report.tb_unkown_ever(ids_ever) rescue 0
-    @tb_unknown = report.tb_unkown(ids) rescue 0
-    @no_tb_ever = report.no_tb_ever(ids_ever) rescue 0
-    @no_tb = report.no_tb(ids) rescue 0
+    @tb_unknown_ever = report.tb_unknown_ever(ids_ever)
+    @tb_unknown =  report.tb_unknown(ids)
+ 
+    #@no_tb = report.no_tb(ids) rescue 0
     @tb_ever = report.tb_ever(ids_ever) rescue 0
     @tb = report.tb(ids) rescue 0
+    @no_tb_ever = @tb_known_ever -  @tb_ever #report.no_tb_ever(ids_ever) rescue 0
+    @no_tb = @tb_known -  @tb
     @reactive_not_on_art_ever = report.reactive_not_on_art_ever(ids_ever) rescue 0
     @reactive_not_on_art = report.reactive_not_on_art(ids) rescue 0
     @reactive_on_art_ever = report.reactive_on_art_ever(ids_ever) rescue 0
