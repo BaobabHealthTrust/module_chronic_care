@@ -1305,27 +1305,28 @@ class Reports::CohortDm
   end
 
   def tb_known_ever(ids)
-    @orders = Order.find_by_sql("SELECT DISTINCT person_id 
-                                 FROM obs LEFT OUTER JOIN patient ON  patient.patient_id = obs.person_id
-                                 WHERE concept_id = (SELECT concept_id
-                                                      FROM concept_name WHERE name = 'HAVE YOU EVER HAD TB?')
-                                 AND patient.voided = 0 AND patient.patient_id IN (#{ids})
-                                 AND obs.voided = 0
-                                 AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "' ").length rescue 0
+    tb = Order.find_by_sql("SELECT DISTINCT person_id FROM obs LEFT OUTER JOIN patient ON \
+                              patient.patient_id = obs.person_id WHERE concept_id = (SELECT concept_id \
+                              FROM concept_name WHERE name = 'HAVE YOU EVER HAD TB?')").collect{|o| o.person_id}.compact.delete_if{|x| x == ""}.join(", ")
+
+    @orders = Order.find_by_sql("SELECT DISTINCT patient_id FROM patient WHERE  patient_id IN \
+                                (" + (tb.length > 0 ? tb : "0") +  ") AND patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
+                                        DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'").length rescue 0
   end
 
   def tb_known(ids)
-    @orders = Order.find_by_sql("SELECT DISTINCT person_id FROM obs LEFT OUTER JOIN patient ON \
-                              patient.patient_id = obs.person_id 
-                              WHERE concept_id = (SELECT concept_id FROM concept_name
-                                                  WHERE name = 'HAVE YOU EVER HAD TB?')
-                              AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') >= '" + @start_date +"'
-                              AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'
-                              AND patient.voided = 0 AND patient.patient_id IN (#{ids})
-                              AND obs.voided = 0 ").length rescue 0
+
+   tb = Order.find_by_sql("SELECT DISTINCT person_id FROM obs LEFT OUTER JOIN patient ON \
+                              patient.patient_id = obs.person_id WHERE concept_id = (SELECT concept_id \
+                              FROM concept_name WHERE name = 'HAVE YOU EVER HAD TB?')").collect{|o| o.person_id}.compact.delete_if{|x| x == ""}.join(", ")
+
+    @orders = Order.find_by_sql("SELECT DISTINCT patient_id FROM patient WHERE  patient_id IN \
+                                (" + (tb.length > 0 ? tb : "0") +  ") AND patient.voided = 0 AND patient.patient_id IN (#{ids})
+                                        AND patient.date_created >= '#{@start_date}' AND \
+                                        DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'").length rescue 0
   end
 
-  def tb_unkown_ever(ids)
+  def tb_unknown_ever(ids)
     
     tb = Order.find_by_sql("SELECT DISTINCT person_id FROM obs LEFT OUTER JOIN patient ON \
                               patient.patient_id = obs.person_id WHERE concept_id = (SELECT concept_id \
@@ -1336,8 +1337,17 @@ class Reports::CohortDm
                                         DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'").length rescue 0
   end
 
-  def tb_unkown(ids)
+  def tb_unknown(ids)
 
+   tb = Order.find_by_sql("SELECT DISTINCT person_id FROM obs LEFT OUTER JOIN patient ON \
+                              patient.patient_id = obs.person_id WHERE concept_id = (SELECT concept_id \
+                              FROM concept_name WHERE name = 'HAVE YOU EVER HAD TB?')").collect{|o| o.person_id}.compact.delete_if{|x| x == ""}.join(", ")
+
+    @orders = Order.find_by_sql("SELECT DISTINCT patient_id FROM patient WHERE NOT patient_id IN \
+                                (" + (tb.length > 0 ? tb : "0") +  ") AND patient.voided = 0 AND patient.patient_id IN (#{ids})
+                                        AND patient.date_created >= '#{@start_date}' AND \
+                                        DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'").length rescue 0
+=begin
     tb = Order.find_by_sql("SELECT DISTINCT patient_id FROM patient
                         WHERE patient_id NOT IN (
                         SELECT DISTINCT person_id FROM obs LEFT OUTER JOIN patient ON
@@ -1345,10 +1355,11 @@ class Reports::CohortDm
                         FROM concept_name WHERE name = 'HAVE YOU EVER HAD TB?')
                         AND obs.voided = 0
                         AND patient.voided = 0
-                        AND DATE(patient.date_created) >= '#{@start_date}' AND DATE(patient.date_created) <= '#{@end_date}')
+                        AND patient.date_created >= '#{@start_date}' AND patient.date_created <= '#{@end_date}')
                         AND patient.voided = 0
                         AND patient.patient_id IN (#{ids})
-                        AND DATE(patient.date_created) >= '#{@start_date}' AND DATE(patient.date_created) <= '#{@end_date}'").length rescue 0
+                        AND patient.date_created >= '#{@start_date}' AND patient.date_created <= '#{@end_date}'").length #rescue 0
+=end
   end
 
   # HIV Status: Reactive Not on ART
