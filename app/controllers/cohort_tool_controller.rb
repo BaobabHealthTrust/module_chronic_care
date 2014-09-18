@@ -776,11 +776,11 @@ class CohortToolController < ApplicationController
     captopril = report.patient_ids_on_drugs(ids, 'captopril')
     captopril_ever = report.patient_ids_on_drugs(ids_ever, 'captopril')
 
-    @no_asthma_ever = @total_ever_registered  -  asthma_ever.uniq.length
-    @no_asthma = @total_registered - asthma.uniq.length
+    @no_asthma_ever = @asthma_ever.uniq.length  -  asthma_ever.uniq.length
+    @no_asthma = @asthma.uniq.length - asthma.uniq.length
 
-    @no_epilepsy_ever = @total_ever_registered  -  epilepsy_ever.uniq.length
-    @no_epilepsy = @total_registered - epilepsy.uniq.length
+    @no_epilepsy_ever = @epilepsy_ever.uniq.length  -  epilepsy_ever.uniq.length
+    @no_epilepsy = @epilepsy.uniq.length - epilepsy.uniq.length
 
     @stroke = report.stroke(ids) rescue 0
     @stroke_ever = report.stroke_ever(ids_ever) rescue 0

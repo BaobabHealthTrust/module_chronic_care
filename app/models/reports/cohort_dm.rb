@@ -146,79 +146,68 @@ class Reports::CohortDm
     #encounter = EncounterType.find_by_name("Vitals").id
     if type.upcase == "HT"
       #concept = ConceptName.find_by_name("cardiovascular system diagnosis").concept_id
-      @orders = Order.find_by_sql("SELECT d.patient_id FROM start_date d
-                                    INNER JOIN person p ON p.person_id = d.patient_id
-                                    WHERE DATE(d.date_enrolled) >= '#{@start_date}'
-                                     AND DATE(d.date_enrolled) <= '#{@end_date}'
-                                     AND d.patient_id IN (#{ids})
-                                     AND d.patient_id NOT IN (SELECT s.patient_id FROM dm_start_date s
-                                                           WHERE s.date_enrolled <= '#{@end_date}'
-                                                           AND s.date_enrolled >= '#{@start_date}')
-                                     #{categorise} ")
+      @orders = Order.find_by_sql("SELECT DISTINCT(orders.patient_id) FROM orders
+                                      INNER JOIN person p ON p.person_id = orders.patient_id
+                                      INNER JOIN patient ON patient.patient_id = orders.patient_id \
+                                      WHERE patient.voided = 0 AND patient.patient_id IN (#{ids})
+                                      #{categorise}
+                                      AND orders.start_date <= '#{@end_date}'
+																			AND orders.patient_id IN (SELECT DISTINCT(orders.patient_id) FROM orders WHERE orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+																			concept_set = #{@hypertensition_medication_id}) AND orders.start_date <= '#{@end_date}')
+                                      AND orders.patient_id NOT IN (SELECT DISTINCT(orders.patient_id) FROM orders WHERE orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+																			concept_set IN (#{@asthma_id},#{@diabetes_id}, #{@epilepsy_id})) AND orders.start_date <= '#{@end_date}')")
 
     elsif type.upcase == "DM"
       #answer = ConceptName.find_by_name("yes").concept_id
       #ht_concept = ConceptName.find_by_name("cardiovascular system diagnosis").concept_id
      # concept = ConceptName.find_by_name("Patient has Diabetes").concept_id
 
-      @orders = Order.find_by_sql("SELECT d.patient_id FROM dm_start_date d
-                                    INNER JOIN person p ON p.person_id = d.patient_id
-                                    WHERE DATE(d.date_enrolled) >= '#{@start_date}'
-                                     AND DATE(d.date_enrolled) <= '#{@end_date}'
-                                     AND d.patient_id IN (#{ids})
-                                     AND d.patient_id NOT IN (SELECT s.patient_id FROM start_date s
-                                                           WHERE s.date_enrolled <= '#{@end_date}'
-                                                           AND s.date_enrolled >= '#{@start_date}')
-                                     #{categorise} ")
-    elsif type.upcase == "ASTHMA"
-      as_concept = ConceptName.find_by_name("ASTHMA").concept_id
-      as_answer = ConceptName.find_by_name("yes").concept_id
-      @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
-                                INNER JOIN obs o ON o.person_id = orders.patient_id
-                                INNER JOIN person p ON p.person_id = orders.patient_id
-                                INNER JOIN patient ON patient.patient_id = orders.patient_id \
-                                WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) 
-                                #{categorise} 
-                                AND DATE(o.obs_datetime) <= '#{@end_date}'
-                                AND o.obs_datetime >= '#{@start_date}'
-                                AND (o.concept_id = #{as_concept}
-                                AND o.value_coded = #{as_answer})
-                                GROUP BY patient_id") rescue []
-    elsif type.upcase == "EPILEPSY"
-      ep_concept = ConceptName.find_by_name("Confirm diagnosis of epilepsy").concept_id
-       ep_answer = ConceptName.find_by_name("yes").concept_id
-      @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
-                                INNER JOIN obs o ON o.person_id = orders.patient_id
-                                INNER JOIN person p ON p.person_id = orders.patient_id
-                                INNER JOIN patient ON patient.patient_id = orders.patient_id \
-                                WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) 
-                                #{categorise}
-                                AND DATE(o.obs_datetime) <= '#{@end_date}'
-                                AND o.obs_datetime >= '#{@start_date}'
-                                AND (o.concept_id = #{ep_concept}
-                                  AND o.value_coded = #{ep_answer})
-                                GROUP BY patient_id") rescue []
-    elsif type.upcase == "DM HT"
-     @orders = Order.find_by_sql("
-                                  SELECT DISTINCT(pp.patient_id) FROM patient pp
-                                  INNER JOIN person p ON p.person_id = pp.patient_id
-                                  WHERE pp.patient_id IN (SELECT d.patient_id FROM dm_start_date d
-                                                           WHERE DATE(d.date_enrolled) <= '#{@end_date}'
-                                                           AND DATE(d.date_enrolled) >= '#{@start_date}')
-                                  AND pp.patient_id IN (SELECT d.patient_id FROM start_date d
-                                                           WHERE DATE(d.date_enrolled) <= '#{@end_date}'
-                                                           AND DATE(d.date_enrolled) >= '#{@start_date}')
-                                  AND pp.patient_id IN (#{ids})
-                                  AND pp.voided = 0 #{categorise} ")
-    elsif type.upcase == "OTHER"
-      @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
+      @orders = Order.find_by_sql("SELECT DISTINCT(orders.patient_id) FROM orders
                                       INNER JOIN person p ON p.person_id = orders.patient_id
                                       INNER JOIN patient ON patient.patient_id = orders.patient_id \
                                       WHERE patient.voided = 0 AND patient.patient_id IN (#{ids})
-                                      #{categorise} 
-																			AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
-																			concept_set NOT IN (#{@hypertensition_medication_id}, #{@asthma_id},#{@diabetes_id}, #{@epilepsy_id})) \
-                                      GROUP BY patient_id") rescue []
+                                      #{categorise}
+                                       AND orders.start_date <= '#{@end_date}'
+																			AND orders.patient_id IN (SELECT DISTINCT(orders.patient_id) FROM orders WHERE orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+																			concept_set = #{@diabetes_id}) AND orders.start_date <= '#{@end_date}')
+                                      AND orders.patient_id NOT IN (SELECT DISTINCT(orders.patient_id) FROM orders WHERE orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+																			concept_set IN (#{@asthma_id},#{@hypertensition_medication_id}, #{@epilepsy_id})) AND orders.start_date <= '#{@end_date}')")
+    elsif type.upcase == "ASTHMA"
+     @orders = Order.find_by_sql("SELECT DISTINCT(orders.patient_id) FROM orders
+                                      INNER JOIN person p ON p.person_id = orders.patient_id
+                                      INNER JOIN patient ON patient.patient_id = orders.patient_id \
+                                      WHERE patient.voided = 0 AND patient.patient_id IN (#{ids})
+                                      #{categorise}
+                                       AND orders.start_date <= '#{@end_date}'
+																			AND orders.patient_id IN (SELECT DISTINCT(orders.patient_id) FROM orders WHERE orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+																			concept_set = #{@asthma_id}) AND orders.start_date <= '#{@end_date}')
+                                      AND orders.patient_id NOT IN (SELECT DISTINCT(orders.patient_id) FROM orders WHERE orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+																			concept_set IN (#{@hypertensition_medication_id},#{@diabetes_id}, #{@epilepsy_id})) AND orders.start_date <= '#{@end_date}')")
+    elsif type.upcase == "EPILEPSY"
+     @orders = Order.find_by_sql("SELECT DISTINCT(orders.patient_id) FROM orders
+                                      INNER JOIN person p ON p.person_id = orders.patient_id
+                                      INNER JOIN patient ON patient.patient_id = orders.patient_id \
+                                      WHERE patient.voided = 0 AND patient.patient_id IN (#{ids})
+                                      #{categorise}
+                                      AND orders.start_date <= '#{@end_date}'
+																			AND orders.patient_id IN (SELECT DISTINCT(orders.patient_id) FROM orders WHERE orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+																			concept_set = #{@epilepsy_id}) AND orders.start_date <= '#{@end_date}')
+                                      AND orders.patient_id NOT IN (SELECT DISTINCT(orders.patient_id) FROM orders WHERE orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+																			concept_set IN (#{@asthma_id},#{@diabetes_id}, #{@hypertensition_medication_id})) AND orders.start_date <= '#{@end_date}')")
+    elsif type.upcase == "DM HT"
+     @orders = Order.find_by_sql("SELECT DISTINCT(orders.patient_id) FROM orders
+                                      INNER JOIN person p ON p.person_id = orders.patient_id
+                                      INNER JOIN patient ON patient.patient_id = orders.patient_id \
+                                      WHERE patient.voided = 0 AND patient.patient_id IN (#{ids})
+                                      #{categorise}
+                                      AND orders.start_date <= '#{@end_date}'
+																			AND (orders.patient_id IN (SELECT DISTINCT(orders.patient_id) FROM orders WHERE orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+																			concept_set = #{@hypertensition_medication_id}) AND orders.start_date <= '#{@end_date}')
+                                       AND orders.patient_id IN (SELECT DISTINCT(orders.patient_id) FROM orders WHERE orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+																			concept_set = #{@diabetes_id}) AND orders.start_date <= '#{@end_date}')
+                                        )
+                                      AND orders.patient_id NOT IN (SELECT DISTINCT(orders.patient_id) FROM orders WHERE orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+																			concept_set IN (#{@asthma_id}, #{@epilepsy_id})) AND orders.start_date <= '#{@end_date}')")
     end
     return @orders
   end
@@ -232,81 +221,69 @@ class Reports::CohortDm
     end
     
     if type.upcase == "HT"
+      #concept = ConceptName.find_by_name("cardiovascular system diagnosis").concept_id
+      @orders = Order.find_by_sql("SELECT DISTINCT(orders.patient_id) FROM orders
+                                      INNER JOIN person p ON p.person_id = orders.patient_id
+                                      INNER JOIN patient ON patient.patient_id = orders.patient_id \
+                                      WHERE patient.voided = 0 AND patient.patient_id IN (#{ids})
+                                      #{categorise}
+                                      AND orders.start_date <= '#{@end_date}'
+																			AND orders.patient_id IN (SELECT DISTINCT(orders.patient_id) FROM orders WHERE orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+																			concept_set = #{@hypertensition_medication_id}) AND orders.start_date <= '#{@end_date}')
+                                      AND orders.patient_id NOT IN (SELECT DISTINCT(orders.patient_id) FROM orders WHERE orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+																			concept_set IN (#{@asthma_id},#{@diabetes_id}, #{@epilepsy_id})) AND orders.start_date <= '#{@end_date}')")
 
-      @orders = Order.find_by_sql("SELECT d.patient_id FROM start_date d
-                                    INNER JOIN person p ON p.person_id = d.patient_id
-                                    WHERE d.date_enrolled <= '#{@end_date}'
-                                    AND d.patient_id IN (#{ids})
-                                    AND d.patient_id NOT IN (
-                                                         SELECT s.patient_id FROM dm_start_date s
-                                                           WHERE s.date_enrolled <= '#{@end_date}')
-                                     #{categorise} ")
-      
     elsif type.upcase == "DM"
+      #answer = ConceptName.find_by_name("yes").concept_id
+      #ht_concept = ConceptName.find_by_name("cardiovascular system diagnosis").concept_id
+     # concept = ConceptName.find_by_name("Patient has Diabetes").concept_id
 
-      @orders = Order.find_by_sql("SELECT d.patient_id FROM dm_start_date d
-                                    INNER JOIN person p ON p.person_id = d.patient_id
-                                    WHERE d.date_enrolled <= '#{@end_date}'
-                                    AND d.patient_id IN (#{ids})
-                                    AND d.patient_id NOT IN (SELECT s.patient_id FROM start_date s
-                                                            WHERE s.date_enrolled <= '#{@end_date}')
-                                     #{categorise} ")
-
+      @orders = Order.find_by_sql("SELECT DISTINCT(orders.patient_id) FROM orders
+                                      INNER JOIN person p ON p.person_id = orders.patient_id
+                                      INNER JOIN patient ON patient.patient_id = orders.patient_id \
+                                      WHERE patient.voided = 0 AND patient.patient_id IN (#{ids})
+                                      #{categorise}
+                                       AND orders.start_date <= '#{@end_date}'
+																			AND orders.patient_id IN (SELECT DISTINCT(orders.patient_id) FROM orders WHERE orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+																			concept_set = #{@diabetes_id}) AND orders.start_date <= '#{@end_date}')
+                                      AND orders.patient_id NOT IN (SELECT DISTINCT(orders.patient_id) FROM orders WHERE orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+																			concept_set IN (#{@asthma_id},#{@hypertensition_medication_id}, #{@epilepsy_id})) AND orders.start_date <= '#{@end_date}' )")
     elsif type.upcase == "ASTHMA"
-
-      as_concept = ConceptName.find_by_name("ASTHMA").concept_id
-      as_answer = ConceptName.find_by_name("yes").concept_id
-      @orders = Order.find_by_sql("SELECT DISTINCT(orders.patient_id) FROM orders
-                                  INNER JOIN obs o ON o.person_id = orders.patient_id
-                                  INNER JOIN person p ON p.person_id = orders.patient_id
-                                  INNER JOIN patient ON patient.patient_id = orders.patient_id \
-                                  WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) 
-                                  #{categorise}
-                                  AND o.obs_datetime <= '#{@end_date}'
-                                  AND ( (o.concept_id = #{as_concept}
-                                  AND o.value_coded = #{as_answer})
-                                  OR   orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
-                                  concept_set  = '#{@asthma_id}'))
-                                  GROUP BY patient_id")
-
+     @orders = Order.find_by_sql("SELECT DISTINCT(orders.patient_id) FROM orders
+                                      INNER JOIN person p ON p.person_id = orders.patient_id
+                                      INNER JOIN patient ON patient.patient_id = orders.patient_id \
+                                      WHERE patient.voided = 0 AND patient.patient_id IN (#{ids})
+                                      #{categorise}
+                                       AND orders.start_date <= '#{@end_date}'
+																			AND orders.patient_id IN (SELECT DISTINCT(orders.patient_id) FROM orders WHERE orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+																			concept_set = #{@asthma_id}) AND orders.start_date <= '#{@end_date}')
+                                      AND orders.patient_id NOT IN (SELECT DISTINCT(orders.patient_id) FROM orders WHERE orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+																			concept_set IN (#{@hypertensition_medication_id},#{@diabetes_id}, #{@epilepsy_id})) AND orders.start_date <= '#{@end_date}')")
     elsif type.upcase == "EPILEPSY"
-
-       ep_concept = ConceptName.find_by_name("Confirm diagnosis of epilepsy").concept_id
-       ep_answer = ConceptName.find_by_name("yes").concept_id
-      @orders = Order.find_by_sql("SELECT DISTINCT(orders.patient_id) FROM orders
-                                  INNER JOIN obs o ON o.person_id = orders.patient_id
-                                  INNER JOIN person p ON p.person_id = orders.patient_id
-                                  INNER JOIN patient ON patient.patient_id = orders.patient_id \
-                                  WHERE patient.voided = 0
-                                  AND o.voided = 0 AND DATE(o.obs_datetime) <= '#{@end_date}'
-                                  AND patient.patient_id IN (#{ids})
-                                  #{categorise} AND ((o.concept_id = #{ep_concept}
-                                  AND o.value_coded = #{ep_answer})
-                                  OR   orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
-                                  concept_set  = '#{@epilepsy_id}'))
-                                  GROUP BY patient_id")
-
+     @orders = Order.find_by_sql("SELECT DISTINCT(orders.patient_id) FROM orders
+                                      INNER JOIN person p ON p.person_id = orders.patient_id
+                                      INNER JOIN patient ON patient.patient_id = orders.patient_id \
+                                      WHERE patient.voided = 0 AND patient.patient_id IN (#{ids})
+                                      #{categorise}
+                                      AND orders.start_date <= '#{@end_date}'
+																			AND orders.patient_id IN (SELECT DISTINCT(orders.patient_id) FROM orders WHERE orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+																			concept_set = #{@epilepsy_id}) AND orders.start_date <= '#{@end_date}')
+                                      AND orders.patient_id NOT IN (SELECT DISTINCT(orders.patient_id) FROM orders WHERE orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+																			concept_set IN (#{@asthma_id},#{@diabetes_id}, #{@hypertensition_medication_id})) AND orders.start_date <= '#{@end_date}')")
     elsif type.upcase == "DM HT"
-
-      @orders = Order.find_by_sql("
-                                  SELECT DISTINCT(pp.patient_id) FROM patient pp
-                                  INNER JOIN person p ON p.person_id = pp.patient_id
-                                  WHERE pp.patient_id IN (SELECT d.patient_id FROM dm_start_date d
-                                                           WHERE DATE(d.date_enrolled) <= '#{@end_date}')
-                                  AND pp.patient_id IN (SELECT d.patient_id FROM start_date d
-                                                           WHERE DATE(d.date_enrolled) <= '#{@end_date}')
-                                  AND pp.patient_id IN (#{ids})
-                                  AND pp.voided = 0 #{categorise} ")
-      
-    elsif type.upcase == "OTHER"
-
-      @orders = Order.find_by_sql("SELECT DISTINCT(orders.patient_id) FROM orders
-                                  INNER JOIN person p ON p.person_id = orders.patient_id
-                                  INNER JOIN patient ON patient.patient_id = orders.patient_id \
-                                  WHERE patient.voided = 0 AND patient.patient_id IN (#{ids}) AND \
-                                  #{categorise} AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
-                                  concept_set NOT IN (#{@hypertensition_medication_id}, #{@asthma_id},#{@diabetes_id}, #{@epilepsy_id})) \
-                                  GROUP BY patient_id")
+     @orders = Order.find_by_sql("SELECT DISTINCT(orders.patient_id) FROM orders
+                                      INNER JOIN person p ON p.person_id = orders.patient_id
+                                      INNER JOIN patient ON patient.patient_id = orders.patient_id \
+                                      WHERE patient.voided = 0 AND patient.patient_id IN (#{ids})
+                                      #{categorise}
+                                      AND orders.start_date <= '#{@end_date}'
+																			AND (orders.patient_id IN (SELECT DISTINCT(orders.patient_id) FROM orders WHERE orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+																			concept_set = #{@hypertensition_medication_id}) AND orders.start_date <= '#{@end_date}')
+                                       AND orders.patient_id  IN (SELECT DISTINCT(orders.patient_id) FROM orders WHERE orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+																			concept_set = #{@diabetes_id}) AND orders.start_date <= '#{@end_date}')
+                                        )
+                                      AND orders.patient_id NOT IN (SELECT DISTINCT(orders.patient_id) FROM orders WHERE orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
+																			concept_set IN (#{@asthma_id}, #{@epilepsy_id})) AND orders.start_date <= '#{@end_date}')")
       
     end 
     return @orders
