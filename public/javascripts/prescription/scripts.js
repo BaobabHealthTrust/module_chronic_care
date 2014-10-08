@@ -193,6 +193,177 @@ function showFixedKeyboard(ctrl, global_control, abc){
 }
 
 
+function showStrength(id, global_control, current){
+
+    var row1 = ["1","2","3"];
+    var row2 = ["4","5","6"];
+    var row3 = ["7","8","9"];
+    var row4 = ["C",".","0","OK"];
+
+    var tbl = document.createElement("table");
+    tbl.className = "keyBoardTable";
+    tbl.cellSpacing = 0;
+    tbl.cellPadding = 3;
+    tbl.id = "tblKeyboard";
+    tbl.style.margin = "auto";
+    
+    var tr1 = document.createElement("tr");
+
+    var td = document.createElement("td");
+    td.rowSpan = "4";
+    td.style.minWidth = "60px";
+    td.style.textAlign = "center";
+    td.style.verticalAlign = "top";
+
+    tr1.appendChild(td);
+
+    if(typeof(showDefault) != "undefined"){
+        if(showDefault == true){
+            td.innerHTML = "<span style='font-size: 1.1em; font-style: italic;'>Default</span>";
+
+            var defaultButton = document.createElement("button");
+            defaultButton.id = "defaultButton" + id;
+            defaultButton.className = "button_blue keyboard_button";
+            defaultButton.onclick = function(){
+                var value = this.innerHTML.replace(/\<span\>/i, "").replace(/\<\/span\>/i, "");
+
+                if(value != "Default"){
+                    __$(global_control).value = value;
+                } else {
+                    __$(global_control).value = 0;
+                }
+            }
+
+            td.appendChild(defaultButton);
+        }
+    }
+
+    for(var i = 0; i < row1.length; i++){
+        var td1 = document.createElement("td");
+        td1.align = "center";
+        td1.vAlign = "middle";
+        td1.style.cursor = "pointer";
+        td1.bgColor = "#ffffff";
+        td1.width = "30px";
+
+        tr1.appendChild(td1);
+
+        var btn = document.createElement("button");
+        btn.className = "button_blue keyboard_button";
+        btn.innerHTML = "<span>" + row1[i] + "</span>";
+        btn.onclick = function(){
+            if(!this.innerHTML.match(/^__$/)){
+                __$(global_control).value += this.innerHTML.match(/<span>(.+)<\/span>/)[1];
+            }
+        }
+
+        td1.appendChild(btn);
+
+    }
+
+    tbl.appendChild(tr1);
+
+    var tr2 = document.createElement("tr");
+
+    for(var i = 0; i < row2.length; i++){
+        var td2 = document.createElement("td");
+        td2.align = "center";
+        td2.vAlign = "middle";
+        td2.style.cursor = "pointer";
+        td2.bgColor = "#ffffff";
+        td2.width = "30px";
+
+        tr2.appendChild(td2);
+
+        var btn = document.createElement("button");
+        btn.className = "button_blue keyboard_button";
+        btn.innerHTML = "<span>" + row2[i] + "</span>";
+        btn.onclick = function(){
+            if(!this.innerHTML.match(/^$/)){
+                __$(global_control).value += this.innerHTML.match(/<span>(.+)<\/span>/)[1];
+            }
+        }
+
+        td2.appendChild(btn);
+
+    }
+
+    tbl.appendChild(tr2);
+
+    var tr3 = document.createElement("tr");
+
+    for(var i = 0; i < row3.length; i++){
+        var td3 = document.createElement("td");
+        td3.align = "center";
+        td3.vAlign = "middle";
+        td3.style.cursor = "pointer";
+        td3.bgColor = "#ffffff";
+        td3.width = "30px";
+
+        tr3.appendChild(td3);
+
+        var btn = document.createElement("button");
+        btn.className = "button_blue keyboard_button";
+        btn.innerHTML = "<span>" + row3[i] + "</span>";
+        btn.onclick = function(){
+            if(!this.innerHTML.match(/^__$/)){
+                __$(global_control).value += this.innerHTML.match(/<span>(.+)<\/span>/)[1];
+            }
+        }
+
+        td3.appendChild(btn);
+
+    }
+
+    tbl.appendChild(tr3);
+
+    var tr4 = document.createElement("tr");
+
+    for(var i = 0; i < row4.length; i++){
+        var td4 = document.createElement("td");
+        td4.align = "center";
+        td4.vAlign = "middle";
+        td4.style.cursor = "pointer";
+        td4.bgColor = "#ffffff";
+        td4.width = "30px";
+
+        tr4.appendChild(td4);
+
+        var btn = document.createElement("button");
+        btn.innerHTML = "<span>" + row4[i] + "</span>";
+        if (i == 1){
+            btn.className = "button_blue keyboard_button";
+        }else if (i == 0){
+            btn.className = "button_red keyboard_button";
+        }else if (i == 2){
+            btn.className = "button_blue keyboard_button";
+        }else if (i == 3){
+            btn.className = "button_green keyboard_button";
+        }
+        btn.onclick = function(){
+            if(this.innerHTML.match(/<span>(.+)<\/span>/)[1] == "C"){
+                __$(global_control).value = __$(global_control).value.substring(0,__$(global_control).value.length - 1);
+            }else if(this.innerHTML.match(/OK/)){
+                
+                    document.getElementById('search').value = '';
+                    switchToFrequency(current);               
+
+            }else if(!this.innerHTML.match(/^$/)){
+                __$(global_control).value += this.innerHTML.match(/<span>(.+)<\/span>/)[1];
+            }
+        }
+
+        td4.appendChild(btn);
+
+    }
+
+    tbl.appendChild(tr4);
+
+    __$(id).appendChild(tbl);
+
+}
+
+
 function showNumber(id, global_control, showDefault){
     
     var row1 = ["1","2","3"];
@@ -458,6 +629,88 @@ function loadAllDrugs(){
     clicksChecker = checkClicks();
 }
 
+function loadStreng(id){
+
+    clearTimeout(clicksChecker);
+
+    __$("switcher").innerHTML = "";
+    __$("searchbox").value = "";
+    __$("searchbox").style.display = "none";
+
+    var table = document.createElement("div");
+    table.className = "table";
+    table.style.width = "100%";
+    table.style.height = "100%";
+    table.style.borderRadius = "10px";
+    table.style.border = "1px solid #ccc";
+
+    __$("switcher").appendChild(table);
+
+    var row = document.createElement("div");
+    row.className = "row";
+
+    table.appendChild(row);
+
+    var cell = document.createElement("div");
+    cell.className = "cell";
+
+    row.appendChild(cell);
+
+    var container = document.createElement("div");
+    container.id = "selections";
+    container.style.width = "100%";
+
+    cell.appendChild(container);
+
+    resize();
+
+    var tbl = document.createElement("div");
+    tbl.className = "table";
+    tbl.style.width = "100%";
+
+    container.appendChild(tbl);
+
+    var tr = document.createElement("div");
+    tr.className = "row";
+
+    tbl.appendChild(tr);
+
+    var cell2 = document.createElement("div");
+    cell2.className = "cell";
+    cell2.style.width = "100%";
+    cell2.style.border = "1px solid #ccc";
+    cell2.style.height = "100%";
+    cell2.style.borderRadius = "10px";
+    cell2.style.textAlign = "center";
+    cell2.style.backgroundColor = "#fff";
+    cell2.id = "durationControl";
+    cell2.style.paddingBottom = "10px";
+
+    tr.appendChild(cell2);
+
+    var durHead = document.createElement("div");
+    durHead.style.paddingTop = "10px";
+    durHead.style.paddingBottom = "10px";
+    durHead.style.fontSize = "36px";
+    durHead.innerHTML = "Dose Strength";
+    durHead.style.width = "100%";
+    durHead.style.textAlign = "center";
+
+    cell2.appendChild(durHead);
+
+    var input = document.createElement("input");
+    input.setAttribute("type", "text");
+    input.id = "strength";
+    input.className = "input";
+    input.style.width = "45%";
+    input.style.textAlign = "center";
+    input.style.fontSize = "32px";
+
+    cell2.appendChild(input);
+
+    showStrength("durationControl", "strength", id);
+}
+
 function loadFrequenciesAndDuration(id){
   
     clearTimeout(clicksChecker);
@@ -602,7 +855,6 @@ function loadFrequenciesAndDuration(id){
 }
 
 function setDuration() {
-    
     var duration = null
     if (__$("duration")){
         duration = __$("duration").value;
@@ -625,6 +877,29 @@ function setDuration() {
                 break;
             }else if(cell3s[i].innerHTML.length > 1 && duration != ''){
                 cell3s[i].innerHTML = (duration != null ? (duration > 1 ? duration + " days" : duration + " day") : duration);
+                break;
+            }
+        }
+    }
+
+   if (__$("strength")){
+          duration = __$("strength").value;
+        var keyBoardButtons = document.getElementsByClassName("keyboard_button");
+        for(var i = 0; i < keyBoardButtons.length; i++){
+            if(keyBoardButtons[i].innerHTML.match(/OK/i)){
+                if (duration.length > 0) {
+                    keyBoardButtons[i].disabled = false;
+                }else{
+                    keyBoardButtons[i].disabled = true;
+                }
+            }
+        }
+       
+        var cell3s = document.getElementsByClassName("doses");
+        
+        for(var i = (cell3s.length - 1); i >= 0; i--){
+             if(duration != ''){
+                cell3s[i].innerHTML = duration
                 break;
             }
         }
@@ -733,8 +1008,8 @@ function listAllDrugs(){
                     addDrug(this.id);
           
                     selectedDrugs[this.id] = true;
-                    
-                    loadFrequenciesAndDuration(this.id);
+                    loadStreng(this.id)
+                    //loadFrequenciesAndDuration(this.id);
                 }
             }
       
@@ -801,6 +1076,7 @@ function listDrugsSets(){
                         div.setAttribute("drug", data["drug_name"]);
                         div.setAttribute("frequency", data["frequency"]);
                         div.setAttribute("duration", data["duration"]);
+                        div.setAttribute("dose", data["dose"]);
                         div.setAttribute("units", data["units"]);
                         this.appendChild(div);
                         addDrug(div.id);
@@ -840,7 +1116,12 @@ function confirmAction(message) {
     return false;
 
 }
-    
+
+function switchToFrequency(id){
+   loadFrequenciesAndDuration(id)
+   resize();
+}
+
 function switchViews(current){
     if(current.trim().toLowerCase() == "drug sets"){
         __$("btnswitch").innerHTML = "All Drugs";
@@ -865,6 +1146,7 @@ function addDrug(id){
    
     
     var drug = __$(id).getAttribute("drug");
+    var dose = __$(id).getAttribute("dose");
     var frequency = __$(id).getAttribute("frequency");
     var duration = __$(id).getAttribute("duration");
   
@@ -872,10 +1154,21 @@ function addDrug(id){
     cell1.className = "cell borderRightBottom";
     cell1.innerHTML = drug;
     cell1.style.padding = "5px";
-    cell1.style.width = "45%";
+    cell1.style.width = "35%";
     cell1.style.verticalAlign = "middle";
   
     row.appendChild(cell1);
+
+    var cell = document.createElement("div");
+    cell.className = "cell borderRightBottom doses";
+    cell.innerHTML = dose;
+    cell.style.padding = "5px";
+    cell.style.width = "10%";
+    cell.style.textAlign = "center";
+    cell.style.verticalAlign = "middle";
+    cell.id = "row_dose_" + id;
+
+    row.appendChild(cell);
   
     var cell2 = document.createElement("div");
     cell2.className = "cell borderRightBottom";
