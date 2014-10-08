@@ -44,8 +44,12 @@
                   <div class="table" style="width: 100%; border-spacing: 0px;">
                     <div class="row" style="color: #000;">
                       <div class="cell borderBottom" style="font-weight: bold;
-                           text-align: center; padding: 5px; width: 44%;">
+                           text-align: center; padding: 5px; width: 34%;">
                         Drug
+                      </div>
+                      <div class="cell borderBottom" style="font-weight: bold;
+                           text-align: center; padding: 5px; width: 10%;">
+                        Strength
                       </div>
                       <div class="cell borderBottom" style="font-weight: bold;
                            text-align: center; padding: 5px; width: 29%;">
@@ -194,11 +198,12 @@
       var drug_id = selected_drug.match(/\d+/)[0];
       var frequency = __$("row_frequency_" + selected_drug).innerHTML;
       var duration = __$("row_duration_" + selected_drug).innerHTML;
+      var dose = __$("row_dose_" + selected_drug).innerHTML;
 
       var newElement = document.createElement("input")
       newElement.setAttribute("name",'drug_formulations[]')
       newElement.setAttribute("type","hidden");
-      newElement.value = "{:drug_id => " + drug_id +", :frequency => '" + frequency + "', :duration => '" + duration + "' }";
+      newElement.value = "{:drug_id => " + drug_id +",:dose => " + dose+  ", :frequency => '" + frequency + "', :duration => '" + duration + "' }";
       submitForm.appendChild(newElement);
     }
 

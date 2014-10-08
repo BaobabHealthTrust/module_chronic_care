@@ -64,6 +64,7 @@ class PrescriptionsController < GenericPrescriptionsController
         @drug_sets[set.set_id][d_set.drug_inventory_id]["drug_name"] = drug.name
         @drug_sets[set.set_id][d_set.drug_inventory_id]["units"] = drug.units
         @drug_sets[set.set_id][d_set.drug_inventory_id]["duration"] = d_set.duration
+        @drug_sets[set.set_id][d_set.drug_inventory_id]["dose"] = d_set.dose rescue drug.dose_strength
         @drug_sets[set.set_id][d_set.drug_inventory_id]["frequency"] = d_set.frequency
       end
     end
@@ -81,7 +82,7 @@ class PrescriptionsController < GenericPrescriptionsController
   end
 
   def prescribes
-
+    
     @patient    = Patient.find(params["patient_id"]) rescue nil
   
     d = (session[:datetime].to_date rescue Date.today)
@@ -99,8 +100,8 @@ class PrescriptionsController < GenericPrescriptionsController
       prescription[:prn] = 0 if prescription[:prn].blank?
       auto_expire_date = session_date.to_date + (prescription[:duration].sub(/days/i, "").strip).to_i.days
       drug = Drug.find(prescription[:drug_id])
-
-      DrugOrder.write_order(encounter, @patient, nil, drug, session_date, auto_expire_date, drug.dose_strength,
+      dose = prescription[:dose] rescue drug.dose_strength
+      DrugOrder.write_order(encounter, @patient, nil, drug, session_date, auto_expire_date, dose,
         prescription[:frequency], prescription[:prn].to_i)
     end
 

@@ -349,6 +349,8 @@ class EncountersController < ApplicationController
 				if  params[:concept]["Prescribe Drugs"].to_s.upcase == "YES"
 					if link == "ADVANCED PRESCRIPTION"
             redirect_to "/prescriptions/generic_advanced_prescription?user_id=#{@user["user_id"]}&patient_id=#{params[:patient_id]}" and return
+          elsif link == "PRESCRIPTION WITH SETS"
+            redirect_to "/prescriptions/new_prescription?user_id=#{@user["user_id"]}&patient_id=#{params[:patient_id]}" and return
           else
             redirect_to "/prescriptions/prescribe?user_id=#{@user["user_id"]}&patient_id=#{params[:patient_id]}" and return
           end
