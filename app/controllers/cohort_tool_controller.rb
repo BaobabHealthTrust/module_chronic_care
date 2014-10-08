@@ -693,8 +693,56 @@ class CohortToolController < ApplicationController
          overall_disease = @ht + @dm + @dmht + @asthma + @epilepsy
          overall_disease_ever = @ht_ever + @dm_ever + @dmht_ever + @asthma_ever + @epilepsy_ever
          #raise overall_disease.uniq.sort.length.to_yaml
-         @other_ever = @total_ever_registered  -  overall_disease_ever.uniq.length
-         @other = @total_registered - overall_disease.uniq.length
+         @other_ever = report.total_ever_registered.collect{|p| p.patient_id}  -  overall_disease_ever.uniq
+         @other = report.total_registered.collect{|p| p.patient_id} - overall_disease.uniq
+         #raise @other.to_yaml
+         if @other.length > 0
+            ht_other = []
+            dm_other = []
+            @other.each{|patient|
+               o = Observation.find_by_sql("SELECT * FROM obs o
+                 INNER JOIN concept_name c ON c.concept_id = o.concept_id
+                 WHERE c.name = 'You receive helpful advice on important things in your life' AND o.voided = 0
+                  AND o.person_id = #{patient} LIMIT 1")
+                if ! o.blank?
+                   ht_other <<  patient
+                else
+                   e = Observation.find_by_sql("select * from encounter e inner join encounter_type et on et.encounter_type_id = e.encounter_type
+                            where et.name = 'DIABETES HYPERTENSION INITIAL VISIT' and e.voided = 0 AND e.patient_id = #{patient} LIMIT 1")
+                    unless e.blank?
+                      dm_other << patient
+                    end
+                end
+            }
+            @other -= dm_other
+            @other -= ht_other
+            @dm = ( @dm + dm_other rescue dm_other)
+            @ht = ( @ht + ht_other rescue ht_other)
+         end
+
+         if @other_ever.length > 0
+            ht_other = []
+            dm_other = []
+            @other_ever.each{|patient|
+               o = Observation.find_by_sql("SELECT * FROM obs o
+                 INNER JOIN concept_name c ON c.concept_id = o.concept_id
+                 WHERE c.name = 'You receive helpful advice on important things in your life' AND o.voided = 0
+                  AND o.person_id = #{patient} LIMIT 1")
+                if ! o.blank?
+                   ht_other <<  patient
+                else
+                   e = Observation.find_by_sql("select * from encounter e inner join encounter_type et on et.encounter_type_id = e.encounter_type
+                            where et.name = 'DIABETES HYPERTENSION INITIAL VISIT' and e.voided = 0 AND e.patient_id = #{patient} LIMIT 1")
+                    unless e.blank?
+                      dm_other << patient
+                    end
+                end
+            }
+            @other_ever -= dm_other
+            @other_ever -= ht_other
+            @dm_ever = ( @dm_ever + dm_other rescue dm_other)
+            @ht_ever = ( @ht_ever + ht_other rescue ht_other)
+         end
 
         @transfer_out_ever = report.transfer_out_ever(ids_ever)
         @stopped_treatment_ever = report.stopped_treatment_ever(ids_ever)
