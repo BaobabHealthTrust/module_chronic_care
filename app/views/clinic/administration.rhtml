@@ -72,12 +72,12 @@
       </td>
     </tr>
     <tr>
-      <td rowspan="4" style="">
+      <td rowspan="5" style="">
         <iframe height="300" src="/project_users?user_id=<%= params[:user_id]
               %>&location_id=<%= params[:location_id] %>" style="border: 1px solid #ccc; width: 100%;">
         </iframe>
       </td>
-      <td style="height: 70px; width: 250px;">
+      <td style="height: 60px; width: 250px;">
         <button class="btn" onclick="window.parent.location='/manage_activities?user_id=<%= params[:user_id]
               %>&location_id=<%= session[:location_id] || params[:location_id] %>'">
           <span>
@@ -87,7 +87,7 @@
       </td>
     </tr>
     <tr>
-      <td style="height: 70px;">
+      <td style="height: 60px;">
         <button class="btn" onclick="window.parent.location='<%= @link
       %>/user_list?ext=true&user_id=<%= params[:user_id]
               %>&location_id=<%= session[:location_id] || params[:location_id] %>&src=<%= @host %>'">
@@ -98,7 +98,7 @@
       </td>
     </tr>
     <tr>
-      <td style="height: 70px;">
+      <td style="height: 60px;">
         <button class="btn" onclick="window.parent.location='/project_members?user_id=<%= params[:user_id]
               %>&location_id=<%= session[:location_id] || params[:location_id] %>'">
           <span>
@@ -108,11 +108,21 @@
       </td>
     </tr>
     <tr>
-      <td style="height: 70px;">
+      <td style="height: 60px;">
         <button class="btn" onclick="window.parent.location='/clinic/demographics_fields?user_id=<%= params[:user_id]
               %>&location_id=<%= session[:location_id] || params[:location_id] %>'">
           <span>
             Demographics Fields
+          </span>
+        </button>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 60px;">
+        <button class="btn" onclick="window.parent.location='/clinic/merge_menu?user_id=<%= params[:user_id]
+              %>&location_id=<%= session[:location_id] || params[:location_id] %>'">
+          <span>
+            Merge Patients
           </span>
         </button>
       </td>
