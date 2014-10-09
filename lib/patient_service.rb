@@ -630,7 +630,7 @@ module PatientService
   end
   
   def self.get_patient_identifier(patient, identifier_type)
-    patient_identifier_type_id = PatientIdentifierType.find_by_name(identifier_type).patient_identifier_type_id rescue nil   
+    patient_identifier_type_id = PatientIdentifierType.find_by_name(identifier_type).patient_identifier_type_id  rescue nil
     patient_identifier = PatientIdentifier.find(:first, :select => "identifier",
       :conditions  =>["patient_id = ? and identifier_type = ?", patient.id, patient_identifier_type_id],
       :order => "date_created DESC" ).identifier rescue nil
@@ -841,10 +841,9 @@ EOF
 		patient = PatientBean.new('')
 		patient.person_id = person.id
 		patient.patient_id = person.patient.id
-		patient.arv_number = get_patient_identifier(person.patient, 'ARV Number')
 		patient.address = person.addresses.first.city_village rescue nil
 		patient.national_id = get_patient_identifier(person.patient, 'National id')    
-		patient.national_id_with_dashes = get_national_id_with_dashes(person.patient)
+		patient.national_id_with_dashes = get_national_id_with_dashes(person.patient) rescue person.patient.national_id_with_dashes
 		patient.name = person.names.first.given_name + ' ' + person.names.first.family_name rescue nil
 		patient.first_name = person.names.first.given_name rescue nil 
 		patient.last_name = person.names.first.family_name rescue nil 
