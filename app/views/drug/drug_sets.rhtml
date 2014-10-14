@@ -240,7 +240,7 @@
             Duration
           </th>
           <th id="th4" style="width: 13%;">
-            Creator
+            Strength
           </th>
           <th id="th5" style="width: 8%; ">
             &nbsp;
@@ -289,9 +289,9 @@
                         <%= data.duration %>  days&nbsp;
                       </td>
                       <td style="width: 13%; text-align: center;">
-                        <%= (User.find(data.creator).name || 'admin') rescue data.creator %>
+                        <%= data.dose %>
                       </td>
-                      <% if data.creator.to_i == session[:user_id].to_i || current_user.admin? %>
+                      <% if data.creator.to_i == session[:user_id].to_i || @user.admin? %>
                         <td onclick="confirmDeletion('Are you sure you want to remove <%= name %> from set?', <%= data.drug_set_id %>)" style="width: 8%; padding-left:2.5%;">
                           <img src="/touchscreentoolkit/lib/images/cancel_flat_small_red.png" height="30"
                                alt="delete" /> &nbsp;

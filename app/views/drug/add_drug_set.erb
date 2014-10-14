@@ -43,6 +43,15 @@
     :helpText => "Select drug to add to set <span class='helper'>Task: Add Drug Set</span>"
   } %>
 
+  <%= text_field_tag "strength", nil,
+    {:id => "strength",
+    :field_type => "number",
+    :helptext => "Dose Strength <span class='helper'>Task: Add Drug Set</span>",
+    :tt_pageStyleClass => "NumbersOnlyWithDecimal",
+    :max => 200,
+    :absoluteMax => 1000
+  } %>
+
   <%= select_tag "frequency", options_for_select(@frequencies),
     {
     :id => "frequency",

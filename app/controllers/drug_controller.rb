@@ -1,6 +1,6 @@
 class DrugController < ApplicationController
   def drug_sets
-
+    @user = User.find(params[:user_id])
     @sets = GeneralSet.all(:order => ["date_updated DESC"],
       :conditions => ["status = 'active'"]) +
       GeneralSet.all(:order => ["date_updated DESC"],
@@ -73,6 +73,7 @@ class DrugController < ApplicationController
       :set_id => set_id.to_i,
       :frequency => params[:frequency],
       :duration => params[:duration].to_i,
+      :dose => params[:strength],
       :date_created => session_date,
       :date_updated => session_date,
       :creator => params[:user_id]
