@@ -1,5 +1,8 @@
 
 class ApplicationController < ActionController::Base
+  require 'socket'
+  require 'timeout'
+
   helper :all
 
   before_filter :check_user, :except => [:print_demographics, :demographics_label, :patient_demographics_label,:print_patient_mastercard, :print_mastercard, :prescribe, :locations, :user_login, :user_logout, :missing_program, :static_locations,
@@ -49,6 +52,15 @@ class ApplicationController < ActionController::Base
 		return false
 	end
 
+  def is_port_open(ip, port)
+     begin
+        s = TCPSocket.new(ip, port)
+        return true
+      rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+        return false
+      end
+  end
+  
 	def current_program
     if session[:selected_program].blank?
       return ""
