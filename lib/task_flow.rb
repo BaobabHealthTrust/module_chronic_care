@@ -1,6 +1,8 @@
 
 class TaskFlow
-
+  require 'socket'
+  require 'timeout'
+  
   attr_accessor :patient, :person, :user, :current_date, :tasks, :current_user_activities,
     :encounter_type, :url, :task_scopes, :task_list, :labels, :redirect_to, :current_program, :present_date
 
@@ -179,8 +181,13 @@ class TaskFlow
 
 					next if !vitals.blank?
 					self.encounter_type = 'VITALS'
-					self.url = "http://localhost:3000/vitals?destination=http://#{host}/patients/processvitals/1?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
-					if ! my_activities.include?(tsk)
+          if is_port_open(remote_ip, 3000) == true
+                self.url = "http://localhost:3000/vitals?destination=http://#{host}/patients/processvitals/1?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+          else
+                self.url = "/protocol_patients/vitals?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+          end
+
+          if ! my_activities.include?(tsk)
 						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
 					else
 						return self
@@ -326,6 +333,15 @@ class TaskFlow
 		end
 	end
 
+  def is_port_open(ip, port)
+     begin
+        s = TCPSocket.new(ip, port)
+        return true
+      rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+        return false
+      end
+  end
+
 	def asthma_next_task(host = nil, remote_ip = nil)
 
     normal_flow = self.tasks
@@ -426,8 +442,12 @@ class TaskFlow
 
 					next if !vitals.blank?
 					self.encounter_type = 'VITALS'
-					self.url = "http://localhost:3000/vitals?destination=http://#{host}/patients/processvitals/1?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
-					if ! my_activities.include?(tsk)
+				  if is_port_open(remote_ip, 3000) == true
+                self.url = "http://localhost:3000/vitals?destination=http://#{host}/patients/processvitals/1?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+          else
+                self.url = "/protocol_patients/vitals?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+          end
+          if ! my_activities.include?(tsk)
 						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
 					else
 						return self
@@ -644,8 +664,12 @@ class TaskFlow
 
 					next if !vitals.blank?
 					self.encounter_type = 'VITALS'
-					self.url = "http://localhost:3000/vitals?destination=http://#{host}/patients/processvitals/1?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
-					if ! my_activities.include?(tsk)
+					if is_port_open(remote_ip, 3000) == true
+                self.url = "http://localhost:3000/vitals?destination=http://#{host}/patients/processvitals/1?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+          else
+                self.url = "/protocol_patients/vitals?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+          end
+          if ! my_activities.include?(tsk)
 						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
 					else
 						return self
@@ -873,8 +897,12 @@ class TaskFlow
 
 					next if !vitals.blank?
 					self.encounter_type = 'VITALS'
-					self.url = "http://localhost:3000/vitals?destination=http://#{host}/patients/processvitals/1?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
-					if ! my_activities.include?(tsk)
+					if is_port_open(remote_ip, 3000) == true
+                self.url = "http://localhost:3000/vitals?destination=http://#{host}/patients/processvitals/1?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+          else
+                self.url = "/protocol_patients/vitals?patient_id=#{self.patient.id}&user_id=#{@user["user_id"]}"
+          end
+          if ! my_activities.include?(tsk)
 						redirect_to "/patients/show/#{self.patient.id}?user_id=#{self.user.id}&disable=true" and return
 					else
 						return self
