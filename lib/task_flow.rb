@@ -333,6 +333,11 @@ class TaskFlow
 		end
 	end
 
+  def file_exists?(full_file_path)
+      resp = `wget --spider -v #{full_file_path} && echo 1 || echo 0`
+      resp.to_i.zero? ? false : true
+  end
+
   def is_port_open(ip, port)
      begin
         s = TCPSocket.new(ip, port)
