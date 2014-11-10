@@ -131,7 +131,6 @@ class ClinicController < ApplicationController
 
  def merge_similar_patients
     if request.method == :post
-      raise params[:patient_ids].to_yaml
       params[:patient_ids].split(":").each do | ids |
         master = ids.split(',')[0].to_i
         slaves = ids.split(',')[1..-1]
