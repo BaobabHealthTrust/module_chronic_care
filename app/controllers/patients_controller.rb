@@ -47,8 +47,8 @@ class PatientsController < ApplicationController
     host = request.host_with_port
     @task.tasks.each{|task|
 			next if ! current_user_activities.include?(task.downcase)
-      if task.upcase == "VITALS" and is_port_open(remote_ip, 3000)
-        @links[task.titleize] = "http://localhost:3000/vitals?destination=http://#{host}/patients/processvitals/1?patient_id=#{@patient.id}&user_id=#{params[:user_id]}"
+      if task.upcase == "VITALS" and is_port_open(remote_ip, 3000) == true
+        @links[task.titleize] = "http://#{remote_ip}:3000/vitals?destination=http://#{host}/patients/processvitals/1?patient_id=#{@patient.id}&user_id=#{params[:user_id]}"
       else
         @links[task.titleize] = "/protocol_patients/#{task.gsub(/\s/, "_")}?patient_id=#{@patient.id}&user_id=#{params[:user_id]}"
 
@@ -172,7 +172,7 @@ class PatientsController < ApplicationController
     unless params["Weight"].blank?
       weight = params["Weight"].to_f.round(1)
     end
-    bmi = (weight / ( current * current) * 10000 ).round(1)
+    bmi = (weight / ( current * current) * 10000 ).round(1) rescue "Unknown"
 
     sex =  patient.gender.downcase
     
@@ -1346,11 +1346,11 @@ class PatientsController < ApplicationController
 		@next_task = @task.hypertension_next_task(host,remote_ip).encounter_type.gsub('_',' ') if current_program == "HYPERTENSION PROGRAM" rescue nil
 		@next_task = @task.asthma_next_task(host,remote_ip).encounter_type.gsub('_',' ') if current_program == "ASTHMA PROGRAM" rescue nil
 		@next_task = @task.epilepsy_next_task(host,remote_ip).encounter_type.gsub('_',' ') if current_program == "EPILEPSY PROGRAM" rescue nil
-    @next_task = @task.next_task(host,remote_ip).encounter_type.gsub('_',' ') if current_program == "DIABETES PROGRAM" rescue nil
+    @next_task = @task.next_task(@patient, host,remote_ip).encounter_type.gsub('_',' ') if current_program == "DIABETES PROGRAM" rescue nil
 
 
 		@current_task = @task.hypertension_next_task(host,remote_ip) if current_program == "HYPERTENSION PROGRAM" rescue nil
-    @current_task = @task.next_task(host,remote_ip) if current_program == "DIABETES PROGRAM" rescue nil
+    @current_task = @task.next_task(@patient,host,remote_ip) if current_program == "DIABETES PROGRAM" rescue nil
 		@current_task = @task.asthma_next_task(host,remote_ip) if current_program == "ASTHMA PROGRAM" rescue nil
 		@current_task = @task.epilepsy_next_task(host,remote_ip) if current_program == "EPILEPSY PROGRAM" rescue nil
 
