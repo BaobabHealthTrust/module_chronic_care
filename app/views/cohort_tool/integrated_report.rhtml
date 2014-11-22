@@ -312,16 +312,16 @@
 
                   <td  style="text-align:left;border-width:1px 0px 0px 1px">Measure of disease control</td>
                   <td style="text-align:left;border-width:1px 0px 0px 1px">Blood pressure measured</td>
-                  <td><%= @bp_measured %></td>
-                  <td><%= @bp_measured_ever %></td>
+                  <td><%= @bp_measured.length %></td>
+                  <td><%= @bp_measured_ever.length %></td>
 
                 </tr>
                  <tr >
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Blood pressure controlled (BP <= 140/90)</td>
-                  <td><%= @low_bp %></td>
-                  <td><%= @low_bp_ever %></td>
+                  <td><%= @low_bp.length %></td>
+                  <td><%= @low_bp_ever.length %></td>
 
                 </tr>
                 <tr >

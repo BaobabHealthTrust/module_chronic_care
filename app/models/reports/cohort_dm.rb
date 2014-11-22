@@ -1693,7 +1693,7 @@ class Reports::CohortDm
                                       DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
 																			#{categorise} AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
 																			concept_set IN (#{@asthma_id}, #{@epilepsy_id}, #{@diabetes_id}, #{@hypertensition_medication_id})) \
-                                      GROUP BY patient_id").length rescue 0
+                                      GROUP BY patient_id").collect {|p| p.patient_id} rescue []
   end
 
   def lost_followup_ever(ids, sex=nil)
@@ -2026,16 +2026,22 @@ class Reports::CohortDm
   end
 
   def decrease_in_bp(ids, sex, reason=nil)
-    total = 0
+    total = []
     Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
       WHERE person_id IN (#{ids})
       AND gender LIKE '#{sex}%'").each { |patient| 
       if reason == "compare"
-        total += 1 if compare_bp(patient.person_id.to_i) == true
+        if compare_bp(patient.person_id.to_i) == true
+          total << patient.person_id
+        end
       elsif reason == "measured"
-        total += 1 if measured_bp(patient.person_id.to_i) == true
+         if measured_bp(patient.person_id.to_i) == true
+           total << patient.person_id
+         end
       else
-        total += 1 if low_bp(patient.person_id.to_i) == true
+        if low_bp(patient.person_id.to_i) == true
+           total << patient.person_id
+        end
       end
     }rescue []
     return total

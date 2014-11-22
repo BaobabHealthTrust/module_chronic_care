@@ -619,7 +619,6 @@ class CohortToolController < ApplicationController
 
   def integrated_report
           @quarter = params[:quarter]
-          @start_date, @end_date = Report.generate_cohort_date_range(@quarter)
           @user = User.find(params["user_id"]) rescue nil
           @logo = CoreService.get_global_property_value('logo').to_s
           @facility = Location.current_health_center.name rescue CoreService.get_global_property_value('facility.name') rescue ""
@@ -746,7 +745,7 @@ class CohortToolController < ApplicationController
 
         @transfer_out_ever = report.transfer_out_ever(ids_ever)
         @stopped_treatment_ever = report.stopped_treatment_ever(ids_ever)
-        @not_attend_ever = report.not_attending_ever(ids_ever)
+        @not_attend_ever = report.not_attending_ever(ids_ever).length
         @lost_followup_ever = report.lost_followup_ever(ids_ever)
 
        @dead_ever = report.dead_ever(ids_ever)
