@@ -344,7 +344,7 @@ class ProtocolPatientsController < ApplicationController
     end
 
     @user = User.find(params[:user_id]) rescue nil?
-     @treatements_list = ["Amputation", "Stroke", "Myocardial injactia(MI)", "Creatinine", "Funduscopy","Shortness of breath","Oedema","CVA", "Peripheral nueropathy", "Foot ulcers", "Visual Blindness", "Impotence", "Others"]
+     @treatements_list = ["Amputation", "Stroke", "Myocardial injactia(MI)", "Creatinine", "Funduscopy","Shortness of breath","Oedema","CVA", "Peripheral nueropathy", "Foot ulcers", "Visual Blindness", "Impotence", "None","Others"]
 
     redirect_to '/encounters/no_patient' and return if @user.nil?
     current_date = (!session[:datetime].nil? ? session[:datetime].to_date : Date.today)
