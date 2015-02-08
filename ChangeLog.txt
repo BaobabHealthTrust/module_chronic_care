@@ -3,3 +3,5 @@
 >> List of updates
 >> Link to the version
 >>---------------------------------------------------------------------
+2014-02-08
+PB - Fixed some ccc cohort indicators to return count instead of arrays that were causing the report to crush
