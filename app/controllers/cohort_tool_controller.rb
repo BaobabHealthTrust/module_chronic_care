@@ -745,12 +745,12 @@ class CohortToolController < ApplicationController
 
         @transfer_out_ever = report.transfer_out_ever(ids_ever)
         @stopped_treatment_ever = report.stopped_treatment_ever(ids_ever)
-        @not_attend_ever = report.not_attending_ever(ids_ever).length
+        @not_attend_ever = report.not_attending_ever(ids_ever)
         @lost_followup_ever = report.lost_followup_ever(ids_ever)
 
        @dead_ever = report.dead_ever(ids_ever)
-       @attending = @total_ever_registered  - @not_attend_ever - @stopped_treatment_ever - @lost_followup_ever - @transfer_out_ever - @dead_ever
-
+       @attending = (report.total_ever_registered.collect{|patient|patient.patient_id}.uniq  - @not_attend_ever.uniq - @stopped_treatment_ever.uniq - @lost_followup_ever.uniq - @transfer_out_ever.uniq - @dead_ever.uniq).uniq
+       
        bmi_female = report.bmi(ids, 'F')
        bmi_male = report.bmi(ids, 'M')
        @bmi = bmi_female + bmi_male
@@ -823,11 +823,11 @@ class CohortToolController < ApplicationController
     captopril = report.patient_ids_on_drugs(ids, 'captopril')
     captopril_ever = report.patient_ids_on_drugs(ids_ever, 'captopril')
 
-    @no_asthma_ever = @asthma_ever.uniq.length  -  asthma_ever.uniq.length
-    @no_asthma = @asthma.uniq.length - asthma.uniq.length
+    @no_asthma_ever = @asthma_ever.uniq  -  asthma_ever.uniq
+    @no_asthma = @asthma.uniq - asthma.uniq
 
-    @no_epilepsy_ever = @epilepsy_ever.uniq.length  -  epilepsy_ever.uniq.length
-    @no_epilepsy = @epilepsy.uniq.length - epilepsy.uniq.length
+    @no_epilepsy_ever = @epilepsy_ever.uniq  -  epilepsy_ever.uniq
+    @no_epilepsy = @epilepsy.uniq - epilepsy.uniq
 
     @stroke = report.stroke(ids) rescue 0
     @stroke_ever = report.stroke_ever(ids_ever) rescue 0
@@ -839,6 +839,55 @@ class CohortToolController < ApplicationController
     controlled_ever_male = report.controlled(ids_ever, 'M')
     controlled_ever_female = report.controlled(ids_ever, 'F')
     @controlled_ever = controlled_ever_female + controlled_ever_male
+
+
+   @attend_ht = report.attended_by_disease(@attending.join(','), @ht.join(','))
+   @attend_dmht = report.attended_by_disease(@attending.join(','), @dmht.join(','))
+   @attend_dm = report.attended_by_disease(@attending.join(','), @dm.join(','))
+   @attend_asthma = report.attended_by_disease(@attending.join(','), @asthma.join(','))
+   @attend_epilepsy = report.attended_by_disease(@attending.join(','), @epilepsy.join(','))
+   @attend_cntl = report.attended_by_disease(@attending.join(','), @controlled.join(','))
+
+   @attend_ht_ever = report.attended_by_disease(@attending.join(','), @ht_ever.join(','))
+   @attend_dmht_ever = report.attended_by_disease(@attending.join(','), @dmht_ever.join(','))
+   @attend_dm_ever = report.attended_by_disease(@attending.join(','), @dm_ever.join(','))
+   @attend_asthma_ever = report.attended_by_disease(@attending.join(','), @asthma_ever.join(','))
+   @attend_epilepsy_ever = report.attended_by_disease(@attending.join(','), @epilepsy_ever.join(','))
+   @attend_cntl_ever = report.attended_by_disease(@attending.join(','), @controlled_ever.join(','))
+
+   @prescribed_ht = report.medcation_prescribed(@attend_ht.join(','))
+   @prescribed_dmht = report.medcation_prescribed(@attend_dmht.join(','))
+   @prescribed_dm = report.medcation_prescribed(@attend_dm.join(','))
+   @prescribed_asthma = report.medcation_prescribed(@attend_asthma.join(','))
+   @prescribed_epilepsy = report.medcation_prescribed(@attend_epilepsy.join(','))
+
+   @prescribed_ht_ever = report.medcation_prescribed(@attend_ht_ever.join(','))
+   @prescribed_dmht_ever = report.medcation_prescribed(@attend_dmht_ever.join(','))
+   @prescribed_dm_ever = report.medcation_prescribed(@attend_dm_ever.join(','))
+   @prescribed_asthma_ever = report.medcation_prescribed(@attend_asthma_ever.join(','))
+   @prescribed_epilepsy_ever = report.medcation_prescribed(@attend_epilepsy_ever.join(','))
+
+   @attend_no_seizure = report.attended_by_disease(@attend_epilepsy.join(','), @no_epilepsy.join(','))
+   @attend_no_seizure_ever = report.attended_by_disease(@attend_epilepsy_ever.join(','), @no_epilepsy_ever.join(','))
+
+   @attend_no_asthma = report.attended_by_disease(@attend_asthma.join(','), @no_asthma.join(','))
+   @attend_no_asthma_ever = report.attended_by_disease(@attend_asthma_ever.join(','), @no_asthma_ever.join(','))
+   
+   @attend_bp_ht =  report.attended_by_disease(@attend_ht.join(','), @bp_measured.join(','))
+   @attend_bp_dmht =  report.attended_by_disease(@attend_dmht.join(','), @bp_measured.join(','))
+   @attend_glucose_dm =  report.attended_by_disease(@attend_dm.join(','), @glucose_measured.join(','))
+   @attend_glucose_controlled_dm =  report.attended_by_disease(@attend_dm.join(','), @glucose_controlled.join(','))
+
+   @attend_lowbp_ht =  report.attended_by_disease(@attend_ht.join(','), @low_bp.join(','))
+   @attend_lowbp_dmht =  report.attended_by_disease(@attend_dmht.join(','), @low_bp.join(','))
+
+  @attend_bp_ever_ht =  report.attended_by_disease(@attend_ht_ever.join(','), @bp_measured_ever.join(','))
+   @attend_bp_ever_dmht =  report.attended_by_disease(@attend_dmht_ever.join(','), @bp_measured_ever.join(','))
+   @attend_glucose_ever_dm =  report.attended_by_disease(@attend_dm_ever.join(','), @glucose_ever_measured.join(','))
+   @attend_glucose_ever_controlled_dm =  report.attended_by_disease(@attend_dm_ever.join(','), @glucose_ever_controlled.join(','))
+
+   @attend_lowbp_ever_ht =  report.attended_by_disease(@attend_ht_ever.join(','), @low_bp_ever.join(','))
+   @attend_lowbp_ever_dmht =  report.attended_by_disease(@attend_dmht_ever.join(','), @low_bp_ever.join(','))
 
     burns_male = report.burns_ever(ids, 'M')
     burns_female = report.burns_ever(ids, 'F')

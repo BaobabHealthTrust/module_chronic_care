@@ -289,6 +289,18 @@ class Reports::CohortDm
     return @orders
   end
 
+  def attended_by_disease(attended_ids, disease_ids)
+     Patient.find_by_sql("SELECT distinct(patient_id) FROM patient
+       WHERE patient_id IN (#{attended_ids}) 
+      AND patient_id IN (#{disease_ids})").collect{|p|p.patient_id} rescue []
+  end
+
+  def medcation_prescribed(attended_ids)
+     Order.find_by_sql("
+       SELECT distinct(patient_id) FROM   orders WHERE start_date >= '#{@start_date}' 
+      AND start_date <= '#{@end_date}' and patient_id IN (#{attended_ids}) ").collect{|p|p.patient_id} rescue []
+  end
+
   def epilepsy_asthma(ids, type)
     start_date = @end_date.to_date -  3.months
    if type.upcase == "ASTHMA"
@@ -1487,7 +1499,7 @@ class Reports::CohortDm
                 INNER JOIN concept_name c ON c.concept_id = pw.concept_id
                 WHERE ps.start_date <= '#{@end_date}'
                 #{categorise} AND c.name = 'PATIENT DIED'
-                AND p.patient_id IN (#{ids})").length rescue 0
+                AND p.patient_id IN (#{ids})").collect{|p| p.patient_id} rescue []
   end
 
   def dead(ids, sex=nil)
@@ -1545,7 +1557,7 @@ class Reports::CohortDm
                 INNER JOIN concept_name c ON c.concept_id = pw.concept_id
                 WHERE ps.start_date <= '#{@end_date}'
                 #{categorise} AND p.patient_id IN (#{ids})
-                AND c.name = 'PATIENT TRANSFERRED OUT'").length  rescue 0
+                AND c.name = 'PATIENT TRANSFERRED OUT'").collect {|p| p.patient_id}  rescue []
 
   end
 
@@ -1581,7 +1593,7 @@ class Reports::CohortDm
                 INNER JOIN concept_name c ON c.concept_id = pw.concept_id
                 WHERE ps.start_date <= '#{@end_date}'
                 #{categorise} AND p.patient_id IN (#{ids})
-                AND c.name = 'TREATMENT STOPPED'").length rescue 0
+                AND c.name = 'TREATMENT STOPPED'").collect{|p| p.patient_id} rescue []
   end
 
   def stopped_treatment(ids, sex=nil)
@@ -1713,7 +1725,7 @@ class Reports::CohortDm
                                       DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
 																			#{categorise} AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
 																			concept_set IN (#{@asthma_id}, #{@epilepsy_id}, #{@diabetes_id}, #{@hypertensition_medication_id})) \
-                                      GROUP BY patient_id").length rescue 0
+                                      GROUP BY patient_id").collect {|p| p.patient_id} rescue []
   end
 
   def attending(ids, sex=nil)
@@ -2048,7 +2060,7 @@ class Reports::CohortDm
   end
 
   def controlled(ids, sex=nil)
-    total = 0
+    total = []
     Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
       WHERE person_id IN (#{ids})
       AND gender LIKE '#{sex}%'").each { |patient|
@@ -2056,7 +2068,7 @@ class Reports::CohortDm
       bp_low = low_bp(patient.person_id.to_i)
       low_sugar = compare_sugar(patient.person_id.to_i)
       if bp_down == true || bp_low == true || low_sugar == true
-        total += 1
+        total << patient.person_id
       end
     } rescue []
 
@@ -2166,7 +2178,7 @@ class Reports::CohortDm
   end
 
   def decrease_in_sugar(ids, sex=nil, reason=nil)
-    total = 0
+    total = []
     Patient.find_by_sql("SELECT DISTINCT(person_id) FROM person
       WHERE person_id IN (#{ids})
       AND gender LIKE '#{sex}%'").each { |patient|

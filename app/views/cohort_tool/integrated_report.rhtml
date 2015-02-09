@@ -60,6 +60,22 @@
             font-size:medium;
           }
 
+          .ht{
+            border-radius: 2px;
+            cursor: default;
+            font-size: 11px;
+            font-weight: bold;
+            background-color: lightblue;
+            height: 27px;
+            line-height: 27px;
+            margin-right: 16px;
+            min-width: 54px;
+            outline: 0 none;
+            padding: 0 8px;
+            text-align: center;
+            white-space: nowrap;
+}
+
           .row_break td {
             border-width:0px;
           }
@@ -229,7 +245,7 @@
                   <td  style="text-align:left;border-width:1px 0px 0px 1px">Patient Outcome<br>at end of quarter</td>
                   <td style="text-align:left;border-width:1px 0px 0px 1px">Attended the clinic</td>
                   <td class="tops"></td>
-                  <td><%= @attending %></td>
+                  <td><%= @attending.length %></td>
 
                 </tr>
                  <tr >
@@ -237,7 +253,7 @@
                   <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Did not attend in quarter</td>
                    <td class="middles"></td>
-                  <td><%= @not_attend_ever %></td>>
+                  <td><%= @not_attend_ever.length %></td>>
 
                 </tr>
                 <tr >
@@ -245,7 +261,7 @@
                   <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Stopped treatment</td>
                   <td class="middles"></td>
-                  <td><%= @stopped_treatment_ever %></td>
+                  <td><%= @stopped_treatment_ever.length %></td>
 
                 </tr>
                 <tr >
@@ -253,7 +269,7 @@
                   <td  style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Transferred out to another facility</td>
                   <td class="middles"></td>
-                  <td><%= @transfer_out_ever %></td>
+                  <td><%= @transfer_out_ever.length %></td>
 
                 </tr>
                 <tr >
@@ -261,7 +277,7 @@
                   <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Died</td>
                   <td class="middles"></td>
-                  <td><%= @dead_ever %></td>
+                  <td><%= @dead_ever.length %></td>
 
                 </tr>
                 <tr >
@@ -269,7 +285,7 @@
                   <td style="text-align:left;border-width:0px 0px 1px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 1px 1px">Lost to follow-up</td>
                   <td class="bottoms"></td>
-                  <td><%= @lost_followup_ever %></td>
+                  <td><%= @lost_followup_ever.length %></td>
 
                 </tr>
                 <tr class = 'row_break'>
@@ -308,63 +324,151 @@
                   <td>&nbsp;</td>
                   <td>&nbsp;</td>
                 </tr>
-                <tr >
+                <tr class="ht">
 
-                  <td  style="text-align:left;border-width:1px 0px 0px 1px">Measure of disease control</td>
-                  <td style="text-align:left;border-width:1px 0px 0px 1px">Blood pressure measured</td>
-                  <td><%= @bp_measured.length %></td>
-                  <td><%= @bp_measured_ever.length %></td>
+                  <td  style="border-width:1px 0px 0px 1px"> <span style="float:left;">Measure of disease control</span> <span style="float:right;">Hypertension</span></td>
+                  <td style="text-align:left;border-width:1px 0px 0px 1px">Attended the clinic in the quarter </td>
+                  <td><%= @attend_ht.length rescue 0 %></td>
+                  <td><%= @attend_ht_ever.length rescue 0 %></td>
 
                 </tr>
-                 <tr >
+                 <tr class="ht">
+
+                   <td style="text-align:left;border-width:0px 0px 0px 1px"></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 1px"> Medication prescribed </td>
+                  <td><%= @prescribed_ht.length %></td>
+                  <td><%= @prescribed_ht_ever.length %></td>
+                 </tr>
+
+                 <tr class="ht">
+
+                   <td style="text-align:left;border-width:0px 0px 0px 1px"></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Blood pressure measured </td>
+                  <td><%= @attend_bp_ht.length %></td>
+                  <td><%= @attend_bp_ever_ht.length %></td>
+                 </tr>
+
+                 <tr class="ht" >
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Blood pressure controlled (BP <= 140/90)</td>
-                  <td><%= @low_bp.length %></td>
-                  <td><%= @low_bp_ever.length %></td>
+                  <td><%= @attend_lowbp_ht.length %></td>
+                  <td><%= @attend_lowbp_ever_ht.length %></td>
 
                 </tr>
-                <tr >
-
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">Blood glucose measured</td>
-                  <td><%= @glucose_measured %></td>
-                  <td><%= @glucose_ever_measured %></td>
+               <tr>
+                <td  style="border-width:0px 0px 0px 1px"> <span style="float:right;">Hypertension  &#38; Diabetes</span></td>
+                  <td style="text-align:left;border-width:1px 0px 0px 1px">Attended the clinic in the quarter </td>
+                  <td><%= @attend_dmht.length %></td>
+                  <td><%= @attend_dmht_ever.length %></td>
 
                 </tr>
                  <tr >
+
+                   <td style="text-align:left;border-width:0px 0px 0px 1px"></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 1px"> Medication prescribed </td>
+                  <td><%= @prescribed_dmht.length %></td>
+                  <td><%= @prescribed_dmht_ever.length %></td>
+                 </tr>
+
+                 <tr >
+                   <td style="text-align:left;border-width:0px 0px 0px 1px"></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Blood pressure measured </td>
+                  <td><%= @attend_bp_dmht.length %></td>
+                  <td><%= @attend_bp_ever_dmht.length %></td>
+                 </tr>
+
+                 <tr  >
+
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Blood pressure controlled (BP <= 140/90)</td>
+                  <td><%= @attend_lowbp_dmht.length %></td>
+                  <td><%= @attend_lowbp_ever_dmht.length %></td>
+
+                </tr>
+
+                <tr   class="ht" >
+
+                <td style="text-align:left;border-width:0px 0px 0px 1px"><span style="float:right;">Diabetes</span></td>
+                 <td style="text-align:left;border-width:1px 0px 0px 1px">Attended the clinic in the quarter </td>
+                  <td><%= @attend_dm.length %></td>
+                  <td><%= @attend_dm_ever.length %></td>
+
+                </tr>
+                 <tr  class="ht" >
+
+                   <td style="text-align:left;border-width:0px 0px 0px 1px"></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 1px"> Medication prescribed </td>
+                  <td><%= @prescribed_dm.length %></td>
+                  <td><%= @prescribed_dm_ever.length %></td>
+                 </tr>
+                 <tr class="ht" >
+                  <td style="text-align:left;border-width:0px 0px 0px 1px"></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 1px">Blood glucose measured</td>
+                  <td><%= @attend_glucose_dm.length  %></td>
+                  <td><%= @attend_glucose_ever_dm.length  %></td>
+
+                </tr>
+                 <tr  class="ht" >
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Blood glucose controlled (FBG < 7.0mmol/l)</td>
-                  <td><%= @glucose_controlled %></td>
-                  <td><%= @glucose_ever_controlled %></td>
+                  <td><%= @attend_glucose_controlled_dm %></td>
+                  <td><%= @attend_glucose_ever_controlled_dm %></td>
 
                 </tr>
                  <tr >
+                  <td style="text-align:left;border-width:0px 0px 0px 1px"><span style="float:right;">Asthma</span></td>
+                  <td style="text-align:left;border-width:1px 0px 0px 1px">Attended the clinic in the quarter </td>
+                  <td><%= @attend_asthma.length %></td>
+                  <td><%= @attend_asthma_ever.length %></td>
 
-                  <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
+                </tr>
+                 <tr >
+                   <td style="text-align:left;border-width:0px 0px 0px 1px"></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 1px"> Medication prescribed </td>
+                  <td><%= @prescribed_asthma.length %></td>
+                  <td><%= @prescribed_asthma_ever.length %></td>
+                 </tr>
+                 <tr  >
+                  <td style="text-align:left;border-width:0px 0px 0px 1px"></td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">No asthma attack in last three month</td>
-                  <td><%= @no_asthma %></td>
-                  <td><%= @no_asthma_ever %></td>
+                  <td><%= @attend_no_asthma.length rescue 0 %></td>
+                  <td><%= @attend_no_asthma_ever.length rescue 0 %></td>
 
                 </tr>
-                 <tr >
+                 <tr  class="ht" >
 
+                   <td style="text-align:left;border-width:0px 0px 0px 1px"><span style="float:right;">Epilepsy</span></td>
+                   <td style="text-align:left;border-width:1px 0px 0px 1px">Attended the clinic in the quarter </td>
+                  <td><%= @attend_epilepsy.length %></td>
+                  <td><%= @attend_epilepsy_ever.length %></td>
+
+                </tr>
+                 <tr  class="ht" >
+
+                   <td style="text-align:left;border-width:0px 0px 0px 1px"></td>
+                  <td style="text-align:left;border-width:0px 0px 0px 1px"> Medication prescribed </td>
+                  <td><%= @prescribed_epilepsy.length %></td>
+                  <td><%= @prescribed_epilepsy_ever.length %></td>
+                 </tr>
+
+                 <tr  class="ht" >
                   <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">No seizure in last three months</td>
-                  <td><%= @no_epilepsy %></td>
-                  <td><%=  @no_epilepsy_ever %></td>
+                  <td><%= @attend_no_epilepsy.length rescue 0%></td>
+                  <td><%=  @attend_no_epilepsy_ever.length rescue 0 %></td>
 
-                </tr>
+                </tr><!--
                  <tr >
 
-                  <td style="text-align:left;border-width:0px 0px 1px 1px">&nbsp;</td>
-                  <td style="text-align:left;border-width:0px 0px 1px 1px">All disease parameters under control</td>
-                  <td><%= @controlled %></td>
-                  <td><%= @controlled_ever %></td>
+                  <td style="text-align:left;border-width:1px 0px 1px 1px">&nbsp;</td>
+                  <td style="text-align:left;border-width:1px 0px 1px 1px">All disease parameters under control</td>
+                  <td><%= @attend_cntl.length %></td>
+                  <td><%= @attend_cntl_ever.length %></td>
 
                 </tr>
-                
+                -->
                 <tr class = 'row_break'>
 
                   <td>&nbsp;</td>
