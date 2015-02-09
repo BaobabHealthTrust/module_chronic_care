@@ -1435,8 +1435,8 @@ class CohortToolController < ApplicationController
       @end_stage_retinapathy +
       @maculopathy
     else
-      @attending_male = total_ever_male - @not_attend_male - @stopped_treatment_ever_male - @lost_followup_male - @transfer_out_ever_male - @dead_ever_male
-      @attending_female = total_ever_female - @not_attend_female - @stopped_treatment_ever_female - @lost_followup_female - @transfer_out_ever_female - @dead_ever_female    #- @dead_ever_male - @transfer_out_ever_male - @stopped_treatment_ever_male
+      @attending_male = total_ever_male - @not_attend_male.count - @stopped_treatment_ever_male - @lost_followup_male - @transfer_out_ever_male - @dead_ever_male
+      @attending_female = total_ever_female - @not_attend_female.count - @stopped_treatment_ever_female - @lost_followup_female - @transfer_out_ever_female - @dead_ever_female    #- @dead_ever_male - @transfer_out_ever_male - @stopped_treatment_ever_male
     end
    
 

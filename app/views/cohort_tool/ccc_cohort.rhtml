@@ -391,9 +391,9 @@
                 <tr>
 
                   <td style="text-align:left;" colspan="5">Did not attend</td>
-                  <td><%=  @not_attend_male %></td>
-                  <td><%=  @not_attend_female %></td>
-                  <td><%=  (@not_attend_male + @not_attend_female) %></td>
+                  <td><%=  @not_attend_male.count %></td>
+                  <td><%=  @not_attend_female.count %></td>
+                  <td><%=  (@not_attend_male.count + @not_attend_female.count) %></td>
                 </tr>
                 <tr>
 
@@ -581,24 +581,24 @@
                 <tr>
 
                   <td style="text-align:left;">Bp down</td>
-                  <td><%=  @bp_male %></td>
-                  <td><%=  @bp_female %></td>
-                  <td><%=  @bp_female + @bp_male %></td>
+                  <td><%=  @bp_male.count %></td>
+                  <td><%=  @bp_female.count %></td>
+                  <td><%=  @bp_female.count + @bp_male.count %></td>
                   <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @bp_ever_male %></td>
-                  <td><%=  @bp_ever_female %></td>
-                  <td><%=  @bp_ever_female + @bp_ever_male %></td>
+                  <td><%=  @bp_ever_male.count %></td>
+                  <td><%=  @bp_ever_female.count %></td>
+                  <td><%=  @bp_ever_female.count + @bp_ever_male.count %></td>
                 </tr>
                 <tr>
 
                   <td style="text-align:left;">Bp < 140/90 </td>
-                  <td><%=  @low_bp_male %></td>
-                  <td><%=  @low_bp_female %></td>
-                  <td><%=  @low_bp_female + @low_bp_male %></td>
+                  <td><%=  @low_bp_male.count %></td>
+                  <td><%=  @low_bp_female.count %></td>
+                  <td><%=  @low_bp_female.count + @low_bp_male.count %></td>
                   <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @low_bp_ever_male %></td>
-                  <td><%=  @low_bp_ever_female %></td>
-                  <td><%=  @low_bp_ever_male + @low_bp_ever_female %></td>
+                  <td><%=  @low_bp_ever_male.count %></td>
+                  <td><%=  @low_bp_ever_female.count %></td>
+                  <td><%=  @low_bp_ever_male.count + @low_bp_ever_female.count %></td>
                 </tr>
                 <tr>
 
