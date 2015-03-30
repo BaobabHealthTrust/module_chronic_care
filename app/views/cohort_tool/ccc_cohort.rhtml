@@ -406,24 +406,24 @@
 
                   <td style="text-align:left;" colspan="5">Stopped</td>
                  
-                  <td><%=  @stopped_treatment_ever_male %></td>
-                  <td><%=  @stopped_treatment_ever_female %></td>
-                  <td><%=  (@stopped_treatment_ever_female + @stopped_treatment_male) %></td>
+                  <td><%=  @stopped_treatment_ever_male.length %></td>
+                  <td><%=  @stopped_treatment_ever_female.length %></td>
+                  <td><%=  (@stopped_treatment_ever_female.length + @stopped_treatment_male.length) %></td>
                 </tr>
                 <tr>
 
                   <td style="text-align:left;" colspan="5">Transferred Out</td>
                   
-                  <td><%=  @transfer_out_ever_male %></td>
-                  <td><%=  @transfer_out_ever_female %></td>
-                  <td><%=  (@transfer_out_ever_female + @transfer_out_ever_male) %></td>
+                  <td><%=  @transfer_out_ever_male.length %></td>
+                  <td><%=  @transfer_out_ever_female.length %></td>
+                  <td><%=  (@transfer_out_ever_female.length + @transfer_out_ever_male.length) %></td>
                 </tr>
                 <tr>
 
                   <td style="text-align:left;" colspan="5">Lost to follow-up</td>
-                  <td><%=  @lost_followup_male %></td>
-                  <td><%=  @lost_followup_female %></td>
-                  <td><%=  (@lost_followup_female + @lost_followup_male) %></td>
+                  <td><%=  @lost_followup_male.length %></td>
+                  <td><%=  @lost_followup_female.length %></td>
+                  <td><%=  (@lost_followup_female.length + @lost_followup_male.length) %></td>
                 </tr>
                 <tr class = 'row_break'>
 
@@ -660,13 +660,13 @@
                 <tr>
 
                   <td style="text-align:left;">Number of patients controlled</td>
-                  <td><%=  @controlled_male %></td>
-                  <td><%=  @controlled_female %></td>
-                  <td><%=  (@controlled_male + @controlled_female) %></td>
+                  <td><%=  @controlled_male.length %></td>
+                  <td><%=  @controlled_female.length %></td>
+                  <td><%=  (@controlled_male.length + @controlled_female.length) %></td>
                   <td style="text-align:left;border-width:0px 0px 0px 0px">&nbsp;</td>
-                  <td><%=  @controlled_ever_male %></td>
-                  <td><%=  @controlled_ever_female %></td>
-                  <td><%=  (@controlled_ever_male + @controlled_ever_female) %></td>
+                  <td><%=  @controlled_ever_male.length %></td>
+                  <td><%=  @controlled_ever_female.length %></td>
+                  <td><%=  (@controlled_ever_male.length + @controlled_ever_female.length) %></td>
                 </tr>
              
 

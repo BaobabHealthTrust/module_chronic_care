@@ -244,9 +244,9 @@
         <tbody>
           <tr>
 
-            <td style="text-align:left;">Total registrated</td>
-            <td><%=  @total_registered %></td>
-            <td><%=  @total_ever_registered %></td>
+            <td style="text-align:left;">Total registered</td>
+            <td><%=  @total_registered.length rescue 0 %></td>
+            <td><%=  @total_ever_registered.length rescue 0 %></td>
           </tr>
 
           <tr class = 'row_break'>
@@ -293,20 +293,20 @@
           <tr class = 'row_break'>
 
             <td style="text-align:left;border-width:0px 0px 0px 1px">Defaulters</td>
-            <td style="border-width:1px 1px 1px 1px"><%= @defaulters %></td>
-            <td style="border-width:1px 1px 1px 1px"><%= @defaulters_ever %></td>
+            <td style="border-width:1px 1px 1px 1px"><%= @defaulters.length %></td>
+            <td style="border-width:1px 1px 1px 1px"><%= @defaulters_ever.length %></td>
           </tr>
           <tr class = 'row_break'>
 
             <td style="text-align:left;border-width:0px 0px 0px 1px">Transfer Out</td>
-            <td style="border-width:1px 1px 1px 1px"><%= @transfer_out %></td>
-            <td style="border-width:1px 1px 1px 1px"><%= @transfer_out_ever %></td>
+            <td style="border-width:1px 1px 1px 1px"><%= @transfer_out.length %></td>
+            <td style="border-width:1px 1px 1px 1px"><%= @transfer_out_ever.length %></td>
           </tr>
           <tr class = 'row_break'>
 
             <td style="text-align:left;border-width:0px 0px 1px 1px">Stop Treatment</td>
-            <td style="border-width:1px 1px 1px 1px"><%= @stopped_treatment %></td>
-            <td style="border-width:1px 1px 1px 1px"><%= @stopped_treatment_ever %></td>
+            <td style="border-width:1px 1px 1px 1px"><%= @stopped_treatment.length %></td>
+            <td style="border-width:1px 1px 1px 1px"><%= @stopped_treatment_ever.length %></td>
           </tr>
 
           <tr class = 'row_break'>

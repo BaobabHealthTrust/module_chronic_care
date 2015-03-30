@@ -1447,6 +1447,7 @@ class Reports::CohortDm
 
   # Outcome
   def discharged_ever(ids, sex=nil)
+    return [] if ids.blank?
     program_id = Program.find_by_name("CHRONIC CARE PROGRAM").id
     if ! sex.blank?
       patient_initial = sex.split(//).first.upcase
@@ -1462,10 +1463,11 @@ class Reports::CohortDm
                 INNER JOIN concept_name c ON c.concept_id = pw.concept_id
                 WHERE ps.start_date <= '#{@end_date}'
                 #{categorise} AND c.name = 'DISCHARGED'
-                 AND p.patient_id IN (#{ids})").length rescue 0
+                 AND p.patient_id IN (#{ids})") 
   end
 
   def discharged(ids, sex=nil)
+    return [] if ids.blank?
     if ! sex.blank?
       patient_initial = sex.split(//).first.upcase
       categorise = "AND (UCASE(pe.gender) = '#{sex.upcase}'
@@ -1482,7 +1484,7 @@ class Reports::CohortDm
                 WHERE ps.start_date <= '#{@end_date}'
                 #{categorise} AND ps.start_date >= '#{@start_date}'
                 AND c.name = 'DISCHARGED'
-                 AND p.patient_id IN (#{ids})").length rescue 0
+                 AND p.patient_id IN (#{ids})")
   end
 
   def dead_ever(ids, sex=nil)
@@ -1544,6 +1546,7 @@ class Reports::CohortDm
   end
 
   def transfer_out_ever(ids, sex=nil)
+    return [] if ids.blank?
     if ! sex.blank?
       patient_initial = sex.split(//).first.upcase
       categorise = "AND (UCASE(pe.gender) = '#{sex.upcase}'
@@ -1562,6 +1565,7 @@ class Reports::CohortDm
   end
 
   def transfer_out(ids, sex=nil)
+    return [] if ids.blank?
     if ! sex.blank?
       patient_initial = sex.split(//).first.upcase
       categorise = "AND (UCASE(pe.gender) = '#{sex.upcase}'
@@ -1576,7 +1580,7 @@ class Reports::CohortDm
                 WHERE ps.start_date <= '#{@end_date}'
                 #{categorise} AND ps.start_date >= '#{@start_date}'
                 AND p.patient_id IN (#{ids})
-                AND c.name = 'PATIENT TRANSFERRED OUT'").length rescue 0
+                AND c.name = 'PATIENT TRANSFERRED OUT'")
   end
 
   def stopped_treatment_ever(ids, sex=nil)
@@ -1597,6 +1601,7 @@ class Reports::CohortDm
   end
 
   def stopped_treatment(ids, sex=nil)
+    return [] if ids.blank?
     if ! sex.blank?
       patient_initial = sex.split(//).first.upcase
       categorise = "AND (UCASE(pe.gender) = '#{sex.upcase}'
@@ -1611,7 +1616,7 @@ class Reports::CohortDm
                 WHERE ps.start_date <= '#{@end_date}'
                 AND ps.start_date >= '#{@start_date}'
                 #{categorise} AND p.patient_id IN (#{ids})
-                AND c.name = 'TREATMENT STOPPED'").length rescue 0
+                AND c.name = 'TREATMENT STOPPED'")
   end
 
   # Treatment (Alive and Even Defaulters)
@@ -1641,7 +1646,7 @@ class Reports::CohortDm
   end
 
   # Outcome: Defaulters
-  def defaulters_ever(ids, sex)
+  def defaulters_ever(ids, sex=[])
     if ! sex.blank?
       patient_initial = sex.split(//).first.upcase
       categorise = "AND (UCASE(pe.gender) = '#{sex.upcase}'
@@ -1652,19 +1657,21 @@ class Reports::CohortDm
     states = []
     names.each { |name|
       concept_name = ConceptName.find_all_by_name(name)
-      states += ProgramWorkflowState.find(:first, :conditions => ["concept_id IN (?)",concept_name.map{|c|c.concept_id}] ).program_workflow_state_id
+      states << ProgramWorkflowState.find_by_sql(["SELECT * FROM program_workflow_state ps
+                INNER JOIN program_workflow p WHERE p.program_id = #{@program_id} AND ps.concept_id = ?",
+                concept_name.map{|c|c.concept_id}]).last.program_workflow_state_id
     }
     states = states.join(',')
-    @orders = Order.find_by_sql("SELECT orders.patient_id, current_state_for_program(orders.patient_id, #{@program_id}, '#{@end_date}') AS state FROM orders
+    @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
                                       LEFT OUTER JOIN patient ON patient.patient_id = orders.patient_id #{joined} \
                                       WHERE DATEDIFF('#{@end_date}', auto_expire_date)/30 > 2 \
                                       AND patient.voided = 0
-                                      AND state NOT IN (#{states})
+                                      AND current_state_for_program(orders.patient_id, #{@program_id}, '#{@end_date}') NOT IN (#{states})
                                       AND patient.patient_id IN (#{ids}) AND \
                                       DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'  \
 																			#{categorise} AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
 																			concept_set IN (#{@asthma_id}, #{@epilepsy_id}, #{@diabetes_id}, #{@hypertensition_medication_id})) \
-                                      GROUP BY patient_id").length rescue 0
+                                      GROUP BY patient_id")
   end
   
   def attending_ever(ids, sex)
@@ -1747,24 +1754,27 @@ class Reports::CohortDm
   end
 
   def defaulters(ids)
+    return [] if ids.blank?
     names = ["PATIENT DIED", "PATIENT TRANSFERRED OUT", "TREATMENT STOPPED"]
     states = []
     names.each { |name|
       concept_name = ConceptName.find_all_by_name(name)
-      states += ProgramWorkflowState.find(:first, :conditions => ["concept_id IN (?)",concept_name.map{|c|c.concept_id}] ).program_workflow_state_id
+      states << ProgramWorkflowState.find_by_sql(["SELECT * FROM program_workflow_state ps
+                INNER JOIN program_workflow p WHERE p.program_id = #{@program_id} AND ps.concept_id = ?",
+                concept_name.map{|c|c.concept_id}]).last.program_workflow_state_id
     }
     states = states.join(',')
 
-    @orders = Order.find_by_sql("SELECT orders.patient_id  current_state_for_program(orders.patient_id, #{@program_id}, '#{@end_date}') AS state FROM orders LEFT OUTER JOIN patient ON
+    @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders LEFT OUTER JOIN patient ON
                                         patient.patient_id = orders.patient_id WHERE DATEDIFF('#{@end_date}', auto_expire_date)/30 > 2
                                         AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') >= '" +
         @start_date + "' AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'
                                         AND patient.voided = 0
-                                        AND state NOT IN (#{states})
+                                        AND current_state_for_program(orders.patient_id, #{@program_id}, '#{@end_date}') NOT IN (#{states})
                                         AND patient.patient_id IN (#{ids})
                                         AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE 
                                         concept_set IN (#{@asthma_id}, #{@epilepsy_id}, #{@diabetes_id}, #{@hypertensition_medication_id}))
-                                        GROUP BY patient_id").length rescue 0
+                                        GROUP BY patient_id") 
   end
 
   # Maculopathy

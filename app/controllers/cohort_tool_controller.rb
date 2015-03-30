@@ -750,7 +750,7 @@ class CohortToolController < ApplicationController
 
        @dead_ever = report.dead_ever(ids_ever)
        @attending = (report.total_ever_registered.collect{|patient|patient.patient_id}.uniq  - @not_attend_ever.uniq - @stopped_treatment_ever.uniq - @lost_followup_ever.uniq - @transfer_out_ever.uniq - @dead_ever.uniq).uniq
-       
+
        bmi_female = report.bmi(ids, 'F')
        bmi_male = report.bmi(ids, 'M')
        @bmi = bmi_female + bmi_male
@@ -803,21 +803,21 @@ class CohortToolController < ApplicationController
 
     asthma = report.epilepsy_asthma(ids, "asthma").map{|patient|patient.patient_id}.uniq
     asthma_ever = report.epilepsy_asthma(ids_ever, "asthma").map{|patient|patient.patient_id}.uniq
-    
-    
+
+
     on_sabutamol_ever = report.patient_ids_on_drugs(ids_ever, 'Salbutamol')
-    on_sabutamol = report.patient_ids_on_drugs(ids, 'Salbutamol') 
+    on_sabutamol = report.patient_ids_on_drugs(ids, 'Salbutamol')
     on_beclomethasone = report.patient_ids_on_drugs(ids, 'beclomethasone')
     on_beclomethasone_ever = report.patient_ids_on_drugs(ids_ever, 'beclomethasone')
-    
+
     @other_asthma = asthma - on_sabutamol.map{|patient|patient.patient_id}.uniq - on_beclomethasone.map{|patient|patient.patient_id}.uniq
     @other_asthma_ever = asthma_ever - on_sabutamol_ever.map{|patient|patient.patient_id}.uniq - on_beclomethasone_ever.map{|patient|patient.patient_id}.uniq
 
     epilepsy = report.epilepsy_asthma(ids, "epilepsy").map{|patient|patient.patient_id}.uniq
     epilepsy_ever = report.epilepsy_asthma(ids_ever, "epilepsy").map{|patient|patient.patient_id}.uniq
-    
+
     hct_ever = report.patient_ids_on_drugs(ids_ever, 'hct')
-    hct = report.patient_ids_on_drugs(ids, 'hct') 
+    hct = report.patient_ids_on_drugs(ids, 'hct')
     amlodipine = report.patient_ids_on_drugs(ids, 'Amlodipine')
     amlodipine_ever = report.patient_ids_on_drugs(ids_ever, 'Amlodipine')
     captopril = report.patient_ids_on_drugs(ids, 'captopril')
@@ -872,7 +872,7 @@ class CohortToolController < ApplicationController
 
    @attend_no_asthma = report.attended_by_disease(@attend_asthma.join(','), @no_asthma.join(','))
    @attend_no_asthma_ever = report.attended_by_disease(@attend_asthma_ever.join(','), @no_asthma_ever.join(','))
-   
+
    @attend_bp_ht =  report.attended_by_disease(@attend_ht.join(','), @bp_measured.join(','))
    @attend_bp_dmht =  report.attended_by_disease(@attend_dmht.join(','), @bp_measured.join(','))
    @attend_glucose_dm =  report.attended_by_disease(@attend_dm.join(','), @glucose_measured.join(','))
@@ -973,7 +973,7 @@ class CohortToolController < ApplicationController
     phenytoin_ever_male = report.patient_ever_on_drugs(ids_ever, "M", 'phenytoin')
     @phenytoin_ever = phenytoin_ever_female + phenytoin_ever_male
 
-    
+
     carbamazepine_female = report.patient_on_drugs(ids, "F", 'Carbamazepine')
     carbamazepine_male = report.patient_on_drugs(ids, "M", 'Carbamazepine')
     @carbamazepine = carbamazepine_female + carbamazepine_male
@@ -1022,22 +1022,22 @@ class CohortToolController < ApplicationController
 
     #@start_date = params[:start_date] rescue nil
     #@end_date = params[:end_date] rescue nil
-    
+
     report = Reports::CohortDm.new(@start_date, @end_date)
     @facility = Location.current_health_center.name rescue ''
 
     @specified_period = report.specified_period
-    
+
     if params[:type] == "ccc"
-              @total_registered = report.total_registered.length rescue 0
+              @total_registered = report.total_registered#.length rescue 0
               ids = report.total_registered.map{|patient|patient.patient_id}.join(',') rescue ""
               ids = report.total_registered.map{|patient|patient.patient_id} if report.total_registered.length == 1
-              @total_ever_registered = report.total_ever_registered.length rescue 0
+              @total_ever_registered = report.total_ever_registered #.length rescue 0
               ids_ever = report.total_ever_registered.map{|patient|patient.patient_id}.join(',') rescue ""
     else
-            @total_registered = report.total_registered("DIABETES HYPERTENSION INITIAL VISIT").length rescue 0
+            @total_registered = report.total_registered("DIABETES HYPERTENSION INITIAL VISIT")#.length rescue 0
             ids = report.total_registered("DIABETES HYPERTENSION INITIAL VISIT").map{|patient|patient.patient_id.to_s}.join(',') rescue ""
-            @total_ever_registered = report.total_ever_registered("DIABETES HYPERTENSION INITIAL VISIT").length rescue 0
+            @total_ever_registered = report.total_ever_registered("DIABETES HYPERTENSION INITIAL VISIT")#.length rescue 0
             ids_ever = report.total_ever_registered("DIABETES HYPERTENSION INITIAL VISIT").map{|patient|patient.patient_id.to_s}.join(',') rescue ""
     end
     report.set_variable(ids_ever)
@@ -1127,7 +1127,7 @@ class CohortToolController < ApplicationController
     @tb_before_diabetes = report.tb_before_diabetes(ids) rescue 0
     @tb_unknown_ever = report.tb_unknown_ever(ids_ever)
     @tb_unknown =  report.tb_unknown(ids)
- 
+
     #@no_tb = report.no_tb(ids) rescue 0
     @tb_ever = report.tb_ever(ids_ever) rescue 0
     @tb = report.tb(ids) rescue 0
@@ -1139,10 +1139,10 @@ class CohortToolController < ApplicationController
     @reactive_on_art = report.reactive_on_art(ids) rescue 0
     @non_reactive_ever = report.non_reactive_ever(ids_ever) rescue 0
     @non_reactive = report.non_reactive(ids) rescue 0
-    @unknown_ever = (@total_ever_registered.to_i - @non_reactive_ever.to_i -
+    @unknown_ever = (@total_ever_registered.length.to_i - @non_reactive_ever.to_i -
         @reactive_on_art_ever.to_i - @reactive_not_on_art_ever.to_i)
 
-    @unknown = (@total_registered.to_i - @non_reactive.to_i -
+    @unknown = (@total_registered.length.to_i - @non_reactive.to_i -
         @reactive_on_art.to_i - @reactive_not_on_art.to_i)
 
    end
@@ -1171,13 +1171,13 @@ class CohortToolController < ApplicationController
 
     @total_children_ever_registered_male = report.total_children_registered(ids_ever, "male", 0, 14, '1900-01-01')
     @total_children_ever_registered_female = report.total_children_registered(ids_ever, "female", 0, 14, '1900-01-01')
-    
+
     @disease_availabe_dm_male = report.disease_availabe(ids, "DM", "male").map{|patient|patient.patient_id}.uniq - report.disease_availabe(ids, "HT", "male").map{|patient|patient.patient_id}.uniq
     @disease_availabe_dm_female = report.disease_availabe(ids, "DM", "female").map{|patient|patient.patient_id}.uniq - report.disease_availabe(ids, "HT", "female").map{|patient|patient.patient_id}.uniq
     @disease_ever_availabe_dm_male = report.disease_ever_availabe(ids_ever, "DM", "male").map{|patient|patient.patient_id}.uniq - report.disease_ever_availabe(ids_ever, "HT", "male").map{|patient|patient.patient_id}.uniq
     @disease_ever_availabe_dm_female = report.disease_ever_availabe(ids_ever, "DM", "female").map{|patient|patient.patient_id}.uniq - report.disease_ever_availabe(ids_ever, "HT", "male").map{|patient|patient.patient_id}.uniq
 
-    
+
     @disease_availabe_ht_male = report.disease_availabe(ids, "HT", "male").map{|patient|patient.patient_id}.uniq - report.disease_availabe(ids, "DM", "male").map{|patient|patient.patient_id}.uniq
     @disease_availabe_ht_female = report.disease_availabe(ids, "HT", "female").map{|patient|patient.patient_id}.uniq - report.disease_availabe(ids, "DM", "female").map{|patient|patient.patient_id}.uniq
 
@@ -1200,13 +1200,13 @@ class CohortToolController < ApplicationController
     @disease_ever_availabe_dmht_female = report.disease_ever_availabe(ids_ever, "dm ht", "female").map{|patient|patient.patient_id}.uniq #- report.disease_ever_availabe(ids_ever, "HT", "female").map{|patient|patient.patient_id}.uniq - report.disease_ever_availabe(ids_ever, "DM", "female").map{|patient|patient.patient_id}.uniq
 
     total_male = @total_children_registered_male + @total_adults_registered_male + @older_persons_registered_male
-    
+
     total_female = @total_children_registered_female + @total_adults_registered_female + @older_persons_registered_female
-    
+
     total_disease_male = (@disease_availabe_dmht_male + @disease_availabe_dm_male + @disease_availabe_ht_male + @disease_availabe_asthma_male + @disease_availabe_epilepsy_male).uniq
     total_disease_female = (@disease_availabe_dmht_female + @disease_availabe_dm_female + @disease_availabe_ht_female + @disease_availabe_asthma_female + @disease_availabe_epilepsy_female).uniq
 
-    
+
     total_ever_male = @total_children_ever_registered_male + @total_adults_ever_registered_male + @older_persons_ever_registered_male
     total_ever_female = @total_children_ever_registered_female + @total_adults_ever_registered_female + @older_persons_ever_registered_female
 
@@ -1216,12 +1216,12 @@ class CohortToolController < ApplicationController
     #  raise @disease_ever_availabe_dm_male.to_yaml
     @disease_availabe_other_male = total_male - total_disease_male.length #rescue 0
     @disease_availabe_other_female = total_female - total_disease_female.length #rescue 0
-   
+
     @disease_ever_availabe_other_male = total_ever_male - total_disease_ever_male.length #rescue 0
    # raise  total_disease_ever_male.length.to_yaml
     @disease_ever_availabe_other_female = total_ever_female - total_disease_ever_female.length #rescue 0
-     
-      
+
+
     @bmi_greater_female = report.bmi(ids, 'F')
     @bmi_greater_male = report.bmi(ids, 'M')
 
@@ -1345,7 +1345,7 @@ class CohortToolController < ApplicationController
     @comp_blind_ever_male = report.blind_ever(ids_ever, 'M')
     @comp_blind_ever_female = report.blind_ever(ids_ever, 'F')
    end
- 
+
     @dead_ever_male = report.dead_ever(ids_ever, "male")# rescue 0
     @dead_ever_female = report.dead_ever(ids_ever, "female")# rescue 0
 
@@ -1363,7 +1363,7 @@ class CohortToolController < ApplicationController
    # raise @transfer_out_ever_male.to_yaml
 
     @transfer_out_ever = @transfer_out_ever_male + @transfer_out_ever_female
-    
+
     @transfer_out_male = report.transfer_out(ids_ever, "male")
     @transfer_out_female = report.transfer_out(ids_ever, "female")
     @transfer_out = @transfer_out_male + @transfer_out_female
@@ -1384,20 +1384,20 @@ class CohortToolController < ApplicationController
 
 
     if params[:type] != "ccc"
-    @stopped_treatment_ever = report.stopped_treatment_ever(ids_ever).length rescue 0
-    @stopped_treatment = report.stopped_treatment(ids).length  rescue 0
-   
-    @defaulters_ever = report.defaulters_ever(ids_ever) rescue 0
+    @stopped_treatment_ever = report.stopped_treatment_ever(ids_ever)
+    @stopped_treatment = report.stopped_treatment(ids)
+
+    @defaulters_ever = report.defaulters_ever(ids_ever)
     #@defaulters_ever = @defaulters_ever - @transfer_out_ever.to_i - @stopped_treatment_ever.to_i - @discharged_ever.to_i
-    @defaulters = report.defaulters(ids) rescue 0
+    @defaulters = report.defaulters(ids)
     #@defaulters = @defaulters - @transfer_out.to_i - @stopped_treatment.to_i - @discharged.to_i
 
     #@defaulters_ever = 0 if @defaulters_ever.to_i < 0
     #@defaulters = 0 if @defaulters.to_i < 0
 
-    @alive_ever = @total_ever_registered.to_i - @defaulters_ever.to_i - @transfer_out_ever.to_i - @stopped_treatment_ever.to_i - @discharged_ever.to_i
+    @alive_ever = @total_ever_registered.length.to_i - @defaulters_ever.length.to_i - @transfer_out_ever.length.to_i - @stopped_treatment_ever.length.to_i - @discharged_ever.length.to_i
 
-    @alive = @total_registered.to_i - @defaulters.to_i - @transfer_out.to_i - @stopped_treatment.to_i - @discharged.to_i
+    @alive = @total_registered.length.to_i - @defaulters.length.to_i - @transfer_out.length.to_i - @stopped_treatment.length.to_i - @discharged.length.to_i
 
     @on_diet_ever = report.diet_only(ids_ever, "cumulative")
 
@@ -1435,10 +1435,10 @@ class CohortToolController < ApplicationController
       @end_stage_retinapathy +
       @maculopathy
     else
-      @attending_male = total_ever_male - @not_attend_male.count - @stopped_treatment_ever_male - @lost_followup_male - @transfer_out_ever_male - @dead_ever_male
-      @attending_female = total_ever_female - @not_attend_female.count - @stopped_treatment_ever_female - @lost_followup_female - @transfer_out_ever_female - @dead_ever_female    #- @dead_ever_male - @transfer_out_ever_male - @stopped_treatment_ever_male
+      @attending_male = total_ever_male - @not_attend_male.count - @stopped_treatment_ever_male.length - @lost_followup_male.length - @transfer_out_ever_male.length - @dead_ever_male.length
+      @attending_female = total_ever_female - @not_attend_female.count - @stopped_treatment_ever_female.length - @lost_followup_female.length - @transfer_out_ever_female.length - @dead_ever_female.length    #- @dead_ever_male - @transfer_out_ever_male - @stopped_treatment_ever_male
     end
-   
+
 
     render :template => "/cohort_tool/ccc_cohort", :layout => "application" and return if params[:type] == "ccc"
     render :template => "/cohort_tool/cohort", :layout => "application"
@@ -1604,29 +1604,29 @@ class CohortToolController < ApplicationController
     @dead = report.dead(ids) #rescue 0
 
     @discharged_ever = report.discharged_ever(ids_ever) rescue 0
-    @discharged =report.discharged(ids) rescue 0
+    @discharged =report.discharged(ids)# rescue 0
 
     @transfer_out_ever = report.transfer_out_ever(ids_ever) rescue 0
 
-    @transfer_out = report.transfer_out(ids) rescue 0
+    @transfer_out = report.transfer_out(ids) #rescue 0
 
     @stopped_treatment_ever = report.stopped_treatment_ever(ids_ever)# rescue 0
 
     @stopped_treatment = report.stopped_treatment(ids) # rescue 0
-  
 
-    @defaulters_ever = report.defaulters_ever(ids_ever) rescue 0
-    @defaulters_ever = @defaulters_ever - @transfer_out_ever.to_i - @stopped_treatment_ever.to_i - @discharged_ever.to_i
 
-    @defaulters = report.defaulters(ids) rescue 0
-    @defaulters = @defaulters - @transfer_out.to_i - @stopped_treatment.to_i - @discharged.to_i
+    @defaulters_ever = report.defaulters_ever(ids_ever)
+    @defaulters_ever = @defaulters_ever.length.to_i - @transfer_out_ever.length.to_i - @stopped_treatment_ever.length.to_i - @discharged_ever.length.to_i
+
+    @defaulters = report.defaulters(ids)# rescue 0
+    @defaulters = @defaulters.length.to_i - @transfer_out.length.to_i - @stopped_treatment.length.to_i - @discharged.length.to_i
 
     @defaulters_ever = 0 if @defaulters_ever.to_i < 0
     @defaulters = 0 if @defaulters.to_i < 0
 
-    @alive_ever = @total_ever_registered.to_i - @defaulters_ever.to_i - @transfer_out_ever.to_i - @stopped_treatment_ever.to_i - @discharged_ever.to_i
+    @alive_ever = @total_ever_registered.to_i - @defaulters_ever.to_i - @transfer_out_ever.length.to_i - @stopped_treatment_ever.length.to_i - @discharged_ever.length.to_i
 
-    @alive = @total_registered.to_i - @defaulters.to_i - @transfer_out.to_i - @stopped_treatment.to_i - @discharged.to_i
+    @alive = @total_registered.to_i - @defaulters.to_i - @transfer_out.length.to_i - @stopped_treatment.length.to_i - @discharged.length.to_i
 
     render :layout => "application"
   end
