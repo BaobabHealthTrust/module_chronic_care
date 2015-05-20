@@ -1,2 +1,3 @@
 config/*.yml
-Gemfile
+Gemfile.lock
+log/
