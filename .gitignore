@@ -1,3 +1,9 @@
 config/*.yml
+<<<<<<< HEAD
 Gemfile
 nbproject*
+=======
+Gemfile.lock
+log/
+tmp/
+>>>>>>> 6bbf42641f18c332ba0a07525f1e58c5035ad6ff

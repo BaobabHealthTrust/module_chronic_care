@@ -140,4 +140,9 @@ module ApplicationHelper
       return program
     end
   end
+  
+  def version_tag
+  	`git describe`.gsub(/\n/, '')
+  end
+  
 end

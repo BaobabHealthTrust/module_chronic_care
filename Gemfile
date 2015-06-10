@@ -1,7 +1,12 @@
 source 'http://rubygems.org'
 
+<<<<<<< HEAD
 #gem 'bundler', '1.9.9'
 #gem 'bundler-unload', '1.0.2'
+=======
+gem 'bundler', '1.9.9'
+gem 'bundler-unload', '1.0.2'
+>>>>>>> 6bbf42641f18c332ba0a07525f1e58c5035ad6ff
 gem 'domain_name', '0.5.24'
 gem 'executable-hooks', '1.3.2'
 gem 'fastercsv', '1.5.5'
