@@ -37,14 +37,14 @@
 #description{
           color:#777;
           position:absolute;
-          margin-top:-70px; 
+          margin-top:-70px;
 }
           table {
             border-style:none;
             border-width:1px;
             width:95% !important;
-            top: 10%; 
-            left: 150%; 
+            top: 10%;
+            left: 150%;
           }
 
           th {
@@ -413,8 +413,8 @@
 
                   <td style="text-align:left;border-width:0px 0px 0px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 0px 1px">Blood glucose controlled (FBG < 7.0mmol/l)</td>
-                  <td><%= @attend_glucose_controlled_dm %></td>
-                  <td><%= @attend_glucose_ever_controlled_dm %></td>
+                  <td><%= @attend_glucose_controlled_dm.length %></td>
+                  <td><%= @attend_glucose_ever_controlled_dm.length %></td>
 
                 </tr>
                  <tr >

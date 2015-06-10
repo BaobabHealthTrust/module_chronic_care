@@ -778,10 +778,11 @@ class CohortToolController < ApplicationController
     bp_ever_female = report.decrease_in_bp(ids_ever, 'F', 'low')
     bp_ever_male = report.decrease_in_bp(ids_ever, 'M', 'low')
     @low_bp_ever = bp_ever_female + bp_ever_male
+    #raise @low_bp_ever.to_yaml
+    bp_measured_female = report.decrease_in_bp(ids, 'F', 'measured')
+    bp_measured_male = report.decrease_in_bp(ids, 'M', 'measured')
+    @bp_measured = bp_measured_female + bp_measured_male
 
-     bp_measured_female = report.decrease_in_bp(ids, 'F', 'measured')
-     bp_measured_male = report.decrease_in_bp(ids, 'M', 'measured')
-     @bp_measured = bp_measured_female + bp_measured_male
     bp_measured_ever_female = report.decrease_in_bp(ids_ever, 'F', 'measured')
     bp_measured_ever_male = report.decrease_in_bp(ids_ever, 'M', 'measured')
     @bp_measured_ever = bp_measured_ever_female + bp_measured_ever_male
@@ -881,7 +882,7 @@ class CohortToolController < ApplicationController
    @attend_lowbp_ht =  report.attended_by_disease(@attend_ht.join(','), @low_bp.join(','))
    @attend_lowbp_dmht =  report.attended_by_disease(@attend_dmht.join(','), @low_bp.join(','))
 
-  @attend_bp_ever_ht =  report.attended_by_disease(@attend_ht_ever.join(','), @bp_measured_ever.join(','))
+   @attend_bp_ever_ht =  report.attended_by_disease(@attend_ht_ever.join(','), @bp_measured_ever.join(','))
    @attend_bp_ever_dmht =  report.attended_by_disease(@attend_dmht_ever.join(','), @bp_measured_ever.join(','))
    @attend_glucose_ever_dm =  report.attended_by_disease(@attend_dm_ever.join(','), @glucose_ever_measured.join(','))
    @attend_glucose_ever_controlled_dm =  report.attended_by_disease(@attend_dm_ever.join(','), @glucose_ever_controlled.join(','))
