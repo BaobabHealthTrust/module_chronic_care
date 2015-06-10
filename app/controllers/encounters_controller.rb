@@ -2,20 +2,20 @@
 class EncountersController < ApplicationController
 
   def create
-     
+
     @retrospective = session[:datetime]
 		@retrospective = Time.now if session[:datetime].blank?
     User.current = User.find(@user["user_id"]) rescue nil
 
     remote_ip = request.remote_ip
     host = request.host_with_port
-    #raise @retrospective.to_yaml
+    #raise params.to_yaml
     Location.current = Location.find(params[:location_id] || session[:location_id]) rescue nil
 
     patient = Patient.find(params[:patient_id]) rescue nil
 
     if !patient.nil?
-			
+
       type = EncounterType.find_by_name(params[:encounter_type]).id rescue nil
 
       if !type.nil?
@@ -23,6 +23,7 @@ class EncountersController < ApplicationController
           :patient_id => patient.id,
           :provider_id => (params[:user_id]),
           :encounter_type => type,
+          :encounter_datetime => @retrospective,
           :location_id => (session[:location_id] || params[:location_id])
         )
 
@@ -33,7 +34,7 @@ class EncountersController < ApplicationController
         if !params[:program].blank?
 
           @program = Program.find_by_concept_id(ConceptName.find_by_name(params[:program]).concept_id) rescue nil
-					
+
           if !@program.nil?
 
             @program_encounter = ProgramEncounter.find_by_program_id(@program.id,
@@ -56,7 +57,7 @@ class EncountersController < ApplicationController
                   :program_id => @program.id
                 )
             #end
-						
+
             @current = PatientProgram.find_by_program_id(@program.id,
               :conditions => ["patient_id = ? AND COALESCE(date_completed, '') = ''", patient.id])
 
@@ -88,13 +89,13 @@ class EncountersController < ApplicationController
         end
 
 				if  params[:encounter_type] == "LAB RESULTS"
-          #raise params.to_yaml
+
           create_obs(@encounter , params)
 
-          @task = TaskFlow.new(params[:user_id] || User.first.id, patient.id)
-        
+          @task = TaskFlow.new(params[:user_id] || User.first.id, patient.id, @retrospective)
+
           redirect_to params[:next_url] and return if !params[:next_url].blank?
-					begin   
+					begin
 						redirect_to @task.asthma_next_task(host,remote_ip).url and return if current_program == "ASTHMA PROGRAM"
 						redirect_to @task.epilepsy_next_task(host,remote_ip).url and return if current_program == "EPILEPSY PROGRAM"
             redirect_to @task.hypertension_next_task(host,remote_ip).url and return if current_program == "HYPETENSION PROGRAM"
@@ -126,7 +127,7 @@ class EncountersController < ApplicationController
                     :end_date => @retrospective
                   }) if !selected_state.nil?
               end
-							
+
               concept_type = nil
               if value.strip.match(/^\d+$/)
 
@@ -164,7 +165,7 @@ class EncountersController < ApplicationController
                 :encounter_id => @encounter.id
               )
               case concept_type
-								
+
               when "date"
 
                 obs.update_attribute("value_datetime", value)
@@ -183,13 +184,13 @@ class EncountersController < ApplicationController
                 obs.update_attribute("value_coded_name_id", value_coded.concept_name_id)
 
               else
-								
+
                 obs.update_attribute("value_text", value)
 
               end
-							
+
             else
-							
+
 							key = key.gsub(" ", "_")
               redirect_to "/encounters/missing_concept?concept=#{key}" and return if !value.blank?
 
@@ -198,7 +199,7 @@ class EncountersController < ApplicationController
           else
 
             value.each do |item|
-							
+
               concept = ConceptName.find_by_name(key.strip).concept_id rescue nil
 
               if !concept.nil? and !item.blank?
@@ -285,7 +286,7 @@ class EncountersController < ApplicationController
             end
 
           end
-					
+
         end if !params[:concept].nil?
 
 
@@ -333,7 +334,7 @@ class EncountersController < ApplicationController
           end
 
         end
-				
+
       else
 
         redirect_to "/encounters/missing_encounter_type?encounter_type=#{params[:encounter_type]}" and return
@@ -361,9 +362,9 @@ class EncountersController < ApplicationController
 				end
 			end
 
-			
+
       redirect_to params[:next_url] and return if !params[:next_url].nil?
-			
+
 			if params[:encounter_type].to_s.upcase == "APPOINTMENT"
         print_and_redirect("/patients/specific_patient_visit_date_label/#{params[:patient_id]}?user_id=#{params[:user_id]}","/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}")
         return
@@ -377,7 +378,7 @@ class EncountersController < ApplicationController
         end
 			elsif params[:encounter_type].to_s.upcase == "EPILEPSY CLINIC VISIT"
         @mrdt = Vitals.current_vitals(Patient.find(params[:patient_id]), "Patient in active seizure")
-						
+
         unless @mrdt.blank?
           @mrdt = @mrdt.value_text.upcase rescue ConceptName.find_by_concept_id(@mrdt.value_coded).name.upcase
           if @mrdt == "YES"
@@ -387,7 +388,7 @@ class EncountersController < ApplicationController
         end
 			end
 
-      @task = TaskFlow.new(params[:user_id] || User.first.id, patient.id)
+      @task = TaskFlow.new(params[:user_id] || User.first.id, patient.id, @retrospective)
 
 			begin
 				redirect_to @task.asthma_next_task(host,remote_ip).url and return if current_program == "ASTHMA PROGRAM" #and return
@@ -404,7 +405,7 @@ class EncountersController < ApplicationController
 
 
   def life_advise
-  	
+
     	@patient = Patient.find(params[:patient_id])
     	@user = User.find(params[:user_id])
     	 current_date = (!session[:datetime].nil? ? session[:datetime].to_date : Date.today)
@@ -438,7 +439,7 @@ class EncountersController < ApplicationController
     @drinking = Vitals.current_vitals(@patient, "Does the patient drink alcohol?").to_s.split(":")[1].squish.upcase rescue "Unknown"
 
     current_date = current_date + 2.months
-    
+
     @previous_treatment = check_encounter(@patient, "TREATMENT", current_date)
 
     @bp = (@sbp / @dbp).to_f rescue 0
@@ -457,7 +458,7 @@ class EncountersController < ApplicationController
           end
     end
   end
-  
+
   def list_observations
     obs = []
     encounter = Encounter.find(params[:encounter_id])
@@ -469,7 +470,7 @@ class EncountersController < ApplicationController
         [o.id, mixed] rescue nil
       }.compact
     elsif encounter.type.name.upcase == "TREATMENT"
-     
+
       if encounter.observations.length > 0
 	      obs = encounter.observations.collect{|o|
 		[o.id, o.to_piped_s.humanize] rescue nil
@@ -684,13 +685,13 @@ class EncountersController < ApplicationController
 		@patient = Patient.find(params[:patient_id] || session[:patient_id])
 		#@patient_bean = PatientService.get_patient(@patient.person)
 		session_date = session[:datetime].to_date rescue Date.today
-		
+
 		if session[:datetime]
 			@retrospective = true
 		else
 			@retrospective = false
 		end
-    
+
 		#@current_height = Vitals.get_patient_attribute_value(@patient, "current_height")
 		#@min_weight = Vitals.get_patient_attribute_value(@patient, "min_weight")
     #@max_weight = Vitals.get_patient_attribute_value(@patient, "max_weight")
@@ -762,7 +763,7 @@ class EncountersController < ApplicationController
 
 		redirect_to :action => :create, 'encounter[encounter_type_name]' => params[:encounter_type].upcase, 'encounter[patient_id]' => @patient.id and return if ['registration'].include?(params[:encounter_type])
 
-		
+
 		render :action => params[:encounter_type].downcase if params[:encounter_type]
 	end
 
@@ -773,7 +774,7 @@ class EncountersController < ApplicationController
 
 		dispensed_date = session[:datetime].to_date rescue Date.today
 		expiry_date = prescription_expiry_date(@patient, dispensed_date)
-		
+
 		#if the patient is a child (age 14 or less) and the peads clinic days are set - we
 		#use the peads clinic days to set the next appointment date
 		peads_clinic_days = CoreService.get_global_property_value('peads.clinic.days')

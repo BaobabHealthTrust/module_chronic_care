@@ -1,2 +1,2 @@
 development:
-    current.path: http://0.0.0.0:3030/report/cohort_menu?user_id=1&location_id=722
+    current.path: http://localhost:3030/patients/visit_history/124874?user_id=1

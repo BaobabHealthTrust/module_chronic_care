@@ -2,7 +2,7 @@
 class TaskFlow
   require 'socket'
   require 'timeout'
-  
+
   attr_accessor :patient, :person, :user, :current_date, :tasks, :current_user_activities,
     :encounter_type, :url, :task_scopes, :task_list, :labels, :redirect_to, :current_program, :present_date
 
@@ -11,7 +11,6 @@ class TaskFlow
     self.user = User.find(user_id)
     self.current_date = session_date
 		#self.current_date = self.present_date
-
 
     if File.exists?("#{Rails.root}/config/protocol_task_flow.yml")
       settings = YAML.load_file("#{Rails.root}/config/protocol_task_flow.yml")["#{Rails.env
@@ -653,6 +652,7 @@ class TaskFlow
 			encounters.each do |tsk|
 
 			found = false
+
 			case tsk
 				when "CLINIC VISIT"
 					next if ! self.current_user_activities.include?(tsk.downcase)

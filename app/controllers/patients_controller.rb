@@ -17,7 +17,7 @@ class PatientsController < ApplicationController
     end
 
     @user = User.find(params[:user_id]) rescue nil
-    
+
     redirect_to "/encounters/no_user" and return if @user.nil?
 
     session[:patient_id] = @patient.id
@@ -35,8 +35,8 @@ class PatientsController < ApplicationController
                       AND p.patient_id = #{@patient.id}").first.status rescue ""
 
 
-    @task = TaskFlow.new(params[:user_id], @patient.id)
-		
+    @task = TaskFlow.new(params[:user_id], @patient.id, @retrospective)
+
     @links = {}
 
 		@project = get_global_property_value("project.name") rescue "Unknown"
@@ -62,7 +62,7 @@ class PatientsController < ApplicationController
       @demographics_url = @demographics_url + "/demographics/#{@patient.id}?user_id=#{@user.id}&ext=true"
     end
 		@demographics_url = "http://" + @demographics_url if !@demographics_url.match(/http:/)
-   
+
 		if current_program == "ASTHMA PROGRAM"
 			@task.asthma_next_task(host,remote_ip) rescue ""
 		elsif current_program == "EPILEPSY PROGRAM"
@@ -138,7 +138,7 @@ class PatientsController < ApplicationController
   end
 
   def processvitals
-   
+
     redirect_to "/patients/show/#{params[:patient_id]}?user_id=#{params[:user_id]}" and return if ! params[:cancel].blank?
     encounter_type = EncounterType.find_by_name("VITALS").encounter_type_id
     uuid = ActiveRecord::Base.connection.select_one("SELECT UUID() as uuid")['uuid']
@@ -154,11 +154,11 @@ class PatientsController < ApplicationController
                     AND DATE(obs_datetime) <= '#{date.to_date}' AND voided = 0
                     ORDER BY  obs_datetime DESC, date_created DESC LIMIT 1").first.to_s.split(':')[1].squish rescue 0
 
-    
+
     unless params["Height"].blank?
       current = params["Height"].to_i
     end
-   
+
 
 
     weight = ConceptName.find_by_sql("select concept_id from concept_name where name = 'weight (kg)' and voided = 0").first.concept_id
@@ -168,14 +168,14 @@ class PatientsController < ApplicationController
                     AND DATE(obs_datetime) <= '#{date.to_date}' AND voided = 0
                     ORDER BY  obs_datetime DESC, date_created DESC LIMIT 1").first.to_s.split(':')[1].squish rescue 0
 
-    
+
     unless params["Weight"].blank?
       weight = params["Weight"].to_f.round(1)
     end
     bmi = (weight / ( current * current) * 10000 ).round(1) rescue "Unknown"
 
     sex =  patient.gender.downcase
-    
+
 	  if (sex == "female")
 		  sex = "f"
     end
@@ -188,7 +188,7 @@ class PatientsController < ApplicationController
 
     user = User.find(params[:user_id]) rescue []
     location = session[:location_id]
-    
+
     unless person.blank?
 
        program = Program.find_by_concept_id(ConceptName.find_by_name("CHRONIC CARE PROGRAM").concept_id) rescue nil
@@ -287,7 +287,7 @@ class PatientsController < ApplicationController
               :creator => encounter.creator
             )
           end
-         
+
         elsif concept.match(/Temperature/i)
           concept = "Temperature"
         end
@@ -308,7 +308,7 @@ class PatientsController < ApplicationController
           )
         end
       }
-      
+
       if systolic.to_i > 0 and diastolic.to_i > 0
 
         if ( systolic.to_i < 120 && diastolic.to_i < 80)
@@ -359,10 +359,10 @@ class PatientsController < ApplicationController
         end
       end
     end
-    
+
     remote_ip = request.remote_ip
     host = request.host_with_port
-    @task = TaskFlow.new(params[:user_id], params[:patient_id])
+    @task = TaskFlow.new(params[:user_id], params[:patient_id], date)
     if current_program == "ASTHMA PROGRAM"
 			redirect_to @task.asthma_next_task(host,remote_ip).url
 		elsif current_program == "EPILEPSY PROGRAM"
@@ -380,7 +380,7 @@ class PatientsController < ApplicationController
     if params[:type] == "bp"
 
       @bps << ["#{Date.today.to_s.gsub("-","/")}",678]
-     
+
       render :partial => 'bp_chart'
     end
   end
@@ -388,7 +388,7 @@ class PatientsController < ApplicationController
     @retrospective = session[:datetime]
 		@retrospective = Time.now if session[:datetime].blank?
 
-    
+
     @patient = Patient.find(params[:id] || params[:patient_id]) rescue nil
 
     ProgramEncounter.current_date = @retrospective
@@ -585,7 +585,7 @@ class PatientsController < ApplicationController
   end
 
   def mastercard
-    
+
     @type = params[:type]
 
     if session[:from_report].to_s == "true"
@@ -606,7 +606,7 @@ class PatientsController < ApplicationController
     @next_button_class = "yellow"
 
 
-    
+
     # if params[:current].to_i ==  1
     #   @prev_button_class = "gray"
     #elsif params[:current].to_i ==  session[:mastercard_ids].length
@@ -674,7 +674,7 @@ class PatientsController < ApplicationController
       @visits = visits(Patient.find(@patient_id))
     end
     #raise params.to_yaml
-    
+
 
     @visits.keys.each do|day|
 			@age_in_months_for_days[day] = PatientService.age_in_months(@patient.person, day.to_date)
@@ -897,7 +897,7 @@ class PatientsController < ApplicationController
       }
 =end
       current_printer = CoreService.get_global_property_value("facility.printer").split(":")[1] rescue []
-   
+
       t1 = Thread.new{
         Kernel.system "wkhtmltopdf --orientation landscape --copies 2 --margin-top 0 --margin-bottom 0 -s A4 http://" +
           request.env["HTTP_HOST"] + "\"/patients/print_patient_mastercard/" +
@@ -913,7 +913,7 @@ class PatientsController < ApplicationController
         print(file, current_printer)
       }
     end
-    
+
     redirect_to request.request_uri.to_s.gsub('print_mastercard', 'mastercard') and return
   end
 
@@ -969,7 +969,7 @@ class PatientsController < ApplicationController
   end
 
   def mastercard_demographics(patient_obj)
-    
+
   	#patient_bean = PatientService.get_patient(patient_obj.person)
     visits = Mastercard.new()
     visits.zone = get_global_property_value("facility.zone.name")# rescue "Unknown"
@@ -1079,7 +1079,7 @@ class PatientsController < ApplicationController
 
     visits.diagnosis_stroke = current_encounter(patient_obj, "GENERAL HEALTH", "CHRONIC DISEASE").to_s.match(/Acute cerebrovascular attack/i) rescue nil
     ! visits.diagnosis_stroke.blank? ? visits.diagnosis_stroke = "Y" : visits.diagnosis_stroke = "N"
-  
+
     visits.smoking = current_vitals(patient_obj, "current smoker").to_s.split(":")[1].match(/yes/i) rescue nil
     ! visits.smoking.blank? ? visits.smoking = "Y" : visits.smoking = "N"
 
@@ -1299,11 +1299,11 @@ class PatientsController < ApplicationController
     visits
   end
 
-  
+
   def calculate_bp(patient, visit_date)
     systolic = Vitals.todays_vitals(patient, "Systolic blood pressure", visit_date).to_s.split(':')[1].squish rescue 0
     diastolic = Vitals.todays_vitals(patient, "Diastolic blood pressure", visit_date).to_s.split(':')[1].squish rescue 0
-    
+
     return "#{systolic}/#{diastolic}"
   end
 
@@ -1314,7 +1314,7 @@ class PatientsController < ApplicationController
     obs = Observation.find_by_sql("SELECT * from obs where concept_id = '#{concept}' AND person_id = '#{patient_id}'
                     AND DATE(obs_datetime) < '#{visit_date}' AND DATE(obs_datetime) >= '#{past_date}' AND voided = 0
                     ORDER BY  obs_datetime DESC, date_created DESC LIMIT 1").first.value_datetime.to_date rescue []
-    
+
     return obs if type == "date"
     return "N" if obs.blank?
     return "Y" if obs.to_date >= past_date
@@ -1326,10 +1326,10 @@ class PatientsController < ApplicationController
 
 		@current_location = params[:location_id]
 		@current_user = User.find(@user["user_id"])
-		
+
 		@found_person_id = params[:found_person_id] || session[:location_id]
 		@relation = params[:relation] rescue []
-		
+
     @person = Person.find(@found_person_id) rescue []
 
 
@@ -1337,7 +1337,7 @@ class PatientsController < ApplicationController
     session[:patient_id] = @patient.id
     session[:user_id] = @current_user.id
     session[:location_id] = params[:location_id]
-		@task = TaskFlow.new(params[:user_id], @person.id) rescue []
+		@task = TaskFlow.new(params[:user_id], @person.id, session_date) rescue []
     concept_id = ConceptName.find_by_name("WEIGHT (KG)")
     @obs = Observation.find_by_sql("SELECT * FROM obs WHERE concept_id = '#{concept_id}'
                                     AND person_id = '#{@person.id}'")
@@ -1354,7 +1354,7 @@ class PatientsController < ApplicationController
 		@current_task = @task.asthma_next_task(host,remote_ip) if current_program == "ASTHMA PROGRAM" rescue nil
 		@current_task = @task.epilepsy_next_task(host,remote_ip) if current_program == "EPILEPSY PROGRAM" rescue nil
 
-		@arv_number = PatientService.get_patient_identifier(@person, 'ARV Number') rescue ""		
+		@arv_number = PatientService.get_patient_identifier(@person, 'ARV Number') rescue ""
 		@patient_bean = PatientService.get_patient(@person) rescue ""
 		@location = Location.find(params[:location_id] || session[:location_id]).name rescue nil
 
@@ -1424,7 +1424,7 @@ class PatientsController < ApplicationController
 		@project = get_global_property_value("project.name") rescue "Unknown"
 
     @advanced = get_global_property_value("prescription.types") rescue "Unknown"
-    
+
     render :template => 'dashboards/treatment_dashboard', :layout => false
   end
 
@@ -1440,7 +1440,7 @@ class PatientsController < ApplicationController
 
     #raise session_date.to_date.to_yaml
     @restricted = ProgramLocationRestriction.all(:conditions => {:location_id => Location.current_health_center.id })
-		
+
     @restricted.each do |restriction|
       @prescriptions = restriction.filter_orders(@prescriptions)
     end
@@ -1468,7 +1468,7 @@ class PatientsController < ApplicationController
     @prescriptions = Order.find(:all,
       :joins => "INNER JOIN encounter e USING (encounter_id)",
       :conditions => ["encounter_type = ? AND e.patient_id = ?",type.id,@patient.id])
-    
+
     @historical = @patient.orders.historical.prescriptions.all
     @restricted = ProgramLocationRestriction.all(:conditions => {:location_id => Location.current_health_center.id })
     @restricted.each do |restriction|
@@ -1477,7 +1477,7 @@ class PatientsController < ApplicationController
 
     render :template => 'dashboards/treatment_tab', :layout => false
   end
-	
+
 	def patient_report
 		@user = User.find(params[:user_id]) rescue nil
 		@patient = Patient.find(params[:patient_id] || params[:id]) rescue nil
@@ -1505,9 +1505,9 @@ class PatientsController < ApplicationController
     end
 		@sbp = current_vitals(@patient, "systolic blood pressure").to_s.split(':')[1].squish rescue 0
 		@dbp = current_vitals(@patient, "diastolic blood pressure").to_s.split(':')[1].squish rescue 0
-    
+
 		@complications = Vitals.current_encounter(@patient, "complications", "complications") rescue []
-								
+
 		@diabetic = ConceptName.find_by_concept_id(Vitals.get_patient_attribute_value(@patient, "Patient has Diabetes")).name rescue []
 
 		@risk = Vitals.current_encounter(@patient, "assessment", "assessment comments") rescue []
@@ -1559,7 +1559,7 @@ class PatientsController < ApplicationController
 	def number_of_booked_patients
 		@user = User.find(params[:user_id]) rescue nil
 		@patient = Patient.find(params[:patient_id] || params[:id]) rescue nil
-		
+
     date = params[:date].to_date
     encounter_type = EncounterType.find_by_name('APPOINTMENT')
     concept_id = ConceptName.find_by_name('APPOINTMENT DATE').concept_id
@@ -1569,7 +1569,7 @@ class PatientsController < ApplicationController
     program_id = Program.find_by_name('CHRONIC CARE PROGRAM').id
 
     appointments = Observation.find_by_sql("SELECT count(*) AS count FROM obs
-      INNER JOIN encounter e USING(encounter_id) 
+      INNER JOIN encounter e USING(encounter_id)
       INNER JOIN program_encounter pe ON e.patient_id = pe.patient_id
       WHERE concept_id = #{concept_id}
       AND pe.program_id = #{program_id}
@@ -1601,12 +1601,12 @@ class PatientsController < ApplicationController
     results = lab_results(patient.id, date)
 		return if visit.blank?
     visit_data = mastercard_visit_data(visit)
-    
+
     label = ZebraPrinter::StandardLabel.new
-    
+
     label.draw_text("#{patient.name}(#{patient.gender})",25,60,0,3,1,1,false)
     label.draw_text("#{visit.height + 'cm' if !visit.height.blank?}  #{visit.weight + 'kg' if !visit.weight.blank?}  #{'BMI:' + visit.bmi if !visit.bmi.blank?}  #{'BP :' + visit_data['bp'] }",25,95,0,2,1,1,false) rescue ""
-    
+
     line = 25
     (results || []).each {|sugar|
       label.draw_text("#{sugar}",line,120,0,2,1,1,false)
@@ -1621,18 +1621,18 @@ class PatientsController < ApplicationController
     starting_index = 25
     start_line = 180
     starting_line = 180
-    
-    visit.gave.each{|values|  
+
+    visit.gave.each{|values|
       data = values#.last.split(";")
       next if data.blank?
-      bold = false   
+      bold = false
       label.draw_text("#{data}",25,starting_line,0,2,1,1,bold)
       #label.draw_text("#{data[1]}",600,starting_line,0,2,1,1,bold)
       #label.draw_text("#{data[2]}",700,starting_line,0,2,1,1,bold)
       #label.draw_text("#{data[3]}",500,starting_line,0,2,1,1,bold)
       starting_line = starting_line + 20
     } rescue []
-    
+
     starting_line = starting_line + 10
     label.draw_line(25,starting_line,800,5)
     starting_line = starting_line + 10
@@ -1644,11 +1644,11 @@ class PatientsController < ApplicationController
     label.draw_text("#{seen_by(patient,date)}",597,starting_line,0,1,1,1,false)
     starting_line = starting_line + 20
     label.draw_text("#{visit_data['next_appointment']}",30,starting_line,0,2,1,1,false) if visit_data['next_appointment']
-    
+
     #starting_line = starting_line + 20
     label.draw_text("Printed: #{Date.today.strftime('%b %d %Y')}",597,starting_line,0,1,1,1,false)
-    
-    
+
+
     label.print(1)
   end
 
@@ -1668,10 +1668,10 @@ class PatientsController < ApplicationController
 	visit_data = mastercard_visit_data(visit)
 
 	label = ZebraPrinter::StandardLabel.new
-	
+
 	label.draw_text("#{patient.name}(#{patient.gender})",25,60,0,3,1,1,false)
 	label.draw_text("#{visit.height + 'cm' if !visit.height.blank?}  #{visit.weight + 'kg' if !visit.weight.blank?}  #{'BMI:' + visit.bmi if !visit.bmi.blank?}  #{'BP :' + visit_data['bp'] }",25,95,0,2,1,1,false) rescue ""
-	
+
 	line = 25
 	(results || []).each {|sugar|
 	label.draw_text("#{sugar}",line,120,0,2,1,1,false)
@@ -1686,17 +1686,17 @@ class PatientsController < ApplicationController
 	start_line = 180
 	starting_line = 180
 
-    visit.gave.each{|values|  
+    visit.gave.each{|values|
       data = values#.last.split(";")
       next if data.blank?
-      bold = false   
+      bold = false
       label.draw_text("#{data}",25,starting_line,0,2,1,1,bold)
      # label.draw_text("#{data[1]}",600,starting_line,0,2,1,1,bold)
      # label.draw_text("#{data[2]}",700,starting_line,0,2,1,1,bold)
      # label.draw_text("#{data[3]}",500,starting_line,0,2,1,1,bold)
       starting_line = starting_line + 20
     } rescue []
-    
+
     starting_line = starting_line + 10
     label.draw_line(25,starting_line,800,5)
     starting_line = starting_line + 10
@@ -1739,7 +1739,7 @@ class PatientsController < ApplicationController
       name = "#{value[0].chars.first}Ch" if name.match(/Cholesterol/i)
       name = "#{value[0].chars.first}BS" if name.match(/Blood Sugar/i)
       name = "SeC" if name.match(/Serum creatinine/i)
-      
+
       result_set << "#{name} :#{(value[1].strip.to_f / 18).round(0).to_i} mmol/l"
     }
     return result_set
@@ -1756,19 +1756,19 @@ class PatientsController < ApplicationController
     return "QID" if frequency.upcase =="FOUR TIMES A DAY"
     return "5X/D" if frequency.upcase == "FIVE TIMES A DAY (5X/D)"
     return "5X/D" if frequency.upcase ==  "FIVE TIMES A DAY"
-    return "Q4HRS" if frequency.upcase == "SIX TIMES A DAY (Q4HRS)" 
+    return "Q4HRS" if frequency.upcase == "SIX TIMES A DAY (Q4HRS)"
     return "Q4HRS" if frequency.upcase ==  "SIX TIMES A DAY"
-    return "QAM" if frequency.upcase == "IN THE MORNING (QAM)" 
+    return "QAM" if frequency.upcase == "IN THE MORNING (QAM)"
     return "QAM" if frequency.upcase ==  "IN THE MORNING"
-    return "QNOON" if frequency.upcase == "ONCE A DAY AT NOON (QNOON)" 
+    return "QNOON" if frequency.upcase == "ONCE A DAY AT NOON (QNOON)"
     return "QNOON" if frequency.upcase == "ONCE A DAY AT NOON"
-    return "QPM" if frequency.upcase == "IN THE EVENING (QPM)" 
+    return "QPM" if frequency.upcase == "IN THE EVENING (QPM)"
     return "QPM" if frequency.upcase == "IN THE EVENING"
-    return "QHS" if frequency.upcase == "ONCE A DAY AT NIGHT (QHS)" 
+    return "QHS" if frequency.upcase == "ONCE A DAY AT NIGHT (QHS)"
     return "QHS" if frequency.upcase ==  "ONCE A DAY AT NIGHT"
-    return "QOD" if frequency.upcase == "EVERY OTHER DAY (QOD)" 
+    return "QOD" if frequency.upcase == "EVERY OTHER DAY (QOD)"
     return "QOD" if frequency.upcase ==  "EVERY OTHER DAY"
-    return "QWK" if frequency.upcase == "ONCE A WEEK (QWK)" 
+    return "QWK" if frequency.upcase == "ONCE A WEEK (QWK)"
     return "QWK" if frequency.upcase == "ONCE A WEEK"
     return "once a month" if frequency.upcase == "ONCE A MONTH"
     return "twice a month" if frequency.upcase == "TWICE A MONTH"
@@ -1851,26 +1851,26 @@ class PatientsController < ApplicationController
         session_date ,patient.id, EncounterType.find_by_name(enc).id]).encounter_id rescue nil
     Observation.find(:all, :order => "obs_datetime DESC,date_created DESC", :conditions => ["encounter_id = ? AND concept_id = ?", encounter, concept]) rescue nil
   end
-  
+
   def specific_encounter_with_date(patient, enc, concept, session_date = Date.today)
-    
+
     concept = ConceptName.find_by_name(concept).concept_id
     encounter = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
       :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
         session_date ,patient.id, EncounterType.find_by_name(enc).id]).encounter_id rescue nil
 
-        
+
     Observation.find(:all, :order => "obs_datetime DESC,date_created DESC", :conditions => ["encounter_id = ? AND concept_id = ? AND value_numeric IS NOT NULL", encounter, concept]) rescue nil
   end
 
   def specific_encounter(patient, enc, concept, session_date = Date.today)
-    
+
     concept = ConceptName.find_by_name(concept).concept_id
     encounter = Encounter.find(:first,:order => "encounter_datetime DESC,date_created DESC",
       :conditions =>["DATE(encounter_datetime) = ? AND patient_id = ? AND encounter_type = ?",
         session_date ,patient.id, EncounterType.find_by_name(enc).id]).encounter_id rescue nil
 
-        
+
     Observation.find(:all, :order => "obs_datetime DESC,date_created DESC", :conditions => ["encounter_id = ? AND concept_id = ?", encounter, concept]) rescue nil
   end
 
@@ -1923,10 +1923,10 @@ class PatientsController < ApplicationController
           visit_date = encounter_date.to_date
           patient_visits[visit_date] = Mastercard.new() if patient_visits[visit_date].blank?
           patient_visits[visit_date].gave = []
-          
+
           obs = Observation.find(:all, :conditions => ["person_id = ? AND concept_id = ? AND DATE(obs_datetime) = ? AND voided = 0",
                  patient_obj.patient_id, concept_id, visit_date.to_date]).collect{|r| r.value_drug}.uniq
-         
+
          patient_visits[visit_date].gave = []
          obs.each{|drug_id|
 
@@ -1965,7 +1965,7 @@ class PatientsController < ApplicationController
           }
          }
        end
-          
+
     end #rescue ""
 
 		gave_hash = Hash.new(0)
@@ -1989,7 +1989,7 @@ class PatientsController < ApplicationController
       patient_visits[visit_date].bp = calculate_bp(patient_obj, visit_date)
       patient_visits[visit_date].smoker = current_vitals(patient_obj,"current smoker", visit_date).to_s.match(/yes/i) rescue nil
       ! patient_visits[visit_date].smoker.blank? ? patient_visits[visit_date].smoker = "Y" : patient_visits[visit_date].smoker = "N"
-     
+
       patient_visits[visit_date].alcohol = current_vitals(patient_obj,"Does the patient drink alcohol?", visit_date).to_s.match(/yes/i) rescue nil
       ! patient_visits[visit_date].alcohol.blank? ? patient_visits[visit_date].alcohol = "Y" : patient_visits[visit_date].alcohol = "N"
 
@@ -2005,9 +2005,9 @@ class PatientsController < ApplicationController
       patient_visits[visit_date].urine = specific_encounter_with_date(patient_obj, "LAB RESULTS","serum creatinine", visit_date).first.to_s.split(":")[1].to_i rescue "Not taken"
 
       program_id = Program.find_by_name('CHRONIC CARE PROGRAM').id
-      
+
 			concept_name = obs.concept.fullname
-      
+
 			if concept_name.upcase == 'APPOINTMENT DATE'
 				patient_visits[visit_date].appointment_date = obs.value_datetime
 			elsif concept_name.upcase == 'HEIGHT (CM)'
@@ -2028,7 +2028,7 @@ class PatientsController < ApplicationController
         #	patient_visits[visit_date].tb_status = 'noRx' if status == 'CONFIRMED TB NOT ON TREATMENT'
         #	patient_visits[visit_date].tb_status = 'Rx' if status == 'CONFIRMED TB ON TREATMENT'
         #	patient_visits[visit_date].tb_status = 'Rx' if status == 'CURRENTLY IN TREATMENT'
-     
+
 			elsif concept_name.upcase == 'ARV REGIMENS RECEIVED ABSTRACTED CONSTRUCT'
 				patient_visits[visit_date].reg = 'Unknown' if obs.value_coded == ConceptName.find_by_name("Unknown antiretroviral drug").concept_id
 				patient_visits[visit_date].reg =  Concept.find_by_concept_id(obs.value_coded).concept_names.typed("SHORT").first.name if !patient_visits[visit_date].reg
@@ -2059,13 +2059,13 @@ class PatientsController < ApplicationController
 				patient_visits[visit_date].notes+= '<br/>' + obs.value_text unless patient_visits[visit_date].notes.blank?
 				patient_visits[visit_date].notes = obs.value_text if patient_visits[visit_date].notes.blank?
 			end
-    
-      
+
+
 		end
 
     #patients currents/available states (patients outcome/s)
     program_id = Program.find_by_name('CHRONIC CARE PROGRAM').id
-    
+
     if encounter_date.blank?
       patient_states = PatientState.find(:all,
 				:joins => "INNER JOIN patient_program p ON p.patient_program_id = patient_state.patient_program_id",
@@ -2080,7 +2080,7 @@ class PatientsController < ApplicationController
       #raise patient_visits[encounter_date].gave.to_yaml
 
     end
-    
+
     #=begin
     patient_states.each do |state|
       visit_date = state.start_date.to_date rescue nil
@@ -2090,7 +2090,7 @@ class PatientsController < ApplicationController
       patient_visits[visit_date].date_of_outcome = state.start_date
     end
     #=end
-    
+
     patient_visits.each do |visit_date,data|
       next if visit_date.blank?
       # patient_visits[visit_date].outcome = hiv_state(patient_obj,visit_date)
@@ -2124,12 +2124,12 @@ class PatientsController < ApplicationController
   end
 
   def specific_patient_visit_date_label
-    
+
 		session_date = params[:session_date].to_date rescue Date.today
     @patient = Patient.find(params[:patient_id]) rescue Patient.find(params[:id]) rescue []
-    
+
     print_string = patient_visit_label(@patient, session_date) #rescue (raise "Unable to find patient (#{params[:patient_id]}) or generate a visit label for that patient")
-   
+
     send_data(print_string,:type=>"application/label; charset=utf-8", :stream=> false, :filename=>"#{params[:patient_id]}#{rand(10000)}.lbl", :disposition => "inline")
   end
 
