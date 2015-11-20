@@ -630,6 +630,7 @@ class CohortToolController < ApplicationController
           ids = report.total_registered.map{|patient|patient.patient_id}.join(',') rescue ""
           ids = report.total_registered.map{|patient|patient.patient_id} if report.total_registered.length == 1
           @total_ever_registered = report.total_ever_registered.length rescue 0
+
           ids_ever = report.total_ever_registered.map{|patient|patient.patient_id}.join(',') rescue ""
 
           @registered_male = report.total_children_registered(ids, "male", 0, 1000)
@@ -656,13 +657,16 @@ class CohortToolController < ApplicationController
           @ht = ht_male + ht_female
           @ht_ever = ever_ht_male + ever_ht_female
 
-          dm_male = report.disease_availabe(ids, "DM", "male").map{|patient|patient.patient_id}.uniq - ht_male
-          dm_female = report.disease_availabe(ids, "DM", "female").map{|patient|patient.patient_id}.uniq - ht_female
-          ever_dm_male = report.disease_ever_availabe(ids_ever, "DM", "male").map{|patient|patient.patient_id}.uniq - ever_ht_male
-          ever_dm_female = report.disease_ever_availabe(ids_ever, "DM", "female").map{|patient|patient.patient_id}.uniq - ever_ht_female
 
-          @dm = dm_male + dm_female
-          @dm_ever = ever_dm_male + ever_dm_female
+          dm_male = (report.disease_availabe(ids, "DM", "male").map{|patient|patient.patient_id}.uniq)
+          # - report.disease_availabe(ids, "HT", "male").map{|patient|patient.patient_id}.uniq)
+          dm_female = (report.disease_availabe(ids, "DM", "female").map{|patient|patient.patient_id}.uniq)
+          # - report.disease_availabe(ids, "HT", "female").map{|patient|patient.patient_id}.uniq)
+          ever_dm_male = report.disease_ever_availabe(ids_ever, "DM", "male").map{|patient|patient.patient_id}.uniq #- ever_ht_male
+          ever_dm_female = report.disease_ever_availabe(ids_ever, "DM", "female").map{|patient|patient.patient_id}.uniq #- ever_ht_female
+
+          @dm = dm_male.uniq + dm_female.uniq
+          @dm_ever = ever_dm_male.uniq + ever_dm_female.uniq
 
           dmht_male = report.disease_availabe(ids, "dm ht", "male").map{|patient|patient.patient_id}.uniq # - report.disease_availabe(ids, "HT", "male").map{|patient|patient.patient_id}.uniq - report.disease_availabe(ids, "DM", "male").map{|patient|patient.patient_id}.uniq
           dmht_female = report.disease_availabe(ids, "dm ht", "female").map{|patient|patient.patient_id}.uniq #- report.disease_availabe(ids, "HT", "female").map{|patient|patient.patient_id}.uniq - report.disease_availabe(ids, "DM", "female").map{|patient|patient.patient_id}.uniq
@@ -692,22 +696,37 @@ class CohortToolController < ApplicationController
          overall_disease = @ht + @dm + @dmht + @asthma + @epilepsy
          overall_disease_ever = @ht_ever + @dm_ever + @dmht_ever + @asthma_ever + @epilepsy_ever
          #raise overall_disease.uniq.sort.length.to_yaml
-         @other_ever = report.total_ever_registered.collect{|p| p.patient_id}  -  overall_disease_ever.uniq
-         @other = report.total_registered.collect{|p| p.patient_id} - overall_disease.uniq
+         @other_ever = report.total_ever_registered.collect{|p| p.patient_id}.uniq  -  overall_disease_ever.uniq
+         @other = report.total_registered.collect{|p| p.patient_id}.uniq - overall_disease.uniq
          #raise @other.to_yaml
          if @other.length > 0
             ht_other = []
             dm_other = []
             @other.each{|patient|
+=begin
                o = Observation.find_by_sql("SELECT * FROM obs o
                  INNER JOIN concept_name c ON c.concept_id = o.concept_id
                  WHERE c.name = 'You receive helpful advice on important things in your life' AND o.voided = 0
                   AND o.person_id = #{patient} LIMIT 1")
+=end
+                o = Encounter.find_by_sql("SELECT * FROM patients_on_chronic_care_program p
+                                              INNER join obs o on o.person_id = p.patient_id AND o.voided = 0
+                                                 AND o.concept_id = 2013
+                                            WHERE p.patient_id = #{patient}
+                                            LIMIT 1")
                 if ! o.blank?
                    ht_other <<  patient
                 else
+=begin
                    e = Observation.find_by_sql("select * from encounter e inner join encounter_type et on et.encounter_type_id = e.encounter_type
                             where et.name = 'DIABETES HYPERTENSION INITIAL VISIT' and e.voided = 0 AND e.patient_id = #{patient} LIMIT 1")
+=end
+                     #DIABETES HYPERTENSION INITIAL VISIT encounter = 29
+                     e = Encounter.find_by_sql("SELECT * FROM patients_on_chronic_care_program p
+                                                 INNER JOIN encounter e ON e.patient_id = p.patient_id
+                                                     AND e.voided = 0 AND e.encounter_type = 29
+                                                WHERE p.patient_id = #{patient}
+                                                LIMIT 1")
                     unless e.blank?
                       dm_other << patient
                     end
@@ -723,33 +742,51 @@ class CohortToolController < ApplicationController
             ht_other = []
             dm_other = []
             @other_ever.each{|patient|
+=begin
                o = Observation.find_by_sql("SELECT * FROM obs o
                  INNER JOIN concept_name c ON c.concept_id = o.concept_id
                  WHERE c.name = 'You receive helpful advice on important things in your life' AND o.voided = 0
                   AND o.person_id = #{patient} LIMIT 1")
+=end
+                o = Encounter.find_by_sql("SELECT * FROM patients_on_chronic_care_program p
+                                              INNER join obs o on o.person_id = p.patient_id AND o.voided = 0
+                                                 AND o.concept_id = 2013
+                                            WHERE p.patient_id = #{patient}
+                                            LIMIT 1")
                 if ! o.blank?
                    ht_other <<  patient
                 else
+=begin
                    e = Observation.find_by_sql("select * from encounter e inner join encounter_type et on et.encounter_type_id = e.encounter_type
                             where et.name = 'DIABETES HYPERTENSION INITIAL VISIT' and e.voided = 0 AND e.patient_id = #{patient} LIMIT 1")
+=end
+                     #DIABETES HYPERTENSION INITIAL VISIT encounter = 29
+                     e = Encounter.find_by_sql("SELECT * FROM patients_on_chronic_care_program p
+                                                 INNER JOIN encounter e ON e.patient_id = p.patient_id
+                                                     AND e.voided = 0 AND e.encounter_type = 29
+                                                WHERE p.patient_id = #{patient}
+                                                LIMIT 1")
                     unless e.blank?
                       dm_other << patient
                     end
                 end
             }
+
             @other_ever -= dm_other
             @other_ever -= ht_other
+
             @dm_ever = ( @dm_ever + dm_other rescue dm_other)
+
             @ht_ever = ( @ht_ever + ht_other rescue ht_other)
          end
 
-        @transfer_out_ever = report.transfer_out_ever(ids_ever)
-        @stopped_treatment_ever = report.stopped_treatment_ever(ids_ever)
-        @not_attend_ever = report.not_attending_ever(ids_ever)
-        @lost_followup_ever = report.lost_followup_ever(ids_ever)
+       @transfer_out_ever = report.transfer_out_ever(ids_ever).uniq
+       @stopped_treatment_ever = report.stopped_treatment_ever(ids_ever).uniq
+       @dead_ever = report.dead_ever(ids_ever).uniq
+       @not_attend_ever = (report.not_attending_ever(ids_ever).uniq - (@transfer_out_ever + @stopped_treatment_ever + @dead_ever)).uniq
+       @lost_followup_ever = (report.lost_followup_ever(ids_ever).uniq - report.not_attending_ever(ids_ever).uniq).uniq
 
-       @dead_ever = report.dead_ever(ids_ever)
-       @attending = (report.total_ever_registered.collect{|patient|patient.patient_id}.uniq  - @not_attend_ever.uniq - @stopped_treatment_ever.uniq - @lost_followup_ever.uniq - @transfer_out_ever.uniq - @dead_ever.uniq).uniq
+      @attending = (report.total_ever_registered.collect{|patient|patient.patient_id}.uniq  - (@not_attend_ever.uniq + @stopped_treatment_ever.uniq + @lost_followup_ever.uniq + @transfer_out_ever.uniq + @dead_ever.uniq))
 
        bmi_female = report.bmi(ids, 'F')
        bmi_male = report.bmi(ids, 'M')
@@ -772,9 +809,9 @@ class CohortToolController < ApplicationController
       alcohol_ever_male = report.alcohol_ever(ids_ever, 'M')
       @alcohol_ever = alcohol_ever_male + alcohol_ever_female
 
-     bp_female = report.decrease_in_bp(ids, 'F', 'low')
-     bp_male = report.decrease_in_bp(ids, 'M', 'low')
-     @low_bp = bp_female + bp_male
+    bp_female = report.decrease_in_bp(ids, 'F', 'low')
+    bp_male = report.decrease_in_bp(ids, 'M', 'low')
+    @low_bp = bp_female + bp_male
     bp_ever_female = report.decrease_in_bp(ids_ever, 'F', 'low')
     bp_ever_male = report.decrease_in_bp(ids_ever, 'M', 'low')
     @low_bp_ever = bp_ever_female + bp_ever_male
@@ -812,6 +849,7 @@ class CohortToolController < ApplicationController
     on_beclomethasone_ever = report.patient_ids_on_drugs(ids_ever, 'beclomethasone')
 
     @other_asthma = asthma - on_sabutamol.map{|patient|patient.patient_id}.uniq - on_beclomethasone.map{|patient|patient.patient_id}.uniq
+
     @other_asthma_ever = asthma_ever - on_sabutamol_ever.map{|patient|patient.patient_id}.uniq - on_beclomethasone_ever.map{|patient|patient.patient_id}.uniq
 
     epilepsy = report.epilepsy_asthma(ids, "epilepsy").map{|patient|patient.patient_id}.uniq
@@ -846,6 +884,7 @@ class CohortToolController < ApplicationController
    @attend_dmht = report.attended_by_disease(@attending.join(','), @dmht.join(','))
    @attend_dm = report.attended_by_disease(@attending.join(','), @dm.join(','))
    @attend_asthma = report.attended_by_disease(@attending.join(','), @asthma.join(','))
+
    @attend_epilepsy = report.attended_by_disease(@attending.join(','), @epilepsy.join(','))
    @attend_cntl = report.attended_by_disease(@attending.join(','), @controlled.join(','))
 
@@ -859,11 +898,13 @@ class CohortToolController < ApplicationController
    @prescribed_ht = report.medcation_prescribed(@attend_ht.join(','))
    @prescribed_dmht = report.medcation_prescribed(@attend_dmht.join(','))
    @prescribed_dm = report.medcation_prescribed(@attend_dm.join(','))
+
    @prescribed_asthma = report.medcation_prescribed(@attend_asthma.join(','))
    @prescribed_epilepsy = report.medcation_prescribed(@attend_epilepsy.join(','))
 
    @prescribed_ht_ever = report.medcation_prescribed(@attend_ht_ever.join(','))
    @prescribed_dmht_ever = report.medcation_prescribed(@attend_dmht_ever.join(','))
+
    @prescribed_dm_ever = report.medcation_prescribed(@attend_dm_ever.join(','))
    @prescribed_asthma_ever = report.medcation_prescribed(@attend_asthma_ever.join(','))
    @prescribed_epilepsy_ever = report.medcation_prescribed(@attend_epilepsy_ever.join(','))

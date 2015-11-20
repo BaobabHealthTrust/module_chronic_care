@@ -603,8 +603,8 @@
 
                    <td style="text-align:left;border-width:0px 0px 1px 1px">&nbsp;</td>
                   <td style="text-align:left;border-width:0px 0px 1px 1px">Other</td>
-                  <td><%= @other_asthma %></td>
-                  <td><%= @other_asthma_ever %></td>
+                  <td><%= @other_asthma.length rescue 0%></td>
+                  <td><%= @other_asthma_ever.length rescue 0 %></td>
 
                 </tr>
                  <tr >
