@@ -166,7 +166,7 @@ class Reports::CohortDm
 																			concept_set IN (#{@asthma_id},#{@diabetes_id}, #{@epilepsy_id})) AND orders.start_date <= '#{@end_date}')")
 =end
       @orders = Order.find_by_sql("SELECT DISTINCT(p.patient_id) FROM patients_on_hypertension_medication p
-                                    WHERE p.start_date <= '#{@end_date}'
+                                    WHERE p.date_enrolled <= '#{@end_date}'
                                     AND p.patient_id IN (#{ids}) #{categorise}
                                     AND p.patient_id NOT IN (SELECT DISTINCT(o.patient_id) FROM orders o
                                                              WHERE concept_id IN (SELECT concept_id FROM concept_set
@@ -190,7 +190,7 @@ class Reports::CohortDm
 																			concept_set IN (#{@asthma_id},#{@hypertensition_medication_id}, #{@epilepsy_id})) AND orders.start_date <= '#{@end_date}')")
 =end
       @orders = Order.find_by_sql("SELECT DISTINCT(p.patient_id) FROM patients_on_diabetes_medication p
-                                    WHERE p.start_date <= '#{@end_date}'
+                                    WHERE p.date_enrolled <= '#{@end_date}'
                                     AND p.patient_id IN (#{ids}) #{categorise}
                                     AND p.patient_id NOT IN (SELECT DISTINCT(o.patient_id) FROM orders o
                                                              WHERE concept_id IN (SELECT concept_id FROM concept_set
@@ -212,7 +212,7 @@ class Reports::CohortDm
 																			concept_set IN (#{@hypertensition_medication_id},#{@diabetes_id}, #{@epilepsy_id})) AND orders.start_date <= '#{@end_date}')")
 =end
       @orders = Order.find_by_sql("SELECT DISTINCT(p.patient_id) FROM patients_on_asthma_medication p
-                                    WHERE p.start_date <= '#{@end_date}'
+                                    WHERE p.date_enrolled <= '#{@end_date}'
                                     AND p.patient_id IN (#{ids}) #{categorise}
                                     AND p.patient_id NOT IN (SELECT DISTINCT(o.patient_id) FROM orders o
                                                              WHERE concept_id IN (SELECT concept_id FROM concept_set
@@ -232,7 +232,7 @@ class Reports::CohortDm
 																			concept_set IN (#{@asthma_id},#{@diabetes_id}, #{@hypertensition_medication_id})) AND orders.start_date <= '#{@end_date}')")
 =end
       @orders = Order.find_by_sql("SELECT DISTINCT(p.patient_id) FROM patients_on_epilepsy_medication p
-                                    WHERE p.start_date <= '#{@end_date}'
+                                    WHERE p.date_enrolled <= '#{@end_date}'
                                     AND p.patient_id IN (#{ids}) #{categorise}
                                     AND p.patient_id NOT IN (SELECT DISTINCT(o.patient_id) FROM orders o
                                                              WHERE concept_id IN (SELECT concept_id FROM concept_set
@@ -326,7 +326,7 @@ raise @orders.length.to_yaml
 raise @orders.length.to_yaml
 =end
        @orders = Order.find_by_sql("SELECT DISTINCT(p.patient_id) FROM patients_on_diabetes_medication p
-                                    WHERE p.start_date <= '#{@end_date}'
+                                    WHERE p.date_enrolled <= '#{@end_date}'
                                     AND p.patient_id IN (#{ids}) #{categorise}
                                     AND p.patient_id NOT IN (SELECT DISTINCT(o.patient_id) FROM orders o
                                                              WHERE concept_id IN (SELECT concept_id FROM concept_set
@@ -348,7 +348,7 @@ raise @orders.length.to_yaml
 =end
 
        @orders = Order.find_by_sql("SELECT DISTINCT(p.patient_id) FROM patients_on_asthma_medication p
-                                    WHERE p.start_date <= '#{@end_date}'
+                                    WHERE p.date_enrolled <= '#{@end_date}'
                                     AND p.patient_id IN (#{ids}) #{categorise}
                                     AND p.patient_id NOT IN (SELECT DISTINCT(o.patient_id) FROM orders o
                                                              WHERE concept_id IN (SELECT concept_id FROM concept_set
@@ -368,7 +368,7 @@ raise @orders.length.to_yaml
 																			concept_set IN (#{@asthma_id},#{@diabetes_id}, #{@hypertensition_medication_id})) AND orders.start_date <= '#{@end_date}')")
 =end
        @orders = Order.find_by_sql("SELECT DISTINCT(p.patient_id) FROM patients_on_epilepsy_medication p
-                                    WHERE p.start_date <= '#{@end_date}'
+                                    WHERE p.date_enrolled <= '#{@end_date}'
                                     AND p.patient_id IN (#{ids}) #{categorise}
                                     AND p.patient_id NOT IN (SELECT DISTINCT(o.patient_id) FROM orders o
                                                              WHERE concept_id IN (SELECT concept_id FROM concept_set
@@ -1840,7 +1840,7 @@ AND \
                                     OR UCASE(patient.gender) = '#{patient_initial}')"
       #joined = "INNER JOIN person pe ON pe.person_id = patient.patient_id"
     end
-
+=begin
     @orders = Order.find_by_sql(" SELECT orders.patient_id FROM orders
                                       LEFT OUTER JOIN patients_on_chronic_care_program patient ON patient.patient_id = orders.patient_id  \
                                   WHERE DATEDIFF('#{@end_date}', auto_expire_date)/30 > 9
@@ -1849,7 +1849,26 @@ AND \
                                     DATE_FORMAT(patient.date_enrolled, '%Y-%m-%d') <= '" + @end_date + "'  \
 																			#{categorise} AND orders.concept_id IN (SELECT concept_id FROM concept_set WHERE \
 																		concept_set IN (#{@asthma_id}, #{@epilepsy_id}, #{@diabetes_id}, #{@hypertensition_medication_id})) \
-                                  GROUP BY patient_id").collect {|p| p.patient_id} rescue []
+                                 GROUP BY patient_id").collect {|p| p.patient_id} rescue []
+=end
+		@orders = Order.find_by_sql("SELECT p.patient_id FROM patients_on_chronic_care_program p \
+				WHERE
+						DATEDIFF('#{@end_date}',
+            (SELECT
+                    MAX(auto_expire_date)
+                FROM
+                    orders
+                WHERE
+                    patient_id = p.patient_id
+                        AND concept_id IN (SELECT
+                            concept_id
+                        FROM
+                            concept_set
+                        WHERE
+                            concept_set IN (#{@asthma_id}, #{@epilepsy_id}, #{@diabetes_id}, #{@hypertensition_medication_id}))
+                        AND start_date <= '#{@end_date}')) / 30 > 9	\
+                        AND current_state_for_program(patient_id, 10, '#{@end_date}') NOT IN (#{@states}) \
+                        AND date_enrolled <= '#{@end_date}'")
   end
 
   def attending(ids, sex=nil)
@@ -2371,13 +2390,15 @@ AND \
                     ORDER BY  obs_datetime DESC, date_created DESC") rescue []
 
     if sys_obs.length > 0
+=begin
       first_sys = sys_obs.first.to_s.split(':')[1].to_i
       #raise sys_obs.first.obs_datetime.to_yaml
       previous_obs = Observation.find_by_sql("SELECT * from obs where concept_id IN ('#{fasting}, #{random}') AND person_id = #{patient_id}
                     AND DATE(obs_datetime) < '#{sys_obs.first.obs_datetime.to_date}' AND voided = 0
                     ORDER BY  obs_datetime DESC, date_created DESC") rescue []
       return true if previous_obs.length > 0
-
+=end
+			return true
     end
     return false
   end
@@ -2387,19 +2408,21 @@ AND \
     random = ConceptName.find_by_sql("select concept_id from concept_name where name = 'Random' and voided = 0").first.concept_id
 
     sys_obs = Observation.find_by_sql("SELECT * from patients_with_fasting_or_random_obs p where p.patient_id = #{patient_id}
-                    AND DATE(obs_datetime) <= '#{@end_date}'
-                    ORDER BY  obs_datetime DESC, date_created DESC") rescue []
+                    AND obs_datetime = (SELECT MAX(obs_datetime) FROM patients_with_fasting_or_random_obs WHERE patient_id = p.patient_id AND DATE(obs_datetime) <= '#{@end_date}')") rescue []
 
-    if sys_obs.length > 1
+    if sys_obs.length > 0
+=begin
       #first_sys = sys_obs.first.to_s.split(':')[1].to_i
       first_sys = sys_obs.first.value_numeric.to_i
 
       previous_obs = Observation.find_by_sql("SELECT * from patients_with_fasting_or_random_obs p where p.patient_id = #{patient_id}
                     AND DATE(obs_datetime) < '#{sys_obs.first.obs_datetime.to_date}'
                     ORDER BY  obs_datetime DESC, date_created DESC").first.value_numeric.to_i rescue 0
+=end
 
-       return true if ((previous_obs / 18) < 7)
+       return true if (((sys_obs.first.value_numeric.to_i) / 18) < 7)
     end
+
     return false
   end
 
@@ -2456,16 +2479,14 @@ AND \
     dys_concept = ConceptName.find_by_sql("select concept_id from concept_name where name = 'Diastolic blood pressure' and voided = 0").first.concept_id
 
     sys_obs = Observation.find_by_sql("SELECT * from obs where concept_id = '#{sys_concept}' AND person_id = #{patient_id}
-                    AND DATE(obs_datetime) <= '#{@end_date}' AND voided = 0
-                    ORDER BY  obs_datetime DESC, date_created DESC") rescue []
-    if sys_obs.length >= 1
-      first_sys = sys_obs.first.to_s.split(':')[1].to_f
+                    AND obs_datetime = (SELECT MAX(obs_datetime) from obs where concept_id = '#{sys_concept}' AND person_id = #{patient_id} AND obs_datetime <= '#{@end_date}' AND voided = 0)") #rescue []
+    if sys_obs.length > 0
+      #first_sys = sys_obs.first.to_s.split(':')[1].to_f
       #raise sys_obs.first.obs_datetime.to_yaml
       dys_obs = Observation.find_by_sql("SELECT * from obs where concept_id = '#{dys_concept}' AND person_id = #{patient_id}
-                    AND DATE(obs_datetime) = '#{sys_obs.first.obs_datetime.to_date}' AND voided = 0
-                    ORDER BY  obs_datetime DESC, date_created DESC").first.to_s.split(':')[1].to_f rescue []
+                    AND DATE(obs_datetime) = '#{sys_obs.first.obs_datetime.to_date}' AND voided = 0") #rescue []
 
-      if (first_sys <= 140 and dys_obs <= 90)
+      if (sys_obs.first.to_s.split(':')[1].to_f <= 140) && (dys_obs.first.to_s.split(':')[1].to_f <= 90)
     #  current_bp = first_sys / dys_obs
     #  threshod = 140 / 90
 
