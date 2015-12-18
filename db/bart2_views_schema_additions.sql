@@ -243,10 +243,33 @@ CREATE OR REPLACE ALGORITHM=UNDEFINED  SQL SECURITY INVOKER
   FROM `obs`
   WHERE ((`obs`.`concept_id` = 7459) and (`obs`.`voided` = 0));
 
+
+-- function getting ccc earliest_start_date
+DROP FUNCTION IF EXISTS current_ccc_program_drug_start_date;
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` FUNCTION `current_ccc_program_drug_start_date`(my_patient_id INT) RETURNS date
+    DETERMINISTIC
+BEGIN
+  DECLARE my_current_date DATETIME;
+
+  SET my_current_date = NULL;
+  SET my_current_date = (SELECT DATE(min(start_date)) FROM orders
+                            WHERE concept_id IN (SELECT concept_id FROM concept_set WHERE concept_set IN (9243, 6871,9246,6872))
+                            AND voided = 0 AND patient_id = my_patient_id);
+
+  RETURN DATE(my_current_date);
+END$$
+DELIMITER ;
+
 -- Pulling all patients on CCC program
 CREATE OR REPLACE ALGORITHM=UNDEFINED  SQL SECURITY INVOKER
   VIEW `patients_on_chronic_care_program` AS
-    SELECT `pp`.`patient_id`, `p`.`birthdate`, `p`.`gender`, `pp`.`date_enrolled`, `pat`.`date_created`
+    SELECT `pp`.`patient_id`,
+           `p`.`birthdate`,
+           `p`.`gender`,
+           `date_enrolled` AS `program_cc_reg`,
+           IFNULL(current_ccc_program_drug_start_date(`pp`.`patient_id`), `date_enrolled`) AS `date_enrolled`,
+           `pat`.`date_created`
     FROM `patient_program` `pp`
       INNER JOIN `person` `p` on `p`.`person_id` = `pp`.`patient_id` AND `p`.`voided` = 0
       INNER JOIN `patient` `pat` ON `pat`.`patient_id` = `pp`.`patient_id` AND `pat`.`voided` = 0

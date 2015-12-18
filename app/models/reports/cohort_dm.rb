@@ -631,6 +631,22 @@ raise @orders.length.to_yaml
     )
   end
 
+  #Return all patients that have a visit within the reporter quarter
+  def attendance_in_quarter(attending_ids=nil)
+    ids = 0
+    if ! attending_ids.nil?
+      ids = attending_ids.join(",")
+    end
+    orders = Order.find_by_sql("SELECT * FROM orders
+                                 WHERE concept_id IN (SELECT concept_id FROM concept_set
+                                                      WHERE concept_set IN (#{@asthma_id},#{@diabetes_id}, #{@epilepsy_id},#{@hypertensition_medication_id}))
+                                 AND voided = 0
+                                 AND (start_date >= '#{start_date}' AND start_date <= '#{end_date}')
+                                 AND patient_id in (#{ids})").map(&:patient_id).uniq rescue []
+
+    return orders
+  end
+
   # Get all patients ever registered
   def total_ever_registered(encounter_type=nil)
     if encounter_type.blank?

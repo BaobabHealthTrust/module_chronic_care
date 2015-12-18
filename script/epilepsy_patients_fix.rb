@@ -24,7 +24,10 @@ def start
 INSERT INTO #{Source_db}.encounter(patient_id, encounter_type,  provider_id, location_id, encounter_datetime, creator, date_created, uuid) VALUES (#{patient.patient_id}, 144, 1, 10, '#{@enc_date}', 1, (NOW()), (SELECT UUID()))
 EOF
         puts"<<<<<<<finished working on patient: #{patient.patient_id}"
+      else
+        puts"<<<<<<<Patient already have 144: #{patient.patient_id}"
       end
+
   end
 end
 start

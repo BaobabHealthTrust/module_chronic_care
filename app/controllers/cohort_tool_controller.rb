@@ -788,6 +788,9 @@ class CohortToolController < ApplicationController
 
       @attending = (report.total_ever_registered.collect{|patient|patient.patient_id}.uniq  - (@not_attend_ever.uniq + @stopped_treatment_ever.uniq + @lost_followup_ever.uniq + @transfer_out_ever.uniq + @dead_ever.uniq))
 
+
+      @attending_in_quarter = (report.attendance_in_quarter(@attending) + (ids.split(",").map(&:to_i) rescue [])).uniq
+
        bmi_female = report.bmi(ids, 'F')
        bmi_male = report.bmi(ids, 'M')
        @bmi = bmi_female + bmi_male
@@ -815,7 +818,7 @@ class CohortToolController < ApplicationController
     bp_ever_female = report.decrease_in_bp(ids_ever, 'F', 'low')
     bp_ever_male = report.decrease_in_bp(ids_ever, 'M', 'low')
     @low_bp_ever = bp_ever_female + bp_ever_male
-    #raise @low_bp_ever.to_yaml
+
     bp_measured_female = report.decrease_in_bp(ids, 'F', 'measured')
     bp_measured_male = report.decrease_in_bp(ids, 'M', 'measured')
     @bp_measured = bp_measured_female + bp_measured_male
@@ -880,20 +883,20 @@ class CohortToolController < ApplicationController
     @controlled_ever = controlled_ever_female + controlled_ever_male
 
 
-   @attend_ht = report.attended_by_disease(@attending.join(','), @ht.join(','))
-   @attend_dmht = report.attended_by_disease(@attending.join(','), @dmht.join(','))
-   @attend_dm = report.attended_by_disease(@attending.join(','), @dm.join(','))
-   @attend_asthma = report.attended_by_disease(@attending.join(','), @asthma.join(','))
+   @attend_ht = report.attended_by_disease(@attending_in_quarter.join(','), @ht.join(','))
+   @attend_dmht = report.attended_by_disease(@attending_in_quarter.join(','), @dmht.join(','))
+   @attend_dm = report.attended_by_disease(@attending_in_quarter.join(','), @dm.join(','))
+   @attend_asthma = report.attended_by_disease(@attending_in_quarter.join(','), @asthma.join(','))
 
-   @attend_epilepsy = report.attended_by_disease(@attending.join(','), @epilepsy.join(','))
-   @attend_cntl = report.attended_by_disease(@attending.join(','), @controlled.join(','))
+   @attend_epilepsy = report.attended_by_disease(@attending_in_quarter.join(','), @epilepsy.join(','))
+   @attend_cntl = report.attended_by_disease(@attending_in_quarter.join(','), @controlled.join(','))
 
-   @attend_ht_ever = report.attended_by_disease(@attending.join(','), @ht_ever.join(','))
-   @attend_dmht_ever = report.attended_by_disease(@attending.join(','), @dmht_ever.join(','))
-   @attend_dm_ever = report.attended_by_disease(@attending.join(','), @dm_ever.join(','))
-   @attend_asthma_ever = report.attended_by_disease(@attending.join(','), @asthma_ever.join(','))
-   @attend_epilepsy_ever = report.attended_by_disease(@attending.join(','), @epilepsy_ever.join(','))
-   @attend_cntl_ever = report.attended_by_disease(@attending.join(','), @controlled_ever.join(','))
+   @attend_ht_ever = report.attended_by_disease(@attending_in_quarter.join(','), @ht_ever.join(','))
+   @attend_dmht_ever = report.attended_by_disease(@attending_in_quarter.join(','), @dmht_ever.join(','))
+   @attend_dm_ever = report.attended_by_disease(@attending_in_quarter.join(','), @dm_ever.join(','))
+   @attend_asthma_ever = report.attended_by_disease(@attending_in_quarter.join(','), @asthma_ever.join(','))
+   @attend_epilepsy_ever = report.attended_by_disease(@attending_in_quarter.join(','), @epilepsy_ever.join(','))
+   @attend_cntl_ever = report.attended_by_disease(@attending_in_quarter.join(','), @controlled_ever.join(','))
 
    @prescribed_ht = report.medcation_prescribed(@attend_ht.join(','))
    @prescribed_dmht = report.medcation_prescribed(@attend_dmht.join(','))
