@@ -783,13 +783,14 @@ class CohortToolController < ApplicationController
        @transfer_out_ever = report.transfer_out_ever(ids_ever).uniq
        @stopped_treatment_ever = report.stopped_treatment_ever(ids_ever).uniq
        @dead_ever = report.dead_ever(ids_ever).uniq
-       @not_attend_ever = (report.not_attending_ever(ids_ever).uniq - (@transfer_out_ever + @stopped_treatment_ever + @dead_ever)).uniq
+       @not_attend_ever_prior = (report.not_attending_ever(ids_ever).uniq - (@transfer_out_ever + @stopped_treatment_ever + @dead_ever)).uniq
        @lost_followup_ever = (report.lost_followup_ever(ids_ever).uniq - report.not_attending_ever(ids_ever).uniq).uniq
 
-      @attending = (report.total_ever_registered.collect{|patient|patient.patient_id}.uniq  - (@not_attend_ever.uniq + @stopped_treatment_ever.uniq + @lost_followup_ever.uniq + @transfer_out_ever.uniq + @dead_ever.uniq))
+      @attending = (report.total_ever_registered.collect{|patient|patient.patient_id}.uniq  - (@not_attend_ever_prior.uniq + @stopped_treatment_ever.uniq + @lost_followup_ever.uniq + @transfer_out_ever.uniq + @dead_ever.uniq))
 
 
       @attending_in_quarter = (report.attendance_in_quarter(@attending) + (ids.split(",").map(&:to_i) rescue [])).uniq
+			@not_attend_ever = @attending - @attending_in_quarter
 
        bmi_female = report.bmi(ids, 'F')
        bmi_male = report.bmi(ids, 'M')

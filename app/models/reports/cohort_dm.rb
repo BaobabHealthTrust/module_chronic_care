@@ -15,7 +15,7 @@ class Reports::CohortDm
     @ht_encounter = EncounterType.find_by_name("DIABETES HYPERTENSION INITIAL VISIT").id
     @ep_encounter = EncounterType.find_by_name("EPILEPSY CLINIC VISIT").id
     #@as_encounter = EncounterType.find_by_name("CLINIC VISIT").id rescue ""
-
+		@end_date_stripped = @end_date.to_date.strftime("%Y-%m-%d")
 
     # Metformin And Glibenclamide
 		# Patients on metformin and glibenclamide: up to end date
@@ -1628,6 +1628,7 @@ raise @orders.length.to_yaml
                                     OR UCASE(p.gender) = '#{patient_initial}')"
       #joined = "INNER JOIN person pe ON pe.person_id = p.patient_id"
     end
+=begin
     @dead = PatientState.find_by_sql("SELECT DISTINCT p.patient_id FROM patients_on_chronic_care_program p
                 INNER JOIN  patient_program pp on pp.patient_id = p.patient_id
                 inner join patient_state ps on ps.patient_program_id = pp.patient_program_id
@@ -1636,6 +1637,12 @@ raise @orders.length.to_yaml
                 WHERE ps.start_date <= '#{@end_date}'
                 #{categorise} AND c.name = 'PATIENT DIED'
                 AND p.patient_id IN (#{ids})").collect{|p| p.patient_id.to_i} rescue []
+=end
+@dead = PatientState.find_by_sql("SELECT DISTINCT p.patient_id FROM patients_on_chronic_care_program p
+                                      WHERE p.patient_id IN (#{ids})
+                                      AND p.date_enrolled <= '#{@end_date}'
+                                      AND current_state_for_program(p.patient_id, #{@program_id}, '#{@end_date_stripped}') = 85 ").collect {|p| p.patient_id.to_i}  rescue []
+
   end
 
   def dead(ids, sex=nil)
@@ -1687,6 +1694,7 @@ raise @orders.length.to_yaml
                                     OR UCASE(pe.gender) = '#{patient_initial}')"
       joined = "INNER JOIN person pe ON pe.person_id = p.patient_id"
     end
+=begin
     @dead = PatientState.find_by_sql("SELECT DISTINCT p.patient_id FROM patient p
                 INNER JOIN  patient_program pp on pp.patient_id = p.patient_id #{joined}
                 inner join patient_state ps on ps.patient_program_id = pp.patient_program_id
@@ -1695,7 +1703,11 @@ raise @orders.length.to_yaml
                 WHERE ps.start_date <= '#{@end_date}'
                 #{categorise} AND p.patient_id IN (#{ids})
                 AND c.name = 'PATIENT TRANSFERRED OUT'").collect {|p| p.patient_id.to_i}  rescue []
-
+=end
+		@dead = PatientState.find_by_sql("SELECT DISTINCT p.patient_id FROM patients_on_chronic_care_program p
+                                      WHERE p.patient_id IN (#{ids})
+                                      AND p.date_enrolled <= '#{@end_date}'
+                                      AND current_state_for_program(p.patient_id, #{@program_id}, '#{@end_date_stripped}') = 84 ").collect {|p| p.patient_id.to_i}  rescue []
   end
 
   def transfer_out(ids, sex=nil)
@@ -1724,6 +1736,7 @@ raise @orders.length.to_yaml
                                     OR UCASE(p.gender) = '#{patient_initial}')"
       #joined = "INNER JOIN person pe ON pe.person_id = p.patient_id"
     end
+=begin
     @dead = PatientState.find_by_sql("SELECT DISTINCT p.patient_id FROM patients_on_chronic_care_program p
                 INNER JOIN  patient_program pp on pp.patient_id = p.patient_id
                 inner join patient_state ps on ps.patient_program_id = pp.patient_program_id
@@ -1732,7 +1745,11 @@ raise @orders.length.to_yaml
                 WHERE ps.start_date <= '#{@end_date}'
                 #{categorise} AND p.patient_id IN (#{ids})
                 AND c.name = 'TREATMENT STOPPED'").collect{|p| p.patient_id.to_i} rescue []
-
+=end
+		@dead = PatientState.find_by_sql("SELECT DISTINCT p.patient_id FROM patients_on_chronic_care_program p
+                                      WHERE p.patient_id IN (#{ids})
+                                      AND p.date_enrolled <= '#{@end_date}'
+                                      AND current_state_for_program(p.patient_id, #{@program_id}, '#{@end_date_stripped}') = 158 ").collect {|p| p.patient_id.to_i}  rescue []
   end
 
   def stopped_treatment(ids, sex=nil)
@@ -1883,7 +1900,7 @@ AND \
                         WHERE
                             concept_set IN (#{@asthma_id}, #{@epilepsy_id}, #{@diabetes_id}, #{@hypertensition_medication_id}))
                         AND start_date <= '#{@end_date}')) / 30 > 9	\
-                        AND current_state_for_program(patient_id, 10, '#{@end_date}') NOT IN (#{@states}) \
+                        AND current_state_for_program(patient_id, 10, '#{@end_date_stripped}') NOT IN (#{@states}) \
                         AND date_enrolled <= '#{@end_date}'")
   end
 
