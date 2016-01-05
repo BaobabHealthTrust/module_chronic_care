@@ -22,10 +22,11 @@ class Reports::CohortDm
 
 
     names = ["PATIENT DIED", "PATIENT TRANSFERRED OUT", "TREATMENT STOPPED"]
+    program_workflow_id = ProgramWorkflow.find_by_program_id(10).program_workflow_id
     @states = []
     names.each { |name|
       concept_name = ConceptName.find_all_by_name(name)
-      @states << ProgramWorkflowState.find(:first, :conditions => ["concept_id IN (?)",concept_name.map{|c|c.concept_id}] ).program_workflow_state_id
+      @states << ProgramWorkflowState.find(:first, :conditions => ["concept_id IN (?) AND program_workflow_id = ? ",concept_name.map{|c|c.concept_id}, program_workflow_id] ).program_workflow_state_id
     }
     @states = @states.join(',')
 
@@ -1815,7 +1816,7 @@ raise @orders.length.to_yaml
     states = states.join(',')
     @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders
                                       LEFT OUTER JOIN patients_on_chronic_care_program patient ON patient.patient_id = orders.patient_id #{joined} \
-                                      WHERE DATEDIFF('#{@end_date}', auto_expire_date)/30 > 2 \
+                                      WHERE DATEDIFF('#{@end_date}', auto_expire_date)/30 > 12 \
                                       AND patient.voided = 0
                                       AND current_state_for_program(orders.patient_id, #{@program_id}, '#{@end_date}') NOT IN (#{states})
                                       AND patient.patient_id IN (#{ids}) AND \
@@ -1884,11 +1885,9 @@ AND \
 																		concept_set IN (#{@asthma_id}, #{@epilepsy_id}, #{@diabetes_id}, #{@hypertensition_medication_id})) \
                                  GROUP BY patient_id").collect {|p| p.patient_id} rescue []
 =end
-		@orders = Order.find_by_sql("SELECT p.patient_id FROM patients_on_chronic_care_program p \
-				WHERE
-						DATEDIFF('#{@end_date}',
+		@orders = Order.find_by_sql("SELECT p.patient_id, DATEDIFF('#{@end_date}',
             (SELECT
-                    MAX(auto_expire_date)
+                    MAX(start_date)
                 FROM
                     orders
                 WHERE
@@ -1899,9 +1898,13 @@ AND \
                             concept_set
                         WHERE
                             concept_set IN (#{@asthma_id}, #{@epilepsy_id}, #{@diabetes_id}, #{@hypertensition_medication_id}))
-                        AND start_date <= '#{@end_date}')) / 30 > 9	\
-                        AND current_state_for_program(patient_id, 10, '#{@end_date_stripped}') NOT IN (#{@states}) \
-                        AND date_enrolled <= '#{@end_date}'")
+                        AND start_date <= '#{@end_date}')) / 30 AS date_diff,
+              current_state_for_program(p.patient_id, 10, '#{@end_date_stripped}') as current_state
+						 FROM patients_on_chronic_care_program p
+				WHERE
+						p.date_enrolled <= '#{@end_date}'
+						AND p.patient_id in (#{ids})
+				HAVING date_diff > 5 AND current_state NOT IN ('#{@states}')").map(&:patient_id).uniq rescue []
   end
 
   def attending(ids, sex=nil)
@@ -1935,7 +1938,7 @@ AND \
     states = states.join(',')
 
     @orders = Order.find_by_sql("SELECT orders.patient_id FROM orders LEFT OUTER JOIN patient ON
-                                        patient.patient_id = orders.patient_id WHERE DATEDIFF('#{@end_date}', auto_expire_date)/30 > 2
+                                        patient.patient_id = orders.patient_id WHERE DATEDIFF('#{@end_date}', auto_expire_date)/30 > 12
                                         AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') >= '" +
         @start_date + "' AND DATE_FORMAT(patient.date_created, '%Y-%m-%d') <= '" + @end_date + "'
                                         AND patient.voided = 0
@@ -2418,7 +2421,8 @@ AND \
     fasting = ConceptName.find_by_sql("select concept_id from concept_name where name = 'Fasting' and voided = 0").first.concept_id
     random = ConceptName.find_by_sql("select concept_id from concept_name where name = 'Random' and voided = 0").first.concept_id
 
-    sys_obs = Observation.find_by_sql("SELECT * from obs where concept_id IN ('#{fasting}, #{random}') AND person_id = #{patient_id}
+    #sys_obs = Observation.find_by_sql("SELECT * from obs where concept_id IN ('#{fasting}, #{random}') AND person_id = #{patient_id}
+    sys_obs = Observation.find_by_sql("SELECT * from obs where concept_id IN (6381) AND person_id = #{patient_id}
                     AND DATE(obs_datetime) <= '#{@end_date}' AND voided = 0
                     ORDER BY  obs_datetime DESC, date_created DESC") rescue []
 
