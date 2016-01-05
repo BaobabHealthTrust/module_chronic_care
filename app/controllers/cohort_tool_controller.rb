@@ -784,8 +784,9 @@ class CohortToolController < ApplicationController
        @stopped_treatment_ever = report.stopped_treatment_ever(ids_ever).uniq
        @dead_ever = report.dead_ever(ids_ever).uniq
        @not_attend_ever_prior = (report.not_attending_ever(ids_ever).uniq - (@transfer_out_ever + @stopped_treatment_ever + @dead_ever)).uniq
-       @lost_followup_ever = (report.lost_followup_ever(ids_ever).uniq - report.not_attending_ever(ids_ever).uniq).uniq
-
+       #@lost_followup_ever = (report.lost_followup_ever(ids_ever).uniq - report.not_attending_ever(ids_ever).uniq).uniq
+       @lost_followup_ever = (report.lost_followup_ever(ids_ever).uniq)
+       #raise @lost_followup_ever.length.to_yaml
       @attending = (report.total_ever_registered.collect{|patient|patient.patient_id}.uniq  - (@not_attend_ever_prior.uniq + @stopped_treatment_ever.uniq + @lost_followup_ever.uniq + @transfer_out_ever.uniq + @dead_ever.uniq))
 
 
